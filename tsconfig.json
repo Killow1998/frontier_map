@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": [
-      "esnext"
-    ],
-    "moduleResolution": "node",
+    "lib": ["esnext"],
+    "moduleResolution": "Node",
     "types": [
-      "wc3ts-1.27a/types",
+      "wc3ts-1.27a/types", 
       "lua-types/5.3",
       "lua-types/core/coroutine",
       "lua-types/core/global",
@@ -16,16 +14,16 @@
       "lua-types/core/string",
       "lua-types/core/table",
       "lua-types/core/os",
-      "@typescript-to-lua/language-extensions",
+      "@typescript-to-lua/language-extensions"
     ],
     "strict": true,
-    "allowJs": false,
+    "allowJs": false
   },
   "tstl": {
     "luaTarget": "5.3",
-    "noImplicitSelf": true,
     "noHeader": true,
-    "luaLibImport": "require",
+    "luaLibImport": "require-minimal", 
+    "noImplicitSelf": true,
     "sourceMapTraceback": false,
     "noResolvePaths": [
       "jass.common",
@@ -42,13 +40,15 @@
       "jass.message",
       "jass.bignum",
       "typescript",
-      "typescript-to-lua"
+      "typescript-to-lua",
+      "wc3ts-1.27a" ,
+      "wc3ts-1.27a/globals"
     ],
     "luaBundle": "maps/map/main.lua",
     "luaBundleEntry": "src/index.ts"
   },
   "include": [
-    "src/**/*",
-    "types/**/*"
+    "src",
+    "node_modules/wc3ts-1.27a/types" 
   ]
 }

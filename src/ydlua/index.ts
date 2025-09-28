@@ -1,4 +1,5 @@
 import { ConfigManager } from "../config";
+
 export const ydcommon = require("jass.common")
 export const ydai = require("jass.ai")
 export const ydglobals = require("jass.globals")
@@ -11,6 +12,13 @@ export const yddebug: Ijassdebug = require("jass.debug")
 export const ydlog = require("jass.log")
 export const ydmessage = require("jass.message")
 export const ydbignum = require("jass.bignum")
+
+
+export interface Ijassconsole {
+  enable: boolean;
+  read: (f: (...msg: any[]) => void) => void;
+  write: (...msg: any[]) => void;
+}
 
 export class ydlua {
 
@@ -76,7 +84,7 @@ export class ydlua {
 
     if (isConsoleEnabled) {
       // 设置全局 print 函数
-      _G["print"] = ydconsole.write;
+      _G["print"] = () => ydconsole.write();
       print('>>> Console enabled');
     }
   }
