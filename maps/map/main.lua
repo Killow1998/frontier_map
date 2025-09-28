@@ -2763,14 +2763,36 @@ local __TS__Await = ____lualib.__TS__Await
 ydConsole = require("jass.console")
 ydConsole.enable = true
 _G.print = ydConsole.write
+ydCommon = require("jass.common")
+_G.CreateUnit = ydCommon.CreateUnit
+_G.Player = ydCommon.Player
+_G.DisplayTextToPlayer = ydCommon.DisplayTextToPlayer
 --- 应用程序主入口
 -- 负责引导整个应用程序的启动
 function main()
     return __TS__AsyncAwaiter(function(____awaiter_resolve)
         print("hello ts")
+        print(Player(0))
+        DisplayTextToPlayer(
+            Player(0),
+            0,
+            0,
+            "hello ts"
+        )
     end)
 end
 main()
+ end,
+["src.ydlua.index"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+____exports.default = __TS__Class()
+local YDLua = ____exports.default
+YDLua.name = "YDLua"
+function YDLua.prototype.____constructor(self)
+end
+return ____exports
  end,
 }
 return require("src.index", ...)

@@ -6,7 +6,17 @@
     ],
     "moduleResolution": "bundler",
     "types": [
-      "lua-types/5.3"
+      "wc3ts-1.27a/types",
+      "lua-types/5.3",
+      "lua-types/core/coroutine",
+      "lua-types/core/global",
+      "lua-types/core/math",
+      "lua-types/core/metatable",
+      "lua-types/core/modules",
+      "lua-types/core/string",
+      "lua-types/core/table",
+      "lua-types/core/os",
+      "@typescript-to-lua/language-extensions",
     ],
     "strict": true
   },
