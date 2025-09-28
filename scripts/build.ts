@@ -82,7 +82,7 @@ function minifyLua(): void {
  */
 function compileTypeScriptToLua(): void {
   try {
-    execSync('tstl', { stdio: 'inherit' });
+    execSync('tstl -p tsconfig.json', { stdio: 'inherit' });
     console.log(">>> TypeScript to Lua compilation completed");
   } catch (error) {
     console.error("Error during TypeScript compilation:", error);

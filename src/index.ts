@@ -13,7 +13,7 @@ async function main(): Promise<void> {
   print("hello ts");
   DisplayTextToPlayer(Player(0), 0, 0, "hello ts");
 
-  Unit.create(Players[0], FourCC("hfoo"), 0, 0, 0);
+  //Unit.create(Players[0], FourCC("hfoo"), 0, 0, 0);
 
 
 }
