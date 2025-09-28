@@ -2756,42 +2756,180 @@ return {
   __TS__UsingAsync = __TS__UsingAsync
 }
  end,
+["src.types.index"] = function(...) 
+local ____exports = {}
+return ____exports
+ end,
+["src.config.index"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+--- 默认应用配置
+local DEFAULT_CONFIG = {debug = true, console = true, runtime = {debuggerPort = 4279, sleep = false, catchCrash = true}, map = {name = "WC3 TypeScript Map", version = "1.0.0", description = "A Warcraft III map built with TypeScript"}}
+--- 配置管理器
+-- 提供应用程序配置的统一管理
+____exports.ConfigManager = __TS__Class()
+local ConfigManager = ____exports.ConfigManager
+ConfigManager.name = "ConfigManager"
+function ConfigManager.prototype.____constructor(self)
+    self.config = __TS__ObjectAssign({}, DEFAULT_CONFIG)
+end
+function ConfigManager.getInstance(self)
+    if not ____exports.ConfigManager.instance then
+        ____exports.ConfigManager.instance = __TS__New(____exports.ConfigManager)
+    end
+    return ____exports.ConfigManager.instance
+end
+function ConfigManager.prototype.getConfig(self)
+    return __TS__ObjectAssign({}, self.config)
+end
+function ConfigManager.prototype.isDebugMode(self)
+    return self.config.debug
+end
+function ConfigManager.prototype.isConsoleEnabled(self)
+    return self.config.console
+end
+function ConfigManager.prototype.getRuntimeConfig(self)
+    return __TS__ObjectAssign({}, self.config.runtime)
+end
+function ConfigManager.prototype.getMapConfig(self)
+    return __TS__ObjectAssign({}, self.config.map)
+end
+function ConfigManager.prototype.updateConfig(self, updates)
+    self.config = __TS__ObjectAssign({}, self.config, updates)
+end
+function ConfigManager.prototype.resetToDefault(self)
+    self.config = __TS__ObjectAssign({}, DEFAULT_CONFIG)
+end
+return ____exports
+ end,
+["src.ydlua.index"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
+local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
+local ____exports = {}
+local ____config = require("src.config.index")
+local ConfigManager = ____config.ConfigManager
+____exports.ydcommon = require("jass.common")
+____exports.ydai = require("jass.ai")
+____exports.ydglobals = require("jass.globals")
+____exports.ydjapi = require("jass.japi")
+____exports.ydhook = require("jass.hook")
+____exports.ydruntime = require("jass.runtime")
+____exports.ydslk = require("jass.slk")
+____exports.ydconsole = require("jass.console")
+____exports.yddebug = require("jass.debug")
+____exports.ydlog = require("jass.log")
+____exports.ydmessage = require("jass.message")
+____exports.ydbignum = require("jass.bignum")
+____exports.ydlua = __TS__Class()
+local ydlua = ____exports.ydlua
+ydlua.name = "ydlua"
+function ydlua.prototype.____constructor(self)
+    self.configManager = ConfigManager:getInstance()
+end
+function ydlua.getInstance(self)
+    if not ____exports.ydlua.instance then
+        ____exports.ydlua.instance = __TS__New(____exports.ydlua)
+    end
+    return ____exports.ydlua.instance
+end
+function ydlua.prototype.initializeRuntime(self)
+    local config = self.configManager:getConfig()
+    local runtimeConfig = config.runtime
+    ____exports.ydruntime.console = config.console
+    ____exports.ydruntime.sleep = runtimeConfig.sleep
+    ____exports.ydruntime.debugger = runtimeConfig.debuggerPort
+    ____exports.ydruntime.catch_crash = runtimeConfig.catchCrash
+    ____exports.ydruntime.error_hanlde = function(self, msg)
+        print("========lua-err========")
+        print(tostring(msg))
+        print("=========================")
+    end
+    print(((">>> Runtime configured: debugger=" .. tostring(runtimeConfig.debuggerPort)) .. ", crash_catch=") .. tostring(runtimeConfig.catchCrash))
+end
+function ydlua.prototype.initialize(self)
+    self:initializeConsole()
+    self:initializeRuntime()
+    self:registerGlobals()
+end
+function ydlua.prototype.initializeConsole(self)
+    local isConsoleEnabled = self.configManager:isConsoleEnabled()
+    ____exports.ydconsole.enable = isConsoleEnabled
+    if isConsoleEnabled then
+        _G.print = ____exports.ydconsole.write
+        print(">>> Console enabled")
+    end
+end
+function ydlua.prototype.registerGlobals(self)
+    __TS__ArrayForEach(
+        __TS__ObjectKeys(____exports.ydcommon),
+        function(____, key)
+            _G[key] = ____exports.ydcommon[key]
+        end
+    )
+    __TS__ArrayForEach(
+        __TS__ObjectKeys(____exports.ydjapi),
+        function(____, key)
+            _G[key] = ____exports.ydjapi[key]
+        end
+    )
+    print(">>> Global APIs registered")
+end
+return ____exports
+ end,
+["src.utils.helper"] = function(...) 
+local ____exports = {}
+function ____exports.c2i(char)
+    return (string.unpack(">I4", char))
+end
+function ____exports.i2c(id)
+    return string.pack("I4", id)
+end
+function ____exports.FourCC(id)
+    return ____exports.c2i(id)
+end
+return ____exports
+ end,
 ["src.index"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
 local __TS__Await = ____lualib.__TS__Await
-ydConsole = require("jass.console")
-ydConsole.enable = true
-_G.print = ydConsole.write
-ydCommon = require("jass.common")
-_G.CreateUnit = ydCommon.CreateUnit
-_G.Player = ydCommon.Player
-_G.DisplayTextToPlayer = ydCommon.DisplayTextToPlayer
+local ____exports = {}
+local ____wc3ts_2D1_2E27a = require("src.wc3ts-1.27a")
+local Unit = ____wc3ts_2D1_2E27a.Unit
+local ____ydlua = require("src.ydlua.index")
+local ydlua = ____ydlua.ydlua
+local ____globals = require("src.wc3ts-1.27a.globals")
+local Players = ____globals.Players
+local ____helper = require("src.utils.helper")
+local FourCC = ____helper.FourCC
 --- 应用程序主入口
 -- 负责引导整个应用程序的启动
-function main()
+local function main()
     return __TS__AsyncAwaiter(function(____awaiter_resolve)
         print("hello ts")
-        print(Player(0))
         DisplayTextToPlayer(
             Player(0),
             0,
             0,
             "hello ts"
         )
+        Unit:create(
+            Players[1],
+            FourCC("hfoo"),
+            0,
+            0,
+            0
+        )
     end)
 end
+ydlua:getInstance():initialize()
 main()
- end,
-["src.ydlua.index"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
-____exports.default = __TS__Class()
-local YDLua = ____exports.default
-YDLua.name = "YDLua"
-function YDLua.prototype.____constructor(self)
-end
 return ____exports
  end,
 }

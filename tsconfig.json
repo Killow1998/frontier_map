@@ -4,7 +4,7 @@
     "lib": [
       "esnext"
     ],
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "types": [
       "wc3ts-1.27a/types",
       "lua-types/5.3",
@@ -18,12 +18,15 @@
       "lua-types/core/os",
       "@typescript-to-lua/language-extensions",
     ],
-    "strict": true
+    "strict": true,
+    "allowJs": false,
   },
   "tstl": {
     "luaTarget": "5.3",
     "noImplicitSelf": true,
     "noHeader": true,
+    "luaLibImport": "require",
+    "sourceMapTraceback": false,
     "noResolvePaths": [
       "jass.common",
       "jass.ai",
@@ -37,7 +40,9 @@
       "jass.log",
       "jass.runtime",
       "jass.message",
-      "jass.bignum"
+      "jass.bignum",
+      "typescript",
+      "typescript-to-lua"
     ],
     "luaBundle": "maps/map/main.lua",
     "luaBundleEntry": "src/index.ts"
