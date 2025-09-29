@@ -2884,64 +2884,18 @@ return ____exports
  end,
 ["src.utils.helper"] = function(...) 
 local ____exports = {}
-function ____exports.c2i(self, char)
+function ____exports.c2i(char)
     return (string.unpack(">I4", char))
 end
-function ____exports.i2c(self, id)
+function ____exports.i2c(id)
     return string.pack("I4", id)
 end
-function ____exports.FourCC(self, id)
-    return ____exports.c2i(nil, id)
+function ____exports.FourCC(id)
+    return ____exports.c2i(id)
 end
 return ____exports
  end,
-["src.index"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
-local __TS__Await = ____lualib.__TS__Await
-local ____exports = {}
-local ____ydlua = require("src.ydlua.index")
-local ydlua = ____ydlua.ydlua
-local ____tstl_2Ddamage_2Dcalculator = require("src.tstl-damage-calculator")
-local DamageCalculator = ____tstl_2Ddamage_2Dcalculator.DamageCalculator
-local DamageType = ____tstl_2Ddamage_2Dcalculator.DamageType
---- 应用程序主入口
--- 负责引导整个应用程序的启动
-local function main(self)
-    return __TS__AsyncAwaiter(function(____awaiter_resolve)
-        print("hello ts")
-        DisplayTextToPlayer(
-            Player(0),
-            0,
-            0,
-            "hello ts"
-        )
-        local attacker = {
-            attack = 100,
-            magicPower = 80,
-            armor = 50,
-            magicResist = 30,
-            criticalChance = 0.25,
-            criticalDamage = 1.5
-        }
-        local defender = {
-            attack = 60,
-            magicPower = 40,
-            armor = 80,
-            magicResist = 60,
-            criticalChance = 0.1,
-            criticalDamage = 1.3
-        }
-        local result = DamageCalculator:calculateDamage(attacker, defender, DamageType.Physical)
-        print("最终伤害: " .. tostring(result.finalDamage))
-        print("是否暴击: " .. tostring(result.isCritical))
-    end)
-end
-ydlua:getInstance():initialize()
-main(nil)
-return ____exports
- end,
-["lua_modules.@eiriksgata.wc3ts.handles.handle"] = function(...) 
+["temp.handles.handle"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local WeakMap = ____lualib.WeakMap
 local __TS__New = ____lualib.__TS__New
@@ -2981,7 +2935,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.force"] = function(...) 
+["temp.handles.force"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -2993,9 +2947,9 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
-local ____player = require("lua_modules.@eiriksgata.wc3ts.handles.player")
+local ____player = require("temp.handles.player")
 local MapPlayer = ____player.MapPlayer
 ____exports.Force = __TS__Class()
 local Force = ____exports.Force
@@ -3091,7 +3045,7 @@ function Force.fromHandle(self, handle)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.point"] = function(...) 
+["temp.handles.point"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -3104,7 +3058,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Point = __TS__Class()
 local Point = ____exports.Point
@@ -3179,7 +3133,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.player"] = function(...) 
+["temp.handles.player"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -3192,7 +3146,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.MapPlayer = __TS__Class()
 local MapPlayer = ____exports.MapPlayer
@@ -3492,7 +3446,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.globals.define"] = function(...) 
+["temp.globals.define"] = function(...) 
 local ____exports = {}
 ____exports.MAP_SPEED_NORMAL = function() return ConvertGameSpeed(2) end
 ____exports.bj_PI = math.pi
@@ -4373,18 +4327,18 @@ ____exports.TEXT_ALIGN_BOTTOM = 20
 ____exports.TEXT_ALIGN_RIGHT_BOTTOM = 36
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.globals.order"] = function(...) 
+["temp.globals.order"] = function(...) 
 local ____exports = {}
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.globals.index"] = function(...) 
+["temp.globals.index"] = function(...) 
 local ____exports = {}
-local ____player = require("lua_modules.@eiriksgata.wc3ts.handles.player")
+local ____player = require("temp.handles.player")
 local MapPlayer = ____player.MapPlayer
-local ____define = require("lua_modules.@eiriksgata.wc3ts.globals.define")
+local ____define = require("temp.globals.define")
 local bj_MAX_PLAYER_SLOTS = ____define.bj_MAX_PLAYER_SLOTS
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.globals.order")
+    local ____export = require("temp.globals.order")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -4404,7 +4358,7 @@ do
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.camera"] = function(...) 
+["temp.handles.camera"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ObjectDefineProperty = ____lualib.__TS__ObjectDefineProperty
@@ -4419,9 +4373,9 @@ local __TS__New = ____lualib.__TS__New
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
-local ____point = require("lua_modules.@eiriksgata.wc3ts.handles.point")
+local ____point = require("temp.handles.point")
 local Point = ____point.Point
 ____exports.Camera = __TS__Class()
 local Camera = ____exports.Camera
@@ -4734,13 +4688,13 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.widget"] = function(...) 
+["temp.handles.widget"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Widget = __TS__Class()
 local Widget = ____exports.Widget
@@ -4789,7 +4743,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.destructable"] = function(...) 
+["temp.handles.destructable"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -4802,9 +4756,9 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
-local ____widget = require("lua_modules.@eiriksgata.wc3ts.handles.widget")
+local ____widget = require("temp.handles.widget")
 local Widget = ____widget.Widget
 ____exports.Destructable = __TS__Class()
 local Destructable = ____exports.Destructable
@@ -5013,7 +4967,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.dialog"] = function(...) 
+["temp.handles.dialog"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -5025,7 +4979,7 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.DialogButton = __TS__Class()
 local DialogButton = ____exports.DialogButton
@@ -5182,7 +5136,7 @@ function Dialog.fromHandle(self, handle)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.effect"] = function(...) 
+["temp.handles.effect"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -5195,7 +5149,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Effect = __TS__Class()
 local Effect = ____exports.Effect
@@ -5266,82 +5220,64 @@ function Effect.createSpellAttachment(self, abilityId, effectType, targetWidget,
     return nil
 end
 function Effect.prototype.addSubAnimation(self, subAnim)
-    BlzSpecialEffectAddSubAnimation(nil, self.handle, subAnim)
+    BlzSpecialEffectAddSubAnimation(self.handle, subAnim)
 end
 function Effect.prototype.clearSubAnimations(self)
-    BlzSpecialEffectClearSubAnimations(nil, self.handle)
+    BlzSpecialEffectClearSubAnimations(self.handle)
 end
 function Effect.prototype.destroy(self)
     DestroyEffect(self.handle)
 end
 function Effect.prototype.playAnimation(self, animType)
-    BlzPlaySpecialEffect(nil, self.handle, animType)
+    BlzPlaySpecialEffect(self.handle, animType)
 end
 function Effect.prototype.playWithTimeScale(self, animType, timeScale)
-    BlzPlaySpecialEffectWithTimeScale(nil, self.handle, animType, timeScale)
+    BlzPlaySpecialEffectWithTimeScale(self.handle, animType, timeScale)
 end
 function Effect.prototype.removeSubAnimation(self, subAnim)
-    BlzSpecialEffectRemoveSubAnimation(nil, self.handle, subAnim)
+    BlzSpecialEffectRemoveSubAnimation(self.handle, subAnim)
 end
 function Effect.prototype.resetScaleMatrix(self)
     EXEffectMatReset(self.handle)
 end
 function Effect.prototype.setAlpha(self, alpha)
-    BlzSetSpecialEffectAlpha(nil, self.handle, alpha)
+    BlzSetSpecialEffectAlpha(self.handle, alpha)
 end
 function Effect.prototype.setColor(self, red, green, blue)
-    BlzSetSpecialEffectColor(
-        nil,
-        self.handle,
-        red,
-        green,
-        blue
-    )
+    BlzSetSpecialEffectColor(self.handle, red, green, blue)
 end
 function Effect.prototype.setColorByPlayer(self, whichPlayer)
-    BlzSetSpecialEffectColorByPlayer(nil, self.handle, whichPlayer.handle)
+    BlzSetSpecialEffectColorByPlayer(self.handle, whichPlayer.handle)
 end
 function Effect.prototype.setHeight(self, height)
-    BlzSetSpecialEffectHeight(nil, self.handle, height)
+    BlzSetSpecialEffectHeight(self.handle, height)
 end
 function Effect.prototype.setOrientation(self, yaw, pitch, roll)
-    BlzSetSpecialEffectOrientation(
-        nil,
-        self.handle,
-        yaw,
-        pitch,
-        roll
-    )
+    BlzSetSpecialEffectOrientation(self.handle, yaw, pitch, roll)
 end
 function Effect.prototype.setPitch(self, pitch)
-    BlzSetSpecialEffectPitch(nil, self.handle, pitch)
+    BlzSetSpecialEffectPitch(self.handle, pitch)
 end
 function Effect.prototype.setPoint(self, p)
-    BlzSetSpecialEffectPositionLoc(nil, self.handle, p.handle)
+    BlzSetSpecialEffectPositionLoc(self.handle, p.handle)
 end
 function Effect.prototype.setPosition(self, x, y, z)
-    BlzSetSpecialEffectPosition(
-        nil,
-        self.handle,
-        x,
-        y,
-        z
-    )
+    BlzSetSpecialEffectPosition(self.handle, x, y, z)
 end
 function Effect.prototype.setRoll(self, roll)
-    BlzSetSpecialEffectRoll(nil, self.handle, roll)
+    BlzSetSpecialEffectRoll(self.handle, roll)
 end
 function Effect.prototype.setScaleMatrix(self, x, y, z)
     EXEffectMatScale(self.handle, x, y, z)
 end
 function Effect.prototype.setTime(self, value)
-    BlzSetSpecialEffectTime(nil, self.handle, value)
+    BlzSetSpecialEffectTime(self.handle, value)
 end
 function Effect.prototype.setTimeScale(self, timeScale)
-    BlzSetSpecialEffectTimeScale(nil, self.handle, timeScale)
+    BlzSetSpecialEffectTimeScale(self.handle, timeScale)
 end
 function Effect.prototype.setYaw(self, y)
-    BlzSetSpecialEffectYaw(nil, self.handle, y)
+    BlzSetSpecialEffectYaw(self.handle, y)
 end
 function Effect.fromHandle(self, handle)
     local ____handle_0
@@ -5406,7 +5342,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.rect"] = function(...) 
+["temp.handles.rect"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -5419,7 +5355,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Rectangle = __TS__Class()
 local Rectangle = ____exports.Rectangle
@@ -5543,7 +5479,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.fogmodifier"] = function(...) 
+["temp.handles.fogmodifier"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -5555,7 +5491,7 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.FogModifier = __TS__Class()
 local FogModifier = ____exports.FogModifier
@@ -5627,7 +5563,7 @@ function FogModifier.fromRect(self, forWhichPlayer, whichState, where, useShared
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.frame"] = function(...) 
+["temp.handles.frame"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -5640,7 +5576,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 --- Warcraft III's UI uses a proprietary format known as FDF (Frame Definition Files).
 -- This class provides the ability to manipulate and create them dynamically through code.
@@ -5737,7 +5673,7 @@ function Frame.createType(self, name, owner, createContext, typeName, inherits)
     return nil
 end
 function Frame.prototype.addText(self, text)
-    BlzFrameAddText(nil, self.handle, text)
+    BlzFrameAddText(self.handle, text)
     return self
 end
 function Frame.prototype.cageMouse(self, enable)
@@ -5757,7 +5693,7 @@ function Frame.prototype.destroy(self)
     return self
 end
 function Frame.prototype.getChild(self, index)
-    return ____exports.Frame:fromHandle(BlzFrameGetChild(nil, self.handle, index))
+    return ____exports.Frame:fromHandle(BlzFrameGetChild(self.handle, index))
 end
 function Frame.prototype.setAbsPoint(self, point, x, y)
     DzFrameSetAbsolutePoint(self.handle, point, x, y)
@@ -5788,7 +5724,7 @@ function Frame.prototype.setHeight(self, height)
     return self
 end
 function Frame.prototype.setLevel(self, level)
-    BlzFrameSetLevel(nil, self.handle, level)
+    BlzFrameSetLevel(self.handle, level)
     return self
 end
 function Frame.prototype.setMinMaxValue(self, minValue, maxValue)
@@ -5830,11 +5766,11 @@ function Frame.prototype.setSize(self, width, height)
     return self
 end
 function Frame.prototype.setSpriteAnimate(self, primaryProp, flags)
-    BlzFrameSetSpriteAnimate(nil, self.handle, primaryProp, flags)
+    BlzFrameSetSpriteAnimate(self.handle, primaryProp, flags)
     return self
 end
 function Frame.prototype.setStepSize(self, stepSize)
-    DzFrameSetStepSize(nil, self.handle, stepSize)
+    DzFrameSetStepSize(self.handle, stepSize)
     return self
 end
 function Frame.prototype.setText(self, text)
@@ -5842,7 +5778,7 @@ function Frame.prototype.setText(self, text)
     return self
 end
 function Frame.prototype.setTextColor(self, color)
-    BlzFrameSetTextColor(nil, self.handle, color)
+    BlzFrameSetTextColor(self.handle, color)
     return self
 end
 function Frame.prototype.setTextSizeLimit(self, size)
@@ -5854,7 +5790,7 @@ function Frame.prototype.setTexture(self, texFile, flag, blend)
     return self
 end
 function Frame.prototype.setTooltip(self, tooltip)
-    BlzFrameSetTooltip(nil, self.handle, tooltip.handle)
+    BlzFrameSetTooltip(self.handle, tooltip.handle)
     return self
 end
 function Frame.prototype.setValue(self, value)
@@ -5874,10 +5810,10 @@ function Frame.prototype.setWidth(self, width)
     return self
 end
 function Frame.autoPosition(self, enable)
-    BlzEnableUIAutoPosition(nil, enable)
+    BlzEnableUIAutoPosition(enable)
 end
 function Frame.fromEvent(self)
-    return self:fromHandle(BlzGetTriggerFrame(nil))
+    return self:fromHandle(BlzGetTriggerFrame())
 end
 function Frame.fromHandle(self, handle)
     local ____handle_0
@@ -5892,19 +5828,19 @@ function Frame.fromName(self, name, createContext)
     return self:fromHandle(DzFrameFindByName(name, createContext))
 end
 function Frame.fromOrigin(self, frameType, index)
-    return self:fromHandle(BlzGetOriginFrame(nil, frameType, index))
+    return self:fromHandle(BlzGetOriginFrame(frameType, index))
 end
 function Frame.getEventHandle(self)
-    return BlzGetTriggerFrameEvent(nil)
+    return BlzGetTriggerFrameEvent()
 end
 function Frame.getEventText(self)
-    return BlzGetTriggerFrameValue(nil)
+    return BlzGetTriggerFrameValue()
 end
 function Frame.getEventValue(self)
-    return BlzGetTriggerFrameValue(nil)
+    return BlzGetTriggerFrameValue()
 end
 function Frame.hideOrigin(self, enable)
-    BlzHideOriginFrames(nil, enable)
+    BlzHideOriginFrames(enable)
 end
 function Frame.loadTOC(self, filename)
     return DzLoadToc(filename)
@@ -5946,7 +5882,7 @@ __TS__SetDescriptor(
     Frame.prototype,
     "childrenCount",
     {get = function(self)
-        return BlzFrameGetChildrenCount(nil, self.handle)
+        return BlzFrameGetChildrenCount(self.handle)
     end},
     true
 )
@@ -6033,7 +5969,7 @@ __TS__SetDescriptor(
     "visible",
     {
         get = function(self)
-            return BlzFrameIsVisible(nil, self.handle)
+            return BlzFrameIsVisible(self.handle)
         end,
         set = function(self, flag)
             DzFrameShow(self.handle, flag)
@@ -6046,7 +5982,7 @@ __TS__SetDescriptor(
     "width",
     {
         get = function(self)
-            return BlzFrameGetWidth(nil, self.handle)
+            return BlzFrameGetWidth(self.handle)
         end,
         set = function(self, width)
             DzFrameSetSize(self.handle, width, self.height)
@@ -6056,7 +5992,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.gamecache"] = function(...) 
+["temp.handles.gamecache"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -6069,7 +6005,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.GameCache = __TS__Class()
 local GameCache = ____exports.GameCache
@@ -6203,7 +6139,7 @@ local function ____error(arg0, arg1)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.item"] = function(...) 
+["temp.handles.item"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -6217,9 +6153,9 @@ local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__StringSubstr = ____lualib.__TS__StringSubstr
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
-local ____widget = require("lua_modules.@eiriksgata.wc3ts.handles.widget")
+local ____widget = require("temp.handles.widget")
 local Widget = ____widget.Widget
 ____exports.Item = __TS__Class()
 local Item = ____exports.Item
@@ -6247,16 +6183,16 @@ function Item.create(self, itemId, x, y)
     return nil
 end
 function Item.prototype.addAbility(self, abilCode)
-    BlzItemAddAbility(nil, self.handle, abilCode)
+    BlzItemAddAbility(self.handle, abilCode)
 end
 function Item.prototype.getAbility(self, abilCode)
-    return BlzGetItemAbility(nil, self.handle, abilCode)
+    return BlzGetItemAbility(self.handle, abilCode)
 end
 function Item.prototype.getAbilityByIndex(self, index)
-    return BlzGetItemAbilityByIndex(nil, self.handle, index)
+    return BlzGetItemAbilityByIndex(self.handle, index)
 end
 function Item.prototype.removeAbility(self, abilCode)
-    BlzItemRemoveAbility(nil, self.handle, abilCode)
+    BlzItemRemoveAbility(self.handle, abilCode)
 end
 function Item.prototype.destroy(self)
     RemoveItem(self.handle)
@@ -6276,19 +6212,19 @@ function Item.prototype.getField(self, field)
         local ____switch13 = fieldType
         local ____cond13 = ____switch13 == "unitbooleanfield"
         if ____cond13 then
-            return BlzGetItemBooleanField(nil, self.handle, field)
+            return BlzGetItemBooleanField(self.handle, field)
         end
         ____cond13 = ____cond13 or ____switch13 == "unitintegerfield"
         if ____cond13 then
-            return BlzGetItemIntegerField(nil, self.handle, field)
+            return BlzGetItemIntegerField(self.handle, field)
         end
         ____cond13 = ____cond13 or ____switch13 == "unitrealfield"
         if ____cond13 then
-            return BlzGetItemRealField(nil, self.handle, field)
+            return BlzGetItemRealField(self.handle, field)
         end
         ____cond13 = ____cond13 or ____switch13 == "unitstringfield"
         if ____cond13 then
-            return BlzGetItemStringField(nil, self.handle, field)
+            return BlzGetItemStringField(self.handle, field)
         end
         do
             return 0
@@ -6328,16 +6264,16 @@ function Item.prototype.setField(self, field, value)
         ) or 0) - 1
     )
     if fieldType == "unitbooleanfield" and type(value) == "boolean" then
-        return BlzSetItemBooleanField(nil, self.handle, field, value)
+        return BlzSetItemBooleanField(self.handle, field, value)
     end
     if fieldType == "unitintegerfield" and type(value) == "number" then
-        return BlzSetItemIntegerField(nil, self.handle, field, value)
+        return BlzSetItemIntegerField(self.handle, field, value)
     end
     if fieldType == "unitrealfield" and type(value) == "number" then
-        return BlzSetItemRealField(nil, self.handle, field, value)
+        return BlzSetItemRealField(self.handle, field, value)
     end
     if fieldType == "unitstringfield" and type(value) == "string" then
-        return BlzSetItemStringField(nil, self.handle, field, value)
+        return BlzSetItemStringField(self.handle, field, value)
     end
     return false
 end
@@ -6410,14 +6346,14 @@ __TS__SetDescriptor(
     "extendedTooltip",
     {
         get = function(self)
-            local ____BlzGetItemExtendedTooltip_result_1 = BlzGetItemExtendedTooltip(nil, self.handle)
+            local ____BlzGetItemExtendedTooltip_result_1 = BlzGetItemExtendedTooltip(self.handle)
             if ____BlzGetItemExtendedTooltip_result_1 == nil then
                 ____BlzGetItemExtendedTooltip_result_1 = ""
             end
             return ____BlzGetItemExtendedTooltip_result_1
         end,
         set = function(self, tooltip)
-            BlzSetItemExtendedTooltip(nil, self.handle, tooltip)
+            BlzSetItemExtendedTooltip(self.handle, tooltip)
         end
     },
     true
@@ -6427,14 +6363,14 @@ __TS__SetDescriptor(
     "icon",
     {
         get = function(self)
-            local ____BlzGetItemIconPath_result_2 = BlzGetItemIconPath(nil, self.handle)
+            local ____BlzGetItemIconPath_result_2 = BlzGetItemIconPath(self.handle)
             if ____BlzGetItemIconPath_result_2 == nil then
                 ____BlzGetItemIconPath_result_2 = ""
             end
             return ____BlzGetItemIconPath_result_2
         end,
         set = function(self, path)
-            BlzSetItemIconPath(nil, self.handle, path)
+            BlzSetItemIconPath(self.handle, path)
         end
     },
     true
@@ -6447,7 +6383,7 @@ __TS__SetDescriptor(
             return GetItemName(self.handle) or ""
         end,
         set = function(self, value)
-            BlzSetItemName(nil, self.handle, value)
+            BlzSetItemName(self.handle, value)
         end
     },
     true
@@ -6457,14 +6393,14 @@ __TS__SetDescriptor(
     "tooltip",
     {
         get = function(self)
-            local ____BlzGetItemTooltip_result_3 = BlzGetItemTooltip(nil, self.handle)
+            local ____BlzGetItemTooltip_result_3 = BlzGetItemTooltip(self.handle)
             if ____BlzGetItemTooltip_result_3 == nil then
                 ____BlzGetItemTooltip_result_3 = ""
             end
             return ____BlzGetItemTooltip_result_3
         end,
         set = function(self, tooltip)
-            BlzSetItemTooltip(nil, self.handle, tooltip)
+            BlzSetItemTooltip(self.handle, tooltip)
         end
     },
     true
@@ -6560,7 +6496,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.sound"] = function(...) 
+["temp.handles.sound"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -6573,7 +6509,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Sound = __TS__Class()
 local Sound = ____exports.Sound
@@ -6707,7 +6643,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.unit"] = function(...) 
+["temp.handles.unit"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -6720,19 +6656,19 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____destructable = require("lua_modules.@eiriksgata.wc3ts.handles.destructable")
+local ____destructable = require("temp.handles.destructable")
 local Destructable = ____destructable.Destructable
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
-local ____item = require("lua_modules.@eiriksgata.wc3ts.handles.item")
+local ____item = require("temp.handles.item")
 local Item = ____item.Item
-local ____player = require("lua_modules.@eiriksgata.wc3ts.handles.player")
+local ____player = require("temp.handles.player")
 local MapPlayer = ____player.MapPlayer
-local ____point = require("lua_modules.@eiriksgata.wc3ts.handles.point")
+local ____point = require("temp.handles.point")
 local Point = ____point.Point
-local ____widget = require("lua_modules.@eiriksgata.wc3ts.handles.widget")
+local ____widget = require("temp.handles.widget")
 local Widget = ____widget.Widget
-local ____define = require("lua_modules.@eiriksgata.wc3ts.globals.define")
+local ____define = require("temp.globals.define")
 local bj_UNIT_FACING = ____define.bj_UNIT_FACING
 local UNIT_STATE_ATTACK_BONUS = ____define.UNIT_STATE_ATTACK_BONUS
 local UNIT_STATE_ATTACK_SPACE = ____define.UNIT_STATE_ATTACK_SPACE
@@ -6957,7 +6893,7 @@ end
 function Unit.prototype.isAlive(self)
     return not IsUnitType(
         self.handle,
-        UNIT_TYPE_DEAD(nil)
+        UNIT_TYPE_DEAD()
     )
 end
 function Unit.prototype.isAlly(self, whichPlayer)
@@ -7174,13 +7110,13 @@ function Unit.prototype.setAnimationWithRarity(self, whichAnimation, rarity)
 end
 function Unit.prototype.setBaseDamageJAPI(self, baseDamage)
     self:setState(
-        UNIT_STATE_ATTACK_WHITE(nil),
+        UNIT_STATE_ATTACK_WHITE(),
         baseDamage
     )
 end
 function Unit.prototype.setBonusDamageJAPI(self, bonusDamage)
     self:setState(
-        UNIT_STATE_ATTACK_BONUS(nil),
+        UNIT_STATE_ATTACK_BONUS(),
         bonusDamage
     )
 end
@@ -7255,13 +7191,13 @@ function Unit.prototype.setTimeScale(self, timeScale)
 end
 function Unit.prototype.setUnitAttackCooldownJAPI(self, cooldown)
     self:setState(
-        UNIT_STATE_ATTACK_SPACE(nil),
+        UNIT_STATE_ATTACK_SPACE(),
         cooldown
     )
 end
 function Unit.prototype.setUnitAttackSpeedJAPI(self, attacksPerSecond)
     self:setState(
-        UNIT_STATE_ATTACK_SPEED(nil),
+        UNIT_STATE_ATTACK_SPEED(),
         attacksPerSecond
     )
 end
@@ -7385,13 +7321,13 @@ __TS__SetDescriptor(
         get = function(self)
             return GetUnitState(
                 self.handle,
-                UNIT_STATE_DEFEND_WHITE(nil)
+                UNIT_STATE_DEFEND_WHITE()
             )
         end,
         set = function(self, armorAmount)
             SetUnitState(
                 self.handle,
-                UNIT_STATE_DEFEND_WHITE(nil),
+                UNIT_STATE_DEFEND_WHITE(),
                 armorAmount
             )
         end
@@ -7559,11 +7495,11 @@ __TS__SetDescriptor(
     "mana",
     {
         get = function(self)
-            return self:getState(UNIT_STATE_MANA(nil))
+            return self:getState(UNIT_STATE_MANA())
         end,
         set = function(self, value)
             self:setState(
-                UNIT_STATE_MANA(nil),
+                UNIT_STATE_MANA(),
                 value
             )
         end
@@ -7575,11 +7511,11 @@ __TS__SetDescriptor(
     "maxLife",
     {
         get = function(self)
-            return self:getState(UNIT_STATE_MAX_LIFE(nil))
+            return self:getState(UNIT_STATE_MAX_LIFE())
         end,
         set = function(self, value)
             self:setState(
-                UNIT_STATE_MAX_LIFE(nil),
+                UNIT_STATE_MAX_LIFE(),
                 value
             )
         end
@@ -7591,11 +7527,11 @@ __TS__SetDescriptor(
     "maxMana",
     {
         get = function(self)
-            return self:getState(UNIT_STATE_MAX_MANA(nil))
+            return self:getState(UNIT_STATE_MAX_MANA())
         end,
         set = function(self, value)
             self:setState(
-                UNIT_STATE_MAX_MANA(nil),
+                UNIT_STATE_MAX_MANA(),
                 value
             )
         end
@@ -7868,7 +7804,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.group"] = function(...) 
+["temp.handles.group"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -7881,9 +7817,9 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
-local ____unit = require("lua_modules.@eiriksgata.wc3ts.handles.unit")
+local ____unit = require("temp.handles.unit")
 local Unit = ____unit.Unit
 ____exports.Group = __TS__Class()
 local Group = ____exports.Group
@@ -8089,7 +8025,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.image"] = function(...) 
+["temp.handles.image"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -8101,7 +8037,7 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.ImageType = ImageType or ({})
 ____exports.ImageType.Selection = 1
@@ -8202,7 +8138,7 @@ function Image.fromHandle(self, handle)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.leaderboard"] = function(...) 
+["temp.handles.leaderboard"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -8215,7 +8151,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Leaderboard = __TS__Class()
 local Leaderboard = ____exports.Leaderboard
@@ -8421,7 +8357,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.multiboard"] = function(...) 
+["temp.handles.multiboard"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -8434,7 +8370,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.MultiboardItem = __TS__Class()
 local MultiboardItem = ____exports.MultiboardItem
@@ -8622,7 +8558,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.quest"] = function(...) 
+["temp.handles.quest"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -8635,7 +8571,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.QuestItem = __TS__Class()
 local QuestItem = ____exports.QuestItem
@@ -8806,7 +8742,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.region"] = function(...) 
+["temp.handles.region"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -8818,7 +8754,7 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Region = __TS__Class()
 local Region = ____exports.Region
@@ -8886,7 +8822,7 @@ function Region.fromHandle(self, handle)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.texttag"] = function(...) 
+["temp.handles.texttag"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -8898,9 +8834,9 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____define = require("lua_modules.@eiriksgata.wc3ts.globals.define")
+local ____define = require("temp.globals.define")
 local bj_DEGTORAD = ____define.bj_DEGTORAD
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.TextTag = __TS__Class()
 local TextTag = ____exports.TextTag
@@ -8993,7 +8929,7 @@ function TextTag.fromHandle(self, handle)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.timer"] = function(...) 
+["temp.handles.timer"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -9006,7 +8942,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Timer = __TS__Class()
 local Timer = ____exports.Timer
@@ -9084,7 +9020,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.timerdialog"] = function(...) 
+["temp.handles.timerdialog"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -9097,7 +9033,7 @@ local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.TimerDialog = __TS__Class()
 local TimerDialog = ____exports.TimerDialog
@@ -9178,7 +9114,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.trigger"] = function(...) 
+["temp.handles.trigger"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -9192,9 +9128,9 @@ local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local __TS__ObjectDefineProperty = ____lualib.__TS__ObjectDefineProperty
 local ____exports = {}
-local ____define = require("lua_modules.@eiriksgata.wc3ts.globals.define")
+local ____define = require("temp.globals.define")
 local bj_MAX_PLAYER_SLOTS = ____define.bj_MAX_PLAYER_SLOTS
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Trigger = __TS__Class()
 local Trigger = ____exports.Trigger
@@ -9454,7 +9390,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.ubersplat"] = function(...) 
+["temp.handles.ubersplat"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -9466,7 +9402,7 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.Ubersplat = __TS__Class()
 local Ubersplat = ____exports.Ubersplat
@@ -9546,7 +9482,7 @@ function Ubersplat.fromHandle(self, handle)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.weathereffect"] = function(...) 
+["temp.handles.weathereffect"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -9558,7 +9494,7 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+local ____handle = require("temp.handles.handle")
 local Handle = ____handle.Handle
 ____exports.WeatherEffect = __TS__Class()
 local WeatherEffect = ____exports.WeatherEffect
@@ -9596,10 +9532,10 @@ function WeatherEffect.fromHandle(self, handle)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.handles.index"] = function(...) 
+["temp.handles.index"] = function(...) 
 local ____exports = {}
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.camera")
+    local ____export = require("temp.handles.camera")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9607,7 +9543,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.destructable")
+    local ____export = require("temp.handles.destructable")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9615,7 +9551,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.dialog")
+    local ____export = require("temp.handles.dialog")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9623,7 +9559,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.effect")
+    local ____export = require("temp.handles.effect")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9631,7 +9567,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.fogmodifier")
+    local ____export = require("temp.handles.fogmodifier")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9639,7 +9575,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.force")
+    local ____export = require("temp.handles.force")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9647,7 +9583,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.frame")
+    local ____export = require("temp.handles.frame")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9655,7 +9591,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.gamecache")
+    local ____export = require("temp.handles.gamecache")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9663,7 +9599,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.group")
+    local ____export = require("temp.handles.group")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9671,7 +9607,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.handle")
+    local ____export = require("temp.handles.handle")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9679,7 +9615,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.image")
+    local ____export = require("temp.handles.image")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9687,7 +9623,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.item")
+    local ____export = require("temp.handles.item")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9695,7 +9631,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.leaderboard")
+    local ____export = require("temp.handles.leaderboard")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9703,7 +9639,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.multiboard")
+    local ____export = require("temp.handles.multiboard")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9711,7 +9647,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.player")
+    local ____export = require("temp.handles.player")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9719,7 +9655,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.point")
+    local ____export = require("temp.handles.point")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9727,7 +9663,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.quest")
+    local ____export = require("temp.handles.quest")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9735,7 +9671,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.rect")
+    local ____export = require("temp.handles.rect")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9743,7 +9679,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.region")
+    local ____export = require("temp.handles.region")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9751,7 +9687,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.sound")
+    local ____export = require("temp.handles.sound")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9759,7 +9695,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.texttag")
+    local ____export = require("temp.handles.texttag")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9767,7 +9703,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.timer")
+    local ____export = require("temp.handles.timer")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9775,7 +9711,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.timerdialog")
+    local ____export = require("temp.handles.timerdialog")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9783,7 +9719,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.trigger")
+    local ____export = require("temp.handles.trigger")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9791,7 +9727,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.ubersplat")
+    local ____export = require("temp.handles.ubersplat")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9799,7 +9735,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.unit")
+    local ____export = require("temp.handles.unit")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9807,7 +9743,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.weathereffect")
+    local ____export = require("temp.handles.weathereffect")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9815,7 +9751,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.widget")
+    local ____export = require("temp.handles.widget")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -9824,7 +9760,7 @@ do
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.system.base64"] = function(...) 
+["temp.system.base64"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__StringCharCodeAt = ____lualib.__TS__StringCharCodeAt
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
@@ -9932,7 +9868,7 @@ function ____exports.base64Decode(input)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.system.binaryreader"] = function(...) 
+["temp.system.binaryreader"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__StringCharCodeAt = ____lualib.__TS__StringCharCodeAt
@@ -10089,7 +10025,7 @@ function BinaryReader.prototype.readUInt8(self)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.system.binarywriter"] = function(...) 
+["temp.system.binarywriter"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
@@ -10233,7 +10169,7 @@ function BinaryWriter.prototype.writeUInt8(self, value)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.system.file"] = function(...) 
+["temp.system.file"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
@@ -10246,10 +10182,10 @@ function File.prototype.____constructor(self)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.system.index"] = function(...) 
+["temp.system.index"] = function(...) 
 local ____exports = {}
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.system.base64")
+    local ____export = require("temp.system.base64")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10257,7 +10193,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.system.binaryreader")
+    local ____export = require("temp.system.binaryreader")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10265,7 +10201,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.system.binarywriter")
+    local ____export = require("temp.system.binarywriter")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10273,7 +10209,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.system.file")
+    local ____export = require("temp.system.file")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10282,7 +10218,7 @@ do
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.utils.color"] = function(...) 
+["temp.utils.color"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
@@ -10290,7 +10226,7 @@ local __TS__New = ____lualib.__TS__New
 local __TS__NumberToString = ____lualib.__TS__NumberToString
 local ____exports = {}
 local toHex, orderedPlayerColors
-local ____define = require("lua_modules.@eiriksgata.wc3ts.globals.define")
+local ____define = require("temp.globals.define")
 local PLAYER_COLOR_AQUA = ____define.PLAYER_COLOR_AQUA
 local PLAYER_COLOR_BLUE = ____define.PLAYER_COLOR_BLUE
 local PLAYER_COLOR_BROWN = ____define.PLAYER_COLOR_BROWN
@@ -10303,7 +10239,7 @@ local PLAYER_COLOR_PINK = ____define.PLAYER_COLOR_PINK
 local PLAYER_COLOR_PURPLE = ____define.PLAYER_COLOR_PURPLE
 local PLAYER_COLOR_RED = ____define.PLAYER_COLOR_RED
 local PLAYER_COLOR_YELLOW = ____define.PLAYER_COLOR_YELLOW
-function toHex(self, value)
+function toHex(value)
     local hex = __TS__NumberToString(value, 16)
     if #hex < 2 then
         hex = "0" .. hex
@@ -10342,7 +10278,7 @@ __TS__SetDescriptor(
     Color.prototype,
     "code",
     {get = function(self)
-        return (("|c" .. toHex(nil, self.alpha)) .. toHex(nil, self.red)) .. toHex(nil, self.green) .. toHex(nil, self.blue)
+        return (("|c" .. toHex(self.alpha)) .. toHex(self.red)) .. toHex(self.green) .. toHex(self.blue)
     end},
     true
 )
@@ -10370,7 +10306,7 @@ __TS__SetDescriptor(
     end},
     true
 )
-____exports.color = function(____, red, green, blue, alpha) return __TS__New(
+____exports.color = function(red, green, blue, alpha) return __TS__New(
     ____exports.Color,
     red,
     green,
@@ -10380,30 +10316,30 @@ ____exports.color = function(____, red, green, blue, alpha) return __TS__New(
 --- The player colors sorted by index. Does not include
 -- neutrals colors.
 ____exports.playerColors = {
-    ____exports.color(nil, 255, 3, 3),
-    ____exports.color(nil, 0, 66, 255),
-    ____exports.color(nil, 28, 230, 185),
-    ____exports.color(nil, 84, 0, 129),
-    ____exports.color(nil, 255, 252, 0),
-    ____exports.color(nil, 254, 138, 14),
-    ____exports.color(nil, 32, 192, 0),
-    ____exports.color(nil, 229, 91, 176),
-    ____exports.color(nil, 149, 150, 151),
-    ____exports.color(nil, 126, 191, 241),
-    ____exports.color(nil, 16, 98, 70),
-    ____exports.color(nil, 78, 42, 3),
-    ____exports.color(nil, 155, 0, 0),
-    ____exports.color(nil, 0, 0, 195),
-    ____exports.color(nil, 0, 234, 255),
-    ____exports.color(nil, 190, 0, 254),
-    ____exports.color(nil, 235, 205, 135),
-    ____exports.color(nil, 248, 164, 139),
-    ____exports.color(nil, 191, 255, 128),
-    ____exports.color(nil, 220, 185, 235),
-    ____exports.color(nil, 80, 79, 85),
-    ____exports.color(nil, 235, 240, 255),
-    ____exports.color(nil, 0, 120, 30),
-    ____exports.color(nil, 164, 111, 51)
+    ____exports.color(255, 3, 3),
+    ____exports.color(0, 66, 255),
+    ____exports.color(28, 230, 185),
+    ____exports.color(84, 0, 129),
+    ____exports.color(255, 252, 0),
+    ____exports.color(254, 138, 14),
+    ____exports.color(32, 192, 0),
+    ____exports.color(229, 91, 176),
+    ____exports.color(149, 150, 151),
+    ____exports.color(126, 191, 241),
+    ____exports.color(16, 98, 70),
+    ____exports.color(78, 42, 3),
+    ____exports.color(155, 0, 0),
+    ____exports.color(0, 0, 195),
+    ____exports.color(0, 234, 255),
+    ____exports.color(190, 0, 254),
+    ____exports.color(235, 205, 135),
+    ____exports.color(248, 164, 139),
+    ____exports.color(191, 255, 128),
+    ____exports.color(220, 185, 235),
+    ____exports.color(80, 79, 85),
+    ____exports.color(235, 240, 255),
+    ____exports.color(0, 120, 30),
+    ____exports.color(164, 111, 51)
 }
 --- The names of players colors sorted by player index.
 ____exports.playerColorNames = {
@@ -10449,24 +10385,24 @@ orderedPlayerColors = {
 }
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.utils.index"] = function(...) 
+["temp.utils.index"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Promise = ____lualib.__TS__Promise
 local __TS__New = ____lualib.__TS__New
 local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
 local __TS__Await = ____lualib.__TS__Await
 local ____exports = {}
-local ____timer = require("lua_modules.@eiriksgata.wc3ts.handles.timer")
+local ____timer = require("temp.handles.timer")
 local Timer = ____timer.Timer
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.utils.color")
+    local ____export = require("temp.utils.color")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
         end
     end
 end
-function ____exports.sleep(self, howMuch)
+function ____exports.sleep(howMuch)
     return __TS__AsyncAwaiter(function(____awaiter_resolve)
         return ____awaiter_resolve(
             nil,
@@ -10489,11 +10425,11 @@ function ____exports.sleep(self, howMuch)
 end
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.index"] = function(...) 
+["temp.index"] = function(...) 
 local ____exports = {}
-local tsGlobals = require("lua_modules.@eiriksgata.wc3ts.globals.index")
+local tsGlobals = require("temp.globals.index")
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.handles.index")
+    local ____export = require("temp.handles.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10501,7 +10437,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.system.index")
+    local ____export = require("temp.system.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10509,7 +10445,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.utils.index")
+    local ____export = require("temp.utils.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10519,7 +10455,220 @@ end
 ____exports.tsGlobals = tsGlobals
 return ____exports
  end,
-["lua_modules.@eiriksgata.wc3ts.globals.const"] = function(...) 
+["src.main"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
+local __TS__Await = ____lualib.__TS__Await
+local ____exports = {}
+local ____ydlua = require("src.ydlua.index")
+local ydlua = ____ydlua.ydlua
+local ____helper = require("src.utils.helper")
+local FourCC = ____helper.FourCC
+local ____globals = require("temp.globals.index")
+local Players = ____globals.Players
+local ____wc3ts = require("temp.index")
+local Unit = ____wc3ts.Unit
+--- 应用程序主入口
+-- 负责引导整个应用程序的启动
+local function main()
+    return __TS__AsyncAwaiter(function(____awaiter_resolve)
+        print("hello ts")
+        DisplayTextToPlayer(
+            Player(0),
+            0,
+            0,
+            "hello ts"
+        )
+        Unit:create(
+            Players[1],
+            FourCC("hfoo"),
+            0,
+            0,
+            0
+        )
+    end)
+end
+ydlua:getInstance():initialize()
+main()
+return ____exports
+ end,
+["temp.types.index"] = function(...) 
+local ____exports = {}
+return ____exports
+ end,
+["temp.config.index"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+--- 默认应用配置
+local DEFAULT_CONFIG = {debug = true, console = true, runtime = {debuggerPort = 4279, sleep = false, catchCrash = true}, map = {name = "WC3 TypeScript Map", version = "1.0.0", description = "A Warcraft III map built with TypeScript"}}
+--- 配置管理器
+-- 提供应用程序配置的统一管理
+____exports.ConfigManager = __TS__Class()
+local ConfigManager = ____exports.ConfigManager
+ConfigManager.name = "ConfigManager"
+function ConfigManager.prototype.____constructor(self)
+    self.config = __TS__ObjectAssign({}, DEFAULT_CONFIG)
+end
+function ConfigManager.getInstance(self)
+    if not ____exports.ConfigManager.instance then
+        ____exports.ConfigManager.instance = __TS__New(____exports.ConfigManager)
+    end
+    return ____exports.ConfigManager.instance
+end
+function ConfigManager.prototype.getConfig(self)
+    return __TS__ObjectAssign({}, self.config)
+end
+function ConfigManager.prototype.isDebugMode(self)
+    return self.config.debug
+end
+function ConfigManager.prototype.isConsoleEnabled(self)
+    return self.config.console
+end
+function ConfigManager.prototype.getRuntimeConfig(self)
+    return __TS__ObjectAssign({}, self.config.runtime)
+end
+function ConfigManager.prototype.getMapConfig(self)
+    return __TS__ObjectAssign({}, self.config.map)
+end
+function ConfigManager.prototype.updateConfig(self, updates)
+    self.config = __TS__ObjectAssign({}, self.config, updates)
+end
+function ConfigManager.prototype.resetToDefault(self)
+    self.config = __TS__ObjectAssign({}, DEFAULT_CONFIG)
+end
+return ____exports
+ end,
+["temp.ydlua.index"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
+local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
+local ____exports = {}
+local ____config = require("temp.config.index")
+local ConfigManager = ____config.ConfigManager
+____exports.ydcommon = require("jass.common")
+____exports.ydai = require("jass.ai")
+____exports.ydglobals = require("jass.globals")
+____exports.ydjapi = require("jass.japi")
+____exports.ydhook = require("jass.hook")
+____exports.ydruntime = require("jass.runtime")
+____exports.ydslk = require("jass.slk")
+____exports.ydconsole = require("jass.console")
+____exports.yddebug = require("jass.debug")
+____exports.ydlog = require("jass.log")
+____exports.ydmessage = require("jass.message")
+____exports.ydbignum = require("jass.bignum")
+____exports.ydlua = __TS__Class()
+local ydlua = ____exports.ydlua
+ydlua.name = "ydlua"
+function ydlua.prototype.____constructor(self)
+    self.configManager = ConfigManager:getInstance()
+end
+function ydlua.getInstance(self)
+    if not ____exports.ydlua.instance then
+        ____exports.ydlua.instance = __TS__New(____exports.ydlua)
+    end
+    return ____exports.ydlua.instance
+end
+function ydlua.prototype.initializeRuntime(self)
+    local config = self.configManager:getConfig()
+    local runtimeConfig = config.runtime
+    ____exports.ydruntime.console = config.console
+    ____exports.ydruntime.sleep = runtimeConfig.sleep
+    ____exports.ydruntime.debugger = runtimeConfig.debuggerPort
+    ____exports.ydruntime.catch_crash = runtimeConfig.catchCrash
+    ____exports.ydruntime.error_hanlde = function(self, msg)
+        print("========lua-err========")
+        print(tostring(msg))
+        print("=========================")
+    end
+    print(((">>> Runtime configured: debugger=" .. tostring(runtimeConfig.debuggerPort)) .. ", crash_catch=") .. tostring(runtimeConfig.catchCrash))
+end
+function ydlua.prototype.initialize(self)
+    self:initializeConsole()
+    self:initializeRuntime()
+    self:registerGlobals()
+end
+function ydlua.prototype.initializeConsole(self)
+    local isConsoleEnabled = self.configManager:isConsoleEnabled()
+    ____exports.ydconsole.enable = isConsoleEnabled
+    if isConsoleEnabled then
+        _G.print = function(message) return ____exports.ydconsole:write(message) end
+        print(">>> Console enabled")
+    end
+end
+function ydlua.prototype.registerGlobals(self)
+    __TS__ArrayForEach(
+        __TS__ObjectKeys(____exports.ydcommon),
+        function(____, key)
+            _G[key] = ____exports.ydcommon[key]
+        end
+    )
+    __TS__ArrayForEach(
+        __TS__ObjectKeys(____exports.ydjapi),
+        function(____, key)
+            _G[key] = ____exports.ydjapi[key]
+        end
+    )
+    print(">>> Global APIs registered")
+end
+return ____exports
+ end,
+["temp.utils.helper"] = function(...) 
+local ____exports = {}
+function ____exports.c2i(char)
+    return (string.unpack(">I4", char))
+end
+function ____exports.i2c(id)
+    return string.pack("I4", id)
+end
+function ____exports.FourCC(id)
+    return ____exports.c2i(id)
+end
+return ____exports
+ end,
+["temp.main"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
+local __TS__Await = ____lualib.__TS__Await
+local ____exports = {}
+local ____ydlua = require("temp.ydlua.index")
+local ydlua = ____ydlua.ydlua
+local ____helper = require("temp.utils.helper")
+local FourCC = ____helper.FourCC
+local ____globals = require("temp.globals.index")
+local Players = ____globals.Players
+local ____wc3ts = require("temp.index")
+local Unit = ____wc3ts.Unit
+--- 应用程序主入口
+-- 负责引导整个应用程序的启动
+local function main()
+    return __TS__AsyncAwaiter(function(____awaiter_resolve)
+        print("hello ts")
+        DisplayTextToPlayer(
+            Player(0),
+            0,
+            0,
+            "hello ts"
+        )
+        Unit:create(
+            Players[1],
+            FourCC("hfoo"),
+            0,
+            0,
+            0
+        )
+    end)
+end
+ydlua:getInstance():initialize()
+main()
+return ____exports
+ end,
+["temp.globals.const"] = function(...) 
 local ____exports = {}
 ____exports.EPlayerColor = EPlayerColor or ({})
 ____exports.EPlayerColor.COLOR1 = "|cFFFF0303"
@@ -10541,4 +10690,4 @@ ____exports.EPlayerColor.COLOR16 = "|cFF282828"
 return ____exports
  end,
 }
-return require("src.index", ...)
+return require("temp.main", ...)

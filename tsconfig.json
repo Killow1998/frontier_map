@@ -5,26 +5,21 @@
       "esnext"
     ],
     "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@eiriksgata/wc3ts": ["temp/index"],
+      "@eiriksgata/wc3ts/*": ["temp/*"]
+    },
     "types": [
       "@eiriksgata/wc3ts/types",
-      "lua-types/5.3",
-      "lua-types/core/coroutine",
-      "lua-types/core/global",
-      "lua-types/core/math",
-      "lua-types/core/metatable",
-      "lua-types/core/modules",
-      "lua-types/core/string",
-      "lua-types/core/table",
-      "lua-types/core/os",
-      "@typescript-to-lua/language-extensions"
+      "lua-types/5.3"
     ],
     "strict": true
   },
   "tstl": {
     "luaTarget": "5.3",
     "noHeader": true,
-    "sourceMapTraceback": false,
-    "luaLibImport": "require",
+    "noImplicitSelf": true,
     "noResolvePaths": [
       "jass.common",
       "jass.ai",
@@ -38,16 +33,13 @@
       "jass.log",
       "jass.runtime",
       "jass.message",
-      "jass.bignum",
-      "@eiriksgata/wc3ts",
-      "@eiriksgata/wc3ts/globals"
+      "jass.bignum"
     ],
     "luaBundle": "maps/map/main.lua",
     "luaBundleEntry": "temp/main.ts"
   },
   "include": [
     "src",
-    "temp/**/*",
-    "node_modules/@eiriksgata/wc3ts/**/*"
+    "temp/**/*"
   ]
 }
