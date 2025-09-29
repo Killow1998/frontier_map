@@ -1,5 +1,6 @@
 
 import * as fs from 'fs';
+import * as path from 'path';
 import { execSync } from 'child_process';
 const luamin = require('luamin');
 
@@ -20,6 +21,26 @@ const isDev: boolean = argv[0] === "dev";
 function ensureDirectoryExists(dir: string): void {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+/**
+ * 递归复制文件夹
+ */
+function copyDir(src: string, dest: string): void {
+  ensureDirectoryExists(dest);
+  
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    
+    if (entry.isDirectory()) {
+      copyDir(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
   }
 }
 
@@ -82,7 +103,23 @@ function minifyLua(): void {
  */
 function compileTypeScriptToLua(): void {
   try {
-    execSync('tstl -p tsconfig.json', { stdio: 'inherit' });
+    //先将代码整合到 temp 文件夹
+    ensureDirectoryExists("temp");
+    
+    // 使用 Node.js 原生方法复制文件，跨平台兼容
+    console.log(">>> Copying source files to temp folder...");
+    copyDir("src", "temp");
+
+    // 将w3cts 代码整理到 temp 文件夹
+    console.log(">>> Copying @eiriksgata/wc3ts to temp folder...");
+    const wc3tsPath = "node_modules/@eiriksgata/wc3ts";
+    if (fs.existsSync(wc3tsPath)) {
+      copyDir(wc3tsPath, "temp");
+    } else {
+      console.warn("Warning: @eiriksgata/wc3ts not found in node_modules");
+    }
+    
+    //execSync('tstl -p tsconfig.json', { stdio: 'inherit' });
     console.log(">>> TypeScript to Lua compilation completed");
   } catch (error) {
     console.error("Error during TypeScript compilation:", error);

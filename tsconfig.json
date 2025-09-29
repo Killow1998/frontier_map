@@ -6,7 +6,7 @@
     ],
     "moduleResolution": "bundler",
     "types": [
-      "@eiriksgata/wc3ts/dist/types",
+      "@eiriksgata/wc3ts/types",
       "lua-types/5.3",
       "lua-types/core/coroutine",
       "lua-types/core/global",
@@ -38,13 +38,16 @@
       "jass.log",
       "jass.runtime",
       "jass.message",
-      "jass.bignum"
+      "jass.bignum",
+      "@eiriksgata/wc3ts",
+      "@eiriksgata/wc3ts/globals"
     ],
     "luaBundle": "maps/map/main.lua",
-    "luaBundleEntry": "src/index.ts"
+    "luaBundleEntry": "temp/main.ts"
   },
   "include": [
     "src",
-    "@eiriksgata/wc3ts/dist/types"
+    "temp/**/*",
+    "node_modules/@eiriksgata/wc3ts/**/*"
   ]
 }

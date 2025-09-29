@@ -1,9 +1,7 @@
 
 import { ydlua } from "./ydlua";
 import { FourCC } from "./utils/helper";
-import { Unit } from "@eiriksgata/wc3ts";
-import { Players } from "@eiriksgata/wc3ts/dist/globals";
-
+import { Players } from "@eiriksgata/wc3ts/globals";
 
 /**
  * 应用程序主入口
@@ -14,8 +12,7 @@ async function main(): Promise<void> {
   print("hello ts");
   DisplayTextToPlayer(Player(0), 0, 0, "hello ts");
 
-  Unit.create(Players[0], FourCC("hfoo"), 0, 0, 0);
-  
+  print(Players[0])
 
 }
 
