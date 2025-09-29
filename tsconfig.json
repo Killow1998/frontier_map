@@ -4,9 +4,9 @@
     "lib": [
       "esnext"
     ],
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "types": [
-      "wc3ts-1.27a/types",
+      "@eiriksgata/wc3ts/dist/types",
       "lua-types/5.3",
       "lua-types/core/coroutine",
       "lua-types/core/global",
@@ -45,6 +45,6 @@
   },
   "include": [
     "src",
-    "node_modules/wc3ts-1.27a/types"
+    "@eiriksgata/wc3ts/dist/types"
   ]
 }

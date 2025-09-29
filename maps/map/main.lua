@@ -2902,6 +2902,12 @@ local __TS__Await = ____lualib.__TS__Await
 local ____exports = {}
 local ____ydlua = require("src.ydlua.index")
 local ydlua = ____ydlua.ydlua
+local ____helper = require("src.utils.helper")
+local FourCC = ____helper.FourCC
+local ____wc3ts = require("src.@eiriksgata.wc3ts")
+local Unit = ____wc3ts.Unit
+local ____globals = require("lua_modules.@eiriksgata.wc3ts.dist.globals.index")
+local Players = ____globals.Players
 --- 应用程序主入口
 -- 负责引导整个应用程序的启动
 local function main(self)
@@ -2913,10 +2919,1282 @@ local function main(self)
             0,
             "hello ts"
         )
+        Unit:create(
+            Players[1],
+            FourCC(nil, "hfoo"),
+            0,
+            0,
+            0
+        )
     end)
 end
 ydlua:getInstance():initialize()
 main(nil)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.dist.globals.index"] = function(...) 
+local ____exports = {}
+local ____player = require("lua_modules.@eiriksgata.wc3ts.dist.handles.player")
+local MapPlayer = ____player.MapPlayer
+local ____define = require("lua_modules.@eiriksgata.wc3ts.dist.globals.define")
+local bj_MAX_PLAYER_SLOTS = ____define.bj_MAX_PLAYER_SLOTS
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.dist.globals.order")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+____exports.Players = {}
+do
+    local i = 0
+    while i < bj_MAX_PLAYER_SLOTS do
+        local pl = MapPlayer:fromHandle(Player(i))
+        if pl then
+            ____exports.Players[i + 1] = pl
+        end
+        i = i + 1
+    end
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.dist.globals.order"] = function(...) 
+local ____exports = {}
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.dist.globals.define"] = function(...) 
+local ____exports = {}
+____exports.MAP_SPEED_NORMAL = function() return ConvertGameSpeed(2) end
+____exports.bj_PI = math.pi
+____exports.bj_E = 2.718281828459045
+____exports.bj_CELLWIDTH = 128
+____exports.bj_CLIFFHEIGHT = 128
+____exports.bj_UNIT_FACING = 270
+____exports.bj_RADTODEG = 180 / ____exports.bj_PI
+____exports.bj_DEGTORAD = ____exports.bj_PI / 180
+____exports.bj_TEXT_DELAY_QUEST = 20
+____exports.bj_TEXT_DELAY_QUESTUPDATE = 20
+____exports.bj_TEXT_DELAY_QUESTDONE = 20
+____exports.bj_TEXT_DELAY_QUESTFAILED = 20
+____exports.bj_TEXT_DELAY_QUESTREQUIREMENT = 20
+____exports.bj_TEXT_DELAY_MISSIONFAILED = 20
+____exports.bj_TEXT_DELAY_ALWAYSHINT = 12
+____exports.bj_TEXT_DELAY_HINT = 12
+____exports.bj_TEXT_DELAY_SECRET = 10
+____exports.bj_TEXT_DELAY_UNITACQUIRED = 15
+____exports.bj_TEXT_DELAY_UNITAVAILABLE = 10
+____exports.bj_TEXT_DELAY_ITEMACQUIRED = 10
+____exports.bj_TEXT_DELAY_WARNING = 12
+____exports.bj_QUEUE_DELAY_QUEST = 5
+____exports.bj_QUEUE_DELAY_HINT = 5
+____exports.bj_QUEUE_DELAY_SECRET = 3
+____exports.bj_HANDICAP_EASY = 60
+____exports.bj_GAME_STARTED_THRESHOLD = 0.01
+____exports.bj_WAIT_FOR_COND_MIN_INTERVAL = 0.1
+____exports.bj_POLLED_WAIT_INTERVAL = 0.1
+____exports.bj_POLLED_WAIT_SKIP_THRESHOLD = 2
+____exports.bj_MAX_INVENTORY = 6
+____exports.bj_MAX_PLAYERS = 12
+____exports.bj_PLAYER_NEUTRAL_VICTIM = 13
+____exports.bj_PLAYER_NEUTRAL_EXTRA = 14
+____exports.bj_MAX_PLAYER_SLOTS = 16
+____exports.bj_MAX_SKELETONS = 25
+____exports.bj_MAX_STOCK_ITEM_SLOTS = 11
+____exports.bj_MAX_STOCK_UNIT_SLOTS = 11
+____exports.bj_MAX_ITEM_LEVEL = 10
+____exports.bj_TOD_DAWN = 6
+____exports.bj_TOD_DUSK = 18
+____exports.bj_MELEE_STARTING_TOD = 8
+____exports.bj_MELEE_STARTING_GOLD_V0 = 750
+____exports.bj_MELEE_STARTING_GOLD_V1 = 500
+____exports.bj_MELEE_STARTING_LUMBER_V0 = 200
+____exports.bj_MELEE_STARTING_LUMBER_V1 = 150
+____exports.bj_MELEE_STARTING_HERO_TOKENS = 1
+____exports.bj_MELEE_HERO_LIMIT = 3
+____exports.bj_MELEE_HERO_TYPE_LIMIT = 1
+____exports.bj_MELEE_MINE_SEARCH_RADIUS = 2000
+____exports.bj_MELEE_CLEAR_UNITS_RADIUS = 1500
+____exports.bj_MELEE_CRIPPLE_TIMEOUT = 120
+____exports.bj_MELEE_CRIPPLE_MSG_DURATION = 20
+____exports.bj_MELEE_MAX_TWINKED_HEROES_V0 = 3
+____exports.bj_MELEE_MAX_TWINKED_HEROES_V1 = 1
+____exports.bj_CREEP_ITEM_DELAY = 0.5
+____exports.bj_STOCK_RESTOCK_INITIAL_DELAY = 120
+____exports.bj_STOCK_RESTOCK_INTERVAL = 30
+____exports.bj_STOCK_MAX_ITERATIONS = 20
+____exports.bj_MAX_DEST_IN_REGION_EVENTS = 64
+____exports.bj_CAMERA_MIN_FARZ = 100
+____exports.bj_CAMERA_DEFAULT_DISTANCE = 1650
+____exports.bj_CAMERA_DEFAULT_FARZ = 5000
+____exports.bj_CAMERA_DEFAULT_AOA = 304
+____exports.bj_CAMERA_DEFAULT_FOV = 70
+____exports.bj_CAMERA_DEFAULT_ROLL = 0
+____exports.bj_CAMERA_DEFAULT_ROTATION = 90
+____exports.bj_RESCUE_PING_TIME = 2
+____exports.bj_NOTHING_SOUND_DURATION = 5
+____exports.bj_TRANSMISSION_PING_TIME = 1
+____exports.bj_TRANSMISSION_IND_RED = 255
+____exports.bj_TRANSMISSION_IND_BLUE = 255
+____exports.bj_TRANSMISSION_IND_GREEN = 255
+____exports.bj_TRANSMISSION_IND_ALPHA = 255
+____exports.bj_TRANSMISSION_PORT_HANGTIME = 1.5
+____exports.bj_CINEMODE_INTERFACEFADE = 0.5
+____exports.bj_CINEMODE_GAMESPEED = ____exports.MAP_SPEED_NORMAL
+____exports.bj_CINEMODE_VOLUME_UNITMOVEMENT = 0.4
+____exports.bj_CINEMODE_VOLUME_UNITSOUNDS = 0
+____exports.bj_CINEMODE_VOLUME_COMBAT = 0.4
+____exports.bj_CINEMODE_VOLUME_SPELLS = 0.4
+____exports.bj_CINEMODE_VOLUME_UI = 0
+____exports.bj_CINEMODE_VOLUME_MUSIC = 0.55
+____exports.bj_CINEMODE_VOLUME_AMBIENTSOUNDS = 1
+____exports.bj_CINEMODE_VOLUME_FIRE = 0.6
+____exports.bj_SPEECH_VOLUME_UNITMOVEMENT = 0.25
+____exports.bj_SPEECH_VOLUME_UNITSOUNDS = 0
+____exports.bj_SPEECH_VOLUME_COMBAT = 0.25
+____exports.bj_SPEECH_VOLUME_SPELLS = 0.25
+____exports.bj_SPEECH_VOLUME_UI = 0
+____exports.bj_SPEECH_VOLUME_MUSIC = 0.55
+____exports.bj_SPEECH_VOLUME_AMBIENTSOUNDS = 1
+____exports.bj_SPEECH_VOLUME_FIRE = 0.6
+____exports.bj_SMARTPAN_TRESHOLD_PAN = 500
+____exports.bj_SMARTPAN_TRESHOLD_SNAP = 3500
+____exports.bj_MAX_QUEUED_TRIGGERS = 100
+____exports.bj_QUEUED_TRIGGER_TIMEOUT = 180
+____exports.bj_CAMPAIGN_INDEX_T = 0
+____exports.bj_CAMPAIGN_INDEX_H = 1
+____exports.bj_CAMPAIGN_INDEX_U = 2
+____exports.bj_CAMPAIGN_INDEX_O = 3
+____exports.bj_CAMPAIGN_INDEX_N = 4
+____exports.bj_CAMPAIGN_INDEX_XN = 5
+____exports.bj_CAMPAIGN_INDEX_XH = 6
+____exports.bj_CAMPAIGN_INDEX_XU = 7
+____exports.bj_CAMPAIGN_INDEX_XO = 8
+____exports.bj_CAMPAIGN_OFFSET_T = 0
+____exports.bj_CAMPAIGN_OFFSET_H = 1
+____exports.bj_CAMPAIGN_OFFSET_U = 2
+____exports.bj_CAMPAIGN_OFFSET_O = 3
+____exports.bj_CAMPAIGN_OFFSET_N = 4
+____exports.bj_CAMPAIGN_OFFSET_XN = 0
+____exports.bj_CAMPAIGN_OFFSET_XH = 1
+____exports.bj_CAMPAIGN_OFFSET_XU = 2
+____exports.bj_CAMPAIGN_OFFSET_XO = 3
+____exports.bj_MISSION_INDEX_T00 = ____exports.bj_CAMPAIGN_OFFSET_T * 1000 + 0
+____exports.bj_MISSION_INDEX_T01 = ____exports.bj_CAMPAIGN_OFFSET_T * 1000 + 1
+____exports.bj_MISSION_INDEX_H00 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 0
+____exports.bj_MISSION_INDEX_H01 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 1
+____exports.bj_MISSION_INDEX_H02 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 2
+____exports.bj_MISSION_INDEX_H03 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 3
+____exports.bj_MISSION_INDEX_H04 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 4
+____exports.bj_MISSION_INDEX_H05 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 5
+____exports.bj_MISSION_INDEX_H06 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 6
+____exports.bj_MISSION_INDEX_H07 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 7
+____exports.bj_MISSION_INDEX_H08 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 8
+____exports.bj_MISSION_INDEX_H09 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 9
+____exports.bj_MISSION_INDEX_H10 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 10
+____exports.bj_MISSION_INDEX_H11 = ____exports.bj_CAMPAIGN_OFFSET_H * 1000 + 11
+____exports.bj_MISSION_INDEX_U00 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 0
+____exports.bj_MISSION_INDEX_U01 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 1
+____exports.bj_MISSION_INDEX_U02 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 2
+____exports.bj_MISSION_INDEX_U03 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 3
+____exports.bj_MISSION_INDEX_U05 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 4
+____exports.bj_MISSION_INDEX_U07 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 5
+____exports.bj_MISSION_INDEX_U08 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 6
+____exports.bj_MISSION_INDEX_U09 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 7
+____exports.bj_MISSION_INDEX_U10 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 8
+____exports.bj_MISSION_INDEX_U11 = ____exports.bj_CAMPAIGN_OFFSET_U * 1000 + 9
+____exports.bj_MISSION_INDEX_O00 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 0
+____exports.bj_MISSION_INDEX_O01 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 1
+____exports.bj_MISSION_INDEX_O02 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 2
+____exports.bj_MISSION_INDEX_O03 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 3
+____exports.bj_MISSION_INDEX_O04 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 4
+____exports.bj_MISSION_INDEX_O05 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 5
+____exports.bj_MISSION_INDEX_O06 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 6
+____exports.bj_MISSION_INDEX_O07 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 7
+____exports.bj_MISSION_INDEX_O08 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 8
+____exports.bj_MISSION_INDEX_O09 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 9
+____exports.bj_MISSION_INDEX_O10 = ____exports.bj_CAMPAIGN_OFFSET_O * 1000 + 10
+____exports.bj_MISSION_INDEX_N00 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 0
+____exports.bj_MISSION_INDEX_N01 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 1
+____exports.bj_MISSION_INDEX_N02 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 2
+____exports.bj_MISSION_INDEX_N03 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 3
+____exports.bj_MISSION_INDEX_N04 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 4
+____exports.bj_MISSION_INDEX_N05 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 5
+____exports.bj_MISSION_INDEX_N06 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 6
+____exports.bj_MISSION_INDEX_N07 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 7
+____exports.bj_MISSION_INDEX_N08 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 8
+____exports.bj_MISSION_INDEX_N09 = ____exports.bj_CAMPAIGN_OFFSET_N * 1000 + 9
+____exports.bj_MISSION_INDEX_XN00 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 0
+____exports.bj_MISSION_INDEX_XN01 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 1
+____exports.bj_MISSION_INDEX_XN02 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 2
+____exports.bj_MISSION_INDEX_XN03 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 3
+____exports.bj_MISSION_INDEX_XN04 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 4
+____exports.bj_MISSION_INDEX_XN05 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 5
+____exports.bj_MISSION_INDEX_XN06 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 6
+____exports.bj_MISSION_INDEX_XN07 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 7
+____exports.bj_MISSION_INDEX_XN08 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 8
+____exports.bj_MISSION_INDEX_XN09 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 9
+____exports.bj_MISSION_INDEX_XN10 = ____exports.bj_CAMPAIGN_OFFSET_XN * 1000 + 10
+____exports.bj_MISSION_INDEX_XH00 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 0
+____exports.bj_MISSION_INDEX_XH01 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 1
+____exports.bj_MISSION_INDEX_XH02 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 2
+____exports.bj_MISSION_INDEX_XH03 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 3
+____exports.bj_MISSION_INDEX_XH04 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 4
+____exports.bj_MISSION_INDEX_XH05 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 5
+____exports.bj_MISSION_INDEX_XH06 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 6
+____exports.bj_MISSION_INDEX_XH07 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 7
+____exports.bj_MISSION_INDEX_XH08 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 8
+____exports.bj_MISSION_INDEX_XH09 = ____exports.bj_CAMPAIGN_OFFSET_XH * 1000 + 9
+____exports.bj_MISSION_INDEX_XU00 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 0
+____exports.bj_MISSION_INDEX_XU01 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 1
+____exports.bj_MISSION_INDEX_XU02 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 2
+____exports.bj_MISSION_INDEX_XU03 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 3
+____exports.bj_MISSION_INDEX_XU04 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 4
+____exports.bj_MISSION_INDEX_XU05 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 5
+____exports.bj_MISSION_INDEX_XU06 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 6
+____exports.bj_MISSION_INDEX_XU07 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 7
+____exports.bj_MISSION_INDEX_XU08 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 8
+____exports.bj_MISSION_INDEX_XU09 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 9
+____exports.bj_MISSION_INDEX_XU10 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 10
+____exports.bj_MISSION_INDEX_XU11 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 11
+____exports.bj_MISSION_INDEX_XU12 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 12
+____exports.bj_MISSION_INDEX_XU13 = ____exports.bj_CAMPAIGN_OFFSET_XU * 1000 + 13
+____exports.bj_MISSION_INDEX_XO00 = ____exports.bj_CAMPAIGN_OFFSET_XO * 1000 + 0
+____exports.bj_CINEMATICINDEX_TOP = 0
+____exports.bj_CINEMATICINDEX_HOP = 1
+____exports.bj_CINEMATICINDEX_HED = 2
+____exports.bj_CINEMATICINDEX_OOP = 3
+____exports.bj_CINEMATICINDEX_OED = 4
+____exports.bj_CINEMATICINDEX_UOP = 5
+____exports.bj_CINEMATICINDEX_UED = 6
+____exports.bj_CINEMATICINDEX_NOP = 7
+____exports.bj_CINEMATICINDEX_NED = 8
+____exports.bj_CINEMATICINDEX_XOP = 9
+____exports.bj_CINEMATICINDEX_XED = 10
+____exports.bj_ALLIANCE_UNALLIED = 0
+____exports.bj_ALLIANCE_UNALLIED_VISION = 1
+____exports.bj_ALLIANCE_ALLIED = 2
+____exports.bj_ALLIANCE_ALLIED_VISION = 3
+____exports.bj_ALLIANCE_ALLIED_UNITS = 4
+____exports.bj_ALLIANCE_ALLIED_ADVUNITS = 5
+____exports.bj_ALLIANCE_NEUTRAL = 6
+____exports.bj_ALLIANCE_NEUTRAL_VISION = 7
+____exports.bj_KEYEVENTTYPE_DEPRESS = 0
+____exports.bj_KEYEVENTTYPE_RELEASE = 1
+____exports.bj_KEYEVENTKEY_LEFT = 0
+____exports.bj_KEYEVENTKEY_RIGHT = 1
+____exports.bj_KEYEVENTKEY_DOWN = 2
+____exports.bj_KEYEVENTKEY_UP = 3
+____exports.bj_TIMETYPE_ADD = 0
+____exports.bj_TIMETYPE_SET = 1
+____exports.bj_TIMETYPE_SUB = 2
+____exports.bj_CAMERABOUNDS_ADJUST_ADD = 0
+____exports.bj_CAMERABOUNDS_ADJUST_SUB = 1
+____exports.bj_QUESTTYPE_REQ_DISCOVERED = 0
+____exports.bj_QUESTTYPE_REQ_UNDISCOVERED = 1
+____exports.bj_QUESTTYPE_OPT_DISCOVERED = 2
+____exports.bj_QUESTTYPE_OPT_UNDISCOVERED = 3
+____exports.bj_QUESTMESSAGE_DISCOVERED = 0
+____exports.bj_QUESTMESSAGE_UPDATED = 1
+____exports.bj_QUESTMESSAGE_COMPLETED = 2
+____exports.bj_QUESTMESSAGE_FAILED = 3
+____exports.bj_QUESTMESSAGE_REQUIREMENT = 4
+____exports.bj_QUESTMESSAGE_MISSIONFAILED = 5
+____exports.bj_QUESTMESSAGE_ALWAYSHINT = 6
+____exports.bj_QUESTMESSAGE_HINT = 7
+____exports.bj_QUESTMESSAGE_SECRET = 8
+____exports.bj_QUESTMESSAGE_UNITACQUIRED = 9
+____exports.bj_QUESTMESSAGE_UNITAVAILABLE = 10
+____exports.bj_QUESTMESSAGE_ITEMACQUIRED = 11
+____exports.bj_QUESTMESSAGE_WARNING = 12
+____exports.bj_SORTTYPE_SORTBYVALUE = 0
+____exports.bj_SORTTYPE_SORTBYPLAYER = 1
+____exports.bj_SORTTYPE_SORTBYLABEL = 2
+____exports.bj_CINEFADETYPE_FADEIN = 0
+____exports.bj_CINEFADETYPE_FADEOUT = 1
+____exports.bj_CINEFADETYPE_FADEOUTIN = 2
+____exports.bj_REMOVEBUFFS_POSITIVE = 0
+____exports.bj_REMOVEBUFFS_NEGATIVE = 1
+____exports.bj_REMOVEBUFFS_ALL = 2
+____exports.bj_REMOVEBUFFS_NONTLIFE = 3
+____exports.bj_BUFF_POLARITY_POSITIVE = 0
+____exports.bj_BUFF_POLARITY_NEGATIVE = 1
+____exports.bj_BUFF_POLARITY_EITHER = 2
+____exports.bj_BUFF_RESIST_MAGIC = 0
+____exports.bj_BUFF_RESIST_PHYSICAL = 1
+____exports.bj_BUFF_RESIST_EITHER = 2
+____exports.bj_BUFF_RESIST_BOTH = 3
+____exports.bj_HEROSTAT_STR = 0
+____exports.bj_HEROSTAT_AGI = 1
+____exports.bj_HEROSTAT_INT = 2
+____exports.bj_MODIFYMETHOD_ADD = 0
+____exports.bj_MODIFYMETHOD_SUB = 1
+____exports.bj_MODIFYMETHOD_SET = 2
+____exports.bj_UNIT_STATE_METHOD_ABSOLUTE = 0
+____exports.bj_UNIT_STATE_METHOD_RELATIVE = 1
+____exports.bj_UNIT_STATE_METHOD_DEFAULTS = 2
+____exports.bj_UNIT_STATE_METHOD_MAXIMUM = 3
+____exports.bj_GATEOPERATION_CLOSE = 0
+____exports.bj_GATEOPERATION_OPEN = 1
+____exports.bj_GATEOPERATION_DESTROY = 2
+____exports.bj_GAMECACHE_BOOLEAN = 0
+____exports.bj_GAMECACHE_INTEGER = 1
+____exports.bj_GAMECACHE_REAL = 2
+____exports.bj_GAMECACHE_UNIT = 3
+____exports.bj_GAMECACHE_STRING = 4
+____exports.bj_ITEM_STATUS_HIDDEN = 0
+____exports.bj_ITEM_STATUS_OWNED = 1
+____exports.bj_ITEM_STATUS_INVULNERABLE = 2
+____exports.bj_ITEM_STATUS_POWERUP = 3
+____exports.bj_ITEM_STATUS_SELLABLE = 4
+____exports.bj_ITEM_STATUS_PAWNABLE = 5
+____exports.bj_ITEMCODE_STATUS_POWERUP = 0
+____exports.bj_ITEMCODE_STATUS_SELLABLE = 1
+____exports.bj_ITEMCODE_STATUS_PAWNABLE = 2
+____exports.bj_MINIMAPPINGSTYLE_SIMPLE = 0
+____exports.bj_MINIMAPPINGSTYLE_FLASHY = 1
+____exports.bj_MINIMAPPINGSTYLE_ATTACK = 2
+____exports.bj_CORPSE_MAX_DEATH_TIME = 8
+____exports.bj_CORPSETYPE_FLESH = 0
+____exports.bj_CORPSETYPE_BONE = 1
+____exports.bj_ELEVATOR_BLOCKER_CODE = "DTep"
+____exports.bj_ELEVATOR_CODE01 = "DTrf"
+____exports.bj_ELEVATOR_CODE02 = "DTrx"
+____exports.bj_ELEVATOR_WALL_TYPE_ALL = 0
+____exports.bj_ELEVATOR_WALL_TYPE_EAST = 1
+____exports.bj_ELEVATOR_WALL_TYPE_NORTH = 2
+____exports.bj_ELEVATOR_WALL_TYPE_SOUTH = 3
+____exports.bj_ELEVATOR_WALL_TYPE_WEST = 4
+____exports.bj_MELEE_MAX_TWINKED_HEROES = 0
+____exports.bj_mapInitialPlayableArea = nil
+____exports.bj_mapInitialCameraBounds = nil
+____exports.bj_forLoopAIndex = 0
+____exports.bj_forLoopBIndex = 0
+____exports.bj_forLoopAIndexEnd = 0
+____exports.bj_forLoopBIndexEnd = 0
+____exports.bj_slotControlReady = false
+____exports.bj_gameStartedTimer = nil
+____exports.bj_gameStarted = false
+____exports.bj_isSinglePlayer = false
+____exports.bj_dncSoundsDay = nil
+____exports.bj_dncSoundsNight = nil
+____exports.bj_dayAmbientSound = nil
+____exports.bj_nightAmbientSound = nil
+____exports.bj_dncSoundsDawn = nil
+____exports.bj_dncSoundsDusk = nil
+____exports.bj_dawnSound = nil
+____exports.bj_duskSound = nil
+____exports.bj_useDawnDuskSounds = true
+____exports.bj_dncIsDaytime = false
+____exports.bj_rescueSound = nil
+____exports.bj_questDiscoveredSound = nil
+____exports.bj_questUpdatedSound = nil
+____exports.bj_questCompletedSound = nil
+____exports.bj_questFailedSound = nil
+____exports.bj_questHintSound = nil
+____exports.bj_questSecretSound = nil
+____exports.bj_questItemAcquiredSound = nil
+____exports.bj_questWarningSound = nil
+____exports.bj_victoryDialogSound = nil
+____exports.bj_defeatDialogSound = nil
+____exports.bj_rescueUnitBehavior = nil
+____exports.bj_rescueChangeColorUnit = true
+____exports.bj_rescueChangeColorBldg = true
+____exports.bj_cineSceneEndingTimer = nil
+____exports.bj_cineSceneLastSound = nil
+____exports.bj_cineSceneBeingSkipped = nil
+____exports.bj_cineModePriorSpeed = ____exports.MAP_SPEED_NORMAL
+____exports.bj_cineModePriorFogSetting = false
+____exports.bj_cineModePriorMaskSetting = false
+____exports.bj_cineModeAlreadyIn = false
+____exports.bj_cineModePriorDawnDusk = false
+____exports.bj_cineModeSavedSeed = 0
+____exports.bj_cineFadeFinishTimer = nil
+____exports.bj_cineFadeContinueTimer = nil
+____exports.bj_cineFadeContinueRed = 0
+____exports.bj_cineFadeContinueGreen = 0
+____exports.bj_cineFadeContinueBlue = 0
+____exports.bj_cineFadeContinueTrans = 0
+____exports.bj_cineFadeContinueDuration = 0
+____exports.bj_cineFadeContinueTex = ""
+____exports.JASS_MAX_ARRAY_SIZE = 8192
+____exports.PLAYER_NEUTRAL_PASSIVE = 15
+____exports.PLAYER_NEUTRAL_AGGRESSIVE = 12
+____exports.PLAYER_COLOR_RED = function() return ConvertPlayerColor(0) end
+____exports.PLAYER_COLOR_BLUE = function() return ConvertPlayerColor(1) end
+____exports.PLAYER_COLOR_CYAN = function() return ConvertPlayerColor(2) end
+____exports.PLAYER_COLOR_PURPLE = function() return ConvertPlayerColor(3) end
+____exports.PLAYER_COLOR_YELLOW = function() return ConvertPlayerColor(4) end
+____exports.PLAYER_COLOR_ORANGE = function() return ConvertPlayerColor(5) end
+____exports.PLAYER_COLOR_GREEN = function() return ConvertPlayerColor(6) end
+____exports.PLAYER_COLOR_PINK = function() return ConvertPlayerColor(7) end
+____exports.PLAYER_COLOR_LIGHT_GRAY = function() return ConvertPlayerColor(8) end
+____exports.PLAYER_COLOR_LIGHT_BLUE = function() return ConvertPlayerColor(9) end
+____exports.PLAYER_COLOR_AQUA = function() return ConvertPlayerColor(10) end
+____exports.PLAYER_COLOR_BROWN = function() return ConvertPlayerColor(11) end
+____exports.PLAYER_COLOR_BLACK = function() return ConvertPlayerColor(12) end
+____exports.RACE_HUMAN = function() return ConvertRace(1) end
+____exports.RACE_ORC = function() return ConvertRace(2) end
+____exports.RACE_UNDEAD = function() return ConvertRace(3) end
+____exports.RACE_NIGHTELF = function() return ConvertRace(4) end
+____exports.RACE_DEMON = function() return ConvertRace(5) end
+____exports.RACE_OTHER = function() return ConvertRace(7) end
+____exports.PLAYER_GAME_RESULT_VICTORY = function() return ConvertPlayerGameResult(0) end
+____exports.PLAYER_GAME_RESULT_DEFEAT = function() return ConvertPlayerGameResult(1) end
+____exports.PLAYER_GAME_RESULT_TIE = function() return ConvertPlayerGameResult(2) end
+____exports.PLAYER_GAME_RESULT_NEUTRAL = function() return ConvertPlayerGameResult(3) end
+____exports.ALLIANCE_PASSIVE = function() return ConvertAllianceType(0) end
+____exports.ALLIANCE_HELP_REQUEST = function() return ConvertAllianceType(1) end
+____exports.ALLIANCE_HELP_RESPONSE = function() return ConvertAllianceType(2) end
+____exports.ALLIANCE_SHARED_XP = function() return ConvertAllianceType(3) end
+____exports.ALLIANCE_SHARED_SPELLS = function() return ConvertAllianceType(4) end
+____exports.ALLIANCE_SHARED_VISION = function() return ConvertAllianceType(5) end
+____exports.ALLIANCE_SHARED_CONTROL = function() return ConvertAllianceType(6) end
+____exports.ALLIANCE_SHARED_ADVANCED_CONTROL = function() return ConvertAllianceType(7) end
+____exports.ALLIANCE_RESCUABLE = function() return ConvertAllianceType(8) end
+____exports.ALLIANCE_SHARED_VISION_FORCED = function() return ConvertAllianceType(9) end
+____exports.VERSION_REIGN_OF_CHAOS = function() return ConvertVersion(0) end
+____exports.VERSION_FROZEN_THRONE = function() return ConvertVersion(1) end
+____exports.ATTACK_TYPE_NORMAL = function() return ConvertAttackType(0) end
+____exports.ATTACK_TYPE_MELEE = function() return ConvertAttackType(1) end
+____exports.ATTACK_TYPE_PIERCE = function() return ConvertAttackType(2) end
+____exports.ATTACK_TYPE_SIEGE = function() return ConvertAttackType(3) end
+____exports.ATTACK_TYPE_MAGIC = function() return ConvertAttackType(4) end
+____exports.ATTACK_TYPE_CHAOS = function() return ConvertAttackType(5) end
+____exports.ATTACK_TYPE_HERO = function() return ConvertAttackType(6) end
+____exports.DAMAGE_TYPE_UNKNOWN = function() return ConvertDamageType(0) end
+____exports.DAMAGE_TYPE_NORMAL = function() return ConvertDamageType(4) end
+____exports.DAMAGE_TYPE_ENHANCED = function() return ConvertDamageType(5) end
+____exports.DAMAGE_TYPE_FIRE = function() return ConvertDamageType(8) end
+____exports.DAMAGE_TYPE_COLD = function() return ConvertDamageType(9) end
+____exports.DAMAGE_TYPE_LIGHTNING = function() return ConvertDamageType(10) end
+____exports.DAMAGE_TYPE_POISON = function() return ConvertDamageType(11) end
+____exports.DAMAGE_TYPE_DISEASE = function() return ConvertDamageType(12) end
+____exports.DAMAGE_TYPE_DIVINE = function() return ConvertDamageType(13) end
+____exports.DAMAGE_TYPE_MAGIC = function() return ConvertDamageType(14) end
+____exports.DAMAGE_TYPE_SONIC = function() return ConvertDamageType(15) end
+____exports.DAMAGE_TYPE_ACID = function() return ConvertDamageType(16) end
+____exports.DAMAGE_TYPE_FORCE = function() return ConvertDamageType(17) end
+____exports.DAMAGE_TYPE_DEATH = function() return ConvertDamageType(18) end
+____exports.DAMAGE_TYPE_MIND = function() return ConvertDamageType(19) end
+____exports.DAMAGE_TYPE_PLANT = function() return ConvertDamageType(20) end
+____exports.DAMAGE_TYPE_DEFENSIVE = function() return ConvertDamageType(21) end
+____exports.DAMAGE_TYPE_DEMOLITION = function() return ConvertDamageType(22) end
+____exports.DAMAGE_TYPE_SLOW_POISON = function() return ConvertDamageType(23) end
+____exports.DAMAGE_TYPE_SPIRIT_LINK = function() return ConvertDamageType(24) end
+____exports.DAMAGE_TYPE_SHADOW_STRIKE = function() return ConvertDamageType(25) end
+____exports.DAMAGE_TYPE_UNIVERSAL = function() return ConvertDamageType(26) end
+____exports.WEAPON_TYPE_WHOKNOWS = function() return ConvertWeaponType(0) end
+____exports.WEAPON_TYPE_METAL_LIGHT_CHOP = function() return ConvertWeaponType(1) end
+____exports.WEAPON_TYPE_METAL_MEDIUM_CHOP = function() return ConvertWeaponType(2) end
+____exports.WEAPON_TYPE_METAL_HEAVY_CHOP = function() return ConvertWeaponType(3) end
+____exports.WEAPON_TYPE_METAL_LIGHT_SLICE = function() return ConvertWeaponType(4) end
+____exports.WEAPON_TYPE_METAL_MEDIUM_SLICE = function() return ConvertWeaponType(5) end
+____exports.WEAPON_TYPE_METAL_HEAVY_SLICE = function() return ConvertWeaponType(6) end
+____exports.WEAPON_TYPE_METAL_MEDIUM_BASH = function() return ConvertWeaponType(7) end
+____exports.WEAPON_TYPE_METAL_HEAVY_BASH = function() return ConvertWeaponType(8) end
+____exports.WEAPON_TYPE_METAL_MEDIUM_STAB = function() return ConvertWeaponType(9) end
+____exports.WEAPON_TYPE_METAL_HEAVY_STAB = function() return ConvertWeaponType(10) end
+____exports.WEAPON_TYPE_WOOD_LIGHT_SLICE = function() return ConvertWeaponType(11) end
+____exports.WEAPON_TYPE_WOOD_MEDIUM_SLICE = function() return ConvertWeaponType(12) end
+____exports.WEAPON_TYPE_WOOD_HEAVY_SLICE = function() return ConvertWeaponType(13) end
+____exports.WEAPON_TYPE_WOOD_LIGHT_BASH = function() return ConvertWeaponType(14) end
+____exports.WEAPON_TYPE_WOOD_MEDIUM_BASH = function() return ConvertWeaponType(15) end
+____exports.WEAPON_TYPE_WOOD_HEAVY_BASH = function() return ConvertWeaponType(16) end
+____exports.WEAPON_TYPE_WOOD_LIGHT_STAB = function() return ConvertWeaponType(17) end
+____exports.WEAPON_TYPE_WOOD_MEDIUM_STAB = function() return ConvertWeaponType(18) end
+____exports.WEAPON_TYPE_CLAW_LIGHT_SLICE = function() return ConvertWeaponType(19) end
+____exports.WEAPON_TYPE_CLAW_MEDIUM_SLICE = function() return ConvertWeaponType(20) end
+____exports.WEAPON_TYPE_CLAW_HEAVY_SLICE = function() return ConvertWeaponType(21) end
+____exports.WEAPON_TYPE_AXE_MEDIUM_CHOP = function() return ConvertWeaponType(22) end
+____exports.WEAPON_TYPE_ROCK_HEAVY_BASH = function() return ConvertWeaponType(23) end
+____exports.PATHING_TYPE_ANY = function() return ConvertPathingType(0) end
+____exports.PATHING_TYPE_WALKABILITY = function() return ConvertPathingType(1) end
+____exports.PATHING_TYPE_FLYABILITY = function() return ConvertPathingType(2) end
+____exports.PATHING_TYPE_BUILDABILITY = function() return ConvertPathingType(3) end
+____exports.PATHING_TYPE_PEONHARVESTPATHING = function() return ConvertPathingType(4) end
+____exports.PATHING_TYPE_BLIGHTPATHING = function() return ConvertPathingType(5) end
+____exports.PATHING_TYPE_FLOATABILITY = function() return ConvertPathingType(6) end
+____exports.PATHING_TYPE_AMPHIBIOUSPATHING = function() return ConvertPathingType(7) end
+____exports.RACE_PREF_HUMAN = function() return ConvertRacePref(1) end
+____exports.RACE_PREF_ORC = function() return ConvertRacePref(2) end
+____exports.RACE_PREF_NIGHTELF = function() return ConvertRacePref(4) end
+____exports.RACE_PREF_UNDEAD = function() return ConvertRacePref(8) end
+____exports.RACE_PREF_DEMON = function() return ConvertRacePref(16) end
+____exports.RACE_PREF_RANDOM = function() return ConvertRacePref(32) end
+____exports.RACE_PREF_USER_SELECTABLE = function() return ConvertRacePref(64) end
+____exports.MAP_CONTROL_USER = function() return ConvertMapControl(0) end
+____exports.MAP_CONTROL_COMPUTER = function() return ConvertMapControl(1) end
+____exports.MAP_CONTROL_RESCUABLE = function() return ConvertMapControl(2) end
+____exports.MAP_CONTROL_NEUTRAL = function() return ConvertMapControl(3) end
+____exports.MAP_CONTROL_CREEP = function() return ConvertMapControl(4) end
+____exports.MAP_CONTROL_NONE = function() return ConvertMapControl(5) end
+____exports.GAME_TYPE_MELEE = function() return ConvertGameType(1) end
+____exports.GAME_TYPE_FFA = function() return ConvertGameType(2) end
+____exports.GAME_TYPE_USE_MAP_SETTINGS = function() return ConvertGameType(4) end
+____exports.GAME_TYPE_BLIZ = function() return ConvertGameType(8) end
+____exports.GAME_TYPE_ONE_ON_ONE = function() return ConvertGameType(16) end
+____exports.GAME_TYPE_TWO_TEAM_PLAY = function() return ConvertGameType(32) end
+____exports.GAME_TYPE_THREE_TEAM_PLAY = function() return ConvertGameType(64) end
+____exports.GAME_TYPE_FOUR_TEAM_PLAY = function() return ConvertGameType(128) end
+____exports.MAP_FOG_HIDE_TERRAIN = function() return ConvertMapFlag(1) end
+____exports.MAP_FOG_MAP_EXPLORED = function() return ConvertMapFlag(2) end
+____exports.MAP_FOG_ALWAYS_VISIBLE = function() return ConvertMapFlag(4) end
+____exports.MAP_USE_HANDICAPS = function() return ConvertMapFlag(8) end
+____exports.MAP_OBSERVERS = function() return ConvertMapFlag(16) end
+____exports.MAP_OBSERVERS_ON_DEATH = function() return ConvertMapFlag(32) end
+____exports.MAP_FIXED_COLORS = function() return ConvertMapFlag(128) end
+____exports.MAP_LOCK_RESOURCE_TRADING = function() return ConvertMapFlag(256) end
+____exports.MAP_RESOURCE_TRADING_ALLIES_ONLY = function() return ConvertMapFlag(512) end
+____exports.MAP_LOCK_ALLIANCE_CHANGES = function() return ConvertMapFlag(1024) end
+____exports.MAP_ALLIANCE_CHANGES_HIDDEN = function() return ConvertMapFlag(2048) end
+____exports.MAP_CHEATS = function() return ConvertMapFlag(4096) end
+____exports.MAP_CHEATS_HIDDEN = function() return ConvertMapFlag(8192) end
+____exports.MAP_LOCK_SPEED = function() return ConvertMapFlag(8192 * 2) end
+____exports.MAP_LOCK_RANDOM_SEED = function() return ConvertMapFlag(8192 * 4) end
+____exports.MAP_SHARED_ADVANCED_CONTROL = function() return ConvertMapFlag(8192 * 8) end
+____exports.MAP_RANDOM_HERO = function() return ConvertMapFlag(8192 * 16) end
+____exports.MAP_RANDOM_RACES = function() return ConvertMapFlag(8192 * 32) end
+____exports.MAP_RELOADED = function() return ConvertMapFlag(8192 * 64) end
+____exports.MAP_PLACEMENT_RANDOM = function() return ConvertPlacement(0) end
+____exports.MAP_PLACEMENT_FIXED = function() return ConvertPlacement(1) end
+____exports.MAP_PLACEMENT_USE_MAP_SETTINGS = function() return ConvertPlacement(2) end
+____exports.MAP_PLACEMENT_TEAMS_TOGETHER = function() return ConvertPlacement(3) end
+____exports.MAP_LOC_PRIO_LOW = function() return ConvertStartLocPrio(0) end
+____exports.MAP_LOC_PRIO_HIGH = function() return ConvertStartLocPrio(1) end
+____exports.MAP_LOC_PRIO_NOT = function() return ConvertStartLocPrio(2) end
+____exports.MAP_DENSITY_NONE = function() return ConvertMapDensity(0) end
+____exports.MAP_DENSITY_LIGHT = function() return ConvertMapDensity(1) end
+____exports.MAP_DENSITY_MEDIUM = function() return ConvertMapDensity(2) end
+____exports.MAP_DENSITY_HEAVY = function() return ConvertMapDensity(3) end
+____exports.MAP_DIFFICULTY_EASY = function() return ConvertGameDifficulty(0) end
+____exports.MAP_DIFFICULTY_NORMAL = function() return ConvertGameDifficulty(1) end
+____exports.MAP_DIFFICULTY_HARD = function() return ConvertGameDifficulty(2) end
+____exports.MAP_DIFFICULTY_INSANE = function() return ConvertGameDifficulty(3) end
+____exports.MAP_SPEED_SLOWEST = function() return ConvertGameSpeed(0) end
+____exports.MAP_SPEED_SLOW = function() return ConvertGameSpeed(1) end
+____exports.MAP_SPEED_FAST = function() return ConvertGameSpeed(3) end
+____exports.MAP_SPEED_FASTEST = function() return ConvertGameSpeed(4) end
+____exports.PLAYER_SLOT_STATE_EMPTY = function() return ConvertPlayerSlotState(0) end
+____exports.PLAYER_SLOT_STATE_PLAYING = function() return ConvertPlayerSlotState(1) end
+____exports.PLAYER_SLOT_STATE_LEFT = function() return ConvertPlayerSlotState(2) end
+____exports.SOUND_VOLUMEGROUP_UNITMOVEMENT = function() return ConvertVolumeGroup(0) end
+____exports.SOUND_VOLUMEGROUP_UNITSOUNDS = function() return ConvertVolumeGroup(1) end
+____exports.SOUND_VOLUMEGROUP_COMBAT = function() return ConvertVolumeGroup(2) end
+____exports.SOUND_VOLUMEGROUP_SPELLS = function() return ConvertVolumeGroup(3) end
+____exports.SOUND_VOLUMEGROUP_UI = function() return ConvertVolumeGroup(4) end
+____exports.SOUND_VOLUMEGROUP_MUSIC = function() return ConvertVolumeGroup(5) end
+____exports.SOUND_VOLUMEGROUP_AMBIENTSOUNDS = function() return ConvertVolumeGroup(6) end
+____exports.SOUND_VOLUMEGROUP_FIRE = function() return ConvertVolumeGroup(7) end
+____exports.GAME_STATE_DIVINE_INTERVENTION = function() return ConvertIGameState(0) end
+____exports.GAME_STATE_DISCONNECTED = function() return ConvertIGameState(1) end
+____exports.GAME_STATE_TIME_OF_DAY = function() return ConvertFGameState(2) end
+____exports.PLAYER_STATE_GAME_RESULT = function() return ConvertPlayerState(0) end
+____exports.PLAYER_STATE_RESOURCE_GOLD = function() return ConvertPlayerState(1) end
+____exports.PLAYER_STATE_RESOURCE_LUMBER = function() return ConvertPlayerState(2) end
+____exports.PLAYER_STATE_RESOURCE_HERO_TOKENS = function() return ConvertPlayerState(3) end
+____exports.PLAYER_STATE_RESOURCE_FOOD_CAP = function() return ConvertPlayerState(4) end
+____exports.PLAYER_STATE_RESOURCE_FOOD_USED = function() return ConvertPlayerState(5) end
+____exports.PLAYER_STATE_FOOD_CAP_CEILING = function() return ConvertPlayerState(6) end
+____exports.PLAYER_STATE_GIVES_BOUNTY = function() return ConvertPlayerState(7) end
+____exports.PLAYER_STATE_ALLIED_VICTORY = function() return ConvertPlayerState(8) end
+____exports.PLAYER_STATE_PLACED = function() return ConvertPlayerState(9) end
+____exports.PLAYER_STATE_OBSERVER_ON_DEATH = function() return ConvertPlayerState(10) end
+____exports.PLAYER_STATE_OBSERVER = function() return ConvertPlayerState(11) end
+____exports.PLAYER_STATE_UNFOLLOWABLE = function() return ConvertPlayerState(12) end
+____exports.PLAYER_STATE_GOLD_UPKEEP_RATE = function() return ConvertPlayerState(13) end
+____exports.PLAYER_STATE_LUMBER_UPKEEP_RATE = function() return ConvertPlayerState(14) end
+____exports.PLAYER_STATE_GOLD_GATHERED = function() return ConvertPlayerState(15) end
+____exports.PLAYER_STATE_LUMBER_GATHERED = function() return ConvertPlayerState(16) end
+____exports.PLAYER_STATE_NO_CREEP_SLEEP = function() return ConvertPlayerState(25) end
+____exports.UNIT_STATE_LIFE = function() return ConvertUnitState(0) end
+____exports.UNIT_STATE_MAX_LIFE = function() return ConvertUnitState(1) end
+____exports.UNIT_STATE_MANA = function() return ConvertUnitState(2) end
+____exports.UNIT_STATE_MAX_MANA = function() return ConvertUnitState(3) end
+____exports.UNIT_STATE_ATTACK_DICE = function() return ConvertUnitState(16) end
+____exports.UNIT_STATE_ATTACK_SIDE = function() return ConvertUnitState(17) end
+____exports.UNIT_STATE_ATTACK_WHITE = function() return ConvertUnitState(18) end
+____exports.UNIT_STATE_ATTACK_BONUS = function() return ConvertUnitState(19) end
+____exports.UNIT_STATE_ATTACK_MIX = function() return ConvertUnitState(20) end
+____exports.UNIT_STATE_ATTACK_MAX = function() return ConvertUnitState(21) end
+____exports.UNIT_STATE_ATTACK_RANGE = function() return ConvertUnitState(22) end
+____exports.UNIT_STATE_DEFEND_WHITE = function() return ConvertUnitState(32) end
+____exports.UNIT_STATE_ATTACK_SPACE = function() return ConvertUnitState(37) end
+____exports.UNIT_STATE_ATTACK_SPEED = function() return ConvertUnitState(81) end
+____exports.AI_DIFFICULTY_NEWBIE = function() return ConvertAIDifficulty(0) end
+____exports.AI_DIFFICULTY_NORMAL = function() return ConvertAIDifficulty(1) end
+____exports.AI_DIFFICULTY_INSANE = function() return ConvertAIDifficulty(2) end
+____exports.PLAYER_SCORE_UNITS_TRAINED = function() return ConvertPlayerScore(0) end
+____exports.PLAYER_SCORE_UNITS_KILLED = function() return ConvertPlayerScore(1) end
+____exports.PLAYER_SCORE_STRUCT_BUILT = function() return ConvertPlayerScore(2) end
+____exports.PLAYER_SCORE_STRUCT_RAZED = function() return ConvertPlayerScore(3) end
+____exports.PLAYER_SCORE_TECH_PERCENT = function() return ConvertPlayerScore(4) end
+____exports.PLAYER_SCORE_FOOD_MAXPROD = function() return ConvertPlayerScore(5) end
+____exports.PLAYER_SCORE_FOOD_MAXUSED = function() return ConvertPlayerScore(6) end
+____exports.PLAYER_SCORE_HEROES_KILLED = function() return ConvertPlayerScore(7) end
+____exports.PLAYER_SCORE_ITEMS_GAINED = function() return ConvertPlayerScore(8) end
+____exports.PLAYER_SCORE_MERCS_HIRED = function() return ConvertPlayerScore(9) end
+____exports.PLAYER_SCORE_GOLD_MINED_TOTAL = function() return ConvertPlayerScore(10) end
+____exports.PLAYER_SCORE_GOLD_MINED_UPKEEP = function() return ConvertPlayerScore(11) end
+____exports.PLAYER_SCORE_GOLD_LOST_UPKEEP = function() return ConvertPlayerScore(12) end
+____exports.PLAYER_SCORE_GOLD_LOST_TAX = function() return ConvertPlayerScore(13) end
+____exports.PLAYER_SCORE_GOLD_GIVEN = function() return ConvertPlayerScore(14) end
+____exports.PLAYER_SCORE_GOLD_RECEIVED = function() return ConvertPlayerScore(15) end
+____exports.PLAYER_SCORE_LUMBER_TOTAL = function() return ConvertPlayerScore(16) end
+____exports.PLAYER_SCORE_LUMBER_LOST_UPKEEP = function() return ConvertPlayerScore(17) end
+____exports.PLAYER_SCORE_LUMBER_LOST_TAX = function() return ConvertPlayerScore(18) end
+____exports.PLAYER_SCORE_LUMBER_GIVEN = function() return ConvertPlayerScore(19) end
+____exports.PLAYER_SCORE_LUMBER_RECEIVED = function() return ConvertPlayerScore(20) end
+____exports.PLAYER_SCORE_UNIT_TOTAL = function() return ConvertPlayerScore(21) end
+____exports.PLAYER_SCORE_HERO_TOTAL = function() return ConvertPlayerScore(22) end
+____exports.PLAYER_SCORE_RESOURCE_TOTAL = function() return ConvertPlayerScore(23) end
+____exports.PLAYER_SCORE_TOTAL = function() return ConvertPlayerScore(24) end
+____exports.EVENT_GAME_VICTORY = function() return ConvertGameEvent(0) end
+____exports.EVENT_GAME_END_LEVEL = function() return ConvertGameEvent(1) end
+____exports.EVENT_GAME_VARIABLE_LIMIT = function() return ConvertGameEvent(2) end
+____exports.EVENT_GAME_STATE_LIMIT = function() return ConvertGameEvent(3) end
+____exports.EVENT_GAME_TIMER_EXPIRED = function() return ConvertGameEvent(4) end
+____exports.EVENT_GAME_ENTER_REGION = function() return ConvertGameEvent(5) end
+____exports.EVENT_GAME_LEAVE_REGION = function() return ConvertGameEvent(6) end
+____exports.EVENT_GAME_TRACKABLE_HIT = function() return ConvertGameEvent(7) end
+____exports.EVENT_GAME_TRACKABLE_TRACK = function() return ConvertGameEvent(8) end
+____exports.EVENT_GAME_SHOW_SKILL = function() return ConvertGameEvent(9) end
+____exports.EVENT_GAME_BUILD_SUBMENU = function() return ConvertGameEvent(10) end
+____exports.EVENT_PLAYER_STATE_LIMIT = function() return ConvertPlayerEvent(11) end
+____exports.EVENT_PLAYER_ALLIANCE_CHANGED = function() return ConvertPlayerEvent(12) end
+____exports.EVENT_PLAYER_DEFEAT = function() return ConvertPlayerEvent(13) end
+____exports.EVENT_PLAYER_VICTORY = function() return ConvertPlayerEvent(14) end
+____exports.EVENT_PLAYER_LEAVE = function() return ConvertPlayerEvent(15) end
+____exports.EVENT_PLAYER_CHAT = function() return ConvertPlayerEvent(16) end
+____exports.EVENT_PLAYER_END_CINEMATIC = function() return ConvertPlayerEvent(17) end
+____exports.EVENT_PLAYER_UNIT_ATTACKED = function() return ConvertPlayerUnitEvent(18) end
+____exports.EVENT_PLAYER_UNIT_RESCUED = function() return ConvertPlayerUnitEvent(19) end
+____exports.EVENT_PLAYER_UNIT_DEATH = function() return ConvertPlayerUnitEvent(20) end
+____exports.EVENT_PLAYER_UNIT_DECAY = function() return ConvertPlayerUnitEvent(21) end
+____exports.EVENT_PLAYER_UNIT_DETECTED = function() return ConvertPlayerUnitEvent(22) end
+____exports.EVENT_PLAYER_UNIT_HIDDEN = function() return ConvertPlayerUnitEvent(23) end
+____exports.EVENT_PLAYER_UNIT_SELECTED = function() return ConvertPlayerUnitEvent(24) end
+____exports.EVENT_PLAYER_UNIT_DESELECTED = function() return ConvertPlayerUnitEvent(25) end
+____exports.EVENT_PLAYER_UNIT_CONSTRUCT_START = function() return ConvertPlayerUnitEvent(26) end
+____exports.EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL = function() return ConvertPlayerUnitEvent(27) end
+____exports.EVENT_PLAYER_UNIT_CONSTRUCT_FINISH = function() return ConvertPlayerUnitEvent(28) end
+____exports.EVENT_PLAYER_UNIT_UPGRADE_START = function() return ConvertPlayerUnitEvent(29) end
+____exports.EVENT_PLAYER_UNIT_UPGRADE_CANCEL = function() return ConvertPlayerUnitEvent(30) end
+____exports.EVENT_PLAYER_UNIT_UPGRADE_FINISH = function() return ConvertPlayerUnitEvent(31) end
+____exports.EVENT_PLAYER_UNIT_TRAIN_START = function() return ConvertPlayerUnitEvent(32) end
+____exports.EVENT_PLAYER_UNIT_TRAIN_CANCEL = function() return ConvertPlayerUnitEvent(33) end
+____exports.EVENT_PLAYER_UNIT_TRAIN_FINISH = function() return ConvertPlayerUnitEvent(34) end
+____exports.EVENT_PLAYER_UNIT_RESEARCH_START = function() return ConvertPlayerUnitEvent(35) end
+____exports.EVENT_PLAYER_UNIT_RESEARCH_CANCEL = function() return ConvertPlayerUnitEvent(36) end
+____exports.EVENT_PLAYER_UNIT_RESEARCH_FINISH = function() return ConvertPlayerUnitEvent(37) end
+____exports.EVENT_PLAYER_UNIT_ISSUED_ORDER = function() return ConvertPlayerUnitEvent(38) end
+____exports.EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER = function() return ConvertPlayerUnitEvent(39) end
+____exports.EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER = function() return ConvertPlayerUnitEvent(40) end
+____exports.EVENT_PLAYER_UNIT_ISSUED_UNIT_ORDER = function() return ConvertPlayerUnitEvent(40) end
+____exports.EVENT_PLAYER_HERO_LEVEL = function() return ConvertPlayerUnitEvent(41) end
+____exports.EVENT_PLAYER_HERO_SKILL = function() return ConvertPlayerUnitEvent(42) end
+____exports.EVENT_PLAYER_HERO_REVIVABLE = function() return ConvertPlayerUnitEvent(43) end
+____exports.EVENT_PLAYER_HERO_REVIVE_START = function() return ConvertPlayerUnitEvent(44) end
+____exports.EVENT_PLAYER_HERO_REVIVE_CANCEL = function() return ConvertPlayerUnitEvent(45) end
+____exports.EVENT_PLAYER_HERO_REVIVE_FINISH = function() return ConvertPlayerUnitEvent(46) end
+____exports.EVENT_PLAYER_UNIT_SUMMON = function() return ConvertPlayerUnitEvent(47) end
+____exports.EVENT_PLAYER_UNIT_DROP_ITEM = function() return ConvertPlayerUnitEvent(48) end
+____exports.EVENT_PLAYER_UNIT_PICKUP_ITEM = function() return ConvertPlayerUnitEvent(49) end
+____exports.EVENT_PLAYER_UNIT_USE_ITEM = function() return ConvertPlayerUnitEvent(50) end
+____exports.EVENT_PLAYER_UNIT_LOADED = function() return ConvertPlayerUnitEvent(51) end
+____exports.EVENT_UNIT_DAMAGED = function() return ConvertUnitEvent(52) end
+____exports.EVENT_UNIT_DEATH = function() return ConvertUnitEvent(53) end
+____exports.EVENT_UNIT_DECAY = function() return ConvertUnitEvent(54) end
+____exports.EVENT_UNIT_DETECTED = function() return ConvertUnitEvent(55) end
+____exports.EVENT_UNIT_HIDDEN = function() return ConvertUnitEvent(56) end
+____exports.EVENT_UNIT_SELECTED = function() return ConvertUnitEvent(57) end
+____exports.EVENT_UNIT_DESELECTED = function() return ConvertUnitEvent(58) end
+____exports.EVENT_UNIT_STATE_LIMIT = function() return ConvertUnitEvent(59) end
+____exports.EVENT_UNIT_ACQUIRED_TARGET = function() return ConvertUnitEvent(60) end
+____exports.EVENT_UNIT_TARGET_IN_RANGE = function() return ConvertUnitEvent(61) end
+____exports.EVENT_UNIT_ATTACKED = function() return ConvertUnitEvent(62) end
+____exports.EVENT_UNIT_RESCUED = function() return ConvertUnitEvent(63) end
+____exports.EVENT_UNIT_CONSTRUCT_CANCEL = function() return ConvertUnitEvent(64) end
+____exports.EVENT_UNIT_CONSTRUCT_FINISH = function() return ConvertUnitEvent(65) end
+____exports.EVENT_UNIT_UPGRADE_START = function() return ConvertUnitEvent(66) end
+____exports.EVENT_UNIT_UPGRADE_CANCEL = function() return ConvertUnitEvent(67) end
+____exports.EVENT_UNIT_UPGRADE_FINISH = function() return ConvertUnitEvent(68) end
+____exports.EVENT_UNIT_TRAIN_START = function() return ConvertUnitEvent(69) end
+____exports.EVENT_UNIT_TRAIN_CANCEL = function() return ConvertUnitEvent(70) end
+____exports.EVENT_UNIT_TRAIN_FINISH = function() return ConvertUnitEvent(71) end
+____exports.EVENT_UNIT_RESEARCH_START = function() return ConvertUnitEvent(72) end
+____exports.EVENT_UNIT_RESEARCH_CANCEL = function() return ConvertUnitEvent(73) end
+____exports.EVENT_UNIT_RESEARCH_FINISH = function() return ConvertUnitEvent(74) end
+____exports.EVENT_UNIT_ISSUED_ORDER = function() return ConvertUnitEvent(75) end
+____exports.EVENT_UNIT_ISSUED_POINT_ORDER = function() return ConvertUnitEvent(76) end
+____exports.EVENT_UNIT_ISSUED_TARGET_ORDER = function() return ConvertUnitEvent(77) end
+____exports.EVENT_UNIT_HERO_LEVEL = function() return ConvertUnitEvent(78) end
+____exports.EVENT_UNIT_HERO_SKILL = function() return ConvertUnitEvent(79) end
+____exports.EVENT_UNIT_HERO_REVIVABLE = function() return ConvertUnitEvent(80) end
+____exports.EVENT_UNIT_HERO_REVIVE_START = function() return ConvertUnitEvent(81) end
+____exports.EVENT_UNIT_HERO_REVIVE_CANCEL = function() return ConvertUnitEvent(82) end
+____exports.EVENT_UNIT_HERO_REVIVE_FINISH = function() return ConvertUnitEvent(83) end
+____exports.EVENT_UNIT_SUMMON = function() return ConvertUnitEvent(84) end
+____exports.EVENT_UNIT_DROP_ITEM = function() return ConvertUnitEvent(85) end
+____exports.EVENT_UNIT_PICKUP_ITEM = function() return ConvertUnitEvent(86) end
+____exports.EVENT_UNIT_USE_ITEM = function() return ConvertUnitEvent(87) end
+____exports.EVENT_UNIT_LOADED = function() return ConvertUnitEvent(88) end
+____exports.EVENT_WIDGET_DEATH = function() return ConvertWidgetEvent(89) end
+____exports.EVENT_DIALOG_BUTTON_CLICK = function() return ConvertDialogEvent(90) end
+____exports.EVENT_DIALOG_CLICK = function() return ConvertDialogEvent(91) end
+____exports.EVENT_GAME_LOADED = function() return ConvertGameEvent(256) end
+____exports.EVENT_GAME_TOURNAMENT_FINISH_SOON = function() return ConvertGameEvent(257) end
+____exports.EVENT_GAME_TOURNAMENT_FINISH_NOW = function() return ConvertGameEvent(258) end
+____exports.EVENT_GAME_SAVE = function() return ConvertGameEvent(259) end
+____exports.EVENT_PLAYER_ARROW_LEFT_DOWN = function() return ConvertPlayerEvent(261) end
+____exports.EVENT_PLAYER_ARROW_LEFT_UP = function() return ConvertPlayerEvent(262) end
+____exports.EVENT_PLAYER_ARROW_RIGHT_DOWN = function() return ConvertPlayerEvent(263) end
+____exports.EVENT_PLAYER_ARROW_RIGHT_UP = function() return ConvertPlayerEvent(264) end
+____exports.EVENT_PLAYER_ARROW_DOWN_DOWN = function() return ConvertPlayerEvent(265) end
+____exports.EVENT_PLAYER_ARROW_DOWN_UP = function() return ConvertPlayerEvent(266) end
+____exports.EVENT_PLAYER_ARROW_UP_DOWN = function() return ConvertPlayerEvent(267) end
+____exports.EVENT_PLAYER_ARROW_UP_UP = function() return ConvertPlayerEvent(268) end
+____exports.EVENT_PLAYER_UNIT_SELL = function() return ConvertPlayerUnitEvent(269) end
+____exports.EVENT_PLAYER_UNIT_CHANGE_OWNER = function() return ConvertPlayerUnitEvent(270) end
+____exports.EVENT_PLAYER_UNIT_SELL_ITEM = function() return ConvertPlayerUnitEvent(271) end
+____exports.EVENT_PLAYER_UNIT_SPELL_CHANNEL = function() return ConvertPlayerUnitEvent(272) end
+____exports.EVENT_PLAYER_UNIT_SPELL_CAST = function() return ConvertPlayerUnitEvent(273) end
+____exports.EVENT_PLAYER_UNIT_SPELL_EFFECT = function() return ConvertPlayerUnitEvent(274) end
+____exports.EVENT_PLAYER_UNIT_SPELL_FINISH = function() return ConvertPlayerUnitEvent(275) end
+____exports.EVENT_PLAYER_UNIT_SPELL_ENDCAST = function() return ConvertPlayerUnitEvent(276) end
+____exports.EVENT_PLAYER_UNIT_PAWN_ITEM = function() return ConvertPlayerUnitEvent(277) end
+____exports.EVENT_UNIT_SELL = function() return ConvertUnitEvent(286) end
+____exports.EVENT_UNIT_CHANGE_OWNER = function() return ConvertUnitEvent(287) end
+____exports.EVENT_UNIT_SELL_ITEM = function() return ConvertUnitEvent(288) end
+____exports.EVENT_UNIT_SPELL_CHANNEL = function() return ConvertUnitEvent(289) end
+____exports.EVENT_UNIT_SPELL_CAST = function() return ConvertUnitEvent(290) end
+____exports.EVENT_UNIT_SPELL_EFFECT = function() return ConvertUnitEvent(291) end
+____exports.EVENT_UNIT_SPELL_FINISH = function() return ConvertUnitEvent(292) end
+____exports.EVENT_UNIT_SPELL_ENDCAST = function() return ConvertUnitEvent(293) end
+____exports.EVENT_UNIT_PAWN_ITEM = function() return ConvertUnitEvent(294) end
+____exports.LESS_THAN = function() return ConvertLimitOp(0) end
+____exports.LESS_THAN_OR_EQUAL = function() return ConvertLimitOp(1) end
+____exports.EQUAL = function() return ConvertLimitOp(2) end
+____exports.GREATER_THAN_OR_EQUAL = function() return ConvertLimitOp(3) end
+____exports.GREATER_THAN = function() return ConvertLimitOp(4) end
+____exports.NOT_EQUAL = function() return ConvertLimitOp(5) end
+____exports.UNIT_TYPE_HERO = function() return ConvertUnitType(0) end
+____exports.UNIT_TYPE_DEAD = function() return ConvertUnitType(1) end
+____exports.UNIT_TYPE_STRUCTURE = function() return ConvertUnitType(2) end
+____exports.UNIT_TYPE_FLYING = function() return ConvertUnitType(3) end
+____exports.UNIT_TYPE_GROUND = function() return ConvertUnitType(4) end
+____exports.UNIT_TYPE_ATTACKS_FLYING = function() return ConvertUnitType(5) end
+____exports.UNIT_TYPE_ATTACKS_GROUND = function() return ConvertUnitType(6) end
+____exports.UNIT_TYPE_MELEE_ATTACKER = function() return ConvertUnitType(7) end
+____exports.UNIT_TYPE_RANGED_ATTACKER = function() return ConvertUnitType(8) end
+____exports.UNIT_TYPE_GIANT = function() return ConvertUnitType(9) end
+____exports.UNIT_TYPE_SUMMONED = function() return ConvertUnitType(10) end
+____exports.UNIT_TYPE_STUNNED = function() return ConvertUnitType(11) end
+____exports.UNIT_TYPE_PLAGUED = function() return ConvertUnitType(12) end
+____exports.UNIT_TYPE_SNARED = function() return ConvertUnitType(13) end
+____exports.UNIT_TYPE_UNDEAD = function() return ConvertUnitType(14) end
+____exports.UNIT_TYPE_MECHANICAL = function() return ConvertUnitType(15) end
+____exports.UNIT_TYPE_PEON = function() return ConvertUnitType(16) end
+____exports.UNIT_TYPE_SAPPER = function() return ConvertUnitType(17) end
+____exports.UNIT_TYPE_TOWNHALL = function() return ConvertUnitType(18) end
+____exports.UNIT_TYPE_ANCIENT = function() return ConvertUnitType(19) end
+____exports.UNIT_TYPE_TAUREN = function() return ConvertUnitType(20) end
+____exports.UNIT_TYPE_POISONED = function() return ConvertUnitType(21) end
+____exports.UNIT_TYPE_POLYMORPHED = function() return ConvertUnitType(22) end
+____exports.UNIT_TYPE_SLEEPING = function() return ConvertUnitType(23) end
+____exports.UNIT_TYPE_RESISTANT = function() return ConvertUnitType(24) end
+____exports.UNIT_TYPE_ETHEREAL = function() return ConvertUnitType(25) end
+____exports.UNIT_TYPE_MAGIC_IMMUNE = function() return ConvertUnitType(26) end
+____exports.ITEM_TYPE_PERMANENT = function() return ConvertItemType(0) end
+____exports.ITEM_TYPE_CHARGED = function() return ConvertItemType(1) end
+____exports.ITEM_TYPE_POWERUP = function() return ConvertItemType(2) end
+____exports.ITEM_TYPE_ARTIFACT = function() return ConvertItemType(3) end
+____exports.ITEM_TYPE_PURCHASABLE = function() return ConvertItemType(4) end
+____exports.ITEM_TYPE_CAMPAIGN = function() return ConvertItemType(5) end
+____exports.ITEM_TYPE_MISCELLANEOUS = function() return ConvertItemType(6) end
+____exports.ITEM_TYPE_UNKNOWN = function() return ConvertItemType(7) end
+____exports.ITEM_TYPE_ANY = function() return ConvertItemType(8) end
+____exports.ITEM_TYPE_TOME = function() return ConvertItemType(2) end
+____exports.CAMERA_FIELD_TARGET_DISTANCE = function() return ConvertCameraField(0) end
+____exports.CAMERA_FIELD_FARZ = function() return ConvertCameraField(1) end
+____exports.CAMERA_FIELD_ANGLE_OF_ATTACK = function() return ConvertCameraField(2) end
+____exports.CAMERA_FIELD_FIELD_OF_VIEW = function() return ConvertCameraField(3) end
+____exports.CAMERA_FIELD_ROLL = function() return ConvertCameraField(4) end
+____exports.CAMERA_FIELD_ROTATION = function() return ConvertCameraField(5) end
+____exports.CAMERA_FIELD_ZOFFSET = function() return ConvertCameraField(6) end
+____exports.BLEND_MODE_NONE = function() return ConvertBlendMode(0) end
+____exports.BLEND_MODE_DONT_CARE = function() return ConvertBlendMode(0) end
+____exports.BLEND_MODE_KEYALPHA = function() return ConvertBlendMode(1) end
+____exports.BLEND_MODE_BLEND = function() return ConvertBlendMode(2) end
+____exports.BLEND_MODE_ADDITIVE = function() return ConvertBlendMode(3) end
+____exports.BLEND_MODE_MODULATE = function() return ConvertBlendMode(4) end
+____exports.BLEND_MODE_MODULATE_2X = function() return ConvertBlendMode(5) end
+____exports.RARITY_FREQUENT = function() return ConvertRarityControl(0) end
+____exports.RARITY_RARE = function() return ConvertRarityControl(1) end
+____exports.TEXMAP_FLAG_NONE = function() return ConvertTexMapFlags(0) end
+____exports.TEXMAP_FLAG_WRAP_U = function() return ConvertTexMapFlags(1) end
+____exports.TEXMAP_FLAG_WRAP_V = function() return ConvertTexMapFlags(2) end
+____exports.TEXMAP_FLAG_WRAP_UV = function() return ConvertTexMapFlags(3) end
+____exports.FOG_OF_WAR_MASKED = function() return ConvertFogState(1) end
+____exports.FOG_OF_WAR_FOGGED = function() return ConvertFogState(2) end
+____exports.FOG_OF_WAR_VISIBLE = function() return ConvertFogState(4) end
+____exports.CAMERA_MARGIN_LEFT = 0
+____exports.CAMERA_MARGIN_RIGHT = 1
+____exports.CAMERA_MARGIN_TOP = 2
+____exports.CAMERA_MARGIN_BOTTOM = 3
+____exports.EFFECT_TYPE_EFFECT = function() return ConvertEffectType(0) end
+____exports.EFFECT_TYPE_TARGET = function() return ConvertEffectType(1) end
+____exports.EFFECT_TYPE_CASTER = function() return ConvertEffectType(2) end
+____exports.EFFECT_TYPE_SPECIAL = function() return ConvertEffectType(3) end
+____exports.EFFECT_TYPE_AREA_EFFECT = function() return ConvertEffectType(4) end
+____exports.EFFECT_TYPE_MISSILE = function() return ConvertEffectType(5) end
+____exports.EFFECT_TYPE_LIGHTNING = function() return ConvertEffectType(6) end
+____exports.SOUND_TYPE_EFFECT = function() return ConvertSoundType(0) end
+____exports.SOUND_TYPE_EFFECT_LOOPED = function() return ConvertSoundType(1) end
+____exports.EVENT_DAMAGE_DATA_VAILD = 0
+____exports.EVENT_DAMAGE_DATA_IS_PHYSICAL = 1
+____exports.EVENT_DAMAGE_DATA_IS_ATTACK = 2
+____exports.EVENT_DAMAGE_DATA_IS_RANGED = 3
+____exports.EVENT_DAMAGE_DATA_DAMAGE_TYPE = 4
+____exports.EVENT_DAMAGE_DATA_WEAPON_TYPE = 5
+____exports.EVENT_DAMAGE_DATA_ATTACK_TYPE = 6
+____exports.MOVE_TYPE_NONE = 0
+____exports.MOVE_TYPE_NOT = 1
+____exports.MOVE_TYPE_FOOT = 2
+____exports.MOVE_TYPE_FLY = 4
+____exports.MOVE_TYPE_MINE = 8
+____exports.MOVE_TYPE_WIND = 16
+____exports.MOVE_TYPE_UN = 32
+____exports.MOVE_TYPE_FLOAT = 64
+____exports.MOVE_TYPE_AMPH = 128
+____exports.COLLISION_TYPE_UNIT = 1
+____exports.COLLISION_TYPE_BUILDING = 3
+____exports.FRAME_ALIGN_LEFT_TOP = 0
+____exports.FRAME_ALIGN_TOP = 1
+____exports.FRAME_ALIGN_RIGHT_TOP = 2
+____exports.FRAME_ALIGN_LEFT = 3
+____exports.FRAME_ALIGN_CENTER = 4
+____exports.FRAME_ALIGN_RIGHT = 5
+____exports.FRAME_ALIGN_LEFT_BOTTOM = 6
+____exports.FRAME_ALIGN_BOTTOM = 7
+____exports.FRAME_ALIGN_RIGHT_BOTTOM = 8
+____exports.MOUSE_ORDER_CLICK = 1
+____exports.MOUSE_ORDER_ENTER = 2
+____exports.MOUSE_ORDER_LEAVE = 3
+____exports.MOUSE_ORDER_RELEASE = 4
+____exports.MOUSE_ORDER_SCROLL = 6
+____exports.MOUSE_ORDER_DOUBLE_CLICK = 12
+____exports.GAME_KEY_MOUSE_LEFT = 1
+____exports.GAME_KEY_MOUSE_RIGHT = 2
+____exports.GAME_KEY_A = 65
+____exports.GAME_KEY_B = 66
+____exports.GAME_KEY_C = 67
+____exports.GAME_KEY_D = 68
+____exports.GAME_KEY_E = 69
+____exports.GAME_KEY_F = 70
+____exports.GAME_KEY_G = 71
+____exports.GAME_KEY_H = 72
+____exports.GAME_KEY_I = 73
+____exports.GAME_KEY_J = 74
+____exports.GAME_KEY_K = 75
+____exports.GAME_KEY_L = 76
+____exports.GAME_KEY_M = 77
+____exports.GAME_KEY_N = 78
+____exports.GAME_KEY_O = 79
+____exports.GAME_KEY_P = 80
+____exports.GAME_KEY_Q = 81
+____exports.GAME_KEY_R = 82
+____exports.GAME_KEY_S = 83
+____exports.GAME_KEY_T = 84
+____exports.GAME_KEY_U = 85
+____exports.GAME_KEY_V = 86
+____exports.GAME_KEY_W = 87
+____exports.GAME_KEY_X = 88
+____exports.GAME_KEY_Y = 89
+____exports.GAME_KEY_Z = 90
+____exports.GAME_KEY_0 = 48
+____exports.GAME_KEY_1 = 49
+____exports.GAME_KEY_2 = 50
+____exports.GAME_KEY_3 = 51
+____exports.GAME_KEY_4 = 52
+____exports.GAME_KEY_5 = 53
+____exports.GAME_KEY_6 = 53
+____exports.GAME_KEY_7 = 55
+____exports.GAME_KEY_8 = 56
+____exports.GAME_KEY_9 = 57
+____exports.GAME_KEY_TAB = 9
+____exports.GAME_KEY_SPACE = 32
+____exports.GAME_KEY_ENTER = 513
+____exports.GAME_KEY_BACKSPACE = 514
+____exports.GAME_KEY_SHIFT = 0
+____exports.GAME_KEY_RIGHT = 516
+____exports.GAME_KEY_UP = 517
+____exports.GAME_KEY_LEFT = 518
+____exports.GAME_KEY_DOWN = 519
+____exports.GAME_KEY_ACTION_PRESS = 1
+____exports.GAME_KEY_ACTION_RELEASE = 0
+____exports.TEXT_ALIGN_LEFT_TOP = 11
+____exports.TEXT_ALIGN_TOP = 17
+____exports.TEXT_ALIGN_RIGHT_TOP = 37
+____exports.TEXT_ALIGN_CENTER = 18
+____exports.TEXT_ALIGN_LEFT = 10
+____exports.TEXT_ALIGN_RIGHT = 34
+____exports.TEXT_ALIGN_LEFT_BOTTOM = 12
+____exports.TEXT_ALIGN_BOTTOM = 20
+____exports.TEXT_ALIGN_RIGHT_BOTTOM = 36
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.dist.handles.player"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.dist.handles.handle")
+local Handle = ____handle.Handle
+____exports.MapPlayer = __TS__Class()
+local MapPlayer = ____exports.MapPlayer
+MapPlayer.name = "MapPlayer"
+__TS__ClassExtends(MapPlayer, Handle)
+function MapPlayer.prototype.____constructor(self, index)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = Player(index)
+    if handle == nil then
+        Error(nil, "w3ts failed to create player handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function MapPlayer.create(self, index)
+    local handle = Player(index)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function MapPlayer.prototype.addTechResearched(self, techId, levels)
+    AddPlayerTechResearched(self.handle, techId, levels)
+end
+function MapPlayer.prototype.cacheHeroData(self)
+    CachePlayerHeroData(self.handle)
+end
+function MapPlayer.prototype.compareAlliance(self, otherPlayer, whichAllianceSetting)
+    return GetPlayerAlliance(self.handle, otherPlayer.handle, whichAllianceSetting)
+end
+function MapPlayer.prototype.coordsFogged(self, x, y)
+    return IsFoggedToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.coordsMasked(self, x, y)
+    return IsMaskedToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.coordsVisible(self, x, y)
+    return IsVisibleToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.cripple(self, toWhichPlayers, flag)
+    CripplePlayer(self.handle, toWhichPlayers.handle, flag)
+end
+function MapPlayer.prototype.getScore(self, whichPlayerScore)
+    return GetPlayerScore(self.handle, whichPlayerScore)
+end
+function MapPlayer.prototype.getState(self, whichPlayerState)
+    return GetPlayerState(self.handle, whichPlayerState)
+end
+function MapPlayer.prototype.getStructureCount(self, includeIncomplete)
+    return GetPlayerStructureCount(self.handle, includeIncomplete)
+end
+function MapPlayer.prototype.getTaxRate(self, otherPlayer, whichResource)
+    return GetPlayerTaxRate(self.handle, otherPlayer, whichResource)
+end
+function MapPlayer.prototype.getTechCount(self, techId, specificonly)
+    return GetPlayerTechCount(self.handle, techId, specificonly)
+end
+function MapPlayer.prototype.getTechMaxAllowed(self, techId)
+    return GetPlayerTechMaxAllowed(self.handle, techId)
+end
+function MapPlayer.prototype.getTechResearched(self, techId, specificonly)
+    return GetPlayerTechResearched(self.handle, techId, specificonly)
+end
+function MapPlayer.prototype.getUnitCount(self, includeIncomplete)
+    return GetPlayerUnitCount(self.handle, includeIncomplete)
+end
+function MapPlayer.prototype.getUnitCountByType(self, unitName, includeIncomplete, includeUpgrades)
+    return GetPlayerTypedUnitCount(self.handle, unitName, includeIncomplete, includeUpgrades)
+end
+function MapPlayer.prototype.inForce(self, whichForce)
+    return IsPlayerInForce(self.handle, whichForce.handle)
+end
+function MapPlayer.prototype.isLocal(self)
+    return GetLocalPlayer() == self.handle
+end
+function MapPlayer.prototype.isObserver(self)
+    return IsPlayerObserver(self.handle)
+end
+function MapPlayer.prototype.isPlayerAlly(self, otherPlayer)
+    return IsPlayerAlly(self.handle, otherPlayer.handle)
+end
+function MapPlayer.prototype.isPlayerEnemy(self, otherPlayer)
+    return IsPlayerEnemy(self.handle, otherPlayer.handle)
+end
+function MapPlayer.prototype.isRacePrefSet(self, pref)
+    return IsPlayerRacePrefSet(self.handle, pref)
+end
+function MapPlayer.prototype.isSelectable(self)
+    return GetPlayerSelectable(self.handle)
+end
+function MapPlayer.prototype.pointFogged(self, whichPoint)
+    return IsLocationFoggedToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.pointMasked(self, whichPoint)
+    return IsLocationMaskedToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.pointVisible(self, whichPoint)
+    return IsLocationVisibleToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.remove(self, gameResult)
+    RemovePlayer(self.handle, gameResult)
+end
+function MapPlayer.prototype.removeAllGuardPositions(self)
+    RemoveAllGuardPositions(self.handle)
+end
+function MapPlayer.prototype.setAbilityAvailable(self, abilId, avail)
+    SetPlayerAbilityAvailable(self.handle, abilId, avail)
+end
+function MapPlayer.prototype.setAlliance(self, otherPlayer, whichAllianceSetting, value)
+    SetPlayerAlliance(self.handle, otherPlayer.handle, whichAllianceSetting, value)
+end
+function MapPlayer.prototype.setOnScoreScreen(self, flag)
+    SetPlayerOnScoreScreen(self.handle, flag)
+end
+function MapPlayer.prototype.setState(self, whichPlayerState, value)
+    SetPlayerState(self.handle, whichPlayerState, value)
+end
+function MapPlayer.prototype.setTaxRate(self, otherPlayer, whichResource, rate)
+    SetPlayerTaxRate(self.handle, otherPlayer.handle, whichResource, rate)
+end
+function MapPlayer.prototype.setTechMaxAllowed(self, techId, maximum)
+    SetPlayerTechMaxAllowed(self.handle, techId, maximum)
+end
+function MapPlayer.prototype.setTechResearched(self, techId, setToLevel)
+    SetPlayerTechResearched(self.handle, techId, setToLevel)
+end
+function MapPlayer.prototype.setUnitsOwner(self, newOwner)
+    SetPlayerUnitsOwner(self.handle, newOwner)
+end
+function MapPlayer.fromEnum(self)
+    return ____exports.MapPlayer:fromHandle(GetEnumPlayer())
+end
+function MapPlayer.fromEvent(self)
+    return ____exports.MapPlayer:fromHandle(GetTriggerPlayer())
+end
+function MapPlayer.fromFilter(self)
+    return ____exports.MapPlayer:fromHandle(GetFilterPlayer())
+end
+function MapPlayer.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function MapPlayer.fromIndex(self, index)
+    return self:fromHandle(Player(index))
+end
+function MapPlayer.fromLocal(self)
+    local pl = GetLocalPlayer()
+    if pl == nil then
+        do
+            local i = 0
+            while i < 10 do
+                DisplayTextToPlayer(
+                    Player(0),
+                    0,
+                    0,
+                    "$$$$$$$$$ LOCAL PLAYER IS NULL. TELL ME"
+                )
+                i = i + 1
+            end
+        end
+    end
+    return self:fromHandle(pl)
+end
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "color",
+    {
+        get = function(self)
+            return GetPlayerColor(self.handle)
+        end,
+        set = function(self, color)
+            SetPlayerColor(self.handle, color)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "controller",
+    {get = function(self)
+        return GetPlayerController(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "handicap",
+    {
+        get = function(self)
+            return GetPlayerHandicap(self.handle)
+        end,
+        set = function(self, handicap)
+            SetPlayerHandicap(self.handle, handicap)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "handicapXp",
+    {
+        get = function(self)
+            return GetPlayerHandicapXP(self.handle)
+        end,
+        set = function(self, handicap)
+            SetPlayerHandicapXP(self.handle, handicap)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "id",
+    {get = function(self)
+        return GetPlayerId(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "name",
+    {
+        get = function(self)
+            return GetPlayerName(self.handle) or ""
+        end,
+        set = function(self, value)
+            SetPlayerName(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "race",
+    {get = function(self)
+        return GetPlayerRace(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "slotState",
+    {get = function(self)
+        return GetPlayerSlotState(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocation",
+    {get = function(self)
+        return GetPlayerStartLocation(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationX",
+    {get = function(self)
+        return GetStartLocationX(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationY",
+    {get = function(self)
+        return GetStartLocationY(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationPoint",
+    {get = function(self)
+        return GetStartLocationLoc(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "team",
+    {get = function(self)
+        return GetPlayerTeam(self.handle)
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.dist.handles.handle"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local WeakMap = ____lualib.WeakMap
+local __TS__New = ____lualib.__TS__New
+local __TS__Class = ____lualib.__TS__Class
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+---
+-- @noSelfInFile
+local map = __TS__New(WeakMap)
+____exports.Handle = __TS__Class()
+local Handle = ____exports.Handle
+Handle.name = "Handle"
+function Handle.prototype.____constructor(self, handle)
+    self.handle = handle == nil and ____exports.Handle.initHandle or handle
+    map:set(self.handle, self)
+end
+function Handle.initFromHandle(self)
+    return ____exports.Handle.initHandle ~= nil
+end
+function Handle.getObject(self, handle)
+    local obj = map:get(handle)
+    if obj ~= nil then
+        return obj
+    end
+    ____exports.Handle.initHandle = handle
+    local newObj = __TS__New(self)
+    ____exports.Handle.initHandle = nil
+    return newObj
+end
+__TS__SetDescriptor(
+    Handle.prototype,
+    "id",
+    {get = function(self)
+        return GetHandleId(self.handle)
+    end},
+    true
+)
 return ____exports
  end,
 }
