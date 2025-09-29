@@ -22,8 +22,9 @@
     "typescript-to-lua": "^1.32.0"
   },
   "dependencies": {
-    "@eiriksgata/wc3ts": "^2.0.0",
+    "@eiriksgata/wc3ts": "^3.0.0",
     "fs-extra": "^11.3.2",
-    "luamin": "^1.0.4"
+    "luamin": "^1.0.4",
+    "tstl-damage-calculator": "D:\\work\\github\\tstl-demo-1"
   }
 }

@@ -7,11 +7,15 @@
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
-      "@eiriksgata/wc3ts": ["temp/index"],
-      "@eiriksgata/wc3ts/*": ["temp/*"]
+      "@eiriksgata/wc3ts/*": [
+        "node_modules/@eiriksgata/wc3ts/src"
+      ],
+      "tstl-damage-calculator": [
+        "node_modules/tstl-damage-calculator/src"
+      ]
     },
     "types": [
-      "@eiriksgata/wc3ts/types",
+      "@eiriksgata/wc3ts/src/types",
       "lua-types/5.3"
     ],
     "strict": true
@@ -20,6 +24,7 @@
     "luaTarget": "5.3",
     "noHeader": true,
     "noImplicitSelf": true,
+    "luaLibImport": "require",
     "noResolvePaths": [
       "jass.common",
       "jass.ai",
@@ -36,10 +41,11 @@
       "jass.bignum"
     ],
     "luaBundle": "maps/map/main.lua",
-    "luaBundleEntry": "temp/main.ts"
+    "luaBundleEntry": "src/main.ts"
   },
   "include": [
     "src",
-    "temp/**/*"
+    "node_modules/@eiriksgata/wc3ts/src",
+    "node_modules/tstl-damage-calculator/src"
   ]
 }

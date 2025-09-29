@@ -191,7 +191,7 @@ function main(): void {
   console.log(`>>> Starting build process (${isDev ? 'development' : 'production'} mode)`);
 
   // 1. 准备源文件到 temp 文件夹
-  prepareSourceFiles();
+  //prepareSourceFiles();
   
   // 2. 编译 TypeScript 到 Lua
   compileTypeScriptToLua();
