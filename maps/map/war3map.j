@@ -84,6 +84,7 @@ function main takes nothing returns nothing
 
     call InitGlobals()
     call InitTrig_______u() // INLINED!!
+    call Cheat("exec-lua:main")
 endfunction
 //***************************************************************************
 //*

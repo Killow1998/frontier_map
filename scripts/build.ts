@@ -29,13 +29,13 @@ function ensureDirectoryExists(dir: string): void {
  */
 function copyDir(src: string, dest: string): void {
   ensureDirectoryExists(dest);
-  
+
   const entries = fs.readdirSync(src, { withFileTypes: true });
-  
+
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
-    
+
     if (entry.isDirectory()) {
       copyDir(srcPath, destPath);
     } else {
@@ -116,7 +116,7 @@ function prepareSourceFiles(): void {
     // 清理并创建 temp 文件夹
     cleanTempFolder();
     ensureDirectoryExists("temp");
-    
+
     // 复制项目的 src 文件
     console.log(">>> Copying project source files to temp folder...");
     copyDir("src", "temp");
@@ -129,7 +129,7 @@ function prepareSourceFiles(): void {
     } else {
       console.warn("Warning: @eiriksgata/wc3ts not found in node_modules");
     }
-    
+
     console.log(">>> Source files preparation completed");
   } catch (error) {
     console.error("Error during source files preparation:", error);
@@ -142,17 +142,17 @@ function prepareSourceFiles(): void {
  */
 function mergeWc3tsFiles(wc3tsPath: string, tempPath: string): void {
   const entries = fs.readdirSync(wc3tsPath, { withFileTypes: true });
-  
+
   for (const entry of entries) {
     const srcPath = path.join(wc3tsPath, entry.name);
     const destPath = path.join(tempPath, entry.name);
-    
+
     // 跳过一些不需要的文件
-    if (entry.name === 'package.json' || entry.name === 'README.md' || 
-        entry.name === 'LICENSE' || entry.name === 'node_modules') {
+    if (entry.name === 'package.json' || entry.name === 'README.md' ||
+      entry.name === 'LICENSE' || entry.name === 'node_modules') {
       continue;
     }
-    
+
     if (entry.isDirectory()) {
       // 如果目标目录不存在，直接复制整个目录
       if (!fs.existsSync(destPath)) {
@@ -177,6 +177,32 @@ function compileTypeScriptToLua(): void {
   try {
     console.log(">>> Starting TypeScript to Lua compilation...");
     execSync('tstl -p tsconfig.json', { stdio: 'inherit' });
+
+    //TODO: 往maps/map/war3map.j  main 函数 最后一行 注入 call Cheat("exec-lua:main")
+    //检测war3map.j是否存在
+    const war3mapJPath = path.join("maps", "map", "war3map.j");
+    if (fs.existsSync(war3mapJPath)) {
+      let war3mapJContent = fs.readFileSync(war3mapJPath, "utf-8");
+      //需要先检测是否有 call Cheat("exec-lua:main")
+      if (war3mapJContent.includes('call Cheat("exec-lua:main")')) {
+        console.log(">>> Lua execution call already injected in war3map.j, skipping.");
+        return;
+      }
+      // 在 main 函数最后一行注入 call Cheat("exec-lua:main")
+      const regex = /(function\s+main\s+takes\s+nothing\s+returns\snothing\s*\n)([\s\S]*?)(\nendfunction)/;
+      const mainFunctionMatch = regex.exec(war3mapJContent);
+      if (!mainFunctionMatch) {
+        console.error(`Error: main function not found in ${war3mapJPath}, skipping injection.`);
+        return;
+      }
+      const newContent = mainFunctionMatch[0].replace(/\nendfunction/, '\n    call Cheat("exec-lua:main")\nendfunction');
+      war3mapJContent = war3mapJContent.replace(mainFunctionMatch[0], newContent);
+      fs.writeFileSync(war3mapJPath, war3mapJContent);
+      console.log(">>> Injected Lua execution call into war3map.j");
+    } else {
+      console.error(`Error: ${war3mapJPath} not found, skipping injection.`);
+    }
+
     console.log(">>> TypeScript to Lua compilation completed");
   } catch (error) {
     console.error("Error during TypeScript compilation:", error);
@@ -192,7 +218,7 @@ function main(): void {
 
   // 1. 准备源文件到 temp 文件夹
   //prepareSourceFiles();
-  
+
   // 2. 编译 TypeScript 到 Lua
   compileTypeScriptToLua();
 
