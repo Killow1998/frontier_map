@@ -8,7 +8,9 @@
     "dev": "ts-node --project tsconfig.node.json scripts/build.ts dev",
     "build": "ts-node --project tsconfig.node.json scripts/build.ts build",
     "build:debug": "ts-node --project tsconfig.node.json scripts/build.ts dev",
-    "test": "ts-node --project tsconfig.node.json scripts/build.ts && ts-node --project tsconfig.node.json scripts/test.ts"
+    "test": "ts-node --project tsconfig.node.json scripts/build.ts && ts-node --project tsconfig.node.json scripts/test.ts",
+    "build:map": "w2l obj maps dist/map.w3x",
+    "test:map": "dev_lib/KKWE/bin/YDWEConfig.exe -launchwar3 -loadfile \"./dist/map.w3x\""
   },
   "keywords": [],
   "author": "",
@@ -22,7 +24,7 @@
     "typescript-to-lua": "^1.32.0"
   },
   "dependencies": {
-    "@eiriksgata/wc3ts": "^3.0.0",
+    "@eiriksgata/wc3ts": "3.0.2",
     "fs-extra": "^11.3.2",
     "luamin": "^1.0.4",
     "tstl-damage-calculator": "D:\\work\\github\\tstl-demo-1"

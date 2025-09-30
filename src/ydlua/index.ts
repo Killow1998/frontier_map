@@ -1,4 +1,8 @@
+
+
+import { bj_MAX_PLAYER_SLOTS, MapPlayer, Players } from "@eiriksgata/wc3ts/src/globals/define";
 import { ConfigManager } from "../config";
+
 
 // 将 JASS 模块声明为局部变量，避免产生 export 导出
 const ydcommon = require("jass.common")
@@ -68,6 +72,13 @@ export class ydlua {
     this.initializeConsole();
     this.initializeRuntime();
     this.registerGlobals();
+
+    for (let i = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
+      const pl = MapPlayer.fromHandle(Player(i));
+      if (pl) {
+        Players[i] = pl;
+      }
+    }
   }
 
   /**
