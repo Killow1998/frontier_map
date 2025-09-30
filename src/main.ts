@@ -1,7 +1,6 @@
 
-import { Effect, Players, Unit } from "@eiriksgata/wc3ts/*";
+import { Effect, Unit, Players } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
-import { DamageCalculator, DamageType, Stats } from 'tstl-damage-calculator';
 import { FourCC } from "./utils/helper";
 ;
 
@@ -16,7 +15,7 @@ async function main(): Promise<void> {
 
   const unit = Unit.create(Players[0], FourCC('hfoo'), 0, 0, 0)!;
   print(`Created unit: ${unit.name}`);
-  
+
 }
 
 

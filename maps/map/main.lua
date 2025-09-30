@@ -2796,6 +2796,116 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.force"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+local ____player = require("lua_modules.@eiriksgata.wc3ts.src.handles.player")
+local MapPlayer = ____player.MapPlayer
+____exports.Force = __TS__Class()
+local Force = ____exports.Force
+Force.name = "Force"
+__TS__ClassExtends(Force, Handle)
+function Force.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateForce()
+    if handle == nil then
+        Error(nil, "w3ts failed to create force handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Force.create(self)
+    local handle = CreateForce()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Force.prototype.addPlayer(self, whichPlayer)
+    ForceAddPlayer(self.handle, whichPlayer.handle)
+end
+function Force.prototype.clear(self)
+    ForceClear(self.handle)
+end
+function Force.prototype.destroy(self)
+    DestroyForce(self.handle)
+end
+function Force.prototype.enumAllies(self, whichPlayer, filter)
+    ForceEnumAllies(
+        self.handle,
+        whichPlayer.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Force.prototype.enumEnemies(self, whichPlayer, filter)
+    ForceEnumEnemies(
+        self.handle,
+        whichPlayer.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Force.prototype.enumPlayers(self, filter)
+    ForceEnumPlayers(
+        self.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Force.prototype.enumPlayersCounted(self, filter, countLimit)
+    ForceEnumPlayersCounted(
+        self.handle,
+        type(filter) == "function" and Filter(filter) or filter,
+        countLimit
+    )
+end
+Force.prototype["for"] = function(self, callback)
+    ForForce(self.handle, callback)
+end
+function Force.prototype.getPlayers(self)
+    local players = {}
+    ForForce(
+        self.handle,
+        function()
+            local pl = MapPlayer:fromEnum()
+            if pl then
+                players[#players + 1] = pl
+            end
+        end
+    )
+    return players
+end
+function Force.prototype.hasPlayer(self, whichPlayer)
+    return IsPlayerInForce(whichPlayer.handle, self.handle)
+end
+function Force.prototype.removePlayer(self, whichPlayer)
+    ForceRemovePlayer(self.handle, whichPlayer.handle)
+end
+function Force.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+return ____exports
+ end,
 ["lua_modules.@eiriksgata.wc3ts.src.handles.point"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -2879,6 +2989,319 @@ __TS__SetDescriptor(
     "z",
     {get = function(self)
         return GetLocationZ(self.handle)
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.player"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.MapPlayer = __TS__Class()
+local MapPlayer = ____exports.MapPlayer
+MapPlayer.name = "MapPlayer"
+__TS__ClassExtends(MapPlayer, Handle)
+function MapPlayer.prototype.____constructor(self, index)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = Player(index)
+    if handle == nil then
+        Error(nil, "w3ts failed to create player handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function MapPlayer.create(self, index)
+    local handle = Player(index)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function MapPlayer.prototype.addTechResearched(self, techId, levels)
+    AddPlayerTechResearched(self.handle, techId, levels)
+end
+function MapPlayer.prototype.cacheHeroData(self)
+    CachePlayerHeroData(self.handle)
+end
+function MapPlayer.prototype.compareAlliance(self, otherPlayer, whichAllianceSetting)
+    return GetPlayerAlliance(self.handle, otherPlayer.handle, whichAllianceSetting)
+end
+function MapPlayer.prototype.coordsFogged(self, x, y)
+    return IsFoggedToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.coordsMasked(self, x, y)
+    return IsMaskedToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.coordsVisible(self, x, y)
+    return IsVisibleToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.cripple(self, toWhichPlayers, flag)
+    CripplePlayer(self.handle, toWhichPlayers.handle, flag)
+end
+function MapPlayer.prototype.getScore(self, whichPlayerScore)
+    return GetPlayerScore(self.handle, whichPlayerScore)
+end
+function MapPlayer.prototype.getState(self, whichPlayerState)
+    return GetPlayerState(self.handle, whichPlayerState)
+end
+function MapPlayer.prototype.getStructureCount(self, includeIncomplete)
+    return GetPlayerStructureCount(self.handle, includeIncomplete)
+end
+function MapPlayer.prototype.getTaxRate(self, otherPlayer, whichResource)
+    return GetPlayerTaxRate(self.handle, otherPlayer, whichResource)
+end
+function MapPlayer.prototype.getTechCount(self, techId, specificonly)
+    return GetPlayerTechCount(self.handle, techId, specificonly)
+end
+function MapPlayer.prototype.getTechMaxAllowed(self, techId)
+    return GetPlayerTechMaxAllowed(self.handle, techId)
+end
+function MapPlayer.prototype.getTechResearched(self, techId, specificonly)
+    return GetPlayerTechResearched(self.handle, techId, specificonly)
+end
+function MapPlayer.prototype.getUnitCount(self, includeIncomplete)
+    return GetPlayerUnitCount(self.handle, includeIncomplete)
+end
+function MapPlayer.prototype.getUnitCountByType(self, unitName, includeIncomplete, includeUpgrades)
+    return GetPlayerTypedUnitCount(self.handle, unitName, includeIncomplete, includeUpgrades)
+end
+function MapPlayer.prototype.inForce(self, whichForce)
+    return IsPlayerInForce(self.handle, whichForce.handle)
+end
+function MapPlayer.prototype.isLocal(self)
+    return GetLocalPlayer() == self.handle
+end
+function MapPlayer.prototype.isObserver(self)
+    return IsPlayerObserver(self.handle)
+end
+function MapPlayer.prototype.isPlayerAlly(self, otherPlayer)
+    return IsPlayerAlly(self.handle, otherPlayer.handle)
+end
+function MapPlayer.prototype.isPlayerEnemy(self, otherPlayer)
+    return IsPlayerEnemy(self.handle, otherPlayer.handle)
+end
+function MapPlayer.prototype.isRacePrefSet(self, pref)
+    return IsPlayerRacePrefSet(self.handle, pref)
+end
+function MapPlayer.prototype.isSelectable(self)
+    return GetPlayerSelectable(self.handle)
+end
+function MapPlayer.prototype.pointFogged(self, whichPoint)
+    return IsLocationFoggedToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.pointMasked(self, whichPoint)
+    return IsLocationMaskedToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.pointVisible(self, whichPoint)
+    return IsLocationVisibleToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.remove(self, gameResult)
+    RemovePlayer(self.handle, gameResult)
+end
+function MapPlayer.prototype.removeAllGuardPositions(self)
+    RemoveAllGuardPositions(self.handle)
+end
+function MapPlayer.prototype.setAbilityAvailable(self, abilId, avail)
+    SetPlayerAbilityAvailable(self.handle, abilId, avail)
+end
+function MapPlayer.prototype.setAlliance(self, otherPlayer, whichAllianceSetting, value)
+    SetPlayerAlliance(self.handle, otherPlayer.handle, whichAllianceSetting, value)
+end
+function MapPlayer.prototype.setOnScoreScreen(self, flag)
+    SetPlayerOnScoreScreen(self.handle, flag)
+end
+function MapPlayer.prototype.setState(self, whichPlayerState, value)
+    SetPlayerState(self.handle, whichPlayerState, value)
+end
+function MapPlayer.prototype.setTaxRate(self, otherPlayer, whichResource, rate)
+    SetPlayerTaxRate(self.handle, otherPlayer.handle, whichResource, rate)
+end
+function MapPlayer.prototype.setTechMaxAllowed(self, techId, maximum)
+    SetPlayerTechMaxAllowed(self.handle, techId, maximum)
+end
+function MapPlayer.prototype.setTechResearched(self, techId, setToLevel)
+    SetPlayerTechResearched(self.handle, techId, setToLevel)
+end
+function MapPlayer.prototype.setUnitsOwner(self, newOwner)
+    SetPlayerUnitsOwner(self.handle, newOwner)
+end
+function MapPlayer.fromEnum(self)
+    return ____exports.MapPlayer:fromHandle(GetEnumPlayer())
+end
+function MapPlayer.fromEvent(self)
+    return ____exports.MapPlayer:fromHandle(GetTriggerPlayer())
+end
+function MapPlayer.fromFilter(self)
+    return ____exports.MapPlayer:fromHandle(GetFilterPlayer())
+end
+function MapPlayer.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function MapPlayer.fromIndex(self, index)
+    return self:fromHandle(Player(index))
+end
+function MapPlayer.fromLocal(self)
+    local pl = GetLocalPlayer()
+    if pl == nil then
+        do
+            local i = 0
+            while i < 10 do
+                DisplayTextToPlayer(
+                    Player(0),
+                    0,
+                    0,
+                    "$$$$$$$$$ LOCAL PLAYER IS NULL. TELL ME"
+                )
+                i = i + 1
+            end
+        end
+    end
+    return self:fromHandle(pl)
+end
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "color",
+    {
+        get = function(self)
+            return GetPlayerColor(self.handle)
+        end,
+        set = function(self, color)
+            SetPlayerColor(self.handle, color)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "controller",
+    {get = function(self)
+        return GetPlayerController(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "handicap",
+    {
+        get = function(self)
+            return GetPlayerHandicap(self.handle)
+        end,
+        set = function(self, handicap)
+            SetPlayerHandicap(self.handle, handicap)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "handicapXp",
+    {
+        get = function(self)
+            return GetPlayerHandicapXP(self.handle)
+        end,
+        set = function(self, handicap)
+            SetPlayerHandicapXP(self.handle, handicap)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "id",
+    {get = function(self)
+        return GetPlayerId(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "name",
+    {
+        get = function(self)
+            return GetPlayerName(self.handle) or ""
+        end,
+        set = function(self, value)
+            SetPlayerName(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "race",
+    {get = function(self)
+        return GetPlayerRace(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "slotState",
+    {get = function(self)
+        return GetPlayerSlotState(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocation",
+    {get = function(self)
+        return GetPlayerStartLocation(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationX",
+    {get = function(self)
+        return GetStartLocationX(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationY",
+    {get = function(self)
+        return GetStartLocationY(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationPoint",
+    {get = function(self)
+        return GetStartLocationLoc(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "team",
+    {get = function(self)
+        return GetPlayerTeam(self.handle)
     end},
     true
 )
@@ -3488,429 +3911,6 @@ __TS__SetDescriptor(
     "y",
     {get = function(self)
         return GetDestructableY(self.handle)
-    end},
-    true
-)
-return ____exports
- end,
-["lua_modules.@eiriksgata.wc3ts.src.handles.force"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__ClassExtends = ____lualib.__TS__ClassExtends
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
-local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
-local Handle = ____handle.Handle
-local ____player = require("lua_modules.@eiriksgata.wc3ts.src.handles.player")
-local MapPlayer = ____player.MapPlayer
-____exports.Force = __TS__Class()
-local Force = ____exports.Force
-Force.name = "Force"
-__TS__ClassExtends(Force, Handle)
-function Force.prototype.____constructor(self)
-    if Handle:initFromHandle() then
-        Handle.prototype.____constructor(self)
-        return
-    end
-    local handle = CreateForce()
-    if handle == nil then
-        Error(nil, "w3ts failed to create force handle.")
-    end
-    Handle.prototype.____constructor(self, handle)
-end
-function Force.create(self)
-    local handle = CreateForce()
-    if handle ~= nil then
-        local obj = self:getObject(handle)
-        local values = {}
-        values.handle = handle
-        return __TS__ObjectAssign(obj, values)
-    end
-    return nil
-end
-function Force.prototype.addPlayer(self, whichPlayer)
-    ForceAddPlayer(self.handle, whichPlayer.handle)
-end
-function Force.prototype.clear(self)
-    ForceClear(self.handle)
-end
-function Force.prototype.destroy(self)
-    DestroyForce(self.handle)
-end
-function Force.prototype.enumAllies(self, whichPlayer, filter)
-    ForceEnumAllies(
-        self.handle,
-        whichPlayer.handle,
-        type(filter) == "function" and Filter(filter) or filter
-    )
-end
-function Force.prototype.enumEnemies(self, whichPlayer, filter)
-    ForceEnumEnemies(
-        self.handle,
-        whichPlayer.handle,
-        type(filter) == "function" and Filter(filter) or filter
-    )
-end
-function Force.prototype.enumPlayers(self, filter)
-    ForceEnumPlayers(
-        self.handle,
-        type(filter) == "function" and Filter(filter) or filter
-    )
-end
-function Force.prototype.enumPlayersCounted(self, filter, countLimit)
-    ForceEnumPlayersCounted(
-        self.handle,
-        type(filter) == "function" and Filter(filter) or filter,
-        countLimit
-    )
-end
-Force.prototype["for"] = function(self, callback)
-    ForForce(self.handle, callback)
-end
-function Force.prototype.getPlayers(self)
-    local players = {}
-    ForForce(
-        self.handle,
-        function()
-            local pl = MapPlayer:fromEnum()
-            if pl then
-                players[#players + 1] = pl
-            end
-        end
-    )
-    return players
-end
-function Force.prototype.hasPlayer(self, whichPlayer)
-    return IsPlayerInForce(whichPlayer.handle, self.handle)
-end
-function Force.prototype.removePlayer(self, whichPlayer)
-    ForceRemovePlayer(self.handle, whichPlayer.handle)
-end
-function Force.fromHandle(self, handle)
-    local ____handle_0
-    if handle then
-        ____handle_0 = self:getObject(handle)
-    else
-        ____handle_0 = nil
-    end
-    return ____handle_0
-end
-return ____exports
- end,
-["lua_modules.@eiriksgata.wc3ts.src.handles.player"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__ClassExtends = ____lualib.__TS__ClassExtends
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
-local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
-local ____exports = {}
-local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
-local Handle = ____handle.Handle
-____exports.MapPlayer = __TS__Class()
-local MapPlayer = ____exports.MapPlayer
-MapPlayer.name = "MapPlayer"
-__TS__ClassExtends(MapPlayer, Handle)
-function MapPlayer.prototype.____constructor(self, index)
-    if Handle:initFromHandle() then
-        Handle.prototype.____constructor(self)
-        return
-    end
-    local handle = Player(index)
-    if handle == nil then
-        Error(nil, "w3ts failed to create player handle.")
-    end
-    Handle.prototype.____constructor(self, handle)
-end
-function MapPlayer.create(self, index)
-    local handle = Player(index)
-    if handle ~= nil then
-        local obj = self:getObject(handle)
-        local values = {}
-        values.handle = handle
-        return __TS__ObjectAssign(obj, values)
-    end
-    return nil
-end
-function MapPlayer.prototype.addTechResearched(self, techId, levels)
-    AddPlayerTechResearched(self.handle, techId, levels)
-end
-function MapPlayer.prototype.cacheHeroData(self)
-    CachePlayerHeroData(self.handle)
-end
-function MapPlayer.prototype.compareAlliance(self, otherPlayer, whichAllianceSetting)
-    return GetPlayerAlliance(self.handle, otherPlayer.handle, whichAllianceSetting)
-end
-function MapPlayer.prototype.coordsFogged(self, x, y)
-    return IsFoggedToPlayer(x, y, self.handle)
-end
-function MapPlayer.prototype.coordsMasked(self, x, y)
-    return IsMaskedToPlayer(x, y, self.handle)
-end
-function MapPlayer.prototype.coordsVisible(self, x, y)
-    return IsVisibleToPlayer(x, y, self.handle)
-end
-function MapPlayer.prototype.cripple(self, toWhichPlayers, flag)
-    CripplePlayer(self.handle, toWhichPlayers.handle, flag)
-end
-function MapPlayer.prototype.getScore(self, whichPlayerScore)
-    return GetPlayerScore(self.handle, whichPlayerScore)
-end
-function MapPlayer.prototype.getState(self, whichPlayerState)
-    return GetPlayerState(self.handle, whichPlayerState)
-end
-function MapPlayer.prototype.getStructureCount(self, includeIncomplete)
-    return GetPlayerStructureCount(self.handle, includeIncomplete)
-end
-function MapPlayer.prototype.getTaxRate(self, otherPlayer, whichResource)
-    return GetPlayerTaxRate(self.handle, otherPlayer, whichResource)
-end
-function MapPlayer.prototype.getTechCount(self, techId, specificonly)
-    return GetPlayerTechCount(self.handle, techId, specificonly)
-end
-function MapPlayer.prototype.getTechMaxAllowed(self, techId)
-    return GetPlayerTechMaxAllowed(self.handle, techId)
-end
-function MapPlayer.prototype.getTechResearched(self, techId, specificonly)
-    return GetPlayerTechResearched(self.handle, techId, specificonly)
-end
-function MapPlayer.prototype.getUnitCount(self, includeIncomplete)
-    return GetPlayerUnitCount(self.handle, includeIncomplete)
-end
-function MapPlayer.prototype.getUnitCountByType(self, unitName, includeIncomplete, includeUpgrades)
-    return GetPlayerTypedUnitCount(self.handle, unitName, includeIncomplete, includeUpgrades)
-end
-function MapPlayer.prototype.inForce(self, whichForce)
-    return IsPlayerInForce(self.handle, whichForce.handle)
-end
-function MapPlayer.prototype.isLocal(self)
-    return GetLocalPlayer() == self.handle
-end
-function MapPlayer.prototype.isObserver(self)
-    return IsPlayerObserver(self.handle)
-end
-function MapPlayer.prototype.isPlayerAlly(self, otherPlayer)
-    return IsPlayerAlly(self.handle, otherPlayer.handle)
-end
-function MapPlayer.prototype.isPlayerEnemy(self, otherPlayer)
-    return IsPlayerEnemy(self.handle, otherPlayer.handle)
-end
-function MapPlayer.prototype.isRacePrefSet(self, pref)
-    return IsPlayerRacePrefSet(self.handle, pref)
-end
-function MapPlayer.prototype.isSelectable(self)
-    return GetPlayerSelectable(self.handle)
-end
-function MapPlayer.prototype.pointFogged(self, whichPoint)
-    return IsLocationFoggedToPlayer(whichPoint.handle, self.handle)
-end
-function MapPlayer.prototype.pointMasked(self, whichPoint)
-    return IsLocationMaskedToPlayer(whichPoint.handle, self.handle)
-end
-function MapPlayer.prototype.pointVisible(self, whichPoint)
-    return IsLocationVisibleToPlayer(whichPoint.handle, self.handle)
-end
-function MapPlayer.prototype.remove(self, gameResult)
-    RemovePlayer(self.handle, gameResult)
-end
-function MapPlayer.prototype.removeAllGuardPositions(self)
-    RemoveAllGuardPositions(self.handle)
-end
-function MapPlayer.prototype.setAbilityAvailable(self, abilId, avail)
-    SetPlayerAbilityAvailable(self.handle, abilId, avail)
-end
-function MapPlayer.prototype.setAlliance(self, otherPlayer, whichAllianceSetting, value)
-    SetPlayerAlliance(self.handle, otherPlayer.handle, whichAllianceSetting, value)
-end
-function MapPlayer.prototype.setOnScoreScreen(self, flag)
-    SetPlayerOnScoreScreen(self.handle, flag)
-end
-function MapPlayer.prototype.setState(self, whichPlayerState, value)
-    SetPlayerState(self.handle, whichPlayerState, value)
-end
-function MapPlayer.prototype.setTaxRate(self, otherPlayer, whichResource, rate)
-    SetPlayerTaxRate(self.handle, otherPlayer.handle, whichResource, rate)
-end
-function MapPlayer.prototype.setTechMaxAllowed(self, techId, maximum)
-    SetPlayerTechMaxAllowed(self.handle, techId, maximum)
-end
-function MapPlayer.prototype.setTechResearched(self, techId, setToLevel)
-    SetPlayerTechResearched(self.handle, techId, setToLevel)
-end
-function MapPlayer.prototype.setUnitsOwner(self, newOwner)
-    SetPlayerUnitsOwner(self.handle, newOwner)
-end
-function MapPlayer.fromEnum(self)
-    return ____exports.MapPlayer:fromHandle(GetEnumPlayer())
-end
-function MapPlayer.fromEvent(self)
-    return ____exports.MapPlayer:fromHandle(GetTriggerPlayer())
-end
-function MapPlayer.fromFilter(self)
-    return ____exports.MapPlayer:fromHandle(GetFilterPlayer())
-end
-function MapPlayer.fromHandle(self, handle)
-    local ____handle_0
-    if handle then
-        ____handle_0 = self:getObject(handle)
-    else
-        ____handle_0 = nil
-    end
-    return ____handle_0
-end
-function MapPlayer.fromIndex(self, index)
-    return self:fromHandle(Player(index))
-end
-function MapPlayer.fromLocal(self)
-    local pl = GetLocalPlayer()
-    if pl == nil then
-        do
-            local i = 0
-            while i < 10 do
-                DisplayTextToPlayer(
-                    Player(0),
-                    0,
-                    0,
-                    "$$$$$$$$$ LOCAL PLAYER IS NULL. TELL ME"
-                )
-                i = i + 1
-            end
-        end
-    end
-    return self:fromHandle(pl)
-end
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "color",
-    {
-        get = function(self)
-            return GetPlayerColor(self.handle)
-        end,
-        set = function(self, color)
-            SetPlayerColor(self.handle, color)
-        end
-    },
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "controller",
-    {get = function(self)
-        return GetPlayerController(self.handle)
-    end},
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "handicap",
-    {
-        get = function(self)
-            return GetPlayerHandicap(self.handle)
-        end,
-        set = function(self, handicap)
-            SetPlayerHandicap(self.handle, handicap)
-        end
-    },
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "handicapXp",
-    {
-        get = function(self)
-            return GetPlayerHandicapXP(self.handle)
-        end,
-        set = function(self, handicap)
-            SetPlayerHandicapXP(self.handle, handicap)
-        end
-    },
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "id",
-    {get = function(self)
-        return GetPlayerId(self.handle)
-    end},
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "name",
-    {
-        get = function(self)
-            return GetPlayerName(self.handle) or ""
-        end,
-        set = function(self, value)
-            SetPlayerName(self.handle, value)
-        end
-    },
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "race",
-    {get = function(self)
-        return GetPlayerRace(self.handle)
-    end},
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "slotState",
-    {get = function(self)
-        return GetPlayerSlotState(self.handle)
-    end},
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "startLocation",
-    {get = function(self)
-        return GetPlayerStartLocation(self.handle)
-    end},
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "startLocationX",
-    {get = function(self)
-        return GetStartLocationX(self.startLocation)
-    end},
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "startLocationY",
-    {get = function(self)
-        return GetStartLocationY(self.startLocation)
-    end},
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "startLocationPoint",
-    {get = function(self)
-        return GetStartLocationLoc(self.startLocation)
-    end},
-    true
-)
-__TS__SetDescriptor(
-    MapPlayer.prototype,
-    "team",
-    {get = function(self)
-        return GetPlayerTeam(self.handle)
     end},
     true
 )
@@ -10307,7 +10307,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.order")
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.const")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10323,7 +10323,15 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.const")
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.order")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -10473,215 +10481,6 @@ function ydlua.prototype.registerGlobals(self)
 end
 return ____exports
  end,
-["lua_modules.tstl-damage-calculator.src.types"] = function(...) 
-local ____exports = {}
-____exports.DamageType = DamageType or ({})
-____exports.DamageType.Physical = "physical"
-____exports.DamageType.Magical = "magical"
-____exports.DamageType.True = "true"
-return ____exports
- end,
-["lua_modules.tstl-damage-calculator.src.damage-calculator"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
-local ____types = require("lua_modules.tstl-damage-calculator.src.types")
-local DamageType = ____types.DamageType
---- 伤害计算工具类
--- 提供各种伤害计算功能，兼容 TypeScript-to-Lua
-____exports.DamageCalculator = __TS__Class()
-local DamageCalculator = ____exports.DamageCalculator
-DamageCalculator.name = "DamageCalculator"
-function DamageCalculator.prototype.____constructor(self)
-end
-function DamageCalculator.calculateBaseDamage(self, attackerStats, damageType)
-    repeat
-        local ____switch4 = damageType
-        local ____cond4 = ____switch4 == DamageType.Physical
-        if ____cond4 then
-            return attackerStats.attack
-        end
-        ____cond4 = ____cond4 or ____switch4 == DamageType.Magical
-        if ____cond4 then
-            return attackerStats.magicPower
-        end
-        ____cond4 = ____cond4 or ____switch4 == DamageType.True
-        if ____cond4 then
-            return attackerStats.attack
-        end
-        do
-            return 0
-        end
-    until true
-end
-function DamageCalculator.calculateArmorReduction(self, armor, armorPenetration)
-    if armorPenetration == nil then
-        armorPenetration = 0
-    end
-    local effectiveArmor = armor * (1 - armorPenetration)
-    return effectiveArmor / (effectiveArmor + 100)
-end
-function DamageCalculator.calculateMagicReduction(self, magicResist, magicPenetration)
-    if magicPenetration == nil then
-        magicPenetration = 0
-    end
-    local effectiveMr = magicResist * (1 - magicPenetration)
-    return effectiveMr / (effectiveMr + 100)
-end
-function DamageCalculator.checkCritical(self, criticalChance)
-    return math.random() < criticalChance
-end
-function DamageCalculator.applyModifier(self, baseDamage, modifier)
-    return baseDamage * modifier.multiplier + modifier.flatBonus
-end
-function DamageCalculator.calculateDamage(self, attackerStats, defenderStats, damageType, modifier)
-    local baseDamage = self:calculateBaseDamage(attackerStats, damageType)
-    if modifier then
-        baseDamage = self:applyModifier(baseDamage, modifier)
-    end
-    local originalDamage = baseDamage
-    local isCritical = self:checkCritical(attackerStats.criticalChance)
-    if isCritical then
-        baseDamage = baseDamage * attackerStats.criticalDamage
-    end
-    local finalDamage = baseDamage
-    local mitigatedAmount = 0
-    if damageType == DamageType.Physical then
-        local armorPenetration = modifier and modifier.armorPenetration or 0
-        local reduction = self:calculateArmorReduction(defenderStats.armor, armorPenetration)
-        mitigatedAmount = baseDamage * reduction
-        finalDamage = baseDamage * (1 - reduction)
-    elseif damageType == DamageType.Magical then
-        local magicPenetration = modifier and modifier.magicPenetration or 0
-        local reduction = self:calculateMagicReduction(defenderStats.magicResist, magicPenetration)
-        mitigatedAmount = baseDamage * reduction
-        finalDamage = baseDamage * (1 - reduction)
-    end
-    return {
-        finalDamage = math.max(0, finalDamage),
-        isCritical = isCritical,
-        damageType = damageType,
-        originalDamage = originalDamage,
-        mitigatedAmount = mitigatedAmount
-    }
-end
-return ____exports
- end,
-["lua_modules.tstl-damage-calculator.src.damage-utils"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
-local ____types = require("lua_modules.tstl-damage-calculator.src.types")
-local DamageType = ____types.DamageType
-local ____damage_2Dcalculator = require("lua_modules.tstl-damage-calculator.src.damage-calculator")
-local DamageCalculator = ____damage_2Dcalculator.DamageCalculator
---- 伤害工具函数集合
--- 提供便捷的伤害计算函数
-____exports.DamageUtils = __TS__Class()
-local DamageUtils = ____exports.DamageUtils
-DamageUtils.name = "DamageUtils"
-function DamageUtils.prototype.____constructor(self)
-end
-function DamageUtils.quickPhysicalDamage(self, attack, armor, critChance, critDamage)
-    if critChance == nil then
-        critChance = 0
-    end
-    if critDamage == nil then
-        critDamage = 1.5
-    end
-    local attackerStats = {
-        attack = attack,
-        magicPower = 0,
-        armor = 0,
-        magicResist = 0,
-        criticalChance = critChance,
-        criticalDamage = critDamage
-    }
-    local defenderStats = {
-        attack = 0,
-        magicPower = 0,
-        armor = armor,
-        magicResist = 0,
-        criticalChance = 0,
-        criticalDamage = 1
-    }
-    local result = DamageCalculator:calculateDamage(attackerStats, defenderStats, DamageType.Physical)
-    return result.finalDamage
-end
-function DamageUtils.quickMagicalDamage(self, magicPower, magicResist, critChance, critDamage)
-    if critChance == nil then
-        critChance = 0
-    end
-    if critDamage == nil then
-        critDamage = 1.5
-    end
-    local attackerStats = {
-        attack = 0,
-        magicPower = magicPower,
-        armor = 0,
-        magicResist = 0,
-        criticalChance = critChance,
-        criticalDamage = critDamage
-    }
-    local defenderStats = {
-        attack = 0,
-        magicPower = 0,
-        armor = 0,
-        magicResist = magicResist,
-        criticalChance = 0,
-        criticalDamage = 1
-    }
-    local result = DamageCalculator:calculateDamage(attackerStats, defenderStats, DamageType.Magical)
-    return result.finalDamage
-end
-function DamageUtils.calculateEffectiveHP(self, hp, armor, magicResist)
-    local physicalReduction = DamageCalculator:calculateArmorReduction(armor)
-    local magicalReduction = DamageCalculator:calculateMagicReduction(magicResist)
-    return {base = hp, againstPhysical = hp / (1 - physicalReduction), againstMagical = hp / (1 - magicalReduction)}
-end
-function DamageUtils.calculateDPS(self, damage, attackSpeed)
-    return damage * attackSpeed
-end
-function DamageUtils.calculateHeal(self, baseHeal, healingPower, healingBonus)
-    if healingBonus == nil then
-        healingBonus = 0
-    end
-    return (baseHeal + healingPower) * (1 + healingBonus)
-end
-return ____exports
- end,
-["lua_modules.tstl-damage-calculator.src.index"] = function(...) 
-local ____exports = {}
-do
-    local ____export = require("lua_modules.tstl-damage-calculator.src.types")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lua_modules.tstl-damage-calculator.src.damage-calculator")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lua_modules.tstl-damage-calculator.src.damage-utils")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____damage_2Dcalculator = require("lua_modules.tstl-damage-calculator.src.damage-calculator")
-    ____exports.default = ____damage_2Dcalculator.DamageCalculator
-end
-return ____exports
- end,
 ["src.utils.helper"] = function(...) 
 local ____exports = {}
 function ____exports.c2i(char)
@@ -10701,8 +10500,8 @@ local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
 local __TS__Await = ____lualib.__TS__Await
 local ____exports = {}
 local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
-local Players = _____2A.Players
 local Unit = _____2A.Unit
+local Players = _____2A.Players
 local ____ydlua = require("src.ydlua.index")
 local ydlua = ____ydlua.ydlua
 local ____helper = require("src.utils.helper")
@@ -10731,8 +10530,6 @@ end
 ydlua:getInstance():initialize()
 main()
 return ____exports
- end,
-["lua_modules.@eiriksgata.wc3ts.src.globals.index"] = function(...) 
  end,
 }
 return require("src.main", ...)
