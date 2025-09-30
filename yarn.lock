@@ -9,6 +9,11 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
+"@eiriksgata/wc3ts@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.npmmirror.com/@eiriksgata/wc3ts/-/wc3ts-3.0.4.tgz#00659d5ad80781be284b25a0ba8c33bb2503c97e"
+  integrity sha512-fFw7qfegrssEJGRltHS5h0FMwYrBoK/ij31qXPw5+IK01/MyrDjNs8X9G2TUU++Lk20Q36j3JBEtduyWUMoRCA==
+
 "@jridgewell/resolve-uri@^3.0.3":
   version "3.1.2"
   resolved "https://registry.npmmirror.com/@jridgewell/resolve-uri/-/resolve-uri-3.1.2.tgz#7a0ee601f60f99a20c7c7c5ff0c80388c1189bd6"
@@ -47,14 +52,14 @@
   resolved "https://registry.npmmirror.com/@tsconfig/node16/-/node16-1.0.4.tgz#0b92dcc0cc1c81f6f306a381f28e31b1a56536e9"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
-"@types/node@^24.5.1":
-  version "24.5.1"
-  resolved "https://registry.npmmirror.com/@types/node/-/node-24.5.1.tgz#dab6917c47113eb4502d27d06e89a407ec0eff95"
-  integrity sha512-/SQdmUP2xa+1rdx7VwB9yPq8PaKej8TD5cQ+XfKDPWWC+VDJU4rvVVagXqKUzhKjtFoNA8rXDJAkCxQPAe00+Q==
+"@types/node@^24.5.2":
+  version "24.6.0"
+  resolved "https://registry.npmmirror.com/@types/node/-/node-24.6.0.tgz#5dd8d4eca0bba7dd81d853e7fadc96b322ff84f6"
+  integrity sha512-F1CBxgqwOMc4GKJ7eY22hWhBVQuMYTtqI8L0FcszYcpYX0fzfDGpez22Xau8Mgm7O9fI+zA/TYIdq3tGWfweBA==
   dependencies:
-    undici-types "~7.12.0"
+    undici-types "~7.13.0"
 
-"@typescript-to-lua/language-extensions@1.19.0":
+"@typescript-to-lua/language-extensions@1.19.0", "@typescript-to-lua/language-extensions@^1.19.0":
   version "1.19.0"
   resolved "https://registry.npmmirror.com/@typescript-to-lua/language-extensions/-/language-extensions-1.19.0.tgz#e7535ed343bed68580dd96e1a8101a1dbb2dc771"
   integrity sha512-Os5wOKwviTD4LeqI29N0btYOjokSJ97iCf45EOjIABlb5IwNQy7AE/AqZJobRw3ywHH8+KzJUMkEirWPzh2tUA==
@@ -222,15 +227,15 @@ typescript-to-lua@^1.32.0:
     resolve "^1.15.1"
     source-map "^0.7.3"
 
-typescript@^5.9.2:
-  version "5.9.2"
-  resolved "https://registry.npmmirror.com/typescript/-/typescript-5.9.2.tgz#d93450cddec5154a2d5cabe3b8102b83316fb2a6"
-  integrity sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==
+typescript@5.8.2:
+  version "5.8.2"
+  resolved "https://registry.npmmirror.com/typescript/-/typescript-5.8.2.tgz#8170b3702f74b79db2e5a96207c15e65807999e4"
+  integrity sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==
 
-undici-types@~7.12.0:
-  version "7.12.0"
-  resolved "https://registry.npmmirror.com/undici-types/-/undici-types-7.12.0.tgz#15c5c7475c2a3ba30659529f5cdb4674b622fafb"
-  integrity sha512-goOacqME2GYyOZZfb5Lgtu+1IDmAlAEu5xnD3+xTzS10hT0vzpf0SPjkXwAw9Jm+4n/mQGDP3LO8CPbYROeBfQ==
+undici-types@~7.13.0:
+  version "7.13.0"
+  resolved "https://registry.npmmirror.com/undici-types/-/undici-types-7.13.0.tgz#a20ba7c0a2be0c97bd55c308069d29d167466bff"
+  integrity sha512-Ov2Rr9Sx+fRgagJ5AX0qvItZG/JKKoBRAVITs1zk7IqZGTJUwgUr7qoYBpWwakpWilTZFM98rG/AFRocu10iIQ==
 
 universalify@^2.0.0:
   version "2.0.1"

@@ -2756,469 +2756,2850 @@ return {
   __TS__UsingAsync = __TS__UsingAsync
 }
  end,
-["src.types.index"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.handles.handle"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local WeakMap = ____lualib.WeakMap
+local __TS__New = ____lualib.__TS__New
+local __TS__Class = ____lualib.__TS__Class
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
+---
+-- @noSelfInFile
+local map = __TS__New(WeakMap)
+____exports.Handle = __TS__Class()
+local Handle = ____exports.Handle
+Handle.name = "Handle"
+function Handle.prototype.____constructor(self, handle)
+    self.handle = handle == nil and ____exports.Handle.initHandle or handle
+    map:set(self.handle, self)
+end
+function Handle.initFromHandle(self)
+    return ____exports.Handle.initHandle ~= nil
+end
+function Handle.getObject(self, handle)
+    local obj = map:get(handle)
+    if obj ~= nil then
+        return obj
+    end
+    ____exports.Handle.initHandle = handle
+    local newObj = __TS__New(self)
+    ____exports.Handle.initHandle = nil
+    return newObj
+end
+__TS__SetDescriptor(
+    Handle.prototype,
+    "id",
+    {get = function(self)
+        return GetHandleId(self.handle)
+    end},
+    true
+)
 return ____exports
  end,
-["src.config.index"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.handles.force"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+local ____player = require("lua_modules.@eiriksgata.wc3ts.src.handles.player")
+local MapPlayer = ____player.MapPlayer
+____exports.Force = __TS__Class()
+local Force = ____exports.Force
+Force.name = "Force"
+__TS__ClassExtends(Force, Handle)
+function Force.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateForce()
+    if handle == nil then
+        Error(nil, "w3ts failed to create force handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Force.create(self)
+    local handle = CreateForce()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Force.prototype.addPlayer(self, whichPlayer)
+    ForceAddPlayer(self.handle, whichPlayer.handle)
+end
+function Force.prototype.clear(self)
+    ForceClear(self.handle)
+end
+function Force.prototype.destroy(self)
+    DestroyForce(self.handle)
+end
+function Force.prototype.enumAllies(self, whichPlayer, filter)
+    ForceEnumAllies(
+        self.handle,
+        whichPlayer.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Force.prototype.enumEnemies(self, whichPlayer, filter)
+    ForceEnumEnemies(
+        self.handle,
+        whichPlayer.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Force.prototype.enumPlayers(self, filter)
+    ForceEnumPlayers(
+        self.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Force.prototype.enumPlayersCounted(self, filter, countLimit)
+    ForceEnumPlayersCounted(
+        self.handle,
+        type(filter) == "function" and Filter(filter) or filter,
+        countLimit
+    )
+end
+Force.prototype["for"] = function(self, callback)
+    ForForce(self.handle, callback)
+end
+function Force.prototype.getPlayers(self)
+    local players = {}
+    ForForce(
+        self.handle,
+        function()
+            local pl = MapPlayer:fromEnum()
+            if pl then
+                players[#players + 1] = pl
+            end
+        end
+    )
+    return players
+end
+function Force.prototype.hasPlayer(self, whichPlayer)
+    return IsPlayerInForce(whichPlayer.handle, self.handle)
+end
+function Force.prototype.removePlayer(self, whichPlayer)
+    ForceRemovePlayer(self.handle, whichPlayer.handle)
+end
+function Force.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.point"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Point = __TS__Class()
+local Point = ____exports.Point
+Point.name = "Point"
+__TS__ClassExtends(Point, Handle)
+function Point.prototype.____constructor(self, x, y)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = Location(x, y)
+    if handle == nil then
+        Error(nil, "w3ts failed to create player handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Point.create(self, x, y)
+    local handle = Location(x, y)
+    local obj = self:getObject(handle)
+    local values = {}
+    values.handle = handle
+    return __TS__ObjectAssign(obj, values)
+end
+function Point.prototype.destroy(self)
+    RemoveLocation(self.handle)
+end
+function Point.prototype.setPosition(self, x, y)
+    MoveLocation(self.handle, x, y)
+end
+function Point.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+__TS__SetDescriptor(
+    Point.prototype,
+    "x",
+    {
+        get = function(self)
+            return GetLocationX(self.handle)
+        end,
+        set = function(self, value)
+            MoveLocation(self.handle, value, self.y)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Point.prototype,
+    "y",
+    {
+        get = function(self)
+            return GetLocationY(self.handle)
+        end,
+        set = function(self, value)
+            MoveLocation(self.handle, self.x, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Point.prototype,
+    "z",
+    {get = function(self)
+        return GetLocationZ(self.handle)
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.player"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.MapPlayer = __TS__Class()
+local MapPlayer = ____exports.MapPlayer
+MapPlayer.name = "MapPlayer"
+__TS__ClassExtends(MapPlayer, Handle)
+function MapPlayer.prototype.____constructor(self, index)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = Player(index)
+    if handle == nil then
+        Error(nil, "w3ts failed to create player handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function MapPlayer.create(self, index)
+    local handle = Player(index)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function MapPlayer.prototype.addTechResearched(self, techId, levels)
+    AddPlayerTechResearched(self.handle, techId, levels)
+end
+function MapPlayer.prototype.cacheHeroData(self)
+    CachePlayerHeroData(self.handle)
+end
+function MapPlayer.prototype.compareAlliance(self, otherPlayer, whichAllianceSetting)
+    return GetPlayerAlliance(self.handle, otherPlayer.handle, whichAllianceSetting)
+end
+function MapPlayer.prototype.coordsFogged(self, x, y)
+    return IsFoggedToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.coordsMasked(self, x, y)
+    return IsMaskedToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.coordsVisible(self, x, y)
+    return IsVisibleToPlayer(x, y, self.handle)
+end
+function MapPlayer.prototype.cripple(self, toWhichPlayers, flag)
+    CripplePlayer(self.handle, toWhichPlayers.handle, flag)
+end
+function MapPlayer.prototype.getScore(self, whichPlayerScore)
+    return GetPlayerScore(self.handle, whichPlayerScore)
+end
+function MapPlayer.prototype.getState(self, whichPlayerState)
+    return GetPlayerState(self.handle, whichPlayerState)
+end
+function MapPlayer.prototype.getStructureCount(self, includeIncomplete)
+    return GetPlayerStructureCount(self.handle, includeIncomplete)
+end
+function MapPlayer.prototype.getTaxRate(self, otherPlayer, whichResource)
+    return GetPlayerTaxRate(self.handle, otherPlayer, whichResource)
+end
+function MapPlayer.prototype.getTechCount(self, techId, specificonly)
+    return GetPlayerTechCount(self.handle, techId, specificonly)
+end
+function MapPlayer.prototype.getTechMaxAllowed(self, techId)
+    return GetPlayerTechMaxAllowed(self.handle, techId)
+end
+function MapPlayer.prototype.getTechResearched(self, techId, specificonly)
+    return GetPlayerTechResearched(self.handle, techId, specificonly)
+end
+function MapPlayer.prototype.getUnitCount(self, includeIncomplete)
+    return GetPlayerUnitCount(self.handle, includeIncomplete)
+end
+function MapPlayer.prototype.getUnitCountByType(self, unitName, includeIncomplete, includeUpgrades)
+    return GetPlayerTypedUnitCount(self.handle, unitName, includeIncomplete, includeUpgrades)
+end
+function MapPlayer.prototype.inForce(self, whichForce)
+    return IsPlayerInForce(self.handle, whichForce.handle)
+end
+function MapPlayer.prototype.isLocal(self)
+    return GetLocalPlayer() == self.handle
+end
+function MapPlayer.prototype.isObserver(self)
+    return IsPlayerObserver(self.handle)
+end
+function MapPlayer.prototype.isPlayerAlly(self, otherPlayer)
+    return IsPlayerAlly(self.handle, otherPlayer.handle)
+end
+function MapPlayer.prototype.isPlayerEnemy(self, otherPlayer)
+    return IsPlayerEnemy(self.handle, otherPlayer.handle)
+end
+function MapPlayer.prototype.isRacePrefSet(self, pref)
+    return IsPlayerRacePrefSet(self.handle, pref)
+end
+function MapPlayer.prototype.isSelectable(self)
+    return GetPlayerSelectable(self.handle)
+end
+function MapPlayer.prototype.pointFogged(self, whichPoint)
+    return IsLocationFoggedToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.pointMasked(self, whichPoint)
+    return IsLocationMaskedToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.pointVisible(self, whichPoint)
+    return IsLocationVisibleToPlayer(whichPoint.handle, self.handle)
+end
+function MapPlayer.prototype.remove(self, gameResult)
+    RemovePlayer(self.handle, gameResult)
+end
+function MapPlayer.prototype.removeAllGuardPositions(self)
+    RemoveAllGuardPositions(self.handle)
+end
+function MapPlayer.prototype.setAbilityAvailable(self, abilId, avail)
+    SetPlayerAbilityAvailable(self.handle, abilId, avail)
+end
+function MapPlayer.prototype.setAlliance(self, otherPlayer, whichAllianceSetting, value)
+    SetPlayerAlliance(self.handle, otherPlayer.handle, whichAllianceSetting, value)
+end
+function MapPlayer.prototype.setOnScoreScreen(self, flag)
+    SetPlayerOnScoreScreen(self.handle, flag)
+end
+function MapPlayer.prototype.setState(self, whichPlayerState, value)
+    SetPlayerState(self.handle, whichPlayerState, value)
+end
+function MapPlayer.prototype.setTaxRate(self, otherPlayer, whichResource, rate)
+    SetPlayerTaxRate(self.handle, otherPlayer.handle, whichResource, rate)
+end
+function MapPlayer.prototype.setTechMaxAllowed(self, techId, maximum)
+    SetPlayerTechMaxAllowed(self.handle, techId, maximum)
+end
+function MapPlayer.prototype.setTechResearched(self, techId, setToLevel)
+    SetPlayerTechResearched(self.handle, techId, setToLevel)
+end
+function MapPlayer.prototype.setUnitsOwner(self, newOwner)
+    SetPlayerUnitsOwner(self.handle, newOwner)
+end
+function MapPlayer.fromEnum(self)
+    return ____exports.MapPlayer:fromHandle(GetEnumPlayer())
+end
+function MapPlayer.fromEvent(self)
+    return ____exports.MapPlayer:fromHandle(GetTriggerPlayer())
+end
+function MapPlayer.fromFilter(self)
+    return ____exports.MapPlayer:fromHandle(GetFilterPlayer())
+end
+function MapPlayer.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function MapPlayer.fromIndex(self, index)
+    return self:fromHandle(Player(index))
+end
+function MapPlayer.fromLocal(self)
+    local pl = GetLocalPlayer()
+    if pl == nil then
+        do
+            local i = 0
+            while i < 10 do
+                DisplayTextToPlayer(
+                    Player(0),
+                    0,
+                    0,
+                    "$$$$$$$$$ LOCAL PLAYER IS NULL. TELL ME"
+                )
+                i = i + 1
+            end
+        end
+    end
+    return self:fromHandle(pl)
+end
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "color",
+    {
+        get = function(self)
+            return GetPlayerColor(self.handle)
+        end,
+        set = function(self, color)
+            SetPlayerColor(self.handle, color)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "controller",
+    {get = function(self)
+        return GetPlayerController(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "handicap",
+    {
+        get = function(self)
+            return GetPlayerHandicap(self.handle)
+        end,
+        set = function(self, handicap)
+            SetPlayerHandicap(self.handle, handicap)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "handicapXp",
+    {
+        get = function(self)
+            return GetPlayerHandicapXP(self.handle)
+        end,
+        set = function(self, handicap)
+            SetPlayerHandicapXP(self.handle, handicap)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "id",
+    {get = function(self)
+        return GetPlayerId(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "name",
+    {
+        get = function(self)
+            return GetPlayerName(self.handle) or ""
+        end,
+        set = function(self, value)
+            SetPlayerName(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "race",
+    {get = function(self)
+        return GetPlayerRace(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "slotState",
+    {get = function(self)
+        return GetPlayerSlotState(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocation",
+    {get = function(self)
+        return GetPlayerStartLocation(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationX",
+    {get = function(self)
+        return GetStartLocationX(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationY",
+    {get = function(self)
+        return GetStartLocationY(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "startLocationPoint",
+    {get = function(self)
+        return GetStartLocationLoc(self.startLocation)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    MapPlayer.prototype,
+    "team",
+    {get = function(self)
+        return GetPlayerTeam(self.handle)
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.camera"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectDefineProperty = ____lualib.__TS__ObjectDefineProperty
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__New = ____lualib.__TS__New
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+local ____point = require("lua_modules.@eiriksgata.wc3ts.src.handles.point")
+local Point = ____point.Point
+____exports.Camera = __TS__Class()
+local Camera = ____exports.Camera
+Camera.name = "Camera"
+function Camera.prototype.____constructor(self)
+end
+function Camera.adjustField(self, whichField, offset, duration)
+    AdjustCameraField(whichField, offset, duration)
+end
+function Camera.endCinematicScene(self)
+    EndCinematicScene()
+end
+function Camera.forceCinematicSubtitles(self, flag)
+    ForceCinematicSubtitles(flag)
+end
+function Camera.getField(self, field)
+    return GetCameraField(field)
+end
+function Camera.getMargin(self, whichMargin)
+    return GetCameraMargin(whichMargin)
+end
+function Camera.pan(self, x, y, zOffsetDest)
+    if zOffsetDest == nil then
+        PanCameraTo(x, y)
+    else
+        PanCameraToWithZ(x, y, zOffsetDest)
+    end
+end
+function Camera.panTimed(self, x, y, duration, zOffsetDest)
+    if zOffsetDest == nil then
+        PanCameraToTimed(x, y, duration)
+    else
+        PanCameraToTimedWithZ(x, y, zOffsetDest, duration)
+    end
+end
+function Camera.reset(self, duration)
+    ResetToGameCamera(duration)
+end
+function Camera.setBounds(self, x1, y1, x2, y2, x3, y3, x4, y4)
+    SetCameraBounds(
+        x1,
+        y1,
+        x2,
+        y2,
+        x3,
+        y3,
+        x4,
+        y4
+    )
+end
+function Camera.setCameraOrientController(self, whichUnit, xOffset, yOffset)
+    SetCameraOrientController(whichUnit, xOffset, yOffset)
+end
+function Camera.setCineFilterBlendMode(self, whichMode)
+    SetCineFilterBlendMode(whichMode)
+end
+function Camera.setCineFilterDuration(self, duration)
+    SetCineFilterDuration(duration)
+end
+function Camera.setCineFilterEndColor(self, red, green, blue, alpha)
+    SetCineFilterEndColor(red, green, blue, alpha)
+end
+function Camera.setCineFilterEndUV(self, minU, minV, maxU, maxV)
+    SetCineFilterEndUV(minU, minV, maxU, maxV)
+end
+function Camera.setCineFilterStartColor(self, red, green, blue, alpha)
+    SetCineFilterStartColor(red, green, blue, alpha)
+end
+function Camera.setCineFilterStartUV(self, minU, minV, maxU, maxV)
+    SetCineFilterStartUV(minU, minV, maxU, maxV)
+end
+function Camera.setCineFilterTexMapFlags(self, whichFlags)
+    SetCineFilterTexMapFlags(whichFlags)
+end
+function Camera.setCineFilterTexture(self, fileName)
+    SetCineFilterTexture(fileName)
+end
+function Camera.setCinematicCamera(self, cameraModelFile)
+    SetCinematicCamera(cameraModelFile)
+end
+function Camera.SetCinematicScene(self, portraitUnitId, color, speakerTitle, text, sceneDuration, voiceoverDuration)
+    SetCinematicScene(
+        portraitUnitId,
+        color,
+        speakerTitle,
+        text,
+        sceneDuration,
+        voiceoverDuration
+    )
+end
+function Camera.setField(self, whichField, value, duration)
+    SetCameraField(whichField, value, duration)
+end
+function Camera.setPos(self, x, y)
+    SetCameraPosition(x, y)
+end
+function Camera.setRotateMode(self, x, y, radiansToSweep, duration)
+    SetCameraRotateMode(x, y, radiansToSweep, duration)
+end
+function Camera.setSmoothingFactor(self, factor)
+    CameraSetSmoothingFactor(factor)
+end
+function Camera.setSourceNoise(self, mag, velocity, vertOnly)
+    if vertOnly == nil then
+        vertOnly = false
+    end
+    CameraSetSourceNoiseEx(mag, velocity, vertOnly)
+end
+function Camera.setTargetController(self, whichUnit, xOffset, yOffset, inheritOrientation)
+    SetCameraTargetController(whichUnit, xOffset, yOffset, inheritOrientation)
+end
+function Camera.setTargetNoise(self, mag, velocity, vertOnly)
+    if vertOnly == nil then
+        vertOnly = false
+    end
+    CameraSetTargetNoiseEx(mag, velocity, vertOnly)
+end
+function Camera.stop(self)
+    StopCamera()
+end
+__TS__ObjectDefineProperty(
+    Camera,
+    "visible",
+    {
+        get = function(self)
+            return IsCineFilterDisplayed()
+        end,
+        set = function(self, flag)
+            DisplayCineFilter(flag)
+        end
+    }
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "boundMinX",
+    {get = function(self)
+        return GetCameraBoundMinX()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "boundMinY",
+    {get = function(self)
+        return GetCameraBoundMinY()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "boundMaxX",
+    {get = function(self)
+        return GetCameraBoundMaxX()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "boundMaxY",
+    {get = function(self)
+        return GetCameraBoundMaxY()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "targetX",
+    {get = function(self)
+        return GetCameraTargetPositionX()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "targetY",
+    {get = function(self)
+        return GetCameraTargetPositionY()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "targetZ",
+    {get = function(self)
+        return GetCameraTargetPositionZ()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "eyeX",
+    {get = function(self)
+        return GetCameraEyePositionX()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "eyeY",
+    {get = function(self)
+        return GetCameraEyePositionY()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "eyeZ",
+    {get = function(self)
+        return GetCameraEyePositionZ()
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "eyePoint",
+    {get = function(self)
+        return Point:fromHandle(GetCameraEyePositionLoc())
+    end}
+)
+__TS__ObjectDefineProperty(
+    Camera,
+    "targetPoint",
+    {get = function(self)
+        return Point:fromHandle(GetCameraTargetPositionLoc())
+    end}
+)
+____exports.CameraSetup = __TS__Class()
+local CameraSetup = ____exports.CameraSetup
+CameraSetup.name = "CameraSetup"
+__TS__ClassExtends(CameraSetup, Handle)
+function CameraSetup.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateCameraSetup()
+    if handle == nil then
+        error(
+            __TS__New(Error, "w3ts failed to create camerasetup handle."),
+            0
+        )
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function CameraSetup.create(self)
+    local handle = CreateCameraSetup()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function CameraSetup.prototype.apply(self, doPan, panTimed)
+    CameraSetupApply(self.handle, doPan, panTimed)
+end
+function CameraSetup.prototype.applyForceDuration(self, doPan, forceDuration)
+    CameraSetupApplyForceDuration(self.handle, doPan, forceDuration)
+end
+function CameraSetup.prototype.applyForceDurationSmooth(self, doPan, forcedDuration, easeInDuration, easeOutDuration, smoothFactor)
+end
+function CameraSetup.prototype.applyForceDurationZ(self, zDestOffset, forceDuration)
+    CameraSetupApplyForceDurationWithZ(self.handle, zDestOffset, forceDuration)
+end
+function CameraSetup.prototype.applyZ(self, zDestOffset)
+    CameraSetupApplyWithZ(self.handle, zDestOffset)
+end
+function CameraSetup.prototype.getField(self, whichField)
+    return CameraSetupGetField(self.handle, whichField)
+end
+function CameraSetup.prototype.setDestPos(self, x, y, duration)
+    CameraSetupSetDestPosition(self.handle, x, y, duration)
+end
+function CameraSetup.prototype.setField(self, whichField, value, duration)
+    CameraSetupSetField(self.handle, whichField, value, duration)
+end
+function CameraSetup.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+__TS__SetDescriptor(
+    CameraSetup.prototype,
+    "destPoint",
+    {get = function(self)
+        return Point:fromHandle(CameraSetupGetDestPositionLoc(self.handle))
+    end},
+    true
+)
+__TS__SetDescriptor(
+    CameraSetup.prototype,
+    "destX",
+    {
+        get = function(self)
+            return CameraSetupGetDestPositionX(self.handle)
+        end,
+        set = function(self, x)
+            CameraSetupSetDestPosition(self.handle, x, self.destY, 0)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    CameraSetup.prototype,
+    "destY",
+    {
+        get = function(self)
+            return CameraSetupGetDestPositionY(self.handle)
+        end,
+        set = function(self, y)
+            CameraSetupSetDestPosition(self.handle, self.destX, y, 0)
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.widget"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Widget = __TS__Class()
+local Widget = ____exports.Widget
+Widget.name = "Widget"
+__TS__ClassExtends(Widget, Handle)
+function Widget.fromEvent(self)
+    return self:fromHandle(GetTriggerWidget())
+end
+function Widget.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+__TS__SetDescriptor(
+    Widget.prototype,
+    "life",
+    {
+        get = function(self)
+            return GetWidgetLife(self.handle)
+        end,
+        set = function(self, value)
+            SetWidgetLife(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Widget.prototype,
+    "x",
+    {get = function(self)
+        return GetWidgetX(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Widget.prototype,
+    "y",
+    {get = function(self)
+        return GetWidgetY(self.handle)
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.destructable"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+local ____widget = require("lua_modules.@eiriksgata.wc3ts.src.handles.widget")
+local Widget = ____widget.Widget
+____exports.Destructable = __TS__Class()
+local Destructable = ____exports.Destructable
+Destructable.name = "Destructable"
+__TS__ClassExtends(Destructable, Widget)
+function Destructable.prototype.____constructor(self, objectId, x, y, z, face, scale, variation)
+    if Handle:initFromHandle() then
+        Widget.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateDestructableZ(
+        objectId,
+        x,
+        y,
+        z,
+        face,
+        scale,
+        variation
+    )
+    if handle == nil then
+        Error(nil, "w3ts failed to create destructable handle.")
+    end
+    Widget.prototype.____constructor(self, handle)
+end
+function Destructable.create(self, objectId, x, y, face, scale, variation, skinId)
+    if face == nil then
+        face = 0
+    end
+    if scale == nil then
+        scale = 1
+    end
+    if variation == nil then
+        variation = 0
+    end
+    local handle
+    if skinId ~= nil then
+        handle = CreateDestructable(
+            objectId,
+            x,
+            y,
+            face,
+            scale,
+            variation
+        )
+    end
+    if handle then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        if skinId ~= nil then
+            values.skin = skinId
+        end
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Destructable.createZ(self, objectId, x, y, z, face, scale, variation, skinId)
+    if face == nil then
+        face = 0
+    end
+    if scale == nil then
+        scale = 1
+    end
+    if variation == nil then
+        variation = 0
+    end
+    local handle
+    if skinId ~= nil then
+        handle = CreateDestructableZ(
+            objectId,
+            x,
+            y,
+            z,
+            face,
+            scale,
+            variation
+        )
+    end
+    if handle then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        if skinId ~= nil then
+            values.skin = skinId
+        end
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Destructable.prototype.destroy(self)
+    RemoveDestructable(self.handle)
+end
+function Destructable.prototype.heal(self, life, birth)
+    DestructableRestoreLife(self.handle, life, birth)
+end
+function Destructable.prototype.kill(self)
+    KillDestructable(self.handle)
+end
+function Destructable.prototype.queueAnim(self, whichAnimation)
+    QueueDestructableAnimation(self.handle, whichAnimation)
+end
+function Destructable.prototype.setAnim(self, whichAnimation)
+    SetDestructableAnimation(self.handle, whichAnimation)
+end
+function Destructable.prototype.setAnimSpeed(self, speedFactor)
+    SetDestructableAnimationSpeed(self.handle, speedFactor)
+end
+function Destructable.prototype.show(self, flag)
+    ShowDestructable(self.handle, flag)
+end
+function Destructable.fromEvent(self)
+    return self:fromHandle(GetTriggerDestructable())
+end
+function Destructable.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+__TS__SetDescriptor(
+    Destructable.prototype,
+    "invulnerable",
+    {
+        get = function(self)
+            return IsDestructableInvulnerable(self.handle)
+        end,
+        set = function(self, flag)
+            SetDestructableInvulnerable(self.handle, flag)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Destructable.prototype,
+    "life",
+    {
+        get = function(self)
+            return GetDestructableLife(self.handle)
+        end,
+        set = function(self, value)
+            SetDestructableLife(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Destructable.prototype,
+    "maxLife",
+    {
+        get = function(self)
+            return GetDestructableMaxLife(self.handle)
+        end,
+        set = function(self, value)
+            SetDestructableMaxLife(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Destructable.prototype,
+    "name",
+    {get = function(self)
+        return GetDestructableName(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Destructable.prototype,
+    "occluderHeight",
+    {
+        get = function(self)
+            return GetDestructableOccluderHeight(self.handle)
+        end,
+        set = function(self, value)
+            SetDestructableOccluderHeight(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Destructable.prototype,
+    "typeId",
+    {get = function(self)
+        return GetDestructableTypeId(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Destructable.prototype,
+    "x",
+    {get = function(self)
+        return GetDestructableX(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Destructable.prototype,
+    "y",
+    {get = function(self)
+        return GetDestructableY(self.handle)
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.dialog"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.DialogButton = __TS__Class()
+local DialogButton = ____exports.DialogButton
+DialogButton.name = "DialogButton"
+__TS__ClassExtends(DialogButton, Handle)
+function DialogButton.prototype.____constructor(self, whichDialog, text, hotkey, quit, score)
+    if hotkey == nil then
+        hotkey = 0
+    end
+    if quit == nil then
+        quit = false
+    end
+    if score == nil then
+        score = false
+    end
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle
+    if quit == false then
+        handle = DialogAddButton(whichDialog.handle, text, hotkey)
+    else
+        handle = DialogAddQuitButton(whichDialog.handle, score, text, hotkey)
+    end
+    if handle == nil then
+        Error(nil, "w3ts failed to create button handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function DialogButton.create(self, whichDialog, text, hotkey, quit, score)
+    if hotkey == nil then
+        hotkey = 0
+    end
+    if quit == nil then
+        quit = false
+    end
+    if score == nil then
+        score = false
+    end
+    local handle
+    if quit == false then
+        handle = DialogAddButton(whichDialog.handle, text, hotkey)
+    else
+        handle = DialogAddQuitButton(whichDialog.handle, score, text, hotkey)
+    end
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function DialogButton.fromEvent(self)
+    return self:fromHandle(GetClickedButton())
+end
+function DialogButton.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+---
+-- @example Create a simple dialog.
+-- ```ts
+-- const dialog = Dialog.create();
+-- if (dialog) {
+-- const trigger = Trigger.create();
+-- 
+-- trigger.registerDialogEvent(dialog);
+-- trigger.addAction(() => {
+-- const clicked = DialogButton.fromEvent();
+-- });
+-- 
+-- Timer.create().start(1.00, false, () => {
+-- DialogButton.create(dialog, "Stay", 0);
+-- DialogButton.create(dialog, "Leave", 0, true);
+-- 
+-- dialog.setMessage("Welcome to TypeScript!");
+-- dialog.display(Players[0], true);
+-- });
+-- }
+-- ```
+____exports.Dialog = __TS__Class()
+local Dialog = ____exports.Dialog
+Dialog.name = "Dialog"
+__TS__ClassExtends(Dialog, Handle)
+function Dialog.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = DialogCreate()
+    if handle == nil then
+        Error(nil, "w3ts failed to create dialog handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Dialog.create(self)
+    local handle = DialogCreate()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Dialog.prototype.addButton(self, text, hotkey, quit, score)
+    if hotkey == nil then
+        hotkey = 0
+    end
+    if quit == nil then
+        quit = false
+    end
+    if score == nil then
+        score = false
+    end
+    return ____exports.DialogButton:create(
+        self,
+        text,
+        hotkey,
+        quit,
+        score
+    )
+end
+function Dialog.prototype.clear(self)
+    DialogClear(self.handle)
+end
+function Dialog.prototype.destroy(self)
+    DialogDestroy(self.handle)
+end
+function Dialog.prototype.display(self, whichPlayer, flag)
+    DialogDisplay(whichPlayer.handle, self.handle, flag)
+end
+function Dialog.prototype.setMessage(self, whichMessage)
+    DialogSetMessage(self.handle, whichMessage)
+end
+function Dialog.fromEvent(self)
+    return self:fromHandle(GetClickedDialog())
+end
+function Dialog.fromHandle(self, handle)
+    local ____handle_1
+    if handle then
+        ____handle_1 = self:getObject(handle)
+    else
+        ____handle_1 = nil
+    end
+    return ____handle_1
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.effect"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Effect = __TS__Class()
+local Effect = ____exports.Effect
+Effect.name = "Effect"
+__TS__ClassExtends(Effect, Handle)
+function Effect.prototype.____constructor(self, modelName, a, b)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle
+    if type(a) == "number" and type(b) == "number" then
+        handle = AddSpecialEffect(modelName, a, b)
+    elseif type(a) ~= "number" and type(b) == "string" then
+        handle = AddSpecialEffectTarget(modelName, a.handle, b)
+    end
+    if handle == nil then
+        Error(nil, "w3ts failed to create effect handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+    if type(a) ~= "number" and type(b) == "string" then
+        self.attachWidget = a
+        self.attachPointName = b
+    end
+end
+function Effect.create(self, modelName, x, y)
+    local handle = AddSpecialEffect(modelName, x, y)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Effect.createAttachment(self, modelName, targetWidget, attachPointName)
+    local handle = AddSpecialEffectTarget(modelName, targetWidget.handle, attachPointName)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        values.attachWidget = targetWidget
+        values.attachPointName = attachPointName
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Effect.createSpell(self, abilityId, effectType, x, y)
+    local handle = AddSpellEffectById(abilityId, effectType, x, y)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Effect.createSpellAttachment(self, abilityId, effectType, targetWidget, attachPointName)
+    local handle = AddSpellEffectTargetById(abilityId, effectType, targetWidget.handle, attachPointName)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        values.attachWidget = targetWidget
+        values.attachPointName = attachPointName
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Effect.prototype.addSubAnimation(self, subAnim)
+    BlzSpecialEffectAddSubAnimation(self.handle, subAnim)
+end
+function Effect.prototype.clearSubAnimations(self)
+    BlzSpecialEffectClearSubAnimations(self.handle)
+end
+function Effect.prototype.destroy(self)
+    DestroyEffect(self.handle)
+end
+function Effect.prototype.playAnimation(self, animType)
+    BlzPlaySpecialEffect(self.handle, animType)
+end
+function Effect.prototype.playWithTimeScale(self, animType, timeScale)
+    BlzPlaySpecialEffectWithTimeScale(self.handle, animType, timeScale)
+end
+function Effect.prototype.removeSubAnimation(self, subAnim)
+    BlzSpecialEffectRemoveSubAnimation(self.handle, subAnim)
+end
+function Effect.prototype.resetScaleMatrix(self)
+    EXEffectMatReset(self.handle)
+end
+function Effect.prototype.setAlpha(self, alpha)
+    BlzSetSpecialEffectAlpha(self.handle, alpha)
+end
+function Effect.prototype.setColor(self, red, green, blue)
+    BlzSetSpecialEffectColor(self.handle, red, green, blue)
+end
+function Effect.prototype.setColorByPlayer(self, whichPlayer)
+    BlzSetSpecialEffectColorByPlayer(self.handle, whichPlayer.handle)
+end
+function Effect.prototype.setHeight(self, height)
+    BlzSetSpecialEffectHeight(self.handle, height)
+end
+function Effect.prototype.setOrientation(self, yaw, pitch, roll)
+    BlzSetSpecialEffectOrientation(self.handle, yaw, pitch, roll)
+end
+function Effect.prototype.setPitch(self, pitch)
+    BlzSetSpecialEffectPitch(self.handle, pitch)
+end
+function Effect.prototype.setPoint(self, p)
+    BlzSetSpecialEffectPositionLoc(self.handle, p.handle)
+end
+function Effect.prototype.setPosition(self, x, y, z)
+    BlzSetSpecialEffectPosition(self.handle, x, y, z)
+end
+function Effect.prototype.setRoll(self, roll)
+    BlzSetSpecialEffectRoll(self.handle, roll)
+end
+function Effect.prototype.setScaleMatrix(self, x, y, z)
+    EXEffectMatScale(self.handle, x, y, z)
+end
+function Effect.prototype.setTime(self, value)
+    BlzSetSpecialEffectTime(self.handle, value)
+end
+function Effect.prototype.setTimeScale(self, timeScale)
+    BlzSetSpecialEffectTimeScale(self.handle, timeScale)
+end
+function Effect.prototype.setYaw(self, y)
+    BlzSetSpecialEffectYaw(self.handle, y)
+end
+function Effect.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+__TS__SetDescriptor(
+    Effect.prototype,
+    "scale",
+    {
+        get = function(self)
+            return EXGetEffectSize(self.handle)
+        end,
+        set = function(self, scale)
+            EXSetEffectSize(self.handle, scale)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Effect.prototype,
+    "x",
+    {
+        get = function(self)
+            return EXGetEffectX(self.handle)
+        end,
+        set = function(self, x)
+            EXSetEffectXY(self.handle, x, self.y)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Effect.prototype,
+    "y",
+    {
+        get = function(self)
+            return EXGetEffectY(self.handle)
+        end,
+        set = function(self, y)
+            EXSetEffectXY(self.handle, self.x, y)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Effect.prototype,
+    "z",
+    {
+        get = function(self)
+            return EXGetEffectZ(self.handle)
+        end,
+        set = function(self, z)
+            EXSetEffectZ(self.handle, z)
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.rect"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Rectangle = __TS__Class()
+local Rectangle = ____exports.Rectangle
+Rectangle.name = "Rectangle"
+__TS__ClassExtends(Rectangle, Handle)
+function Rectangle.prototype.____constructor(self, minX, minY, maxX, maxY)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = Rect(minX, minY, maxX, maxY)
+    if handle == nil then
+        Error(nil, "w3ts failed to create rect handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Rectangle.create(self, minX, minY, maxX, maxY)
+    local handle = Rect(minX, minY, maxX, maxY)
+    local obj = self:getObject(handle)
+    local values = {}
+    values.handle = handle
+    return __TS__ObjectAssign(obj, values)
+end
+function Rectangle.prototype.destroy(self)
+    RemoveRect(self.handle)
+end
+function Rectangle.prototype.enumDestructables(self, filter, actionFunc)
+    EnumDestructablesInRect(
+        self.handle,
+        type(filter) == "function" and Filter(filter) or filter,
+        actionFunc
+    )
+end
+function Rectangle.prototype.enumItems(self, filter, actionFunc)
+    EnumItemsInRect(
+        self.handle,
+        type(filter) == "function" and Filter(filter) or filter,
+        actionFunc
+    )
+end
+function Rectangle.prototype.move(self, newCenterX, newCenterY)
+    MoveRectTo(self.handle, newCenterX, newCenterY)
+end
+function Rectangle.prototype.movePoint(self, newCenterPoint)
+    MoveRectToLoc(self.handle, newCenterPoint.handle)
+end
+function Rectangle.prototype.setRect(self, minX, minY, maxX, maxY)
+    SetRect(
+        self.handle,
+        minX,
+        minY,
+        maxX,
+        maxY
+    )
+end
+function Rectangle.prototype.setRectFromPoint(self, min, max)
+    SetRectFromLoc(self.handle, min.handle, max.handle)
+end
+function Rectangle.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function Rectangle.fromPoint(self, min, max)
+    return self:fromHandle(RectFromLoc(min.handle, max.handle))
+end
+function Rectangle.getWorldBounds(self)
+    return ____exports.Rectangle:fromHandle(GetWorldBounds())
+end
+__TS__SetDescriptor(
+    Rectangle.prototype,
+    "centerX",
+    {get = function(self)
+        return GetRectCenterX(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Rectangle.prototype,
+    "centerY",
+    {get = function(self)
+        return GetRectCenterY(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Rectangle.prototype,
+    "maxX",
+    {get = function(self)
+        return GetRectMaxX(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Rectangle.prototype,
+    "maxY",
+    {get = function(self)
+        return GetRectMaxY(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Rectangle.prototype,
+    "minX",
+    {get = function(self)
+        return GetRectMinX(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Rectangle.prototype,
+    "minY",
+    {get = function(self)
+        return GetRectMinY(self.handle)
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.fogmodifier"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.FogModifier = __TS__Class()
+local FogModifier = ____exports.FogModifier
+FogModifier.name = "FogModifier"
+__TS__ClassExtends(FogModifier, Handle)
+function FogModifier.prototype.____constructor(self, forWhichPlayer, whichState, centerX, centerY, radius, useSharedVision, afterUnits)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateFogModifierRadius(
+        forWhichPlayer.handle,
+        whichState,
+        centerX,
+        centerY,
+        radius,
+        useSharedVision,
+        afterUnits
+    )
+    if handle == nil then
+        Error(nil, "w3ts failed to create fogmodifier handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function FogModifier.create(self, forWhichPlayer, whichState, centerX, centerY, radius, useSharedVision, afterUnits)
+    local handle = CreateFogModifierRadius(
+        forWhichPlayer.handle,
+        whichState,
+        centerX,
+        centerY,
+        radius,
+        useSharedVision,
+        afterUnits
+    )
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function FogModifier.prototype.destroy(self)
+    DestroyFogModifier(self.handle)
+end
+function FogModifier.prototype.start(self)
+    FogModifierStart(self.handle)
+end
+function FogModifier.prototype.stop(self)
+    FogModifierStop(self.handle)
+end
+function FogModifier.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function FogModifier.fromRect(self, forWhichPlayer, whichState, where, useSharedVision, afterUnits)
+    return self:fromHandle(CreateFogModifierRect(
+        forWhichPlayer.handle,
+        whichState,
+        where.handle,
+        useSharedVision,
+        afterUnits
+    ))
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.frame"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+--- Warcraft III's UI uses a proprietary format known as FDF (Frame Definition Files).
+-- This class provides the ability to manipulate and create them dynamically through code.
+-- 
+-- @example Create a simple button.
+-- ```ts
+-- const gameui = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0);
+-- if (gameui) {
+-- // Create a "GLUEBUTTON" named "Facebutton", the clickable Button, for game UI
+-- const buttonFrame = Frame.createType("FaceButton", gameui, 0, "GLUEBUTTON", "");
+-- if (buttonFrame) {
+-- // Create a BACKDROP named "FaceButtonIcon", the visible image, for buttonFrame.
+-- const buttonIconFrame = Frame.createType("FaceButton", buttonFrame, 0, "BACKDROP", "");
+-- // buttonIconFrame will mimic buttonFrame in size and position
+-- buttonIconFrame?.setAllPoints(buttonFrame);
+-- // Set a Texture
+-- buttonIconFrame?.setTexture("ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn", 0, true);
+-- // Place the buttonFrame to the center of the screen
+-- buttonFrame.setAbsPoint(FRAMEPOINT_CENTER, 0.4, 0.3);
+-- // Give that buttonFrame a size
+-- buttonFrame.setSize(0.05, 0.05);
+-- }
+-- }
+-- ```
+-- 
+-- There are many aspects to modifying the UI and it can become complicated, so here are some
+-- guides:
+-- 
+-- https://www.hiveworkshop.com/threads/ui-frames-starting-guide.318603/
+-- https://www.hiveworkshop.com/pastebin/913bd439799b3d917e5b522dd9ef458f20598/
+-- https://www.hiveworkshop.com/tags/ui-fdf/
+____exports.Frame = __TS__Class()
+local Frame = ____exports.Frame
+Frame.name = "Frame"
+__TS__ClassExtends(Frame, Handle)
+function Frame.prototype.____constructor(self, name, owner, priority, createContext, typeName, inherits)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle
+    if createContext == nil then
+        handle = DzCreateSimpleFrame(name, owner.handle, priority)
+    elseif typeName ~= nil and inherits ~= nil then
+        handle = DzCreateFrameByTagName(
+            typeName,
+            name,
+            owner.handle,
+            inherits,
+            createContext
+        )
+    else
+        handle = DzCreateFrame(name, owner.handle, priority)
+    end
+    if handle == nil then
+        Error(nil, "w3ts failed to create framehandle handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Frame.create(self, name, owner, priority, createContext)
+    local handle = DzCreateFrame(name, owner.handle, priority)
+    if handle then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Frame.createSimple(self, name, owner, createContext)
+    local handle = DzCreateSimpleFrame(name, owner.handle, createContext)
+    if handle then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Frame.createType(self, name, owner, createContext, typeName, inherits)
+    local handle = DzCreateFrameByTagName(
+        typeName,
+        name,
+        owner.handle,
+        inherits,
+        createContext
+    )
+    if handle then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Frame.prototype.addText(self, text)
+    BlzFrameAddText(self.handle, text)
+    return self
+end
+function Frame.prototype.cageMouse(self, enable)
+    DzFrameCageMouse(self.handle, enable)
+    return self
+end
+function Frame.prototype.clearPoints(self)
+    DzFrameClearAllPoints(self.handle)
+    return self
+end
+function Frame.prototype.click(self)
+    DzClickFrame(self.handle)
+    return self
+end
+function Frame.prototype.destroy(self)
+    DzDestroyFrame(self.handle)
+    return self
+end
+function Frame.prototype.getChild(self, index)
+    return ____exports.Frame:fromHandle(BlzFrameGetChild(self.handle, index))
+end
+function Frame.prototype.setAbsPoint(self, point, x, y)
+    DzFrameSetAbsolutePoint(self.handle, point, x, y)
+    return self
+end
+function Frame.prototype.setAllPoints(self, relative)
+    DzFrameSetAllPoints(self.handle, relative.handle)
+    return self
+end
+function Frame.prototype.setAlpha(self, alpha)
+    DzFrameSetAlpha(self.handle, alpha)
+    return self
+end
+function Frame.prototype.setEnabled(self, flag)
+    DzFrameSetEnable(self.handle, flag)
+    return self
+end
+function Frame.prototype.setFocus(self, flag)
+    DzFrameSetFocus(self.handle, flag)
+    return self
+end
+function Frame.prototype.setFont(self, filename, height, flags)
+    DzFrameSetFont(self.handle, filename, height, flags)
+    return self
+end
+function Frame.prototype.setHeight(self, height)
+    DzFrameSetSize(self.handle, self.width, height)
+    return self
+end
+function Frame.prototype.setLevel(self, level)
+    BlzFrameSetLevel(self.handle, level)
+    return self
+end
+function Frame.prototype.setMinMaxValue(self, minValue, maxValue)
+    DzFrameSetMinMaxValue(self.handle, minValue, maxValue)
+    return self
+end
+function Frame.prototype.setTextAlignment(self, vert, horz)
+    DzFrameSetTextAlignment(self.handle, vert)
+    return self
+end
+function Frame.prototype.setModel(self, modelFile, cameraIndex)
+    DzFrameSetModel(self.handle, modelFile, cameraIndex, 0)
+    return self
+end
+function Frame.prototype.getParent(self)
+    return ____exports.Frame:fromHandle(DzFrameGetParent(self.handle))
+end
+function Frame.prototype.setParent(self, parent)
+    DzFrameSetParent(self.handle, parent.handle)
+    return self
+end
+function Frame.prototype.setPoint(self, point, relative, relativePoint, x, y)
+    DzFrameSetPoint(
+        self.handle,
+        point,
+        relative.handle,
+        relativePoint,
+        x,
+        y
+    )
+    return self
+end
+function Frame.prototype.setScale(self, scale)
+    DzFrameSetScale(self.handle, scale)
+    return self
+end
+function Frame.prototype.setSize(self, width, height)
+    DzFrameSetSize(self.handle, width, height)
+    return self
+end
+function Frame.prototype.setSpriteAnimate(self, primaryProp, flags)
+    BlzFrameSetSpriteAnimate(self.handle, primaryProp, flags)
+    return self
+end
+function Frame.prototype.setStepSize(self, stepSize)
+    DzFrameSetStepSize(self.handle, stepSize)
+    return self
+end
+function Frame.prototype.setText(self, text)
+    DzFrameSetText(self.handle, text)
+    return self
+end
+function Frame.prototype.setTextColor(self, color)
+    BlzFrameSetTextColor(self.handle, color)
+    return self
+end
+function Frame.prototype.setTextSizeLimit(self, size)
+    DzFrameSetTextSizeLimit(self.handle, size)
+    return self
+end
+function Frame.prototype.setTexture(self, texFile, flag, blend)
+    DzFrameSetTexture(self.handle, texFile, flag)
+    return self
+end
+function Frame.prototype.setTooltip(self, tooltip)
+    BlzFrameSetTooltip(self.handle, tooltip.handle)
+    return self
+end
+function Frame.prototype.setValue(self, value)
+    DzFrameSetValue(self.handle, value)
+    return self
+end
+function Frame.prototype.setVertexColor(self, color)
+    DzFrameSetVertexColor(self.handle, color)
+    return self
+end
+function Frame.prototype.setVisible(self, flag)
+    DzFrameShow(self.handle, flag)
+    return self
+end
+function Frame.prototype.setWidth(self, width)
+    DzFrameSetSize(self.handle, width, self.height)
+    return self
+end
+function Frame.autoPosition(self, enable)
+    BlzEnableUIAutoPosition(enable)
+end
+function Frame.fromEvent(self)
+    return self:fromHandle(BlzGetTriggerFrame())
+end
+function Frame.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function Frame.fromName(self, name, createContext)
+    return self:fromHandle(DzFrameFindByName(name, createContext))
+end
+function Frame.fromOrigin(self, frameType, index)
+    return self:fromHandle(BlzGetOriginFrame(frameType, index))
+end
+function Frame.getEventHandle(self)
+    return BlzGetTriggerFrameEvent()
+end
+function Frame.getEventText(self)
+    return BlzGetTriggerFrameValue()
+end
+function Frame.getEventValue(self)
+    return BlzGetTriggerFrameValue()
+end
+function Frame.hideOrigin(self, enable)
+    BlzHideOriginFrames(enable)
+end
+function Frame.loadTOC(self, filename)
+    return DzLoadToc(filename)
+end
+__TS__SetDescriptor(
+    Frame.prototype,
+    "alpha",
+    {
+        get = function(self)
+            return DzFrameGetAlpha(self.handle)
+        end,
+        set = function(self, alpha)
+            DzFrameSetAlpha(self.handle, alpha)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "children",
+    {get = function(self)
+        local count = self.childrenCount
+        local output = {}
+        do
+            local i = 0
+            while i < count do
+                local child = self:getChild(i)
+                if child then
+                    output[#output + 1] = child
+                end
+                i = i + 1
+            end
+        end
+        return output
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "childrenCount",
+    {get = function(self)
+        return BlzFrameGetChildrenCount(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "enabled",
+    {
+        get = function(self)
+            return DzFrameGetEnable(self.handle)
+        end,
+        set = function(self, flag)
+            DzFrameSetEnable(self.handle, flag)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "height",
+    {
+        get = function(self)
+            return DzFrameGetHeight(self.handle)
+        end,
+        set = function(self, height)
+            DzFrameSetSize(self.handle, self.width, height)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "parent",
+    {
+        get = function(self)
+            return ____exports.Frame:fromHandle(DzFrameGetParent(self.handle))
+        end,
+        set = function(self, parent)
+            DzFrameSetParent(self.handle, parent.handle)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "text",
+    {
+        get = function(self)
+            return DzFrameGetText(self.handle) or ""
+        end,
+        set = function(self, text)
+            DzFrameSetText(self.handle, text)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "textSizeLimit",
+    {
+        get = function(self)
+            return DzFrameGetTextSizeLimit(self.handle)
+        end,
+        set = function(self, size)
+            DzFrameSetTextSizeLimit(self.handle, size)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "value",
+    {
+        get = function(self)
+            return DzFrameGetValue(self.handle)
+        end,
+        set = function(self, value)
+            DzFrameSetValue(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "visible",
+    {
+        get = function(self)
+            return BlzFrameIsVisible(self.handle)
+        end,
+        set = function(self, flag)
+            DzFrameShow(self.handle, flag)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Frame.prototype,
+    "width",
+    {
+        get = function(self)
+            return BlzFrameGetWidth(self.handle)
+        end,
+        set = function(self, width)
+            DzFrameSetSize(self.handle, width, self.height)
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.gamecache"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- 默认应用配置
-local DEFAULT_CONFIG = {debug = true, console = true, runtime = {debuggerPort = 4279, sleep = false, catchCrash = true}, map = {name = "WC3 TypeScript Map", version = "1.0.0", description = "A Warcraft III map built with TypeScript"}}
---- 配置管理器
--- 提供应用程序配置的统一管理
-____exports.ConfigManager = __TS__Class()
-local ConfigManager = ____exports.ConfigManager
-ConfigManager.name = "ConfigManager"
-function ConfigManager.prototype.____constructor(self)
-    self.config = __TS__ObjectAssign({}, DEFAULT_CONFIG)
-end
-function ConfigManager.getInstance(self)
-    if not ____exports.ConfigManager.instance then
-        ____exports.ConfigManager.instance = __TS__New(____exports.ConfigManager)
-    end
-    return ____exports.ConfigManager.instance
-end
-function ConfigManager.prototype.getConfig(self)
-    return __TS__ObjectAssign({}, self.config)
-end
-function ConfigManager.prototype.isDebugMode(self)
-    return self.config.debug
-end
-function ConfigManager.prototype.isConsoleEnabled(self)
-    return self.config.console
-end
-function ConfigManager.prototype.getRuntimeConfig(self)
-    return __TS__ObjectAssign({}, self.config.runtime)
-end
-function ConfigManager.prototype.getMapConfig(self)
-    return __TS__ObjectAssign({}, self.config.map)
-end
-function ConfigManager.prototype.updateConfig(self, updates)
-    self.config = __TS__ObjectAssign({}, self.config, updates)
-end
-function ConfigManager.prototype.resetToDefault(self)
-    self.config = __TS__ObjectAssign({}, DEFAULT_CONFIG)
-end
-return ____exports
- end,
-["src.lib.ydlua"] = function(...) 
-local ____exports = {}
-____exports.ydcommon = require("jass.common")
-____exports.ydai = require("jass.ai")
-____exports.ydglobals = require("jass.globals")
-____exports.ydjapi = require("jass.japi")
-____exports.ydhook = require("jass.hook")
-____exports.ydruntime = require("jass.runtime")
-____exports.ydslk = require("jass.slk")
-____exports.ydconsole = require("jass.console")
-____exports.yddebug = require("jass.debug")
-____exports.ydlog = require("jass.log")
-____exports.ydmessage = require("jass.message")
-____exports.ydbignum = require("jass.bignum")
-return ____exports
- end,
-["src.core.runtime"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
-local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
-local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
-local ____exports = {}
-local ____config = require("src.config.index")
-local ConfigManager = ____config.ConfigManager
-local ____ydlua = require("src.lib.ydlua")
-local ydcommon = ____ydlua.ydcommon
-local ydconsole = ____ydlua.ydconsole
-local ydjapi = ____ydlua.ydjapi
-local ydruntime = ____ydlua.ydruntime
---- 运行时管理器
--- 负责初始化游戏运行时环境
-____exports.RuntimeManager = __TS__Class()
-local RuntimeManager = ____exports.RuntimeManager
-RuntimeManager.name = "RuntimeManager"
-function RuntimeManager.prototype.____constructor(self)
-    self.initialized = false
-    self.configManager = ConfigManager:getInstance()
-end
-function RuntimeManager.getInstance(self)
-    if not ____exports.RuntimeManager.instance then
-        ____exports.RuntimeManager.instance = __TS__New(____exports.RuntimeManager)
-    end
-    return ____exports.RuntimeManager.instance
-end
-function RuntimeManager.prototype.initialize(self)
-    if self.initialized then
-        print("Runtime already initialized")
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.GameCache = __TS__Class()
+local GameCache = ____exports.GameCache
+GameCache.name = "GameCache"
+__TS__ClassExtends(GameCache, Handle)
+function GameCache.prototype.____constructor(self, campaignFile)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
         return
     end
-    print(">>> Initializing runtime environment...")
-    self:initializeConsole()
-    self:initializeRuntime()
-    self:registerGlobals()
-    self.initialized = true
-    print(">>> Runtime environment initialized")
-end
-function RuntimeManager.prototype.initializeConsole(self)
-    local isConsoleEnabled = self.configManager:isConsoleEnabled()
-    ydconsole.enable = isConsoleEnabled
-    if isConsoleEnabled then
-        _G.print = ydconsole.write
-        print(">>> Console enabled")
+    local handle = InitGameCache(campaignFile)
+    if handle == nil then
+        Error(nil, "w3ts failed to create gamecache handle.")
     end
+    Handle.prototype.____constructor(self, handle)
+    self.filename = campaignFile
 end
-function RuntimeManager.prototype.initializeRuntime(self)
-    local config = self.configManager:getConfig()
-    local runtimeConfig = config.runtime
-    ydruntime.console = config.console
-    ydruntime.sleep = runtimeConfig.sleep
-    ydruntime.debugger = runtimeConfig.debuggerPort
-    ydruntime.catch_crash = runtimeConfig.catchCrash
-    ydruntime.error_hanlde = function(self, msg)
-        print("========lua-err========")
-        print(tostring(msg))
-        print("=========================")
+function GameCache.create(self, campaignFile)
+    local handle = InitGameCache(campaignFile)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        values.filename = campaignFile
+        return __TS__ObjectAssign(obj, values)
     end
-    print(((">>> Runtime configured: debugger=" .. tostring(runtimeConfig.debuggerPort)) .. ", crash_catch=") .. tostring(runtimeConfig.catchCrash))
+    return nil
 end
-function RuntimeManager.prototype.registerGlobals(self)
-    __TS__ArrayForEach(
-        __TS__ObjectKeys(ydcommon),
-        function(____, key)
-            _G[key] = ydcommon[key]
-        end
+function GameCache.prototype.flush(self)
+    FlushGameCache(self.handle)
+end
+function GameCache.prototype.flushBoolean(self, missionKey, key)
+    FlushStoredBoolean(self.handle, missionKey, key)
+end
+function GameCache.prototype.flushInteger(self, missionKey, key)
+    FlushStoredInteger(self.handle, missionKey, key)
+end
+function GameCache.prototype.flushMission(self, missionKey)
+    FlushStoredMission(self.handle, missionKey)
+end
+function GameCache.prototype.flushNumber(self, missionKey, key)
+    FlushStoredInteger(self.handle, missionKey, key)
+end
+function GameCache.prototype.flushString(self, missionKey, key)
+    FlushStoredString(self.handle, missionKey, key)
+end
+function GameCache.prototype.flushUnit(self, missionKey, key)
+    FlushStoredUnit(self.handle, missionKey, key)
+end
+function GameCache.prototype.getBoolean(self, missionKey, key)
+    return GetStoredBoolean(self.handle, missionKey, key)
+end
+function GameCache.prototype.getInteger(self, missionKey, key)
+    return GetStoredInteger(self.handle, missionKey, key)
+end
+function GameCache.prototype.getNumber(self, missionKey, key)
+    return GetStoredReal(self.handle, missionKey, key)
+end
+function GameCache.prototype.getString(self, missionKey, key)
+    return GetStoredString(self.handle, missionKey, key)
+end
+function GameCache.prototype.hasBoolean(self, missionKey, key)
+    return HaveStoredBoolean(self.handle, missionKey, key)
+end
+function GameCache.prototype.hasInteger(self, missionKey, key)
+    return HaveStoredInteger(self.handle, missionKey, key)
+end
+function GameCache.prototype.hasNumber(self, missionKey, key)
+    return HaveStoredReal(self.handle, missionKey, key)
+end
+function GameCache.prototype.hasString(self, missionKey, key)
+    return HaveStoredString(self.handle, missionKey, key)
+end
+function GameCache.prototype.restoreUnit(self, missionKey, key, forWhichPlayer, x, y, face)
+    return RestoreUnit(
+        self.handle,
+        missionKey,
+        key,
+        forWhichPlayer.handle,
+        x,
+        y,
+        face
     )
-    __TS__ArrayForEach(
-        __TS__ObjectKeys(ydjapi),
-        function(____, key)
-            _G[key] = ydjapi[key]
-        end
+end
+function GameCache.prototype.save(self)
+    return SaveGameCache(self.handle)
+end
+function GameCache.prototype.store(self, missionKey, key, value)
+    if type(value) == "string" then
+        StoreString(self.handle, missionKey, key, value)
+    elseif type(value) == "boolean" then
+        StoreBoolean(self.handle, missionKey, key, value)
+    elseif type(value) == "number" then
+        StoreReal(self.handle, missionKey, key, value)
+    else
+        StoreUnit(self.handle, missionKey, key, value)
+    end
+end
+function GameCache.prototype.syncBoolean(self, missionKey, key)
+    return SyncStoredBoolean(self.handle, missionKey, key)
+end
+function GameCache.prototype.syncInteger(self, missionKey, key)
+    return SyncStoredInteger(self.handle, missionKey, key)
+end
+function GameCache.prototype.syncNumber(self, missionKey, key)
+    return SyncStoredReal(self.handle, missionKey, key)
+end
+function GameCache.prototype.syncString(self, missionKey, key)
+    return SyncStoredString(self.handle, missionKey, key)
+end
+function GameCache.prototype.syncUnit(self, missionKey, key)
+    return SyncStoredUnit(self.handle, missionKey, key)
+end
+function GameCache.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function GameCache.reloadFromDisk(self)
+    return ReloadGameCachesFromDisk()
+end
+local function ____error(arg0, arg1)
+    error(
+        __TS__New(Error, "Function not implemented."),
+        0
     )
-    print(">>> Global APIs registered")
-end
-function RuntimeManager.prototype.isInitialized(self)
-    return self.initialized
-end
-function RuntimeManager.prototype.reset(self)
-    self.initialized = false
-    print(">>> Runtime reset")
 end
 return ____exports
  end,
-["src.services.index"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.globals.order"] = function(...) 
+local ____exports = {}
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.item"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local Map = ____lualib.Map
-local __TS__New = ____lualib.__TS__New
-local __TS__Iterator = ____lualib.__TS__Iterator
-local __TS__ArrayFrom = ____lualib.__TS__ArrayFrom
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__StringSubstr = ____lualib.__TS__StringSubstr
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
---- 服务管理器
--- 负责管理所有应用服务的生命周期
-____exports.ServiceManager = __TS__Class()
-local ServiceManager = ____exports.ServiceManager
-ServiceManager.name = "ServiceManager"
-function ServiceManager.prototype.____constructor(self)
-    self.services = __TS__New(Map)
-    self.initialized = false
-end
-function ServiceManager.getInstance(self)
-    if not ____exports.ServiceManager.instance then
-        ____exports.ServiceManager.instance = __TS__New(____exports.ServiceManager)
-    end
-    return ____exports.ServiceManager.instance
-end
-function ServiceManager.prototype.registerService(self, service)
-    if self.services:has(service.name) then
-        print(("Service " .. service.name) .. " is already registered")
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+local ____widget = require("lua_modules.@eiriksgata.wc3ts.src.handles.widget")
+local Widget = ____widget.Widget
+____exports.Item = __TS__Class()
+local Item = ____exports.Item
+Item.name = "Item"
+__TS__ClassExtends(Item, Widget)
+function Item.prototype.____constructor(self, itemId, x, y)
+    if Handle:initFromHandle() then
+        Widget.prototype.____constructor(self)
         return
     end
-    self.services:set(service.name, service)
-    print((">>> Service " .. service.name) .. " registered")
-    if self.initialized then
-        service:initialize()
+    local handle = CreateItem(itemId, x, y)
+    if handle == nil then
+        Error(nil, "w3ts failed to create item handle.")
     end
+    Widget.prototype.____constructor(self, handle)
 end
-function ServiceManager.prototype.getService(self, serviceName)
-    return self.services:get(serviceName)
-end
-function ServiceManager.prototype.unregisterService(self, serviceName)
-    local service = self.services:get(serviceName)
-    if service then
-        service:destroy()
-        self.services:delete(serviceName)
-        print((">>> Service " .. serviceName) .. " unregistered")
+function Item.create(self, itemId, x, y)
+    local handle = CreateItem(itemId, x, y)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
     end
+    return nil
 end
-function ServiceManager.prototype.initializeServices(self)
-    if self.initialized then
-        print("Services already initialized")
-        return
-    end
-    print(">>> Initializing all services...")
-    for ____, ____value in __TS__Iterator(self.services:entries()) do
-        local name = ____value[1]
-        local service = ____value[2]
+function Item.prototype.addAbility(self, abilCode)
+    BlzItemAddAbility(self.handle, abilCode)
+end
+function Item.prototype.getAbility(self, abilCode)
+    return BlzGetItemAbility(self.handle, abilCode)
+end
+function Item.prototype.getAbilityByIndex(self, index)
+    return BlzGetItemAbilityByIndex(self.handle, index)
+end
+function Item.prototype.removeAbility(self, abilCode)
+    BlzItemRemoveAbility(self.handle, abilCode)
+end
+function Item.prototype.destroy(self)
+    RemoveItem(self.handle)
+end
+function Item.prototype.getField(self, field)
+    local fieldType = __TS__StringSubstr(
+        tostring(field),
+        0,
+        (string.find(
+            tostring(field),
+            ":",
+            nil,
+            true
+        ) or 0) - 1
+    )
+    repeat
+        local ____switch13 = fieldType
+        local ____cond13 = ____switch13 == "unitbooleanfield"
+        if ____cond13 then
+            return BlzGetItemBooleanField(self.handle, field)
+        end
+        ____cond13 = ____cond13 or ____switch13 == "unitintegerfield"
+        if ____cond13 then
+            return BlzGetItemIntegerField(self.handle, field)
+        end
+        ____cond13 = ____cond13 or ____switch13 == "unitrealfield"
+        if ____cond13 then
+            return BlzGetItemRealField(self.handle, field)
+        end
+        ____cond13 = ____cond13 or ____switch13 == "unitstringfield"
+        if ____cond13 then
+            return BlzGetItemStringField(self.handle, field)
+        end
         do
-            local function ____catch(____error)
-                print(((">>> Error initializing service " .. name) .. ": ") .. tostring(____error))
-            end
-            local ____try, ____hasReturned = pcall(function()
-                service:initialize()
-                print((">>> Service " .. name) .. " initialized successfully")
-            end)
-            if not ____try then
-                ____catch(____hasReturned)
-            end
+            return 0
         end
-    end
-    self.initialized = true
-    print(">>> All services initialized")
+    until true
 end
-function ServiceManager.prototype.destroyServices(self)
-    print(">>> Destroying all services...")
-    for ____, ____value in __TS__Iterator(self.services:entries()) do
-        local name = ____value[1]
-        local service = ____value[2]
-        do
-            local function ____catch(____error)
-                print(((">>> Error destroying service " .. name) .. ": ") .. tostring(____error))
-            end
-            local ____try, ____hasReturned = pcall(function()
-                service:destroy()
-                print((">>> Service " .. name) .. " destroyed")
-            end)
-            if not ____try then
-                ____catch(____hasReturned)
-            end
+function Item.prototype.isOwned(self)
+    return IsItemOwned(self.handle)
+end
+function Item.prototype.isPawnable(self)
+    return IsItemPawnable(self.handle)
+end
+function Item.prototype.isPowerup(self)
+    return IsItemPowerup(self.handle)
+end
+function Item.prototype.isSellable(self)
+    return IsItemSellable(self.handle)
+end
+function Item.prototype.setDropId(self, unitId)
+    SetItemDropID(self.handle, unitId)
+end
+function Item.prototype.setDropOnDeath(self, flag)
+    SetItemDropOnDeath(self.handle, flag)
+end
+function Item.prototype.setDroppable(self, flag)
+    SetItemDroppable(self.handle, flag)
+end
+function Item.prototype.setField(self, field, value)
+    local fieldType = __TS__StringSubstr(
+        tostring(field),
+        0,
+        (string.find(
+            tostring(field),
+            ":",
+            nil,
+            true
+        ) or 0) - 1
+    )
+    if fieldType == "unitbooleanfield" and type(value) == "boolean" then
+        return BlzSetItemBooleanField(self.handle, field, value)
+    end
+    if fieldType == "unitintegerfield" and type(value) == "number" then
+        return BlzSetItemIntegerField(self.handle, field, value)
+    end
+    if fieldType == "unitrealfield" and type(value) == "number" then
+        return BlzSetItemRealField(self.handle, field, value)
+    end
+    if fieldType == "unitstringfield" and type(value) == "string" then
+        return BlzSetItemStringField(self.handle, field, value)
+    end
+    return false
+end
+function Item.prototype.setOwner(self, whichPlayer, changeColor)
+    SetItemPlayer(self.handle, whichPlayer.handle, changeColor)
+end
+function Item.prototype.setPoint(self, whichPoint)
+    SetItemPosition(self.handle, whichPoint.x, whichPoint.y)
+end
+function Item.prototype.setPosition(self, x, y)
+    SetItemPosition(self.handle, x, y)
+end
+function Item.fromEvent(self)
+    return self:fromHandle(GetManipulatedItem())
+end
+function Item.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function Item.isIdPawnable(self, itemId)
+    return IsItemIdPawnable(itemId)
+end
+function Item.isIdPowerup(self, itemId)
+    return IsItemIdPowerup(itemId)
+end
+function Item.isIdSellable(self, itemId)
+    return IsItemIdSellable(itemId)
+end
+__TS__SetDescriptor(
+    Item.prototype,
+    "charges",
+    {
+        get = function(self)
+            return GetItemCharges(self.handle)
+        end,
+        set = function(self, value)
+            SetItemCharges(self.handle, value)
         end
-    end
-    self.services:clear()
-    self.initialized = false
-    print(">>> All services destroyed")
-end
-function ServiceManager.prototype.getRegisteredServices(self)
-    return __TS__ArrayFrom(self.services:keys())
-end
-function ServiceManager.prototype.hasService(self, serviceName)
-    return self.services:has(serviceName)
-end
-function ServiceManager.prototype.getServiceCount(self)
-    return self.services.size
-end
-function ServiceManager.prototype.isInitialized(self)
-    return self.initialized
-end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "invulnerable",
+    {
+        get = function(self)
+            return IsItemInvulnerable(self.handle)
+        end,
+        set = function(self, flag)
+            SetItemInvulnerable(self.handle, true)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "level",
+    {get = function(self)
+        return GetItemLevel(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "extendedTooltip",
+    {
+        get = function(self)
+            local ____BlzGetItemExtendedTooltip_result_1 = BlzGetItemExtendedTooltip(self.handle)
+            if ____BlzGetItemExtendedTooltip_result_1 == nil then
+                ____BlzGetItemExtendedTooltip_result_1 = ""
+            end
+            return ____BlzGetItemExtendedTooltip_result_1
+        end,
+        set = function(self, tooltip)
+            BlzSetItemExtendedTooltip(self.handle, tooltip)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "icon",
+    {
+        get = function(self)
+            local ____BlzGetItemIconPath_result_2 = BlzGetItemIconPath(self.handle)
+            if ____BlzGetItemIconPath_result_2 == nil then
+                ____BlzGetItemIconPath_result_2 = ""
+            end
+            return ____BlzGetItemIconPath_result_2
+        end,
+        set = function(self, path)
+            BlzSetItemIconPath(self.handle, path)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "name",
+    {
+        get = function(self)
+            return GetItemName(self.handle) or ""
+        end,
+        set = function(self, value)
+            BlzSetItemName(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "tooltip",
+    {
+        get = function(self)
+            local ____BlzGetItemTooltip_result_3 = BlzGetItemTooltip(self.handle)
+            if ____BlzGetItemTooltip_result_3 == nil then
+                ____BlzGetItemTooltip_result_3 = ""
+            end
+            return ____BlzGetItemTooltip_result_3
+        end,
+        set = function(self, tooltip)
+            BlzSetItemTooltip(self.handle, tooltip)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "pawnable",
+    {
+        get = function(self)
+            return IsItemPawnable(self.handle)
+        end,
+        set = function(self, flag)
+            SetItemPawnable(self.handle, flag)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "player",
+    {get = function(self)
+        return GetItemPlayer(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "type",
+    {get = function(self)
+        return GetItemType(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "typeId",
+    {get = function(self)
+        return GetItemTypeId(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "userData",
+    {
+        get = function(self)
+            return GetItemUserData(self.handle)
+        end,
+        set = function(self, value)
+            SetItemUserData(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "visible",
+    {
+        get = function(self)
+            return IsItemVisible(self.handle)
+        end,
+        set = function(self, flag)
+            SetItemVisible(self.handle, flag)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "x",
+    {
+        get = function(self)
+            return GetItemX(self.handle)
+        end,
+        set = function(self, value)
+            SetItemPosition(self.handle, value, self.y)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Item.prototype,
+    "y",
+    {
+        get = function(self)
+            return GetItemY(self.handle)
+        end,
+        set = function(self, value)
+            SetItemPosition(self.handle, self.x, value)
+        end
+    },
+    true
+)
 return ____exports
  end,
-["src.core.Application"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.handles.sound"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
-local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
-local __TS__Await = ____lualib.__TS__Await
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____config = require("src.config.index")
-local ConfigManager = ____config.ConfigManager
-local ____runtime = require("src.core.runtime")
-local RuntimeManager = ____runtime.RuntimeManager
-local ____services = require("src.services.index")
-local ServiceManager = ____services.ServiceManager
---- 应用程序主类
--- 负责整个应用的生命周期管理
-____exports.Application = __TS__Class()
-local Application = ____exports.Application
-Application.name = "Application"
-function Application.prototype.____constructor(self)
-    self.initialized = false
-    self.configManager = ConfigManager:getInstance()
-    self.runtimeManager = RuntimeManager:getInstance()
-    self.serviceManager = ServiceManager:getInstance()
-end
-function Application.getInstance(self)
-    if not ____exports.Application.instance then
-        ____exports.Application.instance = __TS__New(____exports.Application)
-    end
-    return ____exports.Application.instance
-end
-function Application.prototype.initialize(self)
-    return __TS__AsyncAwaiter(function(____awaiter_resolve)
-        if self.initialized then
-            print("Application already initialized")
-            return ____awaiter_resolve(nil)
-        end
-        print(">>> Starting application initialization...")
-        local ____try = __TS__AsyncAwaiter(function()
-            self.runtimeManager:initialize()
-            self.serviceManager:initializeServices()
-            self.initialized = true
-            print(">>> Application initialized successfully")
-            self:printApplicationInfo()
-        end)
-        __TS__Await(____try.catch(
-            ____try,
-            function(____, ____error)
-                print(">>> Application initialization failed: " .. tostring(____error))
-                error(____error, 0)
-            end
-        ))
-    end)
-end
-function Application.prototype.registerService(self, service)
-    self.serviceManager:registerService(service)
-end
-function Application.prototype.getService(self, serviceName)
-    return self.serviceManager:getService(serviceName)
-end
-function Application.prototype.getConfigManager(self)
-    return self.configManager
-end
-function Application.prototype.getRuntimeManager(self)
-    return self.runtimeManager
-end
-function Application.prototype.getServiceManager(self)
-    return self.serviceManager
-end
-function Application.prototype.destroy(self)
-    if not self.initialized then
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Sound = __TS__Class()
+local Sound = ____exports.Sound
+Sound.name = "Sound"
+__TS__ClassExtends(Sound, Handle)
+function Sound.prototype.____constructor(self, fileName, looping, is3D, stopWhenOutOfRange, fadeInRate, fadeOutRate, eaxSetting)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
         return
     end
-    print(">>> Shutting down application...")
-    do
-        local function ____catch(____error)
-            print(">>> Error during application shutdown: " .. tostring(____error))
+    local handle = CreateSound(
+        fileName,
+        looping,
+        is3D,
+        stopWhenOutOfRange,
+        fadeInRate,
+        fadeOutRate,
+        eaxSetting
+    )
+    if handle == nil then
+        Error(nil, "w3ts failed to create sound handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Sound.create(self, fileName, looping, is3D, stopWhenOutOfRange, fadeInRate, fadeOutRate, eaxSetting)
+    local handle = CreateSound(
+        fileName,
+        looping,
+        is3D,
+        stopWhenOutOfRange,
+        fadeInRate,
+        fadeOutRate,
+        eaxSetting
+    )
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Sound.prototype.killWhenDone(self)
+    KillSoundWhenDone(self.handle)
+end
+function Sound.prototype.registerStacked(self, byPosition, rectWidth, rectHeight)
+    RegisterStackedSound(self.handle, byPosition, rectWidth, rectHeight)
+end
+function Sound.prototype.setChannel(self, channel)
+    SetSoundDistanceCutoff(self.handle, channel)
+end
+function Sound.prototype.setConeAngles(self, inside, outside, outsideVolume)
+    SetSoundConeAngles(self.handle, inside, outside, outsideVolume)
+end
+function Sound.prototype.setConeOrientation(self, x, y, z)
+    SetSoundConeOrientation(self.handle, x, y, z)
+end
+function Sound.prototype.setDistanceCutoff(self, cutoff)
+    SetSoundDistanceCutoff(self.handle, cutoff)
+end
+function Sound.prototype.setDistances(self, minDist, maxDist)
+    SetSoundDistances(self.handle, minDist, maxDist)
+end
+function Sound.prototype.setParamsFromLabel(self, soundLabel)
+    SetSoundParamsFromLabel(self.handle, soundLabel)
+end
+function Sound.prototype.setPitch(self, pitch)
+    SetSoundPitch(self.handle, pitch)
+end
+function Sound.prototype.setPlayPosition(self, millisecs)
+    SetSoundPlayPosition(self.handle, millisecs)
+end
+function Sound.prototype.setPosition(self, x, y, z)
+    SetSoundPosition(self.handle, x, y, z)
+end
+function Sound.prototype.setVelocity(self, x, y, z)
+    SetSoundVelocity(self.handle, x, y, z)
+end
+function Sound.prototype.setVolume(self, volume)
+    SetSoundVolume(self.handle, volume)
+end
+function Sound.prototype.start(self)
+    StartSound(self.handle)
+end
+function Sound.prototype.stop(self, killWhenDone, fadeOut)
+    StopSound(self.handle, killWhenDone, fadeOut)
+end
+function Sound.prototype.unregisterStacked(self, byPosition, rectWidth, rectHeight)
+    UnregisterStackedSound(self.handle, byPosition, rectWidth, rectHeight)
+end
+function Sound.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function Sound.getFileDuration(self, fileName)
+    return GetSoundFileDuration(fileName)
+end
+__TS__SetDescriptor(
+    Sound.prototype,
+    "duration",
+    {
+        get = function(self)
+            return GetSoundDuration(self.handle)
+        end,
+        set = function(self, duration)
+            SetSoundDuration(self.handle, duration)
         end
-        local ____try, ____hasReturned = pcall(function()
-            self.serviceManager:destroyServices()
-            self.runtimeManager:reset()
-            self.initialized = false
-            print(">>> Application shutdown complete")
-        end)
-        if not ____try then
-            ____catch(____hasReturned)
-        end
-    end
-end
-function Application.prototype.isInitialized(self)
-    return self.initialized
-end
-function Application.prototype.printApplicationInfo(self)
-    local config = self.configManager:getConfig()
-    local mapConfig = config.map
-    print(">>> ============================")
-    print(((">>> " .. mapConfig.name) .. " v") .. mapConfig.version)
-    print(">>> " .. mapConfig.description)
-    print(">>> Debug Mode: " .. (config.debug and "ON" or "OFF"))
-    print(">>> Console: " .. (config.console and "ON" or "OFF"))
-    print(">>> Services: " .. tostring(self.serviceManager:getServiceCount()))
-    print(">>> ============================")
-end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Sound.prototype,
+    "loading",
+    {get = function(self)
+        return GetSoundIsLoading(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Sound.prototype,
+    "playing",
+    {get = function(self)
+        return GetSoundIsPlaying(self.handle)
+    end},
+    true
+)
 return ____exports
  end,
-["src.core.index"] = function(...) 
-local ____exports = {}
-do
-    local ____Application = require("src.core.Application")
-    ____exports.Application = ____Application.Application
-end
-do
-    local ____runtime = require("src.core.runtime")
-    ____exports.RuntimeManager = ____runtime.RuntimeManager
-end
-return ____exports
- end,
-["src.services.EventService"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local Map = ____lualib.Map
-local __TS__New = ____lualib.__TS__New
-local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
-local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
-local ____exports = {}
---- 事件服务
--- 提供游戏事件的统一管理
-____exports.EventService = __TS__Class()
-local EventService = ____exports.EventService
-EventService.name = "EventService"
-function EventService.prototype.____constructor(self)
-    self.name = "EventService"
-    self.listeners = __TS__New(Map)
-    self.initialized = false
-end
-function EventService.prototype.initialize(self)
-    if self.initialized then
-        return
-    end
-    print(">>> Initializing Event Service...")
-    self:setupGameEvents()
-    self.initialized = true
-    print(">>> Event Service initialized")
-end
-function EventService.prototype.destroy(self)
-    self.listeners:clear()
-    self.initialized = false
-    print(">>> Event Service destroyed")
-end
-function EventService.prototype.on(self, eventType, listener)
-    if not self.listeners:has(eventType) then
-        self.listeners:set(eventType, {})
-    end
-    local ____temp_0 = self.listeners:get(eventType)
-    ____temp_0[#____temp_0 + 1] = listener
-end
-function EventService.prototype.off(self, eventType, listener)
-    local eventListeners = self.listeners:get(eventType)
-    if eventListeners then
-        local index = __TS__ArrayIndexOf(eventListeners, listener)
-        if index > -1 then
-            __TS__ArraySplice(eventListeners, index, 1)
-        end
-    end
-end
-function EventService.prototype.emit(self, eventType, data)
-    local eventListeners = self.listeners:get(eventType)
-    if eventListeners then
-        __TS__ArrayForEach(
-            eventListeners,
-            function(____, listener)
-                do
-                    local function ____catch(____error)
-                        print((("Error in event listener for " .. eventType) .. ": ") .. tostring(____error))
-                    end
-                    local ____try, ____hasReturned = pcall(function()
-                        listener(data)
-                    end)
-                    if not ____try then
-                        ____catch(____hasReturned)
-                    end
-                end
-            end
-        )
-    end
-end
-function EventService.prototype.setupGameEvents(self)
-    print(">>> Setting up game event triggers...")
-end
-return ____exports
- end,
-["src.lib.helper"] = function(...) 
-local ____exports = {}
-function ____exports.c2i(char)
-    return (string.unpack(">I4", char))
-end
-function ____exports.i2c(id)
-    return string.pack("I4", id)
-end
-return ____exports
- end,
-["src.lib.define"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.globals.define"] = function(...) 
 local ____exports = {}
 ____exports.MAP_SPEED_NORMAL = function() return ConvertGameSpeed(2) end
-____exports.bj_PI = 3.141592653589793
+____exports.bj_PI = math.pi
 ____exports.bj_E = 2.718281828459045
 ____exports.bj_CELLWIDTH = 128
 ____exports.bj_CLIFFHEIGHT = 128
@@ -4096,373 +6477,3789 @@ ____exports.TEXT_ALIGN_BOTTOM = 20
 ____exports.TEXT_ALIGN_RIGHT_BOTTOM = 36
 return ____exports
  end,
-["src.services.UnitService"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.handles.unit"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local Map = ____lualib.Map
-local __TS__New = ____lualib.__TS__New
-local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____helper = require("src.lib.helper")
-local c2i = ____helper.c2i
-local ____define = require("src.lib.define")
-local UNIT_STATE_LIFE = ____define.UNIT_STATE_LIFE
+local ____destructable = require("lua_modules.@eiriksgata.wc3ts.src.handles.destructable")
+local Destructable = ____destructable.Destructable
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+local ____item = require("lua_modules.@eiriksgata.wc3ts.src.handles.item")
+local Item = ____item.Item
+local ____player = require("lua_modules.@eiriksgata.wc3ts.src.handles.player")
+local MapPlayer = ____player.MapPlayer
+local ____point = require("lua_modules.@eiriksgata.wc3ts.src.handles.point")
+local Point = ____point.Point
+local ____widget = require("lua_modules.@eiriksgata.wc3ts.src.handles.widget")
+local Widget = ____widget.Widget
+local ____define = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
+local bj_UNIT_FACING = ____define.bj_UNIT_FACING
+local UNIT_STATE_ATTACK_BONUS = ____define.UNIT_STATE_ATTACK_BONUS
+local UNIT_STATE_ATTACK_SPACE = ____define.UNIT_STATE_ATTACK_SPACE
+local UNIT_STATE_ATTACK_SPEED = ____define.UNIT_STATE_ATTACK_SPEED
+local UNIT_STATE_ATTACK_WHITE = ____define.UNIT_STATE_ATTACK_WHITE
+local UNIT_STATE_DEFEND_WHITE = ____define.UNIT_STATE_DEFEND_WHITE
 local UNIT_STATE_MANA = ____define.UNIT_STATE_MANA
---- 单位管理服务
--- 提供单位创建和管理的便捷方法
-____exports.UnitService = __TS__Class()
-local UnitService = ____exports.UnitService
-UnitService.name = "UnitService"
-function UnitService.prototype.____constructor(self)
-    self.name = "UnitService"
-    self.initialized = false
-    self.unitRegistry = __TS__New(Map)
-end
-function UnitService.prototype.initialize(self)
-    if self.initialized then
+local UNIT_STATE_MAX_LIFE = ____define.UNIT_STATE_MAX_LIFE
+local UNIT_STATE_MAX_MANA = ____define.UNIT_STATE_MAX_MANA
+local UNIT_TYPE_DEAD = ____define.UNIT_TYPE_DEAD
+____exports.Unit = __TS__Class()
+local Unit = ____exports.Unit
+Unit.name = "Unit"
+__TS__ClassExtends(Unit, Widget)
+function Unit.prototype.____constructor(self, owner, unitId, x, y, face)
+    if Handle:initFromHandle() == true then
+        Widget.prototype.____constructor(self)
         return
     end
-    print(">>> Initializing Unit Service...")
-    self.initialized = true
-    print(">>> Unit Service initialized")
-end
-function UnitService.prototype.destroy(self)
-    self.unitRegistry:clear()
-    self.initialized = false
-    print(">>> Unit Service destroyed")
-end
-function UnitService.prototype.createUnit(self, player, unitTypeId, x, y, facing, registryKey)
-    if facing == nil then
-        facing = 270
+    if face == nil then
+        face = bj_UNIT_FACING
     end
-    do
-        local function ____catch(____error)
-            print((("Error creating unit " .. unitTypeId) .. ": ") .. tostring(____error))
-            return true, nil
+    local handle = CreateUnit(
+        owner.handle,
+        unitId,
+        x,
+        y,
+        face
+    )
+    if handle == nil then
+        Error(nil, "w3ts failed to create unit handle.")
+    end
+    Widget.prototype.____constructor(self, handle)
+end
+function Unit.create(self, owner, unitId, x, y, face, skinId)
+    if face == nil then
+        face = bj_UNIT_FACING
+    end
+    local handle = CreateUnit(
+        owner.handle,
+        unitId,
+        x,
+        y,
+        face
+    )
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Unit.prototype.addAbility(self, abilityId)
+    return UnitAddAbility(self.handle, abilityId)
+end
+function Unit.prototype.addAnimationProps(self, animProperties, add)
+    AddUnitAnimationProperties(self.handle, animProperties, add)
+end
+function Unit.prototype.addExperience(self, xpToAdd, showEyeCandy)
+    AddHeroXP(self.handle, xpToAdd, showEyeCandy)
+end
+function Unit.prototype.addIndicator(self, red, blue, green, alpha)
+    UnitAddIndicator(
+        self.handle,
+        red,
+        blue,
+        green,
+        alpha
+    )
+end
+function Unit.prototype.addItem(self, whichItem)
+    return UnitAddItem(self.handle, whichItem.handle)
+end
+function Unit.prototype.addItemById(self, itemId)
+    return Item:fromHandle(UnitAddItemById(self.handle, itemId))
+end
+function Unit.prototype.addItemToSlotById(self, itemId, itemSlot)
+    return UnitAddItemToSlotById(self.handle, itemId, itemSlot)
+end
+function Unit.prototype.addItemToStock(self, itemId, currentStock, stockMax)
+    AddItemToStock(self.handle, itemId, currentStock, stockMax)
+end
+function Unit.prototype.addResourceAmount(self, amount)
+    AddResourceAmount(self.handle, amount)
+end
+function Unit.prototype.addSleepPerm(self, add)
+    UnitAddSleepPerm(self.handle, add)
+end
+function Unit.prototype.addType(self, whichUnitType)
+    return UnitAddType(self.handle, whichUnitType)
+end
+function Unit.prototype.addUnitToStock(self, unitId, currentStock, stockMax)
+    AddUnitToStock(self.handle, unitId, currentStock, stockMax)
+end
+function Unit.prototype.applyTimedLife(self, buffId, duration)
+    UnitApplyTimedLife(self.handle, buffId, duration)
+end
+function Unit.prototype.attachSound(self, sound)
+    AttachSoundToUnit(sound.handle, self.handle)
+end
+function Unit.prototype.canSleepPerm(self)
+    return UnitCanSleepPerm(self.handle)
+end
+function Unit.prototype.countBuffs(self, removePositive, removeNegative, magic, physical, timedLife, aura, autoDispel)
+    return UnitCountBuffsEx(
+        self.handle,
+        removePositive,
+        removeNegative,
+        magic,
+        physical,
+        timedLife,
+        aura,
+        autoDispel
+    )
+end
+function Unit.prototype.damageAt(self, delay, radius, x, y, amount, attack, ranged, attackType, damageType, weaponType)
+    return UnitDamagePoint(
+        self.handle,
+        delay,
+        radius,
+        x,
+        y,
+        amount,
+        attack,
+        ranged,
+        attackType,
+        damageType,
+        weaponType
+    )
+end
+function Unit.prototype.damageTarget(self, target, amount, attack, ranged, attackType, damageType, weaponType)
+    return UnitDamageTarget(
+        self.handle,
+        target,
+        amount,
+        attack,
+        ranged,
+        attackType,
+        damageType,
+        weaponType
+    )
+end
+function Unit.prototype.decAbilityLevel(self, abilCode)
+    return DecUnitAbilityLevel(self.handle, abilCode)
+end
+function Unit.prototype.destroy(self)
+    RemoveUnit(self.handle)
+end
+function Unit.prototype.dropItem(self, whichItem, x, y)
+    return UnitDropItemPoint(self.handle, whichItem.handle, x, y)
+end
+function Unit.prototype.dropItemFromSlot(self, whichItem, slot)
+    return UnitDropItemSlot(self.handle, whichItem.handle, slot)
+end
+function Unit.prototype.dropItemTarget(self, whichItem, target)
+    return UnitDropItemTarget(self.handle, whichItem.handle, target.handle)
+end
+function Unit.prototype.getAbilityLevel(self, abilCode)
+    return GetUnitAbilityLevel(self.handle, abilCode)
+end
+function Unit.prototype.getAgility(self, includeBonuses)
+    return GetHeroAgi(self.handle, includeBonuses)
+end
+function Unit.prototype.getflyHeight(self)
+    return GetUnitFlyHeight(self.handle)
+end
+function Unit.prototype.getHeroLevel(self)
+    return GetHeroLevel(self.handle)
+end
+function Unit.prototype.getIgnoreAlarm(self, flag)
+    return UnitIgnoreAlarm(self.handle, flag)
+end
+function Unit.prototype.getIntelligence(self, includeBonuses)
+    return GetHeroInt(self.handle, includeBonuses)
+end
+function Unit.prototype.getItemInSlot(self, slot)
+    return Item:fromHandle(UnitItemInSlot(self.handle, slot))
+end
+function Unit.prototype.getState(self, whichUnitState)
+    return GetUnitState(self.handle, whichUnitState)
+end
+function Unit.prototype.getStrength(self, includeBonuses)
+    return GetHeroStr(self.handle, includeBonuses)
+end
+function Unit.prototype.hasBuffs(self, removePositive, removeNegative, magic, physical, timedLife, aura, autoDispel)
+    return UnitHasBuffsEx(
+        self.handle,
+        removePositive,
+        removeNegative,
+        magic,
+        physical,
+        timedLife,
+        aura,
+        autoDispel
+    )
+end
+function Unit.prototype.hasItem(self, whichItem)
+    return UnitHasItem(self.handle, whichItem.handle)
+end
+function Unit.prototype.incAbilityLevel(self, abilCode)
+    return IncUnitAbilityLevel(self.handle, abilCode)
+end
+function Unit.prototype.inForce(self, whichForce)
+    return IsUnitInForce(self.handle, whichForce.handle)
+end
+function Unit.prototype.inGroup(self, whichGroup)
+    return IsUnitInGroup(self.handle, whichGroup.handle)
+end
+function Unit.prototype.inRange(self, x, y, distance)
+    return IsUnitInRangeXY(self.handle, x, y, distance)
+end
+function Unit.prototype.inRangeOfPoint(self, whichPoint, distance)
+    return IsUnitInRangeLoc(self.handle, whichPoint.handle, distance)
+end
+function Unit.prototype.inRangeOfUnit(self, otherUnit, distance)
+    return IsUnitInRange(self.handle, otherUnit.handle, distance)
+end
+function Unit.prototype.inTransport(self, whichTransport)
+    return IsUnitInTransport(self.handle, whichTransport.handle)
+end
+function Unit.prototype.isAlive(self)
+    return not IsUnitType(
+        self.handle,
+        UNIT_TYPE_DEAD()
+    )
+end
+function Unit.prototype.isAlly(self, whichPlayer)
+    return IsUnitAlly(self.handle, whichPlayer.handle)
+end
+function Unit.prototype.isEnemy(self, whichPlayer)
+    return IsUnitEnemy(self.handle, whichPlayer.handle)
+end
+function Unit.prototype.isExperienceSuspended(self)
+    return IsSuspendedXP(self.handle)
+end
+function Unit.prototype.isFogged(self, whichPlayer)
+    return IsUnitFogged(self.handle, whichPlayer.handle)
+end
+function Unit.prototype.isHero(self)
+    return IsHeroUnitId(self.typeId)
+end
+function Unit.prototype.isIllusion(self)
+    return IsUnitIllusion(self.handle)
+end
+function Unit.prototype.isLoaded(self)
+    return IsUnitLoaded(self.handle)
+end
+function Unit.prototype.isMasked(self, whichPlayer)
+    return IsUnitMasked(self.handle, whichPlayer.handle)
+end
+function Unit.prototype.isSelected(self, whichPlayer)
+    return IsUnitSelected(self.handle, whichPlayer.handle)
+end
+function Unit.prototype.issueBuildOrder(self, unit, x, y)
+    local ____temp_0
+    if type(unit) == "string" then
+        ____temp_0 = IssueBuildOrder(self.handle, unit, x, y)
+    else
+        ____temp_0 = IssueBuildOrderById(self.handle, unit, x, y)
+    end
+    return ____temp_0
+end
+function Unit.prototype.issueImmediateOrder(self, order)
+    local ____temp_1
+    if type(order) == "string" then
+        ____temp_1 = IssueImmediateOrder(self.handle, order)
+    else
+        ____temp_1 = IssueImmediateOrderById(self.handle, order)
+    end
+    return ____temp_1
+end
+function Unit.prototype.issueInstantOrderAt(self, order, x, y, instantTargetWidget)
+    local ____temp_2
+    if type(order) == "string" then
+        ____temp_2 = IssueInstantPointOrder(
+            self.handle,
+            order,
+            x,
+            y,
+            instantTargetWidget.handle
+        )
+    else
+        ____temp_2 = IssueInstantPointOrderById(
+            self.handle,
+            order,
+            x,
+            y,
+            instantTargetWidget.handle
+        )
+    end
+    return ____temp_2
+end
+function Unit.prototype.issueInstantTargetOrder(self, order, targetWidget, instantTargetWidget)
+    local ____temp_3
+    if type(order) == "string" then
+        ____temp_3 = IssueInstantTargetOrder(self.handle, order, targetWidget.handle, instantTargetWidget.handle)
+    else
+        ____temp_3 = IssueInstantTargetOrderById(self.handle, order, targetWidget.handle, instantTargetWidget.handle)
+    end
+    return ____temp_3
+end
+function Unit.prototype.issueOrderAt(self, order, x, y)
+    local ____temp_4
+    if type(order) == "string" then
+        ____temp_4 = IssuePointOrder(self.handle, order, x, y)
+    else
+        ____temp_4 = IssuePointOrderById(self.handle, order, x, y)
+    end
+    return ____temp_4
+end
+function Unit.prototype.issuePointOrder(self, order, whichPoint)
+    local ____temp_5
+    if type(order) == "string" then
+        ____temp_5 = IssuePointOrderLoc(self.handle, order, whichPoint.handle)
+    else
+        ____temp_5 = IssuePointOrderByIdLoc(self.handle, order, whichPoint.handle)
+    end
+    return ____temp_5
+end
+function Unit.prototype.issueTargetOrder(self, order, targetWidget)
+    local ____temp_6
+    if type(order) == "string" then
+        ____temp_6 = IssueTargetOrder(self.handle, order, targetWidget.handle)
+    else
+        ____temp_6 = IssueTargetOrderById(self.handle, order, targetWidget.handle)
+    end
+    return ____temp_6
+end
+function Unit.prototype.isUnit(self, whichSpecifiedUnit)
+    return IsUnit(self.handle, whichSpecifiedUnit.handle)
+end
+function Unit.prototype.isUnitType(self, whichUnitType)
+    return IsUnitType(self.handle, whichUnitType)
+end
+function Unit.prototype.isVisible(self, whichPlayer)
+    return IsUnitVisible(self.handle, whichPlayer.handle)
+end
+function Unit.prototype.kill(self)
+    KillUnit(self.handle)
+end
+function Unit.prototype.lookAt(self, whichBone, lookAtTarget, offsetX, offsetY, offsetZ)
+    SetUnitLookAt(
+        self.handle,
+        whichBone,
+        lookAtTarget.handle,
+        offsetX,
+        offsetY,
+        offsetZ
+    )
+end
+function Unit.prototype.makeAbilityPermanent(self, permanent, abilityId)
+    UnitMakeAbilityPermanent(self.handle, permanent, abilityId)
+end
+function Unit.prototype.modifySkillPoints(self, skillPointDelta)
+    return UnitModifySkillPoints(self.handle, skillPointDelta)
+end
+function Unit.prototype.pauseEx(self, flag)
+    PauseUnit(self.handle, flag)
+end
+function Unit.prototype.pauseTimedLife(self, flag)
+    UnitPauseTimedLife(self.handle, flag)
+end
+function Unit.prototype.queueAnimation(self, whichAnimation)
+    QueueUnitAnimation(self.handle, whichAnimation)
+end
+function Unit.prototype.recycleGuardPosition(self)
+    RecycleGuardPosition(self.handle)
+end
+function Unit.prototype.removeAbility(self, abilityId)
+    return UnitRemoveAbility(self.handle, abilityId)
+end
+function Unit.prototype.removeBuffs(self, removePositive, removeNegative)
+    UnitRemoveBuffs(self.handle, removePositive, removeNegative)
+end
+function Unit.prototype.removeBuffsEx(self, removePositive, removeNegative, magic, physical, timedLife, aura, autoDispel)
+    UnitRemoveBuffsEx(
+        self.handle,
+        removePositive,
+        removeNegative,
+        magic,
+        physical,
+        timedLife,
+        aura,
+        autoDispel
+    )
+end
+function Unit.prototype.removeGuardPosition(self)
+    RemoveGuardPosition(self.handle)
+end
+function Unit.prototype.removeItem(self, whichItem)
+    UnitRemoveItem(self.handle, whichItem.handle)
+end
+function Unit.prototype.removeItemFromSlot(self, itemSlot)
+    return Item:fromHandle(UnitRemoveItemFromSlot(self.handle, itemSlot))
+end
+function Unit.prototype.removeItemFromStock(self, itemId)
+    RemoveItemFromStock(self.handle, itemId)
+end
+function Unit.prototype.removeType(self, whichUnitType)
+    return UnitAddType(self.handle, whichUnitType)
+end
+function Unit.prototype.removeUnitFromStock(self, itemId)
+    RemoveUnitFromStock(self.handle, itemId)
+end
+function Unit.prototype.resetCooldown(self)
+    UnitResetCooldown(self.handle)
+end
+function Unit.prototype.resetLookAt(self)
+    ResetUnitLookAt(self.handle)
+end
+function Unit.prototype.revive(self, x, y, doEyecandy)
+    return ReviveHero(self.handle, x, y, doEyecandy)
+end
+function Unit.prototype.reviveAtPoint(self, whichPoint, doEyecandy)
+    return ReviveHeroLoc(self.handle, whichPoint.handle, doEyecandy)
+end
+function Unit.prototype.select(self, flag)
+    SelectUnit(self.handle, flag)
+end
+function Unit.prototype.selectSkill(self, abilCode)
+    SelectHeroSkill(self.handle, abilCode)
+end
+function Unit.prototype.setAbilityLevel(self, abilCode, level)
+    return SetUnitAbilityLevel(self.handle, abilCode, level)
+end
+function Unit.prototype.setAgility(self, value, permanent)
+    SetHeroAgi(self.handle, value, permanent)
+end
+function Unit.prototype.setAnimation(self, whichAnimation)
+    if type(whichAnimation) == "string" then
+        SetUnitAnimation(self.handle, whichAnimation)
+    else
+        SetUnitAnimationByIndex(self.handle, whichAnimation)
+    end
+end
+function Unit.prototype.setAnimationWithRarity(self, whichAnimation, rarity)
+    SetUnitAnimationWithRarity(self.handle, whichAnimation, rarity)
+end
+function Unit.prototype.setBaseDamageJAPI(self, baseDamage)
+    self:setState(
+        UNIT_STATE_ATTACK_WHITE(),
+        baseDamage
+    )
+end
+function Unit.prototype.setBonusDamageJAPI(self, bonusDamage)
+    self:setState(
+        UNIT_STATE_ATTACK_BONUS(),
+        bonusDamage
+    )
+end
+function Unit.prototype.setBlendTime(self, timeScale)
+    SetUnitBlendTime(self.handle, timeScale)
+end
+function Unit.prototype.setConstructionProgress(self, constructionPercentage)
+    UnitSetConstructionProgress(self.handle, constructionPercentage)
+end
+function Unit.prototype.setCreepGuard(self, creepGuard)
+    SetUnitCreepGuard(self.handle, creepGuard)
+end
+function Unit.prototype.setExperience(self, newXpVal, showEyeCandy)
+    SetHeroXP(self.handle, newXpVal, showEyeCandy)
+end
+function Unit.prototype.setExploded(self, exploded)
+    SetUnitExploded(self.handle, exploded)
+end
+function Unit.prototype.setFacingEx(self, facingAngle)
+    SetUnitFacing(self.handle, facingAngle)
+end
+function Unit.prototype.setflyHeight(self, value, rate)
+    SetUnitFlyHeight(self.handle, value, rate)
+end
+function Unit.prototype.setHeroLevel(self, level, showEyeCandy)
+    SetHeroLevel(self.handle, level, showEyeCandy)
+end
+function Unit.prototype.setIntelligence(self, value, permanent)
+    SetHeroInt(self.handle, value, permanent)
+end
+function Unit.prototype.setItemTypeSlots(self, slots)
+    SetItemTypeSlots(self.handle, slots)
+end
+function Unit.prototype.setOwner(self, whichPlayer, changeColor)
+    if changeColor == nil then
+        changeColor = true
+    end
+    SetUnitOwner(self.handle, whichPlayer.handle, changeColor)
+end
+function Unit.prototype.getOwner(self)
+    return MapPlayer:fromHandle(GetOwningPlayer(self.handle))
+end
+function Unit.prototype.setPoint(self, point)
+    SetUnitPositionLoc(self.handle, point.handle)
+end
+function Unit.prototype.getPoint(self)
+    return Point:fromHandle(GetUnitLoc(self.handle))
+end
+function Unit.prototype.setPathing(self, flag)
+    SetUnitPathing(self.handle, flag)
+end
+function Unit.prototype.setPosition(self, x, y)
+    SetUnitPosition(self.handle, x, y)
+end
+function Unit.prototype.setRescuable(self, byWhichPlayer, flag)
+    SetUnitRescuable(self.handle, byWhichPlayer.handle, flag)
+end
+function Unit.prototype.setRescueRange(self, range)
+    SetUnitRescueRange(self.handle, range)
+end
+function Unit.prototype.setScale(self, scaleX, scaleY, scaleZ)
+    SetUnitScale(self.handle, scaleX, scaleY, scaleZ)
+end
+function Unit.prototype.setState(self, whichUnitState, newVal)
+    SetUnitState(self.handle, whichUnitState, newVal)
+end
+function Unit.prototype.setStrength(self, value, permanent)
+    SetHeroStr(self.handle, value, permanent)
+end
+function Unit.prototype.setTimeScale(self, timeScale)
+    SetUnitTimeScale(self.handle, timeScale)
+end
+function Unit.prototype.setUnitAttackCooldownJAPI(self, cooldown)
+    self:setState(
+        UNIT_STATE_ATTACK_SPACE(),
+        cooldown
+    )
+end
+function Unit.prototype.setUnitAttackSpeedJAPI(self, attacksPerSecond)
+    self:setState(
+        UNIT_STATE_ATTACK_SPEED(),
+        attacksPerSecond
+    )
+end
+function Unit.prototype.setUnitTypeSlots(self, slots)
+    SetUnitTypeSlots(self.handle, slots)
+end
+function Unit.prototype.setUpgradeProgress(self, upgradePercentage)
+    UnitSetUpgradeProgress(self.handle, upgradePercentage)
+end
+function Unit.prototype.setUseAltIcon(self, flag)
+    UnitSetUsesAltIcon(self.handle, flag)
+end
+function Unit.prototype.setUseFood(self, useFood)
+    SetUnitUseFood(self.handle, useFood)
+end
+function Unit.prototype.setVertexColor(self, red, green, blue, alpha)
+    SetUnitVertexColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function Unit.prototype.shareVision(self, whichPlayer, share)
+    UnitShareVision(self.handle, whichPlayer.handle, share)
+end
+function Unit.prototype.stripLevels(self, howManyLevels)
+    return UnitStripHeroLevel(self.handle, howManyLevels)
+end
+function Unit.prototype.suspendDecay(self, suspend)
+    UnitSuspendDecay(self.handle, suspend)
+end
+function Unit.prototype.suspendExperience(self, flag)
+    SuspendHeroXP(self.handle, flag)
+end
+function Unit.prototype.useItem(self, whichItem)
+    return UnitUseItem(self.handle, whichItem.handle)
+end
+function Unit.prototype.useItemAt(self, whichItem, x, y)
+    return UnitUseItemPoint(self.handle, whichItem.handle, x, y)
+end
+function Unit.prototype.useItemTarget(self, whichItem, target)
+    return UnitUseItemTarget(self.handle, whichItem.handle, target.handle)
+end
+function Unit.prototype.wakeUp(self)
+    UnitWakeUp(self.handle)
+end
+function Unit.prototype.waygateGetDestinationX(self)
+    return WaygateGetDestinationX(self.handle)
+end
+function Unit.prototype.waygateGetDestinationY(self)
+    return WaygateGetDestinationY(self.handle)
+end
+function Unit.prototype.waygateSetDestination(self, x, y)
+    WaygateSetDestination(self.handle, x, y)
+end
+function Unit.foodMadeByType(self, unitId)
+    return GetFoodMade(unitId)
+end
+function Unit.foodUsedByType(self, unitId)
+    return GetFoodUsed(unitId)
+end
+function Unit.fromEnum(self)
+    return self:fromHandle(GetEnumUnit())
+end
+function Unit.fromEvent(self)
+    return self:fromHandle(GetTriggerUnit())
+end
+function Unit.fromFilter(self)
+    return self:fromHandle(GetFilterUnit())
+end
+function Unit.fromHandle(self, handle)
+    local ____handle_7
+    if handle then
+        ____handle_7 = self:getObject(handle)
+    else
+        ____handle_7 = nil
+    end
+    return ____handle_7
+end
+function Unit.getPointValueByType(self, unitType)
+    return GetUnitPointValueByType(unitType)
+end
+function Unit.isUnitIdHero(self, unitId)
+    return IsHeroUnitId(unitId)
+end
+function Unit.isUnitIdType(self, unitId, whichUnitType)
+    return IsUnitIdType(unitId, whichUnitType)
+end
+__TS__SetDescriptor(
+    Unit.prototype,
+    "acquireRange",
+    {
+        get = function(self)
+            return GetUnitAcquireRange(self.handle)
+        end,
+        set = function(self, value)
+            SetUnitAcquireRange(self.handle, value)
         end
-        local ____try, ____hasReturned, ____returnValue = pcall(function()
-            local unitId = c2i(unitTypeId)
-            local createdUnit = CreateUnit(
-                player,
-                unitId,
-                x,
-                y,
-                facing
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "agility",
+    {
+        get = function(self)
+            return GetHeroAgi(self.handle, false)
+        end,
+        set = function(self, value)
+            SetHeroAgi(self.handle, value, true)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "armor",
+    {
+        get = function(self)
+            return GetUnitState(
+                self.handle,
+                UNIT_STATE_DEFEND_WHITE()
             )
-            if createdUnit and registryKey then
-                self.unitRegistry:set(registryKey, createdUnit)
-            end
-            return true, createdUnit
-        end)
-        if not ____try then
-            ____hasReturned, ____returnValue = ____catch(____hasReturned)
-        end
-        if ____hasReturned then
-            return ____returnValue
-        end
-    end
-end
-function UnitService.prototype.getUnit(self, registryKey)
-    return self.unitRegistry:get(registryKey)
-end
-function UnitService.prototype.removeUnit(self, unit)
-    do
-        local function ____catch(____error)
-            print("Error removing unit: " .. tostring(____error))
-        end
-        local ____try, ____hasReturned = pcall(function()
-            RemoveUnit(unit)
-            for ____, ____value in __TS__Iterator(self.unitRegistry:entries()) do
-                local key = ____value[1]
-                local registeredUnit = ____value[2]
-                if registeredUnit == unit then
-                    self.unitRegistry:delete(key)
-                    break
-                end
-            end
-        end)
-        if not ____try then
-            ____catch(____hasReturned)
-        end
-    end
-end
-function UnitService.prototype.setUnitLife(self, unit, life)
-    do
-        local function ____catch(____error)
-            print("Error setting unit life: " .. tostring(____error))
-        end
-        local ____try, ____hasReturned = pcall(function()
+        end,
+        set = function(self, armorAmount)
             SetUnitState(
-                unit,
-                UNIT_STATE_LIFE(),
-                life
+                self.handle,
+                UNIT_STATE_DEFEND_WHITE(),
+                armorAmount
             )
-        end)
-        if not ____try then
-            ____catch(____hasReturned)
         end
-    end
-end
-function UnitService.prototype.setUnitMana(self, unit, mana)
-    do
-        local function ____catch(____error)
-            print("Error setting unit mana: " .. tostring(____error))
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "canSleep",
+    {
+        get = function(self)
+            return UnitCanSleep(self.handle)
+        end,
+        set = function(self, flag)
+            UnitAddSleep(self.handle, flag)
         end
-        local ____try, ____hasReturned = pcall(function()
-            SetUnitState(
-                unit,
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "color",
+    {set = function(self, whichColor)
+        SetUnitColor(self.handle, whichColor)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "currentOrder",
+    {get = function(self)
+        return GetUnitCurrentOrder(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "defaultAcquireRange",
+    {get = function(self)
+        return GetUnitDefaultAcquireRange(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "defaultFlyHeight",
+    {get = function(self)
+        return GetUnitDefaultFlyHeight(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "defaultMoveSpeed",
+    {get = function(self)
+        return GetUnitDefaultMoveSpeed(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "defaultPropWindow",
+    {get = function(self)
+        return GetUnitDefaultPropWindow(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "defaultTurnSpeed",
+    {get = function(self)
+        return GetUnitDefaultTurnSpeed(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "experience",
+    {
+        get = function(self)
+            return GetHeroXP(self.handle)
+        end,
+        set = function(self, newXpVal)
+            SetHeroXP(self.handle, newXpVal, true)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "facing",
+    {
+        get = function(self)
+            return GetUnitFacing(self.handle)
+        end,
+        set = function(self, value)
+            SetUnitFacing(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "foodMade",
+    {get = function(self)
+        return GetUnitFoodMade(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "foodUsed",
+    {get = function(self)
+        return GetUnitFoodUsed(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "ignoreAlarmToggled",
+    {get = function(self)
+        return UnitIgnoreAlarmToggled(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "intelligence",
+    {
+        get = function(self)
+            return GetHeroInt(self.handle, false)
+        end,
+        set = function(self, value)
+            SetHeroInt(self.handle, value, true)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "inventorySize",
+    {get = function(self)
+        return UnitInventorySize(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "invulnerable",
+    {set = function(self, flag)
+        SetUnitInvulnerable(self.handle, flag)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "level",
+    {get = function(self)
+        return GetUnitLevel(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "mana",
+    {
+        get = function(self)
+            return self:getState(UNIT_STATE_MANA())
+        end,
+        set = function(self, value)
+            self:setState(
                 UNIT_STATE_MANA(),
-                mana
+                value
             )
-        end)
-        if not ____try then
-            ____catch(____hasReturned)
         end
-    end
-end
-function UnitService.prototype.getUnitLife(self, unit)
-    do
-        local function ____catch(____error)
-            print("Error getting unit life: " .. tostring(____error))
-            return true, 0
-        end
-        local ____try, ____hasReturned, ____returnValue = pcall(function()
-            return true, GetUnitState(
-                unit,
-                UNIT_STATE_LIFE()
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "maxLife",
+    {
+        get = function(self)
+            return self:getState(UNIT_STATE_MAX_LIFE())
+        end,
+        set = function(self, value)
+            self:setState(
+                UNIT_STATE_MAX_LIFE(),
+                value
             )
-        end)
-        if not ____try then
-            ____hasReturned, ____returnValue = ____catch(____hasReturned)
         end
-        if ____hasReturned then
-            return ____returnValue
-        end
-    end
-end
-function UnitService.prototype.getUnitMana(self, unit)
-    do
-        local function ____catch(____error)
-            print("Error getting unit mana: " .. tostring(____error))
-            return true, 0
-        end
-        local ____try, ____hasReturned, ____returnValue = pcall(function()
-            return true, GetUnitState(
-                unit,
-                UNIT_STATE_MANA()
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "maxMana",
+    {
+        get = function(self)
+            return self:getState(UNIT_STATE_MAX_MANA())
+        end,
+        set = function(self, value)
+            self:setState(
+                UNIT_STATE_MAX_MANA(),
+                value
             )
-        end)
-        if not ____try then
-            ____hasReturned, ____returnValue = ____catch(____hasReturned)
         end
-        if ____hasReturned then
-            return ____returnValue
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "moveSpeed",
+    {
+        get = function(self)
+            return GetUnitMoveSpeed(self.handle)
+        end,
+        set = function(self, value)
+            SetUnitMoveSpeed(self.handle, value)
         end
-    end
-end
-function UnitService.prototype.getAllRegisteredUnits(self)
-    return __TS__New(Map, self.unitRegistry)
-end
-function UnitService.prototype.clearRegistry(self)
-    self.unitRegistry:clear()
-    print(">>> Unit registry cleared")
-end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "name",
+    {
+        get = function(self)
+            return GetUnitName(self.handle) or ""
+        end,
+        set = function(self, value)
+            DzSetUnitName(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "nameProper",
+    {
+        get = function(self)
+            return GetHeroProperName(self.handle) or ""
+        end,
+        set = function(self, value)
+            DzSetUnitProperName(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "owner",
+    {
+        get = function(self)
+            return MapPlayer:fromHandle(GetOwningPlayer(self.handle))
+        end,
+        set = function(self, whichPlayer)
+            SetUnitOwner(self.handle, whichPlayer.handle, true)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "paused",
+    {
+        get = function(self)
+            return IsUnitPaused(self.handle)
+        end,
+        set = function(self, flag)
+            PauseUnit(self.handle, flag)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "point",
+    {
+        get = function(self)
+            return Point:fromHandle(GetUnitLoc(self.handle))
+        end,
+        set = function(self, whichPoint)
+            SetUnitPositionLoc(self.handle, whichPoint.handle)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "pointValue",
+    {get = function(self)
+        return GetUnitPointValue(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "propWindow",
+    {
+        get = function(self)
+            return GetUnitPropWindow(self.handle)
+        end,
+        set = function(self, newPropWindowAngle)
+            SetUnitPropWindow(self.handle, newPropWindowAngle)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "race",
+    {get = function(self)
+        return GetUnitRace(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "rallyDestructable",
+    {get = function(self)
+        return Destructable:fromHandle(GetUnitRallyDestructable(self.handle))
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "rallyPoint",
+    {get = function(self)
+        return Point:fromHandle(GetUnitRallyPoint(self.handle))
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "rallyUnit",
+    {get = function(self)
+        return ____exports.Unit:fromHandle(GetUnitRallyUnit(self.handle))
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "resourceAmount",
+    {
+        get = function(self)
+            return GetResourceAmount(self.handle)
+        end,
+        set = function(self, amount)
+            SetResourceAmount(self.handle, amount)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "show",
+    {
+        get = function(self)
+            return not IsUnitHidden(self.handle)
+        end,
+        set = function(self, flag)
+            ShowUnit(self.handle, flag)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "skillPoints",
+    {
+        get = function(self)
+            return GetHeroSkillPoints(self.handle)
+        end,
+        set = function(self, skillPointDelta)
+            UnitModifySkillPoints(self.handle, skillPointDelta)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "sleeping",
+    {get = function(self)
+        return UnitIsSleeping(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "strength",
+    {
+        get = function(self)
+            return GetHeroStr(self.handle, false)
+        end,
+        set = function(self, value)
+            SetHeroStr(self.handle, value, true)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "turnSpeed",
+    {
+        get = function(self)
+            return GetUnitTurnSpeed(self.handle)
+        end,
+        set = function(self, value)
+            SetUnitTurnSpeed(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "typeId",
+    {get = function(self)
+        return GetUnitTypeId(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "userData",
+    {
+        get = function(self)
+            return GetUnitUserData(self.handle)
+        end,
+        set = function(self, value)
+            SetUnitUserData(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "waygateActive",
+    {
+        get = function(self)
+            return WaygateIsActive(self.handle)
+        end,
+        set = function(self, flag)
+            WaygateActivate(self.handle, flag)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "x",
+    {
+        get = function(self)
+            return GetUnitX(self.handle)
+        end,
+        set = function(self, value)
+            SetUnitX(self.handle, value)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Unit.prototype,
+    "y",
+    {
+        get = function(self)
+            return GetUnitY(self.handle)
+        end,
+        set = function(self, value)
+            SetUnitY(self.handle, value)
+        end
+    },
+    true
+)
 return ____exports
  end,
-["src.map.start"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.handles.group"] = function(...) 
 local ____lualib = require("lualib_bundle")
-local Map = ____lualib.Map
-local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local setupEventListeners, initializeMapUnits, demoGameplay
-function setupEventListeners(eventService)
-    print(">>> Setting up event listeners...")
-    eventService:on(
-        "unit.created",
-        function(data)
-            print("Unit created for player " .. tostring(GetPlayerId(data.player)))
-        end
-    )
-    eventService:on(
-        "unit.died",
-        function(data)
-            print("Unit died: " .. GetUnitName(data.unit))
-            if data.killer then
-                print("Killed by: " .. GetUnitName(data.killer))
-            end
-        end
-    )
-    eventService:on(
-        "player.left",
-        function(data)
-            print(("Player " .. tostring(GetPlayerId(data.player))) .. " left the game")
-        end
-    )
-end
-function initializeMapUnits(unitService)
-    print(">>> Creating initial units...")
-    local localPlayer = GetLocalPlayer()
-    local hero = unitService:createUnit(
-        localPlayer,
-        "hpea",
-        0,
-        0,
-        270,
-        "demo-hero"
-    )
-    if hero then
-        print(">>> Demo hero created successfully")
-        unitService:setUnitLife(hero, 500)
-        unitService:setUnitMana(hero, 200)
-        local life = unitService:getUnitLife(hero)
-        local mana = unitService:getUnitMana(hero)
-        print(((">>> Hero stats - Life: " .. tostring(life)) .. ", Mana: ") .. tostring(mana))
-    end
-end
-function demoGameplay(app)
-    print(">>> Starting gameplay demo...")
-    local config = app:getConfigManager():getConfig()
-    if config.debug then
-        print(">>> Debug mode is enabled")
-        local unitService = app:getService("UnitService")
-        if unitService then
-            do
-                local i = 1
-                while i <= 3 do
-                    local unit = unitService:createUnit(
-                        GetLocalPlayer(),
-                        "hfoo",
-                        i * 100,
-                        i * 100,
-                        0,
-                        "debug-unit-" .. tostring(i)
-                    )
-                    if unit then
-                        print((((((">>> Debug unit " .. tostring(i)) .. " created at (") .. tostring(i * 100)) .. ", ") .. tostring(i * 100)) .. ")")
-                    end
-                    i = i + 1
-                end
-            end
-        end
-    end
-    local unitService = app:getService("UnitService")
-    if unitService then
-        local registeredUnits = unitService:getAllRegisteredUnits()
-        print(">>> Total registered units: " .. tostring(registeredUnits.size))
-        for ____, ____value in __TS__Iterator(registeredUnits) do
-            local key = ____value[1]
-            print(">>> Registered unit: " .. key)
-        end
-    end
-end
---- 地图初始化函数
--- 展示如何使用新的解耦架构
-function ____exports.mapInit(app)
-    print(">>> Initializing map components...")
-    local eventService = app:getService("EventService")
-    local unitService = app:getService("UnitService")
-    if not eventService or not unitService then
-        print(">>> Error: Required services not found")
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+local ____unit = require("lua_modules.@eiriksgata.wc3ts.src.handles.unit")
+local Unit = ____unit.Unit
+____exports.Group = __TS__Class()
+local Group = ____exports.Group
+Group.name = "Group"
+__TS__ClassExtends(Group, Handle)
+function Group.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
         return
     end
-    setupEventListeners(eventService)
-    initializeMapUnits(unitService)
-    demoGameplay(app)
-    print(">>> Map initialization complete")
+    local handle = CreateGroup()
+    if handle == nil then
+        Error(nil, "w3ts failed to create group handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Group.create(self)
+    local handle = CreateGroup()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Group.prototype.addUnit(self, whichUnit)
+    return GroupAddUnit(self.handle, whichUnit.handle)
+end
+function Group.prototype.clear(self)
+    GroupClear(self.handle)
+end
+function Group.prototype.destroy(self)
+    DestroyGroup(self.handle)
+end
+function Group.prototype.enumUnitsInRange(self, x, y, radius, filter)
+    GroupEnumUnitsInRange(
+        self.handle,
+        x,
+        y,
+        radius,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Group.prototype.enumUnitsInRangeCounted(self, x, y, radius, filter, countLimit)
+    GroupEnumUnitsInRangeCounted(
+        self.handle,
+        x,
+        y,
+        radius,
+        type(filter) == "function" and Filter(filter) or filter,
+        countLimit
+    )
+end
+function Group.prototype.enumUnitsInRangeOfPoint(self, whichPoint, radius, filter)
+    GroupEnumUnitsInRangeOfLoc(
+        self.handle,
+        whichPoint.handle,
+        radius,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Group.prototype.enumUnitsInRangeOfPointCounted(self, whichPoint, radius, filter, countLimit)
+    GroupEnumUnitsInRangeOfLocCounted(
+        self.handle,
+        whichPoint.handle,
+        radius,
+        type(filter) == "function" and Filter(filter) or filter,
+        countLimit
+    )
+end
+function Group.prototype.enumUnitsInRect(self, r, filter)
+    GroupEnumUnitsInRect(
+        self.handle,
+        r.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Group.prototype.enumUnitsInRectCounted(self, r, filter, countLimit)
+    GroupEnumUnitsInRectCounted(
+        self.handle,
+        r.handle,
+        type(filter) == "function" and Filter(filter) or filter,
+        countLimit
+    )
+end
+function Group.prototype.enumUnitsOfPlayer(self, whichPlayer, filter)
+    GroupEnumUnitsOfPlayer(
+        self.handle,
+        whichPlayer.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Group.prototype.enumUnitsOfType(self, unitName, filter)
+    GroupEnumUnitsOfType(
+        self.handle,
+        unitName,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+function Group.prototype.enumUnitsOfTypeCounted(self, unitName, filter, countLimit)
+    GroupEnumUnitsOfTypeCounted(
+        self.handle,
+        unitName,
+        type(filter) == "function" and Filter(filter) or filter,
+        countLimit
+    )
+end
+function Group.prototype.enumUnitsSelected(self, whichPlayer, filter)
+    GroupEnumUnitsSelected(
+        self.handle,
+        whichPlayer.handle,
+        type(filter) == "function" and Filter(filter) or filter
+    )
+end
+Group.prototype["for"] = function(self, callback)
+    ForGroup(self.handle, callback)
+end
+function Group.prototype.getUnits(self)
+    local units = {}
+    self["for"](
+        self,
+        function()
+            local u = Unit:fromFilter()
+            if u then
+                units[#units + 1] = u
+            end
+        end
+    )
+    return units
+end
+function Group.prototype.hasUnit(self, whichUnit)
+    return IsUnitInGroup(whichUnit.handle, self.handle)
+end
+function Group.prototype.orderCoords(self, order, x, y)
+    if type(order) == "string" then
+        GroupPointOrder(self.handle, order, x, y)
+    else
+        GroupPointOrderById(self.handle, order, x, y)
+    end
+end
+function Group.prototype.orderImmediate(self, order)
+    if type(order) == "string" then
+        GroupImmediateOrder(self.handle, order)
+    else
+        GroupImmediateOrderById(self.handle, order)
+    end
+end
+function Group.prototype.orderPoint(self, order, whichPoint)
+    if type(order) == "string" then
+        GroupPointOrderLoc(self.handle, order, whichPoint.handle)
+    else
+        GroupPointOrderByIdLoc(self.handle, order, whichPoint.handle)
+    end
+end
+function Group.prototype.orderTarget(self, order, targetWidget)
+    if type(order) == "string" then
+        GroupTargetOrder(self.handle, order, targetWidget.handle)
+    else
+        GroupTargetOrderById(self.handle, order, targetWidget.handle)
+    end
+end
+function Group.prototype.removeUnit(self, whichUnit)
+    return GroupRemoveUnit(self.handle, whichUnit.handle)
+end
+function Group.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function Group.getEnumUnit(self)
+    return Unit:fromHandle(GetEnumUnit())
+end
+function Group.getFilterUnit(self)
+    return Unit:fromHandle(GetFilterUnit())
+end
+__TS__SetDescriptor(
+    Group.prototype,
+    "first",
+    {get = function(self)
+        return Unit:fromHandle(FirstOfGroup(self.handle))
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Group.prototype,
+    "size",
+    {get = function(self)
+        local size = 0
+        self["for"](
+            self,
+            function()
+                size = size + 1
+            end
+        )
+        return size
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.image"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.ImageType = ImageType or ({})
+____exports.ImageType.Selection = 1
+____exports.ImageType[____exports.ImageType.Selection] = "Selection"
+____exports.ImageType.Indicator = 2
+____exports.ImageType[____exports.ImageType.Indicator] = "Indicator"
+____exports.ImageType.OcclusionMask = 3
+____exports.ImageType[____exports.ImageType.OcclusionMask] = "OcclusionMask"
+____exports.ImageType.Ubersplat = 4
+____exports.ImageType[____exports.ImageType.Ubersplat] = "Ubersplat"
+____exports.Image = __TS__Class()
+local Image = ____exports.Image
+Image.name = "Image"
+__TS__ClassExtends(Image, Handle)
+function Image.prototype.____constructor(self, file, sizeX, sizeY, sizeZ, posX, posY, posZ, originX, originY, originZ, imageType)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateImage(
+        file,
+        sizeX,
+        sizeY,
+        sizeZ,
+        posX,
+        posY,
+        posZ,
+        originX,
+        originY,
+        originZ,
+        imageType
+    )
+    if handle == nil then
+        Error(nil, "w3ts failed to create image handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Image.create(self, file, sizeX, sizeY, sizeZ, posX, posY, posZ, originX, originY, originZ, imageType)
+    local handle = CreateImage(
+        file,
+        sizeX,
+        sizeY,
+        sizeZ,
+        posX,
+        posY,
+        posZ,
+        originX,
+        originY,
+        originZ,
+        imageType
+    )
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Image.prototype.destroy(self)
+    DestroyImage(self.handle)
+end
+function Image.prototype.setAboveWater(self, flag, useWaterAlpha)
+    SetImageAboveWater(self.handle, flag, useWaterAlpha)
+end
+function Image.prototype.setColor(self, red, green, blue, alpha)
+    SetImageColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function Image.prototype.setConstantHeight(self, flag, height)
+    SetImageConstantHeight(self.handle, flag, height)
+end
+function Image.prototype.setPosition(self, x, y, z)
+    SetImagePosition(self.handle, x, y, z)
+end
+function Image.prototype.setRender(self, flag)
+    SetImageRenderAlways(self.handle, flag)
+end
+function Image.prototype.setType(self, imageType)
+    SetImageType(self.handle, imageType)
+end
+function Image.prototype.show(self, flag)
+    ShowImage(self.handle, flag)
+end
+function Image.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
 end
 return ____exports
  end,
-["src.index"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.handles.leaderboard"] = function(...) 
 local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Leaderboard = __TS__Class()
+local Leaderboard = ____exports.Leaderboard
+Leaderboard.name = "Leaderboard"
+__TS__ClassExtends(Leaderboard, Handle)
+function Leaderboard.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateLeaderboard()
+    if handle == nil then
+        Error(nil, "w3ts failed to create leaderboard handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Leaderboard.create(self)
+    local handle = CreateLeaderboard()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Leaderboard.prototype.addItem(self, label, value, p)
+    LeaderboardAddItem(self.handle, label, value, p.handle)
+end
+function Leaderboard.prototype.clear(self)
+    LeaderboardClear(self.handle)
+end
+function Leaderboard.prototype.destroy(self)
+    DestroyLeaderboard(self.handle)
+end
+function Leaderboard.prototype.display(self, flag)
+    if flag == nil then
+        flag = true
+    end
+    LeaderboardDisplay(self.handle, flag)
+end
+function Leaderboard.prototype.getPlayerIndex(self, p)
+    return LeaderboardGetPlayerIndex(self.handle, p.handle)
+end
+function Leaderboard.prototype.hasPlayerItem(self, p)
+    LeaderboardHasPlayerItem(self.handle, p.handle)
+end
+function Leaderboard.prototype.removeItem(self, index)
+    LeaderboardRemoveItem(self.handle, index)
+end
+function Leaderboard.prototype.removePlayerItem(self, p)
+    LeaderboardRemovePlayerItem(self.handle, p.handle)
+end
+function Leaderboard.prototype.setItemLabel(self, item, label)
+    LeaderboardSetItemLabel(self.handle, item, label)
+end
+function Leaderboard.prototype.setItemLabelColor(self, item, red, green, blue, alpha)
+    LeaderboardSetItemLabelColor(
+        self.handle,
+        item,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function Leaderboard.prototype.setItemStyle(self, item, showLabel, showValues, showIcons)
+    if showLabel == nil then
+        showLabel = true
+    end
+    if showValues == nil then
+        showValues = true
+    end
+    if showIcons == nil then
+        showIcons = true
+    end
+    LeaderboardSetItemStyle(
+        self.handle,
+        item,
+        showLabel,
+        showValues,
+        showIcons
+    )
+end
+function Leaderboard.prototype.setItemValue(self, item, value)
+    LeaderboardSetItemValue(self.handle, item, value)
+end
+function Leaderboard.prototype.setItemValueColor(self, item, red, green, blue, alpha)
+    LeaderboardSetItemValueColor(
+        self.handle,
+        item,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function Leaderboard.prototype.setLabelColor(self, red, green, blue, alpha)
+    LeaderboardSetLabelColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function Leaderboard.prototype.setPlayerBoard(self, p)
+    PlayerSetLeaderboard(p.handle, self.handle)
+end
+function Leaderboard.prototype.setStyle(self, showLabel, showNames, showValues, showIcons)
+    if showLabel == nil then
+        showLabel = true
+    end
+    if showNames == nil then
+        showNames = true
+    end
+    if showValues == nil then
+        showValues = true
+    end
+    if showIcons == nil then
+        showIcons = true
+    end
+    LeaderboardSetStyle(
+        self.handle,
+        showLabel,
+        showNames,
+        showValues,
+        showIcons
+    )
+end
+function Leaderboard.prototype.setValueColor(self, red, green, blue, alpha)
+    LeaderboardSetValueColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function Leaderboard.prototype.sortByLabel(self, asc)
+    if asc == nil then
+        asc = true
+    end
+    LeaderboardSortItemsByLabel(self.handle, asc)
+end
+function Leaderboard.prototype.sortByPlayer(self, asc)
+    if asc == nil then
+        asc = true
+    end
+    LeaderboardSortItemsByPlayer(self.handle, asc)
+end
+function Leaderboard.prototype.sortByValue(self, asc)
+    if asc == nil then
+        asc = true
+    end
+    LeaderboardSortItemsByValue(self.handle, asc)
+end
+function Leaderboard.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function Leaderboard.fromPlayer(self, p)
+    return self:fromHandle(PlayerGetLeaderboard(p.handle))
+end
+__TS__SetDescriptor(
+    Leaderboard.prototype,
+    "displayed",
+    {get = function(self)
+        return IsLeaderboardDisplayed(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Leaderboard.prototype,
+    "itemCount",
+    {
+        get = function(self)
+            return LeaderboardGetItemCount(self.handle)
+        end,
+        set = function(self, count)
+            LeaderboardSetSizeByItemCount(self.handle, count)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Leaderboard.prototype,
+    "label",
+    {
+        get = function(self)
+            return LeaderboardGetLabelText(self.handle) or ""
+        end,
+        set = function(self, value)
+            LeaderboardSetLabel(self.handle, value)
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.multiboard"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.MultiboardItem = __TS__Class()
+local MultiboardItem = ____exports.MultiboardItem
+MultiboardItem.name = "MultiboardItem"
+__TS__ClassExtends(MultiboardItem, Handle)
+function MultiboardItem.prototype.____constructor(self, board, x, y)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = MultiboardGetItem(board.handle, x - 1, y - 1)
+    if handle == nil then
+        Error(nil, "w3ts failed to create multiboarditem handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function MultiboardItem.create(self, board, x, y)
+    local handle = MultiboardGetItem(board.handle, x - 1, y - 1)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function MultiboardItem.prototype.destroy(self)
+    MultiboardReleaseItem(self.handle)
+end
+function MultiboardItem.prototype.setIcon(self, icon)
+    MultiboardSetItemIcon(self.handle, icon)
+end
+function MultiboardItem.prototype.setStyle(self, showValue, showIcon)
+    MultiboardSetItemStyle(self.handle, showValue, showIcon)
+end
+function MultiboardItem.prototype.setValue(self, val)
+    MultiboardSetItemValue(self.handle, val)
+end
+function MultiboardItem.prototype.setValueColor(self, red, green, blue, alpha)
+    MultiboardSetItemValueColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function MultiboardItem.prototype.setWidth(self, width)
+    MultiboardSetItemWidth(self.handle, width)
+end
+function MultiboardItem.fromHandle(self, handle)
+    return self:getObject(handle)
+end
+____exports.Multiboard = __TS__Class()
+local Multiboard = ____exports.Multiboard
+Multiboard.name = "Multiboard"
+__TS__ClassExtends(Multiboard, Handle)
+function Multiboard.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateMultiboard()
+    if handle == nil then
+        Error(nil, "w3ts failed to create multiboard handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Multiboard.create(self)
+    local handle = CreateMultiboard()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Multiboard.prototype.clear(self)
+    MultiboardClear(self.handle)
+end
+function Multiboard.prototype.createItem(self, x, y)
+    return ____exports.MultiboardItem:create(self, x, y)
+end
+function Multiboard.prototype.destroy(self)
+    DestroyMultiboard(self.handle)
+end
+function Multiboard.prototype.display(self, show)
+    MultiboardDisplay(self.handle, show)
+end
+function Multiboard.prototype.minimize(self, flag)
+    MultiboardMinimize(self.handle, flag)
+end
+function Multiboard.prototype.minimized(self)
+    return IsMultiboardMinimized(self.handle)
+end
+function Multiboard.prototype.setItemsIcons(self, icon)
+    MultiboardSetItemsIcon(self.handle, icon)
+end
+function Multiboard.prototype.setItemsStyle(self, showValues, showIcons)
+    MultiboardSetItemsStyle(self.handle, showValues, showIcons)
+end
+function Multiboard.prototype.setItemsValue(self, value)
+    MultiboardSetItemsValue(self.handle, value)
+end
+function Multiboard.prototype.setItemsValueColor(self, red, green, blue, alpha)
+    MultiboardSetItemsValueColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function Multiboard.prototype.setItemsWidth(self, width)
+    MultiboardSetItemsWidth(self.handle, width)
+end
+function Multiboard.prototype.setTitleTextColor(self, red, green, blue, alpha)
+    MultiboardSetTitleTextColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function Multiboard.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+function Multiboard.suppressDisplay(self, flag)
+    MultiboardSuppressDisplay(flag)
+end
+__TS__SetDescriptor(
+    Multiboard.prototype,
+    "columns",
+    {
+        get = function(self)
+            return MultiboardGetColumnCount(self.handle)
+        end,
+        set = function(self, count)
+            MultiboardSetColumnCount(self.handle, count)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Multiboard.prototype,
+    "displayed",
+    {get = function(self)
+        return IsMultiboardDisplayed(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Multiboard.prototype,
+    "rows",
+    {
+        get = function(self)
+            return MultiboardGetRowCount(self.handle)
+        end,
+        set = function(self, count)
+            MultiboardSetRowCount(self.handle, count)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Multiboard.prototype,
+    "title",
+    {
+        get = function(self)
+            return MultiboardGetTitleText(self.handle) or ""
+        end,
+        set = function(self, label)
+            MultiboardSetTitleText(self.handle, label)
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.quest"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.QuestItem = __TS__Class()
+local QuestItem = ____exports.QuestItem
+QuestItem.name = "QuestItem"
+__TS__ClassExtends(QuestItem, Handle)
+function QuestItem.prototype.____constructor(self, whichQuest)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = QuestCreateItem(whichQuest.handle)
+    if handle == nil then
+        Error(nil, "w3ts failed to create questitem handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+    self.quest = whichQuest
+end
+function QuestItem.create(self, whichQuest)
+    local handle = QuestCreateItem(whichQuest.handle)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        values.quest = whichQuest
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function QuestItem.prototype.setDescription(self, description)
+    QuestItemSetDescription(self.handle, description)
+end
+__TS__SetDescriptor(
+    QuestItem.prototype,
+    "completed",
+    {
+        get = function(self)
+            return IsQuestItemCompleted(self.handle)
+        end,
+        set = function(self, completed)
+            QuestItemSetCompleted(self.handle, completed)
+        end
+    },
+    true
+)
+____exports.Quest = __TS__Class()
+local Quest = ____exports.Quest
+Quest.name = "Quest"
+__TS__ClassExtends(Quest, Handle)
+function Quest.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateQuest()
+    if handle == nil then
+        Error(nil, "w3ts failed to create quest handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Quest.create(self)
+    local handle = CreateQuest()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Quest.prototype.addItem(self, description)
+    local questItem = ____exports.QuestItem:create(self)
+    if questItem ~= nil then
+        questItem:setDescription(description)
+    end
+    return questItem
+end
+function Quest.prototype.destroy(self)
+    DestroyQuest(self.handle)
+end
+function Quest.prototype.setDescription(self, description)
+    QuestSetDescription(self.handle, description)
+end
+function Quest.prototype.setIcon(self, iconPath)
+    QuestSetIconPath(self.handle, iconPath)
+end
+function Quest.prototype.setTitle(self, title)
+    QuestSetTitle(self.handle, title)
+end
+function Quest.flashQuestDialogButton(self)
+    FlashQuestDialogButton()
+end
+function Quest.forceQuestDialogUpdate(self)
+    ForceQuestDialogUpdate()
+end
+function Quest.fromHandle(self, handle)
+    local ____handle_2
+    if handle then
+        ____handle_2 = self:getObject(handle)
+    else
+        ____handle_2 = nil
+    end
+    return ____handle_2
+end
+__TS__SetDescriptor(
+    Quest.prototype,
+    "completed",
+    {
+        get = function(self)
+            return IsQuestCompleted(self.handle)
+        end,
+        set = function(self, completed)
+            QuestSetCompleted(self.handle, completed)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Quest.prototype,
+    "discovered",
+    {
+        get = function(self)
+            return IsQuestDiscovered(self.handle)
+        end,
+        set = function(self, discovered)
+            QuestSetDiscovered(self.handle, discovered)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Quest.prototype,
+    "enabled",
+    {
+        get = function(self)
+            return IsQuestEnabled(self.handle)
+        end,
+        set = function(self, enabled)
+            QuestSetEnabled(self.handle, enabled)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Quest.prototype,
+    "failed",
+    {
+        get = function(self)
+            return IsQuestFailed(self.handle)
+        end,
+        set = function(self, failed)
+            QuestSetFailed(self.handle, failed)
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Quest.prototype,
+    "required",
+    {
+        get = function(self)
+            return IsQuestRequired(self.handle)
+        end,
+        set = function(self, required)
+            QuestSetRequired(self.handle, required)
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.region"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Region = __TS__Class()
+local Region = ____exports.Region
+Region.name = "Region"
+__TS__ClassExtends(Region, Handle)
+function Region.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateRegion()
+    if handle == nil then
+        Error(nil, "w3ts failed to create rect handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Region.create(self)
+    local handle = CreateRegion()
+    local obj = self:getObject(handle)
+    local values = {}
+    values.handle = handle
+    return __TS__ObjectAssign(obj, values)
+end
+function Region.prototype.addCell(self, x, y)
+    RegionAddCell(self.handle, x, y)
+end
+function Region.prototype.addCellPoint(self, whichPoint)
+    RegionAddCellAtLoc(self.handle, whichPoint.handle)
+end
+function Region.prototype.addRect(self, r)
+    RegionAddRect(self.handle, r.handle)
+end
+function Region.prototype.clearCell(self, x, y)
+    RegionClearCell(self.handle, x, y)
+end
+function Region.prototype.clearCellPoint(self, whichPoint)
+    RegionClearCellAtLoc(self.handle, whichPoint.handle)
+end
+function Region.prototype.clearRect(self, r)
+    RegionClearRect(self.handle, r.handle)
+end
+function Region.prototype.containsCoords(self, x, y)
+    return IsPointInRegion(self.handle, x, y)
+end
+function Region.prototype.containsPoint(self, whichPoint)
+    IsLocationInRegion(self.handle, whichPoint.handle)
+end
+function Region.prototype.containsUnit(self, whichUnit)
+    return IsUnitInRegion(self.handle, whichUnit.handle)
+end
+function Region.prototype.destroy(self)
+    RemoveRegion(self.handle)
+end
+function Region.fromEvent(self)
+    return self:fromHandle(GetTriggeringRegion())
+end
+function Region.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.texttag"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____define = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
+local bj_DEGTORAD = ____define.bj_DEGTORAD
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.TextTag = __TS__Class()
+local TextTag = ____exports.TextTag
+TextTag.name = "TextTag"
+__TS__ClassExtends(TextTag, Handle)
+function TextTag.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateTextTag()
+    if handle == nil then
+        Error(nil, "w3ts failed to create texttag handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function TextTag.create(self)
+    local handle = CreateTextTag()
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function TextTag.prototype.destroy(self)
+    DestroyTextTag(self.handle)
+end
+function TextTag.prototype.setAge(self, age)
+    SetTextTagAge(self.handle, age)
+end
+function TextTag.prototype.setColor(self, red, green, blue, alpha)
+    SetTextTagColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function TextTag.prototype.setFadepoint(self, fadepoint)
+    SetTextTagFadepoint(self.handle, fadepoint)
+end
+function TextTag.prototype.setLifespan(self, lifespan)
+    SetTextTagLifespan(self.handle, lifespan)
+end
+function TextTag.prototype.setPermanent(self, flag)
+    SetTextTagPermanent(self.handle, flag)
+end
+function TextTag.prototype.setPos(self, x, y, heightOffset)
+    SetTextTagPos(self.handle, x, y, heightOffset)
+end
+function TextTag.prototype.setPosUnit(self, u, heightOffset)
+    SetTextTagPosUnit(self.handle, u.handle, heightOffset)
+end
+function TextTag.prototype.setSuspended(self, flag)
+    SetTextTagSuspended(self.handle, flag)
+end
+function TextTag.prototype.setText(self, s, height, adjustHeight)
+    if adjustHeight == nil then
+        adjustHeight = false
+    end
+    if adjustHeight then
+        height = height * 0.0023
+    end
+    SetTextTagText(self.handle, s, height)
+end
+function TextTag.prototype.setVelocity(self, xvel, yvel)
+    SetTextTagVelocity(self.handle, xvel, yvel)
+end
+function TextTag.prototype.setVelocityAngle(self, speed, angle)
+    local vel = speed * 0.071 / 128
+    self:setVelocity(
+        vel * Cos(angle * bj_DEGTORAD),
+        vel * Sin(angle * bj_DEGTORAD)
+    )
+end
+function TextTag.prototype.setVisible(self, flag)
+    SetTextTagVisibility(self.handle, flag)
+end
+function TextTag.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.timer"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Timer = __TS__Class()
+local Timer = ____exports.Timer
+Timer.name = "Timer"
+__TS__ClassExtends(Timer, Handle)
+function Timer.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateTimer()
+    if handle == nil then
+        Error(nil, "w3ts failed to create timer handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Timer.create(self)
+    local handle = CreateTimer()
+    local obj = self:getObject(handle)
+    local values = {}
+    values.handle = handle
+    return __TS__ObjectAssign(obj, values)
+end
+function Timer.prototype.destroy(self)
+    DestroyTimer(self.handle)
+    return self
+end
+function Timer.prototype.pause(self)
+    PauseTimer(self.handle)
+    return self
+end
+function Timer.prototype.resume(self)
+    ResumeTimer(self.handle)
+    return self
+end
+function Timer.prototype.start(self, timeout, periodic, handlerFunc)
+    TimerStart(self.handle, timeout, periodic, handlerFunc)
+    return self
+end
+function Timer.fromExpired(self)
+    return self:fromHandle(GetExpiredTimer())
+end
+function Timer.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+__TS__SetDescriptor(
+    Timer.prototype,
+    "elapsed",
+    {get = function(self)
+        return TimerGetElapsed(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Timer.prototype,
+    "remaining",
+    {get = function(self)
+        return TimerGetRemaining(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Timer.prototype,
+    "timeout",
+    {get = function(self)
+        return TimerGetTimeout(self.handle)
+    end},
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.timerdialog"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.TimerDialog = __TS__Class()
+local TimerDialog = ____exports.TimerDialog
+TimerDialog.name = "TimerDialog"
+__TS__ClassExtends(TimerDialog, Handle)
+function TimerDialog.prototype.____constructor(self, t)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateTimerDialog(t.handle)
+    if handle == nil then
+        Error(nil, "w3ts failed to create timer handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function TimerDialog.create(self, t)
+    local handle = CreateTimerDialog(t.handle)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function TimerDialog.prototype.destroy(self)
+    DestroyTimerDialog(self.handle)
+end
+function TimerDialog.prototype.setSpeed(self, speedMultFactor)
+    TimerDialogSetSpeed(self.handle, speedMultFactor)
+end
+function TimerDialog.prototype.setTimeRemaining(self, value)
+    TimerDialogSetRealTimeRemaining(self.handle, value)
+end
+function TimerDialog.prototype.setTitle(self, title)
+    TimerDialogSetTitle(self.handle, title)
+end
+function TimerDialog.prototype.setTitleColor(self, red, green, blue, alpha)
+    TimerDialogSetTitleColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function TimerDialog.prototype.setTimeColor(self, red, green, blue, alpha)
+    TimerDialogSetTimeColor(
+        self.handle,
+        red,
+        green,
+        blue,
+        alpha
+    )
+end
+function TimerDialog.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+__TS__SetDescriptor(
+    TimerDialog.prototype,
+    "display",
+    {
+        get = function(self)
+            return IsTimerDialogDisplayed(self.handle)
+        end,
+        set = function(self, display)
+            TimerDialogDisplay(self.handle, display)
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.trigger"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local __TS__ObjectDefineProperty = ____lualib.__TS__ObjectDefineProperty
+local ____exports = {}
+local ____define = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
+local bj_MAX_PLAYER_SLOTS = ____define.bj_MAX_PLAYER_SLOTS
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Trigger = __TS__Class()
+local Trigger = ____exports.Trigger
+Trigger.name = "Trigger"
+__TS__ClassExtends(Trigger, Handle)
+function Trigger.prototype.____constructor(self)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateTrigger()
+    if handle == nil then
+        Error(nil, "w3ts failed to create trigger handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Trigger.create(self)
+    local handle = CreateTrigger()
+    local obj = self:getObject(handle)
+    local values = {}
+    values.handle = handle
+    return __TS__ObjectAssign(obj, values)
+end
+function Trigger.prototype.addAction(self, actionFunc)
+    return TriggerAddAction(self.handle, actionFunc)
+end
+function Trigger.prototype.addCondition(self, condition)
+    if type(condition) == "function" then
+        local cf = Condition(condition)
+        return cf ~= nil and TriggerAddCondition(self.handle, cf) or nil
+    end
+    return TriggerAddCondition(self.handle, condition)
+end
+function Trigger.prototype.destroy(self)
+    DestroyTrigger(self.handle)
+end
+function Trigger.prototype.eval(self)
+    return TriggerEvaluate(self.handle)
+end
+function Trigger.prototype.exec(self)
+    return TriggerExecute(self.handle)
+end
+function Trigger.prototype.execWait(self)
+    TriggerExecuteWait(self.handle)
+end
+function Trigger.prototype.registerAnyUnitEvent(self, whichPlayerUnitEvent)
+    do
+        local i = 0
+        while i < bj_MAX_PLAYER_SLOTS do
+            TriggerRegisterPlayerUnitEvent(
+                self.handle,
+                Player(i),
+                whichPlayerUnitEvent,
+                function()
+                    return true
+                end
+            )
+            i = i + 1
+        end
+    end
+end
+function Trigger.prototype.registerDeathEvent(self, whichWidget)
+    return TriggerRegisterDeathEvent(self.handle, whichWidget.handle)
+end
+function Trigger.prototype.registerDialogButtonEvent(self, whichButton)
+    return TriggerRegisterDialogButtonEvent(self.handle, whichButton.handle)
+end
+function Trigger.prototype.registerDialogEvent(self, whichDialog)
+    return TriggerRegisterDialogEvent(self.handle, whichDialog.handle)
+end
+function Trigger.prototype.registerEnterRegion(self, whichRegion, filter)
+    return TriggerRegisterEnterRegion(
+        self.handle,
+        whichRegion.handle,
+        type(filter) == "function" and Filter(filter) or (filter or nil)
+    )
+end
+function Trigger.prototype.registerFilterUnitEvent(self, whichUnit, whichEvent, filter)
+    return TriggerRegisterFilterUnitEvent(
+        self.handle,
+        whichUnit.handle,
+        whichEvent,
+        type(filter) == "function" and Filter(filter) or (filter or nil)
+    )
+end
+function Trigger.prototype.registerGameEvent(self, whichGameEvent)
+    return TriggerRegisterGameEvent(self.handle, whichGameEvent)
+end
+function Trigger.prototype.registerGameStateEvent(self, whichState, opcode, limitval)
+    return TriggerRegisterGameStateEvent(self.handle, whichState, opcode, limitval)
+end
+function Trigger.prototype.registerLeaveRegion(self, whichRegion, filter)
+    return TriggerRegisterLeaveRegion(
+        self.handle,
+        whichRegion.handle,
+        type(filter) == "function" and Filter(filter) or (filter or nil)
+    )
+end
+function Trigger.prototype.registerPlayerAllianceChange(self, whichPlayer, whichAlliance)
+    return TriggerRegisterPlayerAllianceChange(self.handle, whichPlayer.handle, whichAlliance)
+end
+function Trigger.prototype.registerPlayerChatEvent(self, whichPlayer, chatMessageToDetect, exactMatchOnly)
+    return TriggerRegisterPlayerChatEvent(self.handle, whichPlayer.handle, chatMessageToDetect, exactMatchOnly)
+end
+function Trigger.prototype.registerPlayerEvent(self, whichPlayer, whichPlayerEvent)
+    return TriggerRegisterPlayerEvent(self.handle, whichPlayer.handle, whichPlayerEvent)
+end
+function Trigger.prototype.registerPlayerKeyEvent(self, trig, key, status, sync, funcHandle)
+    return DzTriggerRegisterKeyEventByCode(
+        trig,
+        key,
+        status,
+        sync,
+        funcHandle
+    )
+end
+function Trigger.prototype.registerPlayerMouseEvent(self, trig, btn, status, sync, funcHandle)
+    return DzTriggerRegisterMouseEventByCode(
+        trig,
+        btn,
+        status,
+        sync,
+        funcHandle
+    )
+end
+function Trigger.prototype.registerPlayerStateEvent(self, whichPlayer, whichState, opcode, limitval)
+    return TriggerRegisterPlayerStateEvent(
+        self.handle,
+        whichPlayer.handle,
+        whichState,
+        opcode,
+        limitval
+    )
+end
+function Trigger.prototype.registerPlayerUnitEvent(self, whichPlayer, whichPlayerUnitEvent, filter)
+    return TriggerRegisterPlayerUnitEvent(
+        self.handle,
+        whichPlayer.handle,
+        whichPlayerUnitEvent,
+        type(filter) == "function" and Filter(filter) or (filter or nil)
+    )
+end
+function Trigger.prototype.registerTimerEvent(self, timeout, periodic)
+    return TriggerRegisterTimerEvent(self.handle, timeout, periodic)
+end
+function Trigger.prototype.registerTimerExpireEvent(self, t)
+    return TriggerRegisterTimerExpireEvent(self.handle, t)
+end
+function Trigger.prototype.registerTrackableHitEvent(self, whichTrackable)
+    return TriggerRegisterTrackableHitEvent(self.handle, whichTrackable)
+end
+function Trigger.prototype.registerTrackableTrackEvent(self, whichTrackable)
+    return TriggerRegisterTrackableTrackEvent(self.handle, whichTrackable)
+end
+function Trigger.prototype.registerUnitEvent(self, whichUnit, whichEvent)
+    return TriggerRegisterUnitEvent(self.handle, whichUnit.handle, whichEvent)
+end
+function Trigger.prototype.registerUnitInRange(self, whichUnit, range, filter)
+    return TriggerRegisterUnitInRange(
+        self.handle,
+        whichUnit.handle,
+        range,
+        type(filter) == "function" and Filter(filter) or (filter or nil)
+    )
+end
+function Trigger.prototype.registerUnitStateEvent(self, whichUnit, whichState, opcode, limitval)
+    return TriggerRegisterUnitStateEvent(
+        self.handle,
+        whichUnit.handle,
+        whichState,
+        opcode,
+        limitval
+    )
+end
+function Trigger.prototype.registerVariableEvent(self, varName, opcode, limitval)
+    return TriggerRegisterVariableEvent(self.handle, varName, opcode, limitval)
+end
+function Trigger.prototype.removeAction(self, whichAction)
+    return TriggerRemoveAction(self.handle, whichAction)
+end
+function Trigger.prototype.removeActions(self)
+    return TriggerClearActions(self.handle)
+end
+function Trigger.prototype.removeCondition(self, whichCondition)
+    return TriggerRemoveCondition(self.handle, whichCondition)
+end
+function Trigger.prototype.removeConditions(self)
+    return TriggerClearConditions(self.handle)
+end
+function Trigger.prototype.reset(self)
+    ResetTrigger(self.handle)
+end
+function Trigger.fromEvent(self)
+    return self:fromHandle(GetTriggeringTrigger())
+end
+function Trigger.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+__TS__SetDescriptor(
+    Trigger.prototype,
+    "enabled",
+    {
+        get = function(self)
+            return IsTriggerEnabled(self.handle)
+        end,
+        set = function(self, flag)
+            if flag then
+                EnableTrigger(self.handle)
+            else
+                DisableTrigger(self.handle)
+            end
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    Trigger.prototype,
+    "evalCount",
+    {get = function(self)
+        return GetTriggerEvalCount(self.handle)
+    end},
+    true
+)
+__TS__ObjectDefineProperty(
+    Trigger,
+    "eventId",
+    {get = function(self)
+        return GetTriggerEventId()
+    end}
+)
+__TS__SetDescriptor(
+    Trigger.prototype,
+    "execCount",
+    {get = function(self)
+        return GetTriggerExecCount(self.handle)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Trigger.prototype,
+    "waitOnSleeps",
+    {
+        get = function(self)
+            return IsTriggerWaitOnSleeps(self.handle)
+        end,
+        set = function(self, flag)
+            TriggerWaitOnSleeps(self.handle, flag)
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.ubersplat"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.Ubersplat = __TS__Class()
+local Ubersplat = ____exports.Ubersplat
+Ubersplat.name = "Ubersplat"
+__TS__ClassExtends(Ubersplat, Handle)
+function Ubersplat.prototype.____constructor(self, x, y, name, red, green, blue, alpha, forcePaused, noBirthTime)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = CreateUbersplat(
+        x,
+        y,
+        name,
+        red,
+        green,
+        blue,
+        alpha,
+        forcePaused,
+        noBirthTime
+    )
+    if handle == nil then
+        Error(nil, "w3ts failed to create ubersplat handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function Ubersplat.create(self, x, y, name, red, green, blue, alpha, forcePaused, noBirthTime)
+    local handle = CreateUbersplat(
+        x,
+        y,
+        name,
+        red,
+        green,
+        blue,
+        alpha,
+        forcePaused,
+        noBirthTime
+    )
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function Ubersplat.prototype.destroy(self)
+    DestroyUbersplat(self.handle)
+end
+function Ubersplat.prototype.finish(self)
+    FinishUbersplat(self.handle)
+end
+function Ubersplat.prototype.render(self, flag, always)
+    if always == nil then
+        always = false
+    end
+    if always then
+        SetUbersplatRenderAlways(self.handle, flag)
+    else
+        SetUbersplatRender(self.handle, flag)
+    end
+end
+function Ubersplat.prototype.reset(self)
+    ResetUbersplat(self.handle)
+end
+function Ubersplat.prototype.show(self, flag)
+    ShowUbersplat(self.handle, flag)
+end
+function Ubersplat.fromHandle(self, handle)
+    local ____handle_0
+    if handle then
+        ____handle_0 = self:getObject(handle)
+    else
+        ____handle_0 = nil
+    end
+    return ____handle_0
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.weathereffect"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____handle = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+local Handle = ____handle.Handle
+____exports.WeatherEffect = __TS__Class()
+local WeatherEffect = ____exports.WeatherEffect
+WeatherEffect.name = "WeatherEffect"
+__TS__ClassExtends(WeatherEffect, Handle)
+function WeatherEffect.prototype.____constructor(self, where, effectID)
+    if Handle:initFromHandle() then
+        Handle.prototype.____constructor(self)
+        return
+    end
+    local handle = AddWeatherEffect(where.handle, effectID)
+    if handle == nil then
+        Error(nil, "w3ts failed to create unit handle.")
+    end
+    Handle.prototype.____constructor(self, handle)
+end
+function WeatherEffect.create(self, where, effectID)
+    local handle = AddWeatherEffect(where.handle, effectID)
+    if handle ~= nil then
+        local obj = self:getObject(handle)
+        local values = {}
+        values.handle = handle
+        return __TS__ObjectAssign(obj, values)
+    end
+    return nil
+end
+function WeatherEffect.prototype.destroy(self)
+    RemoveWeatherEffect(self.handle)
+end
+function WeatherEffect.prototype.enable(self, flag)
+    EnableWeatherEffect(self.handle, flag)
+end
+function WeatherEffect.fromHandle(self, handle)
+    return self:getObject(handle)
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.handles.index"] = function(...) 
+local ____exports = {}
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.camera")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.destructable")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.dialog")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.effect")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.fogmodifier")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.force")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.frame")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.gamecache")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.group")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.handle")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.image")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.item")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.leaderboard")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.multiboard")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.player")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.point")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.quest")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.rect")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.region")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.sound")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.texttag")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.timer")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.timerdialog")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.trigger")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.ubersplat")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.unit")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.weathereffect")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.widget")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.system.base64"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__StringCharCodeAt = ____lualib.__TS__StringCharCodeAt
+local __TS__StringCharAt = ____lualib.__TS__StringCharAt
+local __TS__StringAccess = ____lualib.__TS__StringAccess
+local __TS__StringSubstr = ____lualib.__TS__StringSubstr
+local ____exports = {}
+---
+-- @noSelfInFile
+local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+--- Encode a string to base64.
+-- 
+-- @param input The string to encode.
+function ____exports.base64Encode(input)
+    local output = ""
+    do
+        local block = 0
+        local charCode = 0
+        local idx = 0
+        local map = chars
+        while true do
+            local ____temp_1 = #__TS__StringCharAt(
+                input,
+                math.floor(idx) | 0
+            ) > 0
+            if not ____temp_1 then
+                map = "="
+                local ____ = map
+                ____temp_1 = idx % 1
+            end
+            if not ____temp_1 then
+                break
+            end
+            local ____input_0 = input
+            idx = idx + 3 / 4
+            charCode = __TS__StringCharCodeAt(
+                ____input_0,
+                math.floor(idx)
+            ) or 0
+            if math.floor(idx) > #input and charCode == 0 then
+                if #output % 4 == 1 then
+                    return output .. "="
+                end
+                return output .. "=="
+            end
+            if charCode > 255 then
+                return output
+            end
+            block = block << 8 | charCode
+            output = output .. __TS__StringCharAt(
+                map,
+                math.floor(63 & block >> 8 - idx % 1 * 8)
+            )
+        end
+    end
+    return output
+end
+--- Decode a base64 string.
+-- 
+-- @param input The base64 string to decode.
+function ____exports.base64Decode(input)
+    local i = #input
+    do
+        while i > 0 and __TS__StringAccess(input, i) ~= "=" do
+            i = i - 1
+        end
+    end
+    local str = __TS__StringSubstr(input, 0, i - 1)
+    local output = ""
+    if #str % 4 == 1 then
+        return output
+    end
+    local bs = 0
+    do
+        local bc = 0
+        local buffer
+        local idx = 0
+        while true do
+            buffer = __TS__StringCharAt(str, idx)
+            if not buffer then
+                break
+            end
+            if #buffer == 0 then
+                break
+            end
+            buffer = (string.find(chars, buffer, nil, true) or 0) - 1
+            idx = idx + 1
+            local ____temp_4
+            local ____temp_3 = ~buffer
+            if ____temp_3 then
+                bs = bc % 4 ~= 0 and bs * 64 + buffer or buffer
+                local ____ = bs
+                local ____bc_2 = bc
+                bc = ____bc_2 + 1
+                ____temp_3 = ____bc_2 % 4 ~= 0
+            end
+            if ____temp_3 then
+                output = output .. string.char(255 & bs >> (-2 * bc & 6))
+                ____temp_4 = output
+            else
+                ____temp_4 = 0
+            end
+        end
+    end
+    return output
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.system.binaryreader"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__StringCharCodeAt = ____lualib.__TS__StringCharCodeAt
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+--- Reads primitive types from a packed binary string.
+-- 
+-- @example ```ts
+-- // Write the values
+-- const writer = new BinaryWriter();
+-- writer.writeUInt8(5);
+-- writer.writeUInt8(32);
+-- writer.writeUInt8(78);
+-- writer.writeUInt8(200);
+-- writer.writeUInt32(12345678);
+-- writer.writeString("hello");
+-- writer.writeUInt16(45000);
+-- 
+-- // Read the values
+-- const binaryString = writer.toString();
+-- const reader = new BinaryReader(binaryString);
+-- const values: any[] = [];
+-- 
+-- values[0] = reader.readUInt8(); // 5
+-- values[1] = reader.readUInt8(); // 32
+-- values[2] = reader.readUInt8(); // 78
+-- values[3] = reader.readUInt8(); // 200
+-- values[4] = reader.readUInt32(); // 12345678
+-- values[5] = reader.readString(); // hello
+-- values[6] = reader.readUInt16(); // 45000
+-- ```
+____exports.BinaryReader = __TS__Class()
+local BinaryReader = ____exports.BinaryReader
+BinaryReader.name = "BinaryReader"
+function BinaryReader.prototype.____constructor(self, binaryString)
+    self.pos = 0
+    self.data = binaryString
+end
+function BinaryReader.prototype.readBytes(self, size)
+    local bytes = {}
+    do
+        local i = 0
+        while i < size do
+            if self.pos + i >= #self.data then
+                bytes[#bytes + 1] = 0
+            else
+                bytes[#bytes + 1] = __TS__StringCharCodeAt(self.data, self.pos + i)
+            end
+            i = i + 1
+        end
+    end
+    self.pos = self.pos + size
+    return bytes
+end
+function BinaryReader.prototype.readDouble(self)
+    local bytes = self:readBytes(8)
+    local arrayBuffer = __TS__New(ArrayBuffer, 8)
+    local view = __TS__New(DataView, arrayBuffer)
+    do
+        local i = 0
+        while i < 8 do
+            view:setUint8(i, bytes[i + 1])
+            i = i + 1
+        end
+    end
+    return view:getFloat64(0, false)
+end
+function BinaryReader.prototype.readFloat(self)
+    local bytes = self:readBytes(4)
+    local arrayBuffer = __TS__New(ArrayBuffer, 4)
+    local view = __TS__New(DataView, arrayBuffer)
+    do
+        local i = 0
+        while i < 4 do
+            view:setUint8(i, bytes[i + 1])
+            i = i + 1
+        end
+    end
+    return view:getFloat32(0, false)
+end
+function BinaryReader.prototype.readInt16(self)
+    local bytes = self:readBytes(2)
+    local arrayBuffer = __TS__New(ArrayBuffer, 2)
+    local view = __TS__New(DataView, arrayBuffer)
+    do
+        local i = 0
+        while i < 2 do
+            view:setUint8(i, bytes[i + 1])
+            i = i + 1
+        end
+    end
+    return view:getInt16(0, false)
+end
+function BinaryReader.prototype.readInt32(self)
+    local bytes = self:readBytes(4)
+    local arrayBuffer = __TS__New(ArrayBuffer, 4)
+    local view = __TS__New(DataView, arrayBuffer)
+    do
+        local i = 0
+        while i < 4 do
+            view:setUint8(i, bytes[i + 1])
+            i = i + 1
+        end
+    end
+    return view:getInt32(0, false)
+end
+function BinaryReader.prototype.readInt8(self)
+    local bytes = self:readBytes(1)
+    local arrayBuffer = __TS__New(ArrayBuffer, 1)
+    local view = __TS__New(DataView, arrayBuffer)
+    view:setUint8(0, bytes[1])
+    return view:getInt8(0)
+end
+function BinaryReader.prototype.readString(self)
+    local result = ""
+    local charCode = __TS__StringCharCodeAt(self.data, self.pos)
+    while charCode ~= 0 and self.pos < #self.data do
+        result = result .. string.char(charCode)
+        self.pos = self.pos + 1
+        charCode = __TS__StringCharCodeAt(self.data, self.pos)
+    end
+    self.pos = self.pos + 1
+    return result
+end
+function BinaryReader.prototype.readUInt16(self)
+    local bytes = self:readBytes(2)
+    local arrayBuffer = __TS__New(ArrayBuffer, 2)
+    local view = __TS__New(DataView, arrayBuffer)
+    do
+        local i = 0
+        while i < 2 do
+            view:setUint8(i, bytes[i + 1])
+            i = i + 1
+        end
+    end
+    return view:getUint16(0, false)
+end
+function BinaryReader.prototype.readUInt32(self)
+    local bytes = self:readBytes(4)
+    local arrayBuffer = __TS__New(ArrayBuffer, 4)
+    local view = __TS__New(DataView, arrayBuffer)
+    do
+        local i = 0
+        while i < 4 do
+            view:setUint8(i, bytes[i + 1])
+            i = i + 1
+        end
+    end
+    return view:getUint32(0, false)
+end
+function BinaryReader.prototype.readUInt8(self)
+    local bytes = self:readBytes(1)
+    return bytes[1]
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.system.binarywriter"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local __TS__StringCharCodeAt = ____lualib.__TS__StringCharCodeAt
+local ____exports = {}
+--- Packs primitive types into a binary string.
+-- 
+-- @example ```ts
+-- // Write the values
+-- const writer = new BinaryWriter();
+-- writer.writeUInt8(5);
+-- writer.writeUInt8(32);
+-- writer.writeUInt8(78);
+-- writer.writeUInt8(200);
+-- writer.writeUInt32(12345678);
+-- writer.writeString("hello");
+-- writer.writeUInt16(45000);
+-- 
+-- // Read the values
+-- const binaryString = writer.toString();
+-- const reader = new BinaryReader(binaryString);
+-- const values: any[] = [];
+-- 
+-- values[0] = reader.readUInt8(); // 5
+-- values[1] = reader.readUInt8(); // 32
+-- values[2] = reader.readUInt8(); // 78
+-- values[3] = reader.readUInt8(); // 200
+-- values[4] = reader.readUInt32(); // 12345678
+-- values[5] = reader.readString(); // hello
+-- values[6] = reader.readUInt16(); // 45000
+-- ```
+____exports.BinaryWriter = __TS__Class()
+local BinaryWriter = ____exports.BinaryWriter
+BinaryWriter.name = "BinaryWriter"
+function BinaryWriter.prototype.____constructor(self)
+    self.buffer = {}
+end
+function BinaryWriter.prototype.__tostring(self)
+    return string.char(table.unpack(self.buffer))
+end
+function BinaryWriter.prototype.writeDouble(self, value)
+    local arrayBuffer = __TS__New(ArrayBuffer, 8)
+    local view = __TS__New(DataView, arrayBuffer)
+    view:setFloat64(0, value, false)
+    do
+        local i = 0
+        while i < 8 do
+            local ____self_buffer_0 = self.buffer
+            ____self_buffer_0[#____self_buffer_0 + 1] = view:getUint8(i)
+            i = i + 1
+        end
+    end
+end
+function BinaryWriter.prototype.writeFloat(self, value)
+    local arrayBuffer = __TS__New(ArrayBuffer, 4)
+    local view = __TS__New(DataView, arrayBuffer)
+    view:setFloat32(0, value, false)
+    do
+        local i = 0
+        while i < 4 do
+            local ____self_buffer_1 = self.buffer
+            ____self_buffer_1[#____self_buffer_1 + 1] = view:getUint8(i)
+            i = i + 1
+        end
+    end
+end
+function BinaryWriter.prototype.writeInt16(self, value)
+    local arrayBuffer = __TS__New(ArrayBuffer, 2)
+    local view = __TS__New(DataView, arrayBuffer)
+    view:setInt16(0, value, false)
+    do
+        local i = 0
+        while i < 2 do
+            local ____self_buffer_2 = self.buffer
+            ____self_buffer_2[#____self_buffer_2 + 1] = view:getUint8(i)
+            i = i + 1
+        end
+    end
+end
+function BinaryWriter.prototype.writeInt32(self, value)
+    local arrayBuffer = __TS__New(ArrayBuffer, 4)
+    local view = __TS__New(DataView, arrayBuffer)
+    view:setInt32(0, value, false)
+    do
+        local i = 0
+        while i < 4 do
+            local ____self_buffer_3 = self.buffer
+            ____self_buffer_3[#____self_buffer_3 + 1] = view:getUint8(i)
+            i = i + 1
+        end
+    end
+end
+function BinaryWriter.prototype.writeInt8(self, value)
+    local arrayBuffer = __TS__New(ArrayBuffer, 1)
+    local view = __TS__New(DataView, arrayBuffer)
+    view:setInt8(0, value)
+    local ____self_buffer_4 = self.buffer
+    ____self_buffer_4[#____self_buffer_4 + 1] = view:getUint8(0)
+end
+function BinaryWriter.prototype.writeString(self, value)
+    do
+        local i = 0
+        while i < #value do
+            local ____self_buffer_5 = self.buffer
+            ____self_buffer_5[#____self_buffer_5 + 1] = __TS__StringCharCodeAt(value, i)
+            i = i + 1
+        end
+    end
+    local ____self_buffer_6 = self.buffer
+    ____self_buffer_6[#____self_buffer_6 + 1] = 0
+end
+function BinaryWriter.prototype.writeUInt16(self, value)
+    local arrayBuffer = __TS__New(ArrayBuffer, 2)
+    local view = __TS__New(DataView, arrayBuffer)
+    view:setUint16(0, value, false)
+    do
+        local i = 0
+        while i < 2 do
+            local ____self_buffer_7 = self.buffer
+            ____self_buffer_7[#____self_buffer_7 + 1] = view:getUint8(i)
+            i = i + 1
+        end
+    end
+end
+function BinaryWriter.prototype.writeUInt32(self, value)
+    local arrayBuffer = __TS__New(ArrayBuffer, 4)
+    local view = __TS__New(DataView, arrayBuffer)
+    view:setUint32(0, value, false)
+    do
+        local i = 0
+        while i < 4 do
+            local ____self_buffer_8 = self.buffer
+            ____self_buffer_8[#____self_buffer_8 + 1] = view:getUint8(i)
+            i = i + 1
+        end
+    end
+end
+function BinaryWriter.prototype.writeUInt8(self, value)
+    local ____self_buffer_9 = self.buffer
+    ____self_buffer_9[#____self_buffer_9 + 1] = value & 255
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.system.file"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+---
+-- @noSelfInFile
+____exports.File = __TS__Class()
+local File = ____exports.File
+File.name = "File"
+function File.prototype.____constructor(self)
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.system.index"] = function(...) 
+local ____exports = {}
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.system.base64")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.system.binaryreader")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.system.binarywriter")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.system.file")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.utils.color"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local __TS__New = ____lualib.__TS__New
+local __TS__NumberToString = ____lualib.__TS__NumberToString
+local ____exports = {}
+local toHex, orderedPlayerColors
+local ____define = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
+local PLAYER_COLOR_AQUA = ____define.PLAYER_COLOR_AQUA
+local PLAYER_COLOR_BLUE = ____define.PLAYER_COLOR_BLUE
+local PLAYER_COLOR_BROWN = ____define.PLAYER_COLOR_BROWN
+local PLAYER_COLOR_CYAN = ____define.PLAYER_COLOR_CYAN
+local PLAYER_COLOR_GREEN = ____define.PLAYER_COLOR_GREEN
+local PLAYER_COLOR_LIGHT_BLUE = ____define.PLAYER_COLOR_LIGHT_BLUE
+local PLAYER_COLOR_LIGHT_GRAY = ____define.PLAYER_COLOR_LIGHT_GRAY
+local PLAYER_COLOR_ORANGE = ____define.PLAYER_COLOR_ORANGE
+local PLAYER_COLOR_PINK = ____define.PLAYER_COLOR_PINK
+local PLAYER_COLOR_PURPLE = ____define.PLAYER_COLOR_PURPLE
+local PLAYER_COLOR_RED = ____define.PLAYER_COLOR_RED
+local PLAYER_COLOR_YELLOW = ____define.PLAYER_COLOR_YELLOW
+function toHex(value)
+    local hex = __TS__NumberToString(value, 16)
+    if #hex < 2 then
+        hex = "0" .. hex
+    end
+    return hex
+end
+____exports.Color = __TS__Class()
+local Color = ____exports.Color
+Color.name = "Color"
+function Color.prototype.____constructor(self, red, green, blue, alpha)
+    self.red = red
+    self.green = green
+    self.blue = blue
+    if alpha then
+        self.alpha = alpha
+    else
+        self.alpha = 255
+    end
+end
+function Color.prototype.equals(self, other)
+    return self.red == other.red and self.green == other.green and self.blue == other.blue and self.alpha == other.alpha
+end
+function Color.prototype.playerColorIndex(self)
+    local i = 0
+    do
+        while i < #____exports.playerColors do
+            if ____exports.playerColors[i + 1]:equals(self) then
+                break
+            end
+            i = i + 1
+        end
+    end
+    return i
+end
+__TS__SetDescriptor(
+    Color.prototype,
+    "code",
+    {get = function(self)
+        return (("|c" .. toHex(self.alpha)) .. toHex(self.red)) .. toHex(self.green) .. toHex(self.blue)
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Color.prototype,
+    "name",
+    {get = function(self)
+        local index = self:playerColorIndex()
+        if index < #____exports.playerColors then
+            return ____exports.playerColorNames[index + 1]
+        end
+        return "unknown"
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Color.prototype,
+    "playerColor",
+    {get = function(self)
+        local index = self:playerColorIndex()
+        if index < #____exports.playerColors then
+            return orderedPlayerColors[index + 1]
+        end
+        return PLAYER_COLOR_RED
+    end},
+    true
+)
+____exports.color = function(red, green, blue, alpha) return __TS__New(
+    ____exports.Color,
+    red,
+    green,
+    blue,
+    alpha
+) end
+--- The player colors sorted by index. Does not include
+-- neutrals colors.
+____exports.playerColors = {
+    ____exports.color(255, 3, 3),
+    ____exports.color(0, 66, 255),
+    ____exports.color(28, 230, 185),
+    ____exports.color(84, 0, 129),
+    ____exports.color(255, 252, 0),
+    ____exports.color(254, 138, 14),
+    ____exports.color(32, 192, 0),
+    ____exports.color(229, 91, 176),
+    ____exports.color(149, 150, 151),
+    ____exports.color(126, 191, 241),
+    ____exports.color(16, 98, 70),
+    ____exports.color(78, 42, 3),
+    ____exports.color(155, 0, 0),
+    ____exports.color(0, 0, 195),
+    ____exports.color(0, 234, 255),
+    ____exports.color(190, 0, 254),
+    ____exports.color(235, 205, 135),
+    ____exports.color(248, 164, 139),
+    ____exports.color(191, 255, 128),
+    ____exports.color(220, 185, 235),
+    ____exports.color(80, 79, 85),
+    ____exports.color(235, 240, 255),
+    ____exports.color(0, 120, 30),
+    ____exports.color(164, 111, 51)
+}
+--- The names of players colors sorted by player index.
+____exports.playerColorNames = {
+    "red",
+    "blue",
+    "teal",
+    "purple",
+    "yellow",
+    "orange",
+    "green",
+    "pink",
+    "gray",
+    "light blue",
+    "dark green",
+    "brown",
+    "maroon",
+    "navy",
+    "turquoise",
+    "violet",
+    "wheat",
+    "peach",
+    "mint",
+    "lavender",
+    "coal",
+    "snow",
+    "emerald",
+    "peanut"
+}
+--- An ordered list of `playercolor`s, for lookup
+orderedPlayerColors = {
+    PLAYER_COLOR_RED,
+    PLAYER_COLOR_BLUE,
+    PLAYER_COLOR_CYAN,
+    PLAYER_COLOR_PURPLE,
+    PLAYER_COLOR_YELLOW,
+    PLAYER_COLOR_ORANGE,
+    PLAYER_COLOR_GREEN,
+    PLAYER_COLOR_PINK,
+    PLAYER_COLOR_LIGHT_GRAY,
+    PLAYER_COLOR_LIGHT_BLUE,
+    PLAYER_COLOR_AQUA,
+    PLAYER_COLOR_BROWN
+}
+return ____exports
+ end,
+["lua_modules.@eiriksgata.wc3ts.src.utils.index"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Promise = ____lualib.__TS__Promise
 local __TS__New = ____lualib.__TS__New
 local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
 local __TS__Await = ____lualib.__TS__Await
 local ____exports = {}
-local ____core = require("src.core.index")
-local Application = ____core.Application
-local ____EventService = require("src.services.EventService")
-local EventService = ____EventService.EventService
-local ____UnitService = require("src.services.UnitService")
-local UnitService = ____UnitService.UnitService
-local ____start = require("src.map.start")
-local mapInit = ____start.mapInit
---- 应用程序主入口
--- 负责引导整个应用程序的启动
-local function main()
+local ____timer = require("lua_modules.@eiriksgata.wc3ts.src.handles.timer")
+local Timer = ____timer.Timer
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.utils.color")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+function ____exports.sleep(howMuch)
     return __TS__AsyncAwaiter(function(____awaiter_resolve)
-        local ____try = __TS__AsyncAwaiter(function()
-            local app = Application:getInstance()
-            app:registerService(__TS__New(EventService))
-            app:registerService(__TS__New(UnitService))
-            __TS__Await(app:initialize())
-            DisplayTextToPlayer(
-                Player(0),
-                0,
-                0,
-                ">>> Application initialized"
+        return ____awaiter_resolve(
+            nil,
+            __TS__New(
+                __TS__Promise,
+                function(____, resolve, reject)
+                    local t = Timer:create()
+                    t:start(
+                        howMuch,
+                        false,
+                        function()
+                            t:destroy()
+                            resolve(nil, nil)
+                        end
+                    )
+                end
             )
-            print(">>> Starting map logic...")
-            mapInit(app)
-            print(">>> Map logic initialized")
-        end)
-        __TS__Await(____try.catch(
-            ____try,
-            function(____, ____error)
-                print(">>> Failed to start application: " .. tostring(____error))
-            end
-        ))
+        )
     end)
 end
-main()
 return ____exports
  end,
-["src.runtime"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
-local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
-local ____exports = {}
-local ____ydlua = require("src.lib.ydlua")
-local ydcommon = ____ydlua.ydcommon
-local ydconsole = ____ydlua.ydconsole
-local ydjapi = ____ydlua.ydjapi
-local ydruntime = ____ydlua.ydruntime
-function ____exports.initConsole(isDebug)
-    if isDebug == nil then
-        isDebug = true
-    end
-    ydconsole.enable = isDebug
-end
-function ____exports.env(isDebug)
-    if isDebug == nil then
-        isDebug = true
-    end
-    ____exports.initConsole(isDebug)
-    _G.print = ydconsole.write
-    ydruntime.console = isDebug
-    ydruntime.sleep = false
-    ydruntime.debugger = 4279
-    ydruntime.catch_crash = isDebug
-    ydruntime.error_hanlde = function(self, msg)
-        print("========lua-err========")
-        print(tostring(msg))
-        print("=========================")
-    end
-    __TS__ArrayForEach(
-        __TS__ObjectKeys(ydcommon),
-        function(____, v)
-            _G[v] = ydcommon[v]
-        end
-    )
-    __TS__ArrayForEach(
-        __TS__ObjectKeys(ydjapi),
-        function(____, v)
-            _G[v] = ydjapi[v]
-        end
-    )
-end
-return ____exports
- end,
-["src.lib.const"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.globals.const"] = function(...) 
 local ____exports = {}
 ____exports.EPlayerColor = EPlayerColor or ({})
 ____exports.EPlayerColor.COLOR1 = "|cFFFF0303"
@@ -4483,89 +10280,256 @@ ____exports.EPlayerColor.COLOR15 = "|cFF282828"
 ____exports.EPlayerColor.COLOR16 = "|cFF282828"
 return ____exports
  end,
-["src.modules.AutoSaveModule"] = function(...) 
+["lua_modules.@eiriksgata.wc3ts.src.index"] = function(...) 
+local ____exports = {}
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.handles.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.system.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.utils.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.const")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.order")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+____exports.Players = {}
+return ____exports
+ end,
+["src.types.index"] = function(...) 
+local ____exports = {}
+return ____exports
+ end,
+["src.config.index"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- 自动保存模块
--- 展示如何创建可插拔的游戏模块
-____exports.AutoSaveModule = __TS__Class()
-local AutoSaveModule = ____exports.AutoSaveModule
-AutoSaveModule.name = "AutoSaveModule"
-function AutoSaveModule.prototype.____constructor(self)
-    self.name = "AutoSaveModule"
-    self._enabled = false
-    self.saveInterval = 60
+--- 默认应用配置
+local DEFAULT_CONFIG = {debug = true, console = true, runtime = {debuggerPort = 4279, sleep = false, catchCrash = true}, map = {name = "WC3 TypeScript Map", version = "1.0.0", description = "A Warcraft III map built with TypeScript"}}
+--- 配置管理器
+-- 提供应用程序配置的统一管理
+____exports.ConfigManager = __TS__Class()
+local ConfigManager = ____exports.ConfigManager
+ConfigManager.name = "ConfigManager"
+function ConfigManager.prototype.____constructor(self)
+    self.config = __TS__ObjectAssign({}, DEFAULT_CONFIG)
 end
-function AutoSaveModule.prototype.enable(self)
-    if self._enabled then
-        print(self.name .. " is already enabled")
-        return
+function ConfigManager.getInstance(self)
+    if not ____exports.ConfigManager.instance then
+        ____exports.ConfigManager.instance = __TS__New(____exports.ConfigManager)
     end
-    print((">>> Enabling " .. self.name) .. "...")
-    self.saveTimer = CreateTimer()
-    TimerStart(
-        self.saveTimer,
-        self.saveInterval,
-        true,
-        function()
-            self:performAutoSave()
-        end
-    )
-    self._enabled = true
-    print((((">>> " .. self.name) .. " enabled with interval ") .. tostring(self.saveInterval)) .. "s")
+    return ____exports.ConfigManager.instance
 end
-function AutoSaveModule.prototype.disable(self)
-    if not self._enabled then
-        print(self.name .. " is already disabled")
-        return
-    end
-    print((">>> Disabling " .. self.name) .. "...")
-    if self.saveTimer then
-        DestroyTimer(self.saveTimer)
-        self.saveTimer = nil
-    end
-    self._enabled = false
-    print((">>> " .. self.name) .. " disabled")
+function ConfigManager.prototype.getConfig(self)
+    return __TS__ObjectAssign({}, self.config)
 end
-function AutoSaveModule.prototype.setSaveInterval(self, seconds)
-    self.saveInterval = seconds
-    if self._enabled and self.saveTimer then
-        self:disable()
-        self:enable()
-    end
-    print((">>> Auto-save interval set to " .. tostring(seconds)) .. "s")
+function ConfigManager.prototype.isDebugMode(self)
+    return self.config.debug
 end
-function AutoSaveModule.prototype.performAutoSave(self)
-    print(">>> Performing auto-save...")
+function ConfigManager.prototype.isConsoleEnabled(self)
+    return self.config.console
+end
+function ConfigManager.prototype.getRuntimeConfig(self)
+    return __TS__ObjectAssign({}, self.config.runtime)
+end
+function ConfigManager.prototype.getMapConfig(self)
+    return __TS__ObjectAssign({}, self.config.map)
+end
+function ConfigManager.prototype.updateConfig(self, updates)
+    self.config = __TS__ObjectAssign({}, self.config, updates)
+end
+function ConfigManager.prototype.resetToDefault(self)
+    self.config = __TS__ObjectAssign({}, DEFAULT_CONFIG)
+end
+return ____exports
+ end,
+["src.ydlua.index"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
+local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
+local ____exports = {}
+local ____define = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local bj_MAX_PLAYER_SLOTS = ____define.bj_MAX_PLAYER_SLOTS
+local MapPlayer = ____define.MapPlayer
+local Players = ____define.Players
+local ____config = require("src.config.index")
+local ConfigManager = ____config.ConfigManager
+local ydcommon = require("jass.common")
+local ydai = require("jass.ai")
+local ydglobals = require("jass.globals")
+local ydjapi = require("jass.japi")
+local ydhook = require("jass.hook")
+local ydruntime = require("jass.runtime")
+local ydslk = require("jass.slk")
+local ydconsole = require("jass.console")
+local yddebug = require("jass.debug")
+local ydlog = require("jass.log")
+local ydmessage = require("jass.message")
+local ydbignum = require("jass.bignum")
+____exports.ydlua = __TS__Class()
+local ydlua = ____exports.ydlua
+ydlua.name = "ydlua"
+function ydlua.prototype.____constructor(self)
+    self.configManager = ConfigManager:getInstance()
+end
+function ydlua.getInstance(self)
+    if not ____exports.ydlua.instance then
+        ____exports.ydlua.instance = __TS__New(____exports.ydlua)
+    end
+    return ____exports.ydlua.instance
+end
+function ydlua.prototype.initializeRuntime(self)
+    local config = self.configManager:getConfig()
+    local runtimeConfig = config.runtime
+    ydruntime.console = config.console
+    ydruntime.sleep = runtimeConfig.sleep
+    ydruntime.debugger = runtimeConfig.debuggerPort
+    ydruntime.catch_crash = runtimeConfig.catchCrash
+    ydruntime.error_hanlde = function(self, msg)
+        print("========lua-err========")
+        print(tostring(msg))
+        print("=========================")
+    end
+    print(((">>> Runtime configured: debugger=" .. tostring(runtimeConfig.debuggerPort)) .. ", crash_catch=") .. tostring(runtimeConfig.catchCrash))
+end
+function ydlua.prototype.initialize(self)
+    self:initializeConsole()
+    self:initializeRuntime()
+    self:registerGlobals()
     do
         local i = 0
-        while i < 12 do
-            local player = Player(i)
-            DisplayTextToPlayer(player, 0, 0, "Game auto-saved")
+        while i < bj_MAX_PLAYER_SLOTS do
+            local pl = MapPlayer:fromHandle(Player(i))
+            if pl then
+                Players[i + 1] = pl
+            end
             i = i + 1
         end
     end
-    print(">>> Auto-save completed")
 end
-__TS__SetDescriptor(
-    AutoSaveModule.prototype,
-    "enabled",
-    {get = function(self)
-        return self._enabled
-    end},
-    true
-)
+function ydlua.prototype.initializeConsole(self)
+    local isConsoleEnabled = self.configManager:isConsoleEnabled()
+    ydconsole.enable = isConsoleEnabled
+    if isConsoleEnabled then
+        _G.print = function(message) return ydconsole.write(message) end
+        print(">>> Console enabled")
+    end
+end
+function ydlua.prototype.registerGlobals(self)
+    __TS__ArrayForEach(
+        __TS__ObjectKeys(ydcommon),
+        function(____, key)
+            _G[key] = ydcommon[key]
+        end
+    )
+    __TS__ArrayForEach(
+        __TS__ObjectKeys(ydjapi),
+        function(____, key)
+            _G[key] = ydjapi[key]
+        end
+    )
+    print(">>> Global APIs registered")
+end
 return ____exports
  end,
-["src.modules.index"] = function(...) 
+["src.utils.helper"] = function(...) 
 local ____exports = {}
-do
-    local ____AutoSaveModule = require("src.modules.AutoSaveModule")
-    ____exports.AutoSaveModule = ____AutoSaveModule.AutoSaveModule
+function ____exports.c2i(char)
+    return (string.unpack(">I4", char))
 end
+function ____exports.i2c(id)
+    return string.pack("I4", id)
+end
+function ____exports.FourCC(id)
+    return ____exports.c2i(id)
+end
+return ____exports
+ end,
+["src.main"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
+local __TS__Await = ____lualib.__TS__Await
+local ____exports = {}
+local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Unit = _____2A.Unit
+local Players = _____2A.Players
+local ____ydlua = require("src.ydlua.index")
+local ydlua = ____ydlua.ydlua
+local ____helper = require("src.utils.helper")
+local FourCC = ____helper.FourCC
+--- 应用程序主入口
+-- 负责引导整个应用程序的启动
+local function main()
+    return __TS__AsyncAwaiter(function(____awaiter_resolve)
+        print("hello ts")
+        DisplayTextToPlayer(
+            Player(0),
+            0,
+            0,
+            "hello ts"
+        )
+        local unit = Unit:create(
+            Players[1],
+            FourCC("hfoo"),
+            0,
+            0,
+            0
+        )
+        print("Created unit: " .. unit.name)
+    end)
+end
+ydlua:getInstance():initialize()
+main()
 return ____exports
  end,
 }
-return require("src.index", ...)
+return require("src.main", ...)

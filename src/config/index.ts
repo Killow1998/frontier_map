@@ -1,4 +1,5 @@
-import { AppConfig } from '../types';
+import { AppConfig } from "../types";
+
 
 /**
  * 默认应用配置
