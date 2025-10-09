@@ -2,6 +2,5 @@ node_modules
 
 temp
 
-*.w3x
-*.w3m
-*.log
+dev_lib/w3x2lni/log/report.log
+dist/map.w3x
