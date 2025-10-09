@@ -10500,10 +10500,12 @@ return ____exports
  end,
 ["src.main"] = function(...) 
 local ____lualib = require("lualib_bundle")
+local __TS__New = ____lualib.__TS__New
 local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
 local __TS__Await = ____lualib.__TS__Await
 local ____exports = {}
 local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Effect = _____2A.Effect
 local Unit = _____2A.Unit
 local Players = _____2A.Players
 local ____ydlua = require("src.ydlua.index")
@@ -10529,6 +10531,21 @@ local function main()
             0
         )
         print("Created unit: " .. unit.name)
+        SetCameraTargetController(unit.handle, 0, 0, true)
+        SetCameraQuickPosition(
+            GetUnitX(unit.handle),
+            GetUnitY(unit.handle)
+        )
+        local effect = __TS__New(
+            Effect,
+            "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdl",
+            GetUnitX(unit.handle),
+            GetUnitY(unit.handle)
+        )
+        effect:setHeight(100)
+        effect:setYaw(0)
+        effect:setPitch(0)
+        effect:setRoll(0)
     end)
 end
 ydlua:getInstance():initialize()
