@@ -9,7 +9,7 @@
     "build": "ts-node --project tsconfig.node.json scripts/build.ts build",
     "build:debug": "ts-node --project tsconfig.node.json scripts/build.ts dev",
     "test": "ts-node --project tsconfig.node.json scripts/build.ts && ts-node --project tsconfig.node.json scripts/test.ts",
-    "build:map": "w2l obj maps dist/map.w3x",
+    "build:map": "dev_lib/w3x2lni/w2l.exe obj maps dist/map.w3x",
     "test:map": "dev_lib/KKWE/bin/YDWEConfig.exe -launchwar3 -loadfile \"./dist/map.w3x\""
   },
   "keywords": [],

@@ -1,9 +1,9 @@
-输入路径：D:/work/github/wc3-map-ts-template/maps/map
+输入路径：D:/work/github/wc3-map-ts-template/maps
 输出路径：D:/work/github/wc3-map-ts-template/dist/map.w3x
-输入格式：Dir
+输入格式：Lni
 输出模式：obj
 结果：0 个错误，0 条警告
-用时：0.846 秒
+用时：0.913 秒
 ==========================
 无效的物编数据 (7)
 ==========================

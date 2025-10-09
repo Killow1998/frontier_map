@@ -56,7 +56,7 @@ export function buildW3x(): void {
   }
   ensureDirectoryExists("dist");
   try {
-    execSync(`"${w2lPath}/w2l.exe" obj ./maps/map ./dist/map.w3x`);
+    execSync(`"${w2lPath}/w2l.exe" obj ./maps ./dist/map.w3x`);
     console.log(">>> w2l build obj completed");
   } catch (error) {
     console.error("Error during w2l build obj:", error);

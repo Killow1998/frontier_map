@@ -1,9 +1,9 @@
-Date: 2024-04-09 09:58:39
+Date: 2024-04-12 22:01:32
 Version: 2.7.2
 Commit: 654f1a6ac5fff792be4c1760a8e11e8529107e9e
 Stack:
 ----------------------------------------
-E:\github\src\h-lua-sdk\depend\w3x2lni\bin\w3x2lni-lua.exe: .\core\slk/frontend_lni.lua:26: 
+D:\work\github\h-lua-sdk\depend\w3x2lni\bin\w3x2lni-lua.exe: .\core\slk/frontend_lni.lua:26: 
 misc:31: '=' expected near '.'
 stack traceback:
 	[C]: in function 'lni'
@@ -14,7 +14,7 @@ stack traceback:
 	.\backend\cli\obj.lua:4: in function 'backend.cli.obj'
 	.\backend\init.lua:12: in main chunk
 	[C]: in function 'require'
-	E:\github\src\h-lua-sdk\depend\w3x2lni\script\main.lua:2: in main chunk
+	D:\work\github\h-lua-sdk\depend\w3x2lni\script\main.lua:2: in main chunk
 	[C]: in ?
 
 ----------------------------------------
