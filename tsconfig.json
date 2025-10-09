@@ -6,7 +6,6 @@
     ],
     "moduleResolution": "bundler",
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
     "paths": {
       "@eiriksgata/wc3ts/*": [
         "node_modules/@eiriksgata/wc3ts/src"

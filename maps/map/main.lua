@@ -10280,6 +10280,34 @@ ____exports.EPlayerColor.COLOR15 = "|cFF282828"
 ____exports.EPlayerColor.COLOR16 = "|cFF282828"
 return ____exports
  end,
+["lua_modules.@eiriksgata.wc3ts.src.globals.index"] = function(...) 
+local ____exports = {}
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.const")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.order")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+return ____exports
+ end,
 ["lua_modules.@eiriksgata.wc3ts.src.index"] = function(...) 
 local ____exports = {}
 do
@@ -10307,31 +10335,7 @@ do
     end
 end
 do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.const")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.order")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.define")
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.globals.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
