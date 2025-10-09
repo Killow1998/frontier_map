@@ -4,3 +4,6 @@ temp
 
 dev_lib/w3x2lni/log/report.log
 dist/map.w3x
+*.log
+*.w3x
+*.w3m
