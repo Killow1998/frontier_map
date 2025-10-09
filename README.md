@@ -20,14 +20,15 @@ KKWE 该项目不一定是最新的，可自行升级 KKWE
 2. 血条 UI
 3. 伤害系统
 4. 部分技能系统
-5. 更多..
+5. 热更新
+6. excel 物编
 
 ## 开发环境
 
 1. KKWE
 2. w3x2lni
-3. node
-4. yarn
+3. nodejs
+4. npm | yarn
 5. War3 1.27a
 
 ## 项目初始化

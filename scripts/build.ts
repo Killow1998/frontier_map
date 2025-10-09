@@ -98,77 +98,6 @@ function minifyLua(): void {
   }
 }
 
-/**
- * 清理 temp 文件夹
- */
-function cleanTempFolder(): void {
-  if (fs.existsSync("temp")) {
-    fs.rmSync("temp", { recursive: true, force: true });
-    console.log(">>> Cleaned temp folder");
-  }
-}
-
-/**
- * 准备源文件到 temp 文件夹
- */
-function prepareSourceFiles(): void {
-  try {
-    // 清理并创建 temp 文件夹
-    cleanTempFolder();
-    ensureDirectoryExists("temp");
-
-    // 复制项目的 src 文件
-    console.log(">>> Copying project source files to temp folder...");
-    copyDir("src", "temp");
-
-    // 复制 wc3ts 的文件，但要避免覆盖项目文件
-    console.log(">>> Merging @eiriksgata/wc3ts files to temp folder...");
-    const wc3tsPath = "node_modules/@eiriksgata/wc3ts";
-    if (fs.existsSync(wc3tsPath)) {
-      mergeWc3tsFiles(wc3tsPath, "temp");
-    } else {
-      console.warn("Warning: @eiriksgata/wc3ts not found in node_modules");
-    }
-
-    console.log(">>> Source files preparation completed");
-  } catch (error) {
-    console.error("Error during source files preparation:", error);
-    process.exit(1);
-  }
-}
-
-/**
- * 合并 wc3ts 文件到 temp 目录，避免覆盖项目文件
- */
-function mergeWc3tsFiles(wc3tsPath: string, tempPath: string): void {
-  const entries = fs.readdirSync(wc3tsPath, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const srcPath = path.join(wc3tsPath, entry.name);
-    const destPath = path.join(tempPath, entry.name);
-
-    // 跳过一些不需要的文件
-    if (entry.name === 'package.json' || entry.name === 'README.md' ||
-      entry.name === 'LICENSE' || entry.name === 'node_modules') {
-      continue;
-    }
-
-    if (entry.isDirectory()) {
-      // 如果目标目录不存在，直接复制整个目录
-      if (!fs.existsSync(destPath)) {
-        copyDir(srcPath, destPath);
-      } else {
-        // 如果目标目录存在，递归合并
-        mergeWc3tsFiles(srcPath, destPath);
-      }
-    } else {
-      // 只有当目标文件不存在时才复制（项目文件优先）
-      if (!fs.existsSync(destPath)) {
-        fs.copyFileSync(srcPath, destPath);
-      }
-    }
-  }
-}
 
 /**
  * 将 TypeScript 编译为 Lua
@@ -215,9 +144,6 @@ function compileTypeScriptToLua(): void {
  */
 function main(): void {
   console.log(`>>> Starting build process (${isDev ? 'development' : 'production'} mode)`);
-
-  // 1. 准备源文件到 temp 文件夹
-  //prepareSourceFiles();
 
   // 2. 编译 TypeScript 到 Lua
   compileTypeScriptToLua();
