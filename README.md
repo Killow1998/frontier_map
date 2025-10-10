@@ -39,22 +39,24 @@ KKWE 该项目不一定是最新的，可自行升级 KKWE
 ## 主要项目依赖
 
 1. [@eiriksgata/wc3ts](https://github.com/eiriksgata/wc3ts)
-2. fs-extra
-3. luamin
-4. ts-node
-5. typescript-to-lua
-6. ....
+2. luamin
+3. ts-node
+4. typescript-to-lua
 
 ## 编译
 
-`yarn build`
+命令： `yarn build`
 生成的 tstl lua 文件 自动放置于 maps/map/main.lua
 编译 打包生成的 文件 位于 dist/map.w3x
 
 ## 运行测试
 
-`yarn run test`
+命令： `yarn run test`
 编译并且运行 dist/map.w3x 地图
+
+## 更多功能
+
+参考 `package.json` 的 `scripts`
 
 ## 目录结构
 
@@ -65,4 +67,20 @@ KKWE 该项目不一定是最新的，可自行升级 KKWE
 - `src` 地图源文件 ，入口文件为 `main.ts`
 - `config.json` 配置环境目录
 
-## 欢迎 PR
+## excel 原生物编（未实现）
+
+- native-object-table.xlsx 该文件为原生物编数据表格，可自行拓展定义的属性。转换本质是将 excel 数据 转为 lni 数据，通过 w3x2lni 打包成地图数据。
+
+通过 nodejs 脚本对 表格转为 lni 数据。
+
+## 自定义框架数据（未实现）
+
+**_该系统需要依赖于框架系统，本质是舍弃了魔兽原生物编定义，舍弃魔兽原生的伤害系统，舍弃原生 UI 等，改为自身实现一套新的系统。该实现依赖于 诸多模块 自己重新实现的模块，例如 游戏伤害系统，单位属性面板 UI，单位自身血条等。_**
+
+- custom-frame-table.xlsx 文件
+
+## AI Agent - Github copilot
+
+- `./github/copilot-instructions.md`
+
+## Welcome PR
