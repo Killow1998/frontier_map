@@ -3753,7 +3753,7 @@ function Destructable.create(self, objectId, x, y, face, scale, variation, skinI
             variation
         )
     end
-    if handle then
+    if handle ~= nil then
         local obj = self:getObject(handle)
         local values = {}
         values.handle = handle
@@ -3786,7 +3786,7 @@ function Destructable.createZ(self, objectId, x, y, z, face, scale, variation, s
             variation
         )
     end
-    if handle then
+    if handle ~= nil then
         local obj = self:getObject(handle)
         local values = {}
         values.handle = handle
@@ -4587,7 +4587,7 @@ function Frame.prototype.____constructor(self, name, owner, priority, createCont
 end
 function Frame.create(self, name, owner, priority, createContext)
     local handle = DzCreateFrame(name, owner.handle, priority)
-    if handle then
+    if handle ~= nil then
         local obj = self:getObject(handle)
         local values = {}
         values.handle = handle
@@ -4597,7 +4597,7 @@ function Frame.create(self, name, owner, priority, createContext)
 end
 function Frame.createSimple(self, name, owner, createContext)
     local handle = DzCreateSimpleFrame(name, owner.handle, createContext)
-    if handle then
+    if handle ~= nil then
         local obj = self:getObject(handle)
         local values = {}
         values.handle = handle
@@ -4613,17 +4613,13 @@ function Frame.createType(self, name, owner, createContext, typeName, inherits)
         inherits,
         createContext
     )
-    if handle then
+    if handle ~= nil then
         local obj = self:getObject(handle)
         local values = {}
         values.handle = handle
         return __TS__ObjectAssign(obj, values)
     end
     return nil
-end
-function Frame.prototype.addText(self, text)
-    BlzFrameAddText(self.handle, text)
-    return self
 end
 function Frame.prototype.cageMouse(self, enable)
     DzFrameCageMouse(self.handle, enable)
@@ -4640,9 +4636,6 @@ end
 function Frame.prototype.destroy(self)
     DzDestroyFrame(self.handle)
     return self
-end
-function Frame.prototype.getChild(self, index)
-    return ____exports.Frame:fromHandle(BlzFrameGetChild(self.handle, index))
 end
 function Frame.prototype.setAbsPoint(self, point, x, y)
     DzFrameSetAbsolutePoint(self.handle, point, x, y)
@@ -4670,10 +4663,6 @@ function Frame.prototype.setFont(self, filename, height, flags)
 end
 function Frame.prototype.setHeight(self, height)
     DzFrameSetSize(self.handle, self.width, height)
-    return self
-end
-function Frame.prototype.setLevel(self, level)
-    BlzFrameSetLevel(self.handle, level)
     return self
 end
 function Frame.prototype.setMinMaxValue(self, minValue, maxValue)
@@ -4714,10 +4703,6 @@ function Frame.prototype.setSize(self, width, height)
     DzFrameSetSize(self.handle, width, height)
     return self
 end
-function Frame.prototype.setSpriteAnimate(self, primaryProp, flags)
-    BlzFrameSetSpriteAnimate(self.handle, primaryProp, flags)
-    return self
-end
 function Frame.prototype.setStepSize(self, stepSize)
     DzFrameSetStepSize(self.handle, stepSize)
     return self
@@ -4726,20 +4711,12 @@ function Frame.prototype.setText(self, text)
     DzFrameSetText(self.handle, text)
     return self
 end
-function Frame.prototype.setTextColor(self, color)
-    BlzFrameSetTextColor(self.handle, color)
-    return self
-end
 function Frame.prototype.setTextSizeLimit(self, size)
     DzFrameSetTextSizeLimit(self.handle, size)
     return self
 end
 function Frame.prototype.setTexture(self, texFile, flag, blend)
     DzFrameSetTexture(self.handle, texFile, flag)
-    return self
-end
-function Frame.prototype.setTooltip(self, tooltip)
-    BlzFrameSetTooltip(self.handle, tooltip.handle)
     return self
 end
 function Frame.prototype.setValue(self, value)
@@ -4758,12 +4735,6 @@ function Frame.prototype.setWidth(self, width)
     DzFrameSetSize(self.handle, width, self.height)
     return self
 end
-function Frame.autoPosition(self, enable)
-    BlzEnableUIAutoPosition(enable)
-end
-function Frame.fromEvent(self)
-    return self:fromHandle(BlzGetTriggerFrame())
-end
 function Frame.fromHandle(self, handle)
     local ____handle_0
     if handle then
@@ -4775,21 +4746,6 @@ function Frame.fromHandle(self, handle)
 end
 function Frame.fromName(self, name, createContext)
     return self:fromHandle(DzFrameFindByName(name, createContext))
-end
-function Frame.fromOrigin(self, frameType, index)
-    return self:fromHandle(BlzGetOriginFrame(frameType, index))
-end
-function Frame.getEventHandle(self)
-    return BlzGetTriggerFrameEvent()
-end
-function Frame.getEventText(self)
-    return BlzGetTriggerFrameValue()
-end
-function Frame.getEventValue(self)
-    return BlzGetTriggerFrameValue()
-end
-function Frame.hideOrigin(self, enable)
-    BlzHideOriginFrames(enable)
 end
 function Frame.loadTOC(self, filename)
     return DzLoadToc(filename)
@@ -4805,34 +4761,6 @@ __TS__SetDescriptor(
             DzFrameSetAlpha(self.handle, alpha)
         end
     },
-    true
-)
-__TS__SetDescriptor(
-    Frame.prototype,
-    "children",
-    {get = function(self)
-        local count = self.childrenCount
-        local output = {}
-        do
-            local i = 0
-            while i < count do
-                local child = self:getChild(i)
-                if child then
-                    output[#output + 1] = child
-                end
-                i = i + 1
-            end
-        end
-        return output
-    end},
-    true
-)
-__TS__SetDescriptor(
-    Frame.prototype,
-    "childrenCount",
-    {get = function(self)
-        return BlzFrameGetChildrenCount(self.handle)
-    end},
     true
 )
 __TS__SetDescriptor(
@@ -4916,27 +4844,17 @@ __TS__SetDescriptor(
 __TS__SetDescriptor(
     Frame.prototype,
     "visible",
-    {
-        get = function(self)
-            return BlzFrameIsVisible(self.handle)
-        end,
-        set = function(self, flag)
-            DzFrameShow(self.handle, flag)
-        end
-    },
+    {set = function(self, flag)
+        DzFrameShow(self.handle, flag)
+    end},
     true
 )
 __TS__SetDescriptor(
     Frame.prototype,
     "width",
-    {
-        get = function(self)
-            return BlzFrameGetWidth(self.handle)
-        end,
-        set = function(self, width)
-            DzFrameSetSize(self.handle, width, self.height)
-        end
-    },
+    {set = function(self, width)
+        DzFrameSetSize(self.handle, width, self.height)
+    end},
     true
 )
 return ____exports
@@ -7121,6 +7039,9 @@ function Unit.isUnitIdHero(self, unitId)
 end
 function Unit.isUnitIdType(self, unitId, whichUnitType)
     return IsUnitIdType(unitId, whichUnitType)
+end
+function Unit.prototype.setPreselectUIVisible(self, value)
+    DzSetUnitPreselectUIVisible(self.handle, value)
 end
 __TS__SetDescriptor(
     Unit.prototype,
@@ -10219,6 +10140,282 @@ orderedPlayerColors = {
 }
 return ____exports
  end,
+["lua_modules.@eiriksgata.wc3ts.src.utils.kkwe"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local Map = ____lualib.Map
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+function ____exports.DzSetHeroTypeProperName(uid, name)
+    EXSetUnitArrayString(uid, 61, 0, name)
+    EXSetUnitInteger(uid, 61, 1)
+end
+--- 设置单位类型名称
+-- 设置单位类型ID${单位ID}的名称为${名称}
+-- 修改单位类型的显示名称
+function ____exports.DzSetUnitTypeName(uid, name)
+    EXSetUnitArrayString(uid, 10, 0, name)
+    EXSetUnitInteger(uid, 10, 1)
+end
+--- 判断单位攻击类型
+-- 判断${单位}的第${索引}个攻击是否为${攻击类型}
+-- 检查单位指定索引的攻击类型
+function ____exports.DzIsUnitAttackType(whichUnit, index, attackType)
+    return ConvertAttackType(math.floor(GetUnitState(
+        whichUnit,
+        ConvertUnitState(16 + 19 * index)
+    ))) == attackType
+end
+--- 设置单位攻击类型
+-- 设置${单位}的第${索引}个攻击类型为${攻击类型}
+-- 修改单位指定索引的攻击类型
+function ____exports.DzSetUnitAttackType(whichUnit, index, attackType)
+    SetUnitState(
+        whichUnit,
+        ConvertUnitState(16 + 19 * index),
+        GetHandleId(attackType)
+    )
+end
+--- 判断单位防御类型
+-- 判断${单位}的防御类型是否为${防御类型}
+-- 检查单位的防御类型
+function ____exports.DzIsUnitDefenseType(whichUnit, defenseType)
+    return math.floor(GetUnitState(
+        whichUnit,
+        ConvertUnitState(80)
+    )) == defenseType
+end
+--- 设置单位防御类型
+-- 设置${单位}的防御类型为${防御类型}
+-- 修改单位的防御类型
+function ____exports.DzSetUnitDefenseType(whichUnit, defenseType)
+    SetUnitState(
+        whichUnit,
+        ConvertUnitState(80),
+        defenseType
+    )
+end
+--- 设置单位数据缓存整数 - 简化版
+-- 设置单位ID${单位ID}的数据ID${数据ID}值为${值}
+-- 简化版的单位数据缓存设置函数，索引固定为0
+function ____exports.KKWESetUnitDataCacheInteger(uid, id, v)
+    DzSetUnitDataCacheInteger(uid, id, 0, v)
+end
+--- 单位UI添加升级IDs
+-- 为单位ID${单位ID}在索引${索引}添加升级ID${值}
+-- 向单位的升级列表添加新的升级ID
+function ____exports.KKWEUnitUIAddUpgradesIds(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 94, id, v)
+end
+--- 单位UI添加建造IDs
+-- 为单位ID${单位ID}在索引${索引}添加建造ID${值}
+-- 向单位的建造列表添加新的建造ID
+function ____exports.KKWEUnitUIAddBuildsIds(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 100, id, v)
+end
+--- 单位UI添加研究IDs
+-- 为单位ID${单位ID}在索引${索引}添加研究ID${值}
+-- 向单位的研究列表添加新的研究ID
+function ____exports.KKWEUnitUIAddResearchesIds(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 112, id, v)
+end
+--- 单位UI添加训练IDs
+-- 为单位ID${单位ID}在索引${索引}添加训练ID${值}
+-- 向单位的训练列表添加新的训练ID
+function ____exports.KKWEUnitUIAddTrainsIds(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 106, id, v)
+end
+--- 单位UI添加出售单位IDs
+-- 为单位ID${单位ID}在索引${索引}添加出售单位ID${值}
+-- 向单位的出售单位列表添加新的单位ID
+function ____exports.KKWEUnitUIAddSellsUnitIds(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 118, id, v)
+end
+--- 单位UI添加出售物品IDs
+-- 为单位ID${单位ID}在索引${索引}添加出售物品ID${值}
+-- 向单位的出售物品列表添加新的物品ID
+function ____exports.KKWEUnitUIAddSellsItemIds(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 124, id, v)
+end
+--- 单位UI添加制造物品IDs
+-- 为单位ID${单位ID}在索引${索引}添加制造物品ID${值}
+-- 向单位的制造物品列表添加新的物品ID
+function ____exports.KKWEUnitUIAddMakesItemIds(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 130, id, v)
+end
+--- 单位UI添加需求单位代码
+-- 为单位ID${单位ID}在索引${索引}添加需求单位代码${值}
+-- 向单位的需求列表添加新的单位代码
+function ____exports.KKWEUnitUIAddRequiresUnitCode(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 166, id, v)
+end
+--- 单位UI添加需求科技代码
+-- 为单位ID${单位ID}在索引${索引}添加需求科技代码${值}
+-- 向单位的需求列表添加新的科技代码
+function ____exports.KKWEUnitUIAddRequiresTechcode(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 166, id, v)
+end
+--- 单位UI添加需求数量
+-- 为单位ID${单位ID}在索引${索引}添加需求数量${值}
+-- 向单位的需求数量列表添加新的数量值
+function ____exports.KKWEUnitUIAddRequiresAmounts(uid, id, v)
+    DzUnitUIAddLevelArrayInteger(uid, 172, id, v)
+end
+--- 判断是否为闰年
+-- 判断年份${年份}是否为闰年
+-- 根据闰年规则判断指定年份是否为闰年
+function ____exports.DzIsLeapYear(year)
+    return year % 4 == 0 and year % 100 ~= 0 or year % 400 == 0
+end
+--- 从时间戳获取时间日期字符串（内部实现）
+-- 从时间戳${时间戳}获取时间日期字符串
+-- 将UNIX时间戳转换为可读的日期时间字符串
+function ____exports.DzGetTimeDateFromTimestamp(timestamp)
+    local totalSeconds = timestamp + 28800
+    local secondsInDay = 86400
+    local remainingSeconds = totalSeconds % secondsInDay
+    local year = 1970
+    local totalDays = math.floor((totalSeconds + 86399) / secondsInDay)
+    local num = 0
+    local month = 0
+    local days = 0
+    while true do
+        if ____exports.DzIsLeapYear(year) then
+            num = num + 366
+        else
+            num = num + 365
+        end
+        if num > totalDays then
+            break
+        end
+        days = num
+        year = year + 1
+    end
+    month = 1
+    num = 0
+    days = totalDays - days
+    local monthDays = ____exports.DzIsLeapYear(year) and ({
+        31,
+        29,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31
+    }) or ({
+        31,
+        28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31
+    })
+    do
+        local i = 0
+        while i < 12 do
+            if num + monthDays[i + 1] >= days then
+                break
+            end
+            num = num + monthDays[i + 1]
+            month = month + 1
+            i = i + 1
+        end
+    end
+    local day = days - num or 1
+    local hour = math.floor(remainingSeconds / 3600)
+    local minute = math.floor(remainingSeconds % 3600 / 60)
+    local second = remainingSeconds % 60
+    return (((((((((tostring(year) .. "-") .. tostring(month)) .. "-") .. tostring(day)) .. " ") .. tostring(hour)) .. ":") .. tostring(minute)) .. ":") .. tostring(second)
+end
+local timestampCache = __TS__New(Map)
+--- 从时间戳获取时间日期字符串（缓存版）
+-- 从时间戳${时间戳}获取时间日期字符串
+-- 带缓存的时间戳转换函数，提高性能
+function ____exports.KKAPIGetTimeDateFromTimestamp(timestamp)
+    timestamp = math.max(timestamp, 0)
+    local cached = timestampCache:get(timestamp)
+    if cached then
+        return cached.str
+    end
+    local str = ____exports.DzGetTimeDateFromTimestamp(timestamp)
+    return str
+end
+--- 从时间戳获取年份
+-- 从时间戳${时间戳}获取年份
+-- 从UNIX时间戳中提取年份信息
+function ____exports.KKAPIGetTimestampYear(timestamp)
+    timestamp = math.max(timestamp, 0)
+    local date = __TS__New(Date, timestamp * 1000)
+    return date:getFullYear()
+end
+--- 从时间戳获取月份
+-- 从时间戳${时间戳}获取月份
+-- 从UNIX时间戳中提取月份信息
+function ____exports.KKAPIGetTimestampMonth(timestamp)
+    timestamp = math.max(timestamp, 0)
+    local date = __TS__New(Date, timestamp * 1000)
+    return date:getMonth() + 1
+end
+--- 从时间戳获取日期
+-- 从时间戳${时间戳}获取日期
+-- 从UNIX时间戳中提取日期信息
+function ____exports.KKAPIGetTimestampDay(timestamp)
+    timestamp = math.max(timestamp, 0)
+    local date = __TS__New(Date, timestamp * 1000)
+    return date:getDate()
+end
+--- 整数转技能ID
+-- 将整数${整数}转换为技能ID
+-- 简单的类型转换函数
+function ____exports.KKConvertInt2AbilId(i)
+    return i
+end
+--- 技能ID转整数
+-- 将技能ID${技能ID}转换为整数
+-- 简单的类型转换函数
+function ____exports.KKConvertAbilId2Int(i)
+    return i
+end
+--- 整数转颜色
+-- 将整数${整数}转换为颜色
+-- 简单的类型转换函数
+function ____exports.KKConvertInt2Color(i)
+    return i
+end
+--- 颜色转整数
+-- 将颜色${颜色}转换为整数
+-- 简单的类型转换函数
+function ____exports.KKConvertColor2Int(i)
+    return i
+end
+--- 防御类型：小型
+____exports.DEFENSE_TYPE_SMALL = 0
+--- 防御类型：中型
+____exports.DEFENSE_TYPE_MEDIUM = 1
+--- 防御类型：大型
+____exports.DEFENSE_TYPE_LARGE = 2
+--- 防御类型：要塞
+____exports.DEFENSE_TYPE_FORT = 3
+--- 防御类型：普通
+____exports.DEFENSE_TYPE_NORMAL = 4
+--- 防御类型：英雄
+____exports.DEFENSE_TYPE_HERO = 5
+--- 防御类型：神圣
+____exports.DEFENSE_TYPE_DIVINE = 6
+--- 防御类型：无
+____exports.DEFENSE_TYPE_NONE = 7
+return ____exports
+ end,
 ["lua_modules.@eiriksgata.wc3ts.src.utils.index"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Promise = ____lualib.__TS__Promise
@@ -10236,13 +10433,21 @@ do
         end
     end
 end
+do
+    local ____export = require("lua_modules.@eiriksgata.wc3ts.src.utils.kkwe")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 function ____exports.sleep(howMuch)
     return __TS__AsyncAwaiter(function(____awaiter_resolve)
         return ____awaiter_resolve(
             nil,
             __TS__New(
                 __TS__Promise,
-                function(____, resolve, reject)
+                function(____, resolve)
                     local t = Timer:create()
                     t:start(
                         howMuch,
@@ -10498,9 +10703,27 @@ function ____exports.FourCC(id)
 end
 return ____exports
  end,
+["src.system.console"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Players = _____2A.Players
+____exports.Console = __TS__Class()
+local Console = ____exports.Console
+Console.name = "Console"
+function Console.prototype.____constructor(self)
+end
+function Console.log(self, message, player)
+    if player == nil then
+        player = Players[1]
+    end
+    DisplayTextToPlayer(player.handle, 0, 0, message)
+end
+return ____exports
+ end,
 ["src.main"] = function(...) 
 local ____lualib = require("lualib_bundle")
-local __TS__New = ____lualib.__TS__New
 local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
 local __TS__Await = ____lualib.__TS__Await
 local ____exports = {}
@@ -10508,6 +10731,8 @@ local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
 local Effect = _____2A.Effect
 local Unit = _____2A.Unit
 local Players = _____2A.Players
+local Frame = _____2A.Frame
+local FRAME_ALIGN_CENTER = _____2A.FRAME_ALIGN_CENTER
 local ____ydlua = require("src.ydlua.index")
 local ydlua = ____ydlua.ydlua
 local ____helper = require("src.utils.helper")
@@ -10531,13 +10756,32 @@ local function main()
             0
         )
         print("Created unit: " .. unit.name)
+        unit:setBaseDamageJAPI(100)
+        DzSetUnitPreselectUIVisible(unit.handle, false)
+        local x = 330 / 2400
+        local y = 430 / 1800
+        local frame = Frame:createType(
+            "TestFrame",
+            Frame:fromHandle(DzGetGameUI()),
+            0,
+            "BACKDROP",
+            ""
+        )
+        frame:setSize(410 / 2400, 100 / 1800)
+        frame:setPoint(
+            FRAME_ALIGN_CENTER,
+            Frame:fromHandle(DzGetGameUI()),
+            FRAME_ALIGN_CENTER,
+            x,
+            y
+        )
+        frame:setTexture("UI\\Widgets\\BattleNet\\bnet-userlist-back.blp", 0, false)
         SetCameraTargetController(unit.handle, 0, 0, true)
         SetCameraQuickPosition(
             GetUnitX(unit.handle),
             GetUnitY(unit.handle)
         )
-        local effect = __TS__New(
-            Effect,
+        local effect = Effect:create(
             "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdl",
             GetUnitX(unit.handle),
             GetUnitY(unit.handle)
@@ -10550,6 +10794,101 @@ local function main()
 end
 ydlua:getInstance():initialize()
 main()
+return ____exports
+ end,
+["src.system.actor"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+____exports.Actor = __TS__Class()
+local Actor = ____exports.Actor
+Actor.name = "Actor"
+function Actor.prototype.____constructor(self)
+    self.x = 0
+    self.y = 0
+    self.z = 0
+end
+__TS__SetDescriptor(
+    Actor.prototype,
+    "position",
+    {
+        get = function(self)
+            return {x = self.x, y = self.y, z = self.z}
+        end,
+        set = function(self, ____bindingPattern0)
+            local z
+            local y
+            local x
+            x = ____bindingPattern0.x
+            y = ____bindingPattern0.y
+            z = ____bindingPattern0.z
+            self.x = x
+            self.y = y
+            self.z = z
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["src.system.UnitActor"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____actor = require("src.system.actor")
+local Actor = ____actor.Actor
+____exports.UnitActor = __TS__Class()
+local UnitActor = ____exports.UnitActor
+UnitActor.name = "UnitActor"
+__TS__ClassExtends(UnitActor, Actor)
+function UnitActor.prototype.____constructor(self, ...)
+    Actor.prototype.____constructor(self, ...)
+    self.life = 1
+    self.mana = 1
+end
+__TS__SetDescriptor(
+    UnitActor.prototype,
+    "lifePercent",
+    {
+        get = function(self)
+            return self.life * 100
+        end,
+        set = function(self, percent)
+            self.life = percent / 100
+        end
+    },
+    true
+)
+__TS__SetDescriptor(
+    UnitActor.prototype,
+    "manaPercent",
+    {
+        get = function(self)
+            return self.mana * 100
+        end,
+        set = function(self, percent)
+            self.mana = percent / 100
+        end
+    },
+    true
+)
+return ____exports
+ end,
+["src.system.damage"] = function(...) 
+ end,
+["src.system.ui.UnitBlood"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+____exports.UnitBlood = __TS__Class()
+local UnitBlood = ____exports.UnitBlood
+UnitBlood.name = "UnitBlood"
+function UnitBlood.prototype.____constructor(self, unit)
+    self.unit = unit
+end
 return ____exports
  end,
 }

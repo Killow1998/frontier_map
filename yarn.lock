@@ -9,10 +9,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@eiriksgata/wc3ts@3.0.4":
-  version "3.0.4"
-  resolved "https://registry.npmmirror.com/@eiriksgata/wc3ts/-/wc3ts-3.0.4.tgz#00659d5ad80781be284b25a0ba8c33bb2503c97e"
-  integrity sha512-fFw7qfegrssEJGRltHS5h0FMwYrBoK/ij31qXPw5+IK01/MyrDjNs8X9G2TUU++Lk20Q36j3JBEtduyWUMoRCA==
+"@eiriksgata/wc3ts@3.2.3":
+  version "3.2.3"
+  resolved "https://registry.npmmirror.com/@eiriksgata/wc3ts/-/wc3ts-3.2.3.tgz#a1df51cf0054fa100b0d6d3d73599d9da3668a88"
+  integrity sha512-EumqOiTlOG6kBk5P9875dlhuQi8hkwyXr+cEy0FV0cXVeh1SWqGUkLWTAVbe48fX4YUVv/g+hgEdi5nD3wUh7w==
 
 "@jridgewell/resolve-uri@^3.0.3":
   version "3.1.2"
