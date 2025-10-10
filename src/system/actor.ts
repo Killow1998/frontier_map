@@ -1,23 +1,24 @@
-export class Actor {
+import { Unit } from "@eiriksgata/wc3ts/*";
 
-  x: number = 0;
-  y: number = 0;
-  z: number = 0;
+export class Actor extends Unit {
+  // 私有字段存储实际值，并设置默认值
+  private _hpBarUIHeight: number = 300; // 默认血条UI高度
+  private _size: number = 1.0; // 默认大小倍数
 
-
-
-
-
-  get position() {
-    return { x: this.x, y: this.y, z: this.z };
+  public set hpBarUIHeight(value: number) {
+    this._hpBarUIHeight = value;
   }
 
-  set position({ x, y, z }: { x: number; y: number; z: number }) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
+  public get hpBarUIHeight(): number {
+    return this._hpBarUIHeight;
   }
 
+  public set size(value: number) {
+    this._size = value;
+  }
 
+  public get size(): number {
+    return this._size;
+  }
 
 }

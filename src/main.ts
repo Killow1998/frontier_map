@@ -1,8 +1,10 @@
 
-import { Effect, Unit, Players, Frame, FRAME_ALIGN_BOTTOM, FRAME_ALIGN_CENTER } from "@eiriksgata/wc3ts/*";
+import { Effect, Unit, Players, Frame, FRAME_ALIGN_BOTTOM, FRAME_ALIGN_CENTER, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { FourCC } from "./utils/helper";
 import { Console } from "./system/console";
+import { UnitBlood } from "./system/ui/UnitBlood";
+import { CameraControl } from "./utils/CameraControl";
 ;
 
 /**
@@ -14,14 +16,12 @@ async function main(): Promise<void> {
   print("hello ts");
   DisplayTextToPlayer(Player(0), 0, 0, "hello ts");
 
+
   const unit = Unit.create(Players[0], FourCC('hfoo'), 0, 0, 0)!;
   print(`Created unit: ${unit.name}`);
 
   //改变攻击力
   unit.setBaseDamageJAPI(100);
-
-  //隐藏单位的血条
-  DzSetUnitPreselectUIVisible(unit.handle, false);
 
   let x = 330.00 / 2400.00
   let y = 430.00 / 1800.00
@@ -42,13 +42,18 @@ async function main(): Promise<void> {
   frame.setTexture("UI\\Widgets\\BattleNet\\bnet-userlist-back.blp", 0, false);
 
 
-  //载入自定义血条UI
-  
+  //载入自定义血条UI 
+  new UnitBlood(unit);
+
+  Timer.create().start(1, false, () => {
+    CameraControl.initMouseControl();
+  });
+
 
 
   //移动镜头到单位坐标
-  SetCameraTargetController(unit.handle, 0, 0, true);
-  SetCameraQuickPosition(GetUnitX(unit.handle), GetUnitY(unit.handle));
+  // SetCameraTargetController(unit.handle, 0, 0, true);
+  // SetCameraQuickPosition(GetUnitX(unit.handle), GetUnitY(unit.handle));
 
   //创建一个特效
   const effect = Effect.create("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdl", GetUnitX(unit.handle), GetUnitY(unit.handle))!;

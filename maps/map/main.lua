@@ -10701,6 +10701,70 @@ end
 function ____exports.FourCC(id)
     return ____exports.c2i(id)
 end
+function ____exports.worldToScreen(x, y, z)
+    local eyex = GetCameraEyePositionX()
+    local eyey = GetCameraEyePositionZ()
+    local eyez = GetCameraEyePositionY()
+    local upx = 0
+    local upy = 1
+    local upz = 0
+    local centerx = GetCameraTargetPositionX()
+    local centery = GetCameraTargetPositionZ()
+    local centerz = GetCameraTargetPositionY()
+    local z0 = eyex - centerx
+    local z1 = eyey - centery
+    local z2 = eyez - centerz
+    local length = math.sqrt(z0 * z0 + z1 * z1 + z2 * z2)
+    local len = 1
+    local x0
+    local x1
+    local x2
+    local y0
+    local y1
+    local y2
+    local rhw = 1
+    local ratio = 1
+    local clientHeight = DzGetClientHeight()
+    if clientHeight ~= 0 then
+        ratio = DzGetClientWidth() / clientHeight * 600 / 800
+    end
+    if length > 0 then
+        len = 1 / length
+    else
+        len = 1
+    end
+    z0 = z0 * len
+    z1 = z1 * len
+    z2 = z2 * len
+    x0 = upy * z2 - upz * z1
+    x1 = upz * z0 - upx * z2
+    x2 = upx * z1 - upy * z0
+    len = math.sqrt(x0 * x0 + x1 * x1 + x2 * x2)
+    if len > 0 then
+        len = 1 / len
+    else
+        len = 1
+    end
+    x0 = x0 * len
+    x1 = x1 * len
+    x2 = x2 * len
+    y0 = z1 * x2 - z2 * x1
+    y1 = z2 * x0 - z0 * x2
+    y2 = z0 * x1 - z1 * x0
+    rhw = -z0 * x - z1 * y - z2 * z + (z0 * eyex + z1 * eyey + z2 * eyez)
+    if math.abs(rhw) ~= 0 then
+        rhw = 1 / math.abs(rhw)
+    else
+        rhw = 1
+    end
+    if ratio == 0 then
+        ratio = 1
+    end
+    local UIx = 0.8 - (2 / ratio * (x0 * x + x1 * y + x2 * z - (x0 * eyex + x1 * eyey + x2 * eyez)) * rhw + 1) * 0.4
+    local UIy = (2.5613 * (y0 * x + y1 * y + y2 * z - (y0 * eyex + y1 * eyey + y2 * eyez)) * rhw + 1) * 0.3
+    local UIz = (1001 / -999 * (z0 * x + z1 * y + z2 * z + 2 - (z0 * eyex + z1 * eyey + z2 * eyez)) * rhw + 1) * 0.5
+    return {screenX = UIx, screenY = UIy, z = UIz}
+end
 return ____exports
  end,
 ["src.system.console"] = function(...) 
@@ -10722,8 +10786,182 @@ function Console.log(self, message, player)
 end
 return ____exports
  end,
+["src.system.ui.UnitBlood"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Frame = _____2A.Frame
+local FRAME_ALIGN_BOTTOM = _____2A.FRAME_ALIGN_BOTTOM
+local Timer = _____2A.Timer
+local UNIT_TYPE_DEAD = _____2A.UNIT_TYPE_DEAD
+local ____console = require("src.system.console")
+local Console = ____console.Console
+____exports.UnitBlood = __TS__Class()
+local UnitBlood = ____exports.UnitBlood
+UnitBlood.name = "UnitBlood"
+function UnitBlood.prototype.____constructor(self, unit)
+    self.unit = unit
+    unit:setPreselectUIVisible(false)
+    self.frame = Frame:createType(
+        "UnitBloodFrame",
+        Frame:fromHandle(DzGetGameUI()),
+        0,
+        "BACKDROP",
+        ""
+    )
+    self.frame:setSize(0.04, 0.01)
+    self.frame:setTexture("UI\\Widgets\\StatusBar\\HealthBar\\HealthBar.blp", 0, false)
+    self.frame:setVisible(true)
+    local hpBarFrame = DzFrameGetUnitHpBar(unit.handle)
+    Console:log("hpBarFrame: " .. tostring(hpBarFrame))
+    self.frame:setPoint(
+        FRAME_ALIGN_BOTTOM,
+        Frame:fromHandle(hpBarFrame),
+        FRAME_ALIGN_BOTTOM,
+        0,
+        0
+    )
+    self.timer = Timer:create():start(
+        0.1,
+        true,
+        function()
+            if self.unit == nil then
+                self.frame:destroy()
+            end
+            if self.unit:isUnitType(UNIT_TYPE_DEAD()) then
+                self.frame:setVisible(false)
+                return
+            end
+        end
+    )
+end
+return ____exports
+ end,
+["src.utils.CameraControl"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Timer = _____2A.Timer
+local ____console = require("src.system.console")
+local Console = ____console.Console
+--- 镜头控制工具类
+-- 提供鼠标滚轮控制镜头距离和宽屏设置功能
+____exports.CameraControl = __TS__Class()
+local CameraControl = ____exports.CameraControl
+CameraControl.name = "CameraControl"
+function CameraControl.prototype.____constructor(self)
+end
+function CameraControl.initMouseControl(self)
+    SetCameraField(
+        ConvertCameraField(6),
+        20000,
+        0
+    )
+    local mouseTrigger = CreateTrigger()
+    DzTriggerRegisterMouseWheelEventByCode(
+        mouseTrigger,
+        false,
+        function()
+            ____exports.CameraControl:onWheel()
+        end
+    )
+    Timer:create():start(
+        0.02,
+        true,
+        function()
+            ____exports.CameraControl:update()
+            Console:log("CameraControl: 镜头状态更新")
+        end
+    )
+    print("CameraControl: 鼠标控制已初始化")
+end
+function CameraControl.onWheel(self)
+    local delta = DzGetWheelDelta()
+    if not DzIsMouseOverUI() then
+        return
+    end
+    self.resetCam = true
+    if delta < 0 then
+        if self.viewLevel < self.viewLevelMax then
+            self.viewLevel = self.viewLevel + 1
+        end
+    else
+        if self.viewLevel > self.viewLevelMin then
+            self.viewLevel = self.viewLevel - 1
+        end
+    end
+    self.xAngle = self:rad2Deg(GetCameraField(ConvertCameraField(1)))
+end
+function CameraControl.update(self)
+    if self.resetCam then
+        SetCameraField(
+            ConvertCameraField(1),
+            self:degToRad(self.xAngle),
+            0
+        )
+        SetCameraField(
+            ConvertCameraField(0),
+            self.viewLevel * 200,
+            self.wheelSpeed
+        )
+        self.resetCam = false
+    end
+end
+function CameraControl.setWideScreen(self)
+    self.wideScr = not self.wideScr
+    DzEnableWideScreen(self.wideScr)
+    print("CameraControl: 宽屏模式" .. (self.wideScr and "开启" or "关闭"))
+    return self.wideScr
+end
+function CameraControl.rad2Deg(self, rad)
+    return rad * 180 / math.pi
+end
+function CameraControl.degToRad(self, deg)
+    return deg * math.pi / 180
+end
+function CameraControl.getViewLevel(self)
+    return self.viewLevel
+end
+function CameraControl.setViewLevel(self, level)
+    if level >= self.viewLevelMin and level <= self.viewLevelMax then
+        self.viewLevel = level
+        self.resetCam = true
+        print("CameraControl: 视野等级设置为 " .. tostring(level))
+    else
+        print(((("CameraControl: 视野等级必须在 " .. tostring(self.viewLevelMin)) .. "-") .. tostring(self.viewLevelMax)) .. " 之间")
+    end
+end
+function CameraControl.isWideScreen(self)
+    return self.wideScr
+end
+function CameraControl.resetCamera(self)
+    self.viewLevel = 8
+    self.xAngle = 306
+    self.resetCam = true
+    print("CameraControl: 镜头已重置到默认设置")
+end
+function CameraControl.setWheelSpeed(self, speed)
+    if speed >= 0 and speed <= 1 then
+        self.wheelSpeed = speed
+        print("CameraControl: 镜头平滑度设置为 " .. tostring(speed))
+    else
+        print("CameraControl: 镜头平滑度必须在 0-1 之间")
+    end
+end
+CameraControl.viewLevel = 8
+CameraControl.resetCam = false
+CameraControl.wheelSpeed = 0.1
+CameraControl.wideScr = false
+CameraControl.xAngle = 306
+CameraControl.viewLevelMax = 13
+CameraControl.viewLevelMin = 4
+return ____exports
+ end,
 ["src.main"] = function(...) 
 local ____lualib = require("lualib_bundle")
+local __TS__New = ____lualib.__TS__New
 local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
 local __TS__Await = ____lualib.__TS__Await
 local ____exports = {}
@@ -10733,10 +10971,15 @@ local Unit = _____2A.Unit
 local Players = _____2A.Players
 local Frame = _____2A.Frame
 local FRAME_ALIGN_CENTER = _____2A.FRAME_ALIGN_CENTER
+local Timer = _____2A.Timer
 local ____ydlua = require("src.ydlua.index")
 local ydlua = ____ydlua.ydlua
 local ____helper = require("src.utils.helper")
 local FourCC = ____helper.FourCC
+local ____UnitBlood = require("src.system.ui.UnitBlood")
+local UnitBlood = ____UnitBlood.UnitBlood
+local ____CameraControl = require("src.utils.CameraControl")
+local CameraControl = ____CameraControl.CameraControl
 --- 应用程序主入口
 -- 负责引导整个应用程序的启动
 local function main()
@@ -10757,7 +11000,6 @@ local function main()
         )
         print("Created unit: " .. unit.name)
         unit:setBaseDamageJAPI(100)
-        DzSetUnitPreselectUIVisible(unit.handle, false)
         local x = 330 / 2400
         local y = 430 / 1800
         local frame = Frame:createType(
@@ -10776,10 +11018,13 @@ local function main()
             y
         )
         frame:setTexture("UI\\Widgets\\BattleNet\\bnet-userlist-back.blp", 0, false)
-        SetCameraTargetController(unit.handle, 0, 0, true)
-        SetCameraQuickPosition(
-            GetUnitX(unit.handle),
-            GetUnitY(unit.handle)
+        __TS__New(UnitBlood, unit)
+        Timer:create():start(
+            1,
+            false,
+            function()
+                CameraControl:initMouseControl()
+            end
         )
         local effect = Effect:create(
             "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdl",
@@ -10799,78 +11044,42 @@ return ____exports
 ["src.system.actor"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
-local ____exports = {}
-____exports.Actor = __TS__Class()
-local Actor = ____exports.Actor
-Actor.name = "Actor"
-function Actor.prototype.____constructor(self)
-    self.x = 0
-    self.y = 0
-    self.z = 0
-end
-__TS__SetDescriptor(
-    Actor.prototype,
-    "position",
-    {
-        get = function(self)
-            return {x = self.x, y = self.y, z = self.z}
-        end,
-        set = function(self, ____bindingPattern0)
-            local z
-            local y
-            local x
-            x = ____bindingPattern0.x
-            y = ____bindingPattern0.y
-            z = ____bindingPattern0.z
-            self.x = x
-            self.y = y
-            self.z = z
-        end
-    },
-    true
-)
-return ____exports
- end,
-["src.system.UnitActor"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____actor = require("src.system.actor")
-local Actor = ____actor.Actor
-____exports.UnitActor = __TS__Class()
-local UnitActor = ____exports.UnitActor
-UnitActor.name = "UnitActor"
-__TS__ClassExtends(UnitActor, Actor)
-function UnitActor.prototype.____constructor(self, ...)
-    Actor.prototype.____constructor(self, ...)
-    self.life = 1
-    self.mana = 1
+local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Unit = _____2A.Unit
+____exports.Actor = __TS__Class()
+local Actor = ____exports.Actor
+Actor.name = "Actor"
+__TS__ClassExtends(Actor, Unit)
+function Actor.prototype.____constructor(self, ...)
+    Unit.prototype.____constructor(self, ...)
+    self._hpBarUIHeight = 300
+    self._size = 1
 end
 __TS__SetDescriptor(
-    UnitActor.prototype,
-    "lifePercent",
+    Actor.prototype,
+    "hpBarUIHeight",
     {
         get = function(self)
-            return self.life * 100
+            return self._hpBarUIHeight
         end,
-        set = function(self, percent)
-            self.life = percent / 100
+        set = function(self, value)
+            self._hpBarUIHeight = value
         end
     },
     true
 )
 __TS__SetDescriptor(
-    UnitActor.prototype,
-    "manaPercent",
+    Actor.prototype,
+    "size",
     {
         get = function(self)
-            return self.mana * 100
+            return self._size
         end,
-        set = function(self, percent)
-            self.mana = percent / 100
+        set = function(self, value)
+            self._size = value
         end
     },
     true
@@ -10878,18 +11087,6 @@ __TS__SetDescriptor(
 return ____exports
  end,
 ["src.system.damage"] = function(...) 
- end,
-["src.system.ui.UnitBlood"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
-____exports.UnitBlood = __TS__Class()
-local UnitBlood = ____exports.UnitBlood
-UnitBlood.name = "UnitBlood"
-function UnitBlood.prototype.____constructor(self, unit)
-    self.unit = unit
-end
-return ____exports
  end,
 }
 return require("src.main", ...)
