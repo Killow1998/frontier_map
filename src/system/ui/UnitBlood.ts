@@ -20,21 +20,12 @@ export class UnitBlood {
   nameBoxFrame: Frame;
   nameFrame: Frame;
 
-  //tempFrame: Frame;
-
-
   /**
    * 私有构造函数，防止直接实例化
    */
   private constructor(actor: Actor) {
     this.actor = actor;
     actor.setPreselectUIVisible(false);
-
-    //演示示例
-    // this.tempFrame = Frame.createType("TempFrame", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "")!;
-    // this.tempFrame.setSize(130 / 2400, 28 / 1800);
-    // this.tempFrame.setTexture("hpbar\\01.tga", 0, false);
-    // this.tempFrame.setVisible(true);
 
     //血条UI基底框架
     this.frame = Frame.createType("UnitBloodFrame", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "")!;
@@ -235,12 +226,6 @@ export class UnitBlood {
     const unitHeight = this.actor.hpBarUIHeight; // 单位高度数据
     const sizeMultiplier = this.actor.size; // 体积倍数数据
 
-    // 按照伪代码的逻辑计算 Y 坐标偏移
-    // call YDLocal6Set("...", real, "y", 
-    //   YDLocal6Get("...", real, "y") + 
-    //   ((2200.00 + 800.00 + (高度 * 体积倍数)) - GetCameraEyePositionZ()) * 0.00006
-    // )
-
     const baseOffset = 2200.00 + 800.00; // 基础偏移量
     const unitHeightOffset = unitHeight * sizeMultiplier; // 单位高度偏移
     const totalHeight = baseOffset + unitHeightOffset; // 总高度
@@ -274,7 +259,6 @@ export class UnitBlood {
 
     this.frame.setAbsPoint(FRAME_ALIGN_BOTTOM, screenPos.screenX, finalScreenY);
 
-    Console.log(`UnitBlood for unit ${this.actor.id} position updated to (${screenPos.screenX}, ${finalScreenY})`);
   }
 
 
