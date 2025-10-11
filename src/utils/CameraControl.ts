@@ -27,19 +27,13 @@ export class CameraControl {
    */
   public static initMouseControl(): void {
     // 设置镜头远景截断距离
-    SetCameraField(ConvertCameraField(6), 20000.00, 0); // CAMERA_FIELD_FARZ = 6
+    SetCameraField(ConvertCameraField(1), 20000.00, 0);
 
     // 注册鼠标滚轮事件
     const mouseTrigger = CreateTrigger();
 
     DzTriggerRegisterMouseWheelEventByCode(mouseTrigger, false, function () {
       CameraControl.onWheel();
-    });
-
-    // 使用定时器持续更新镜头状态
-    Timer.create().start(0.02, true, () => {
-      CameraControl.update();
-      Console.log("CameraControl: 镜头状态更新")
     });
 
     print("CameraControl: 鼠标控制已初始化");
@@ -77,7 +71,7 @@ export class CameraControl {
   /**
    * 每帧渲染时调用
    */
-  private static update(): void {
+  public static update(): void {
     if (this.resetCam) {
       // 重设镜头角度和高度
       SetCameraField(ConvertCameraField(1), this.degToRad(this.xAngle), 0); // CAMERA_FIELD_ANGLE_OF_ATTACK
