@@ -1,4 +1,4 @@
-import { Frame, Unit, MapPlayer } from "@eiriksgata/wc3ts/*";
+import { Unit, MapPlayer } from "@eiriksgata/wc3ts/*";
 import { UnitBlood } from "./ui/UnitBlood";
 
 export class Actor extends Unit {
@@ -32,10 +32,10 @@ export class Actor extends Unit {
    * @returns Actor实例，如果创建失败返回undefined
    */
   public static create(
-    owner: MapPlayer, 
-    unitId: number, 
-    x: number, 
-    y: number, 
+    owner: MapPlayer,
+    unitId: number,
+    x: number,
+    y: number,
     facing: number = 0
   ): Actor | undefined {
     // 检查是否已经存在该位置的单位
@@ -57,7 +57,7 @@ export class Actor extends Unit {
       const values: Record<string, unknown> = {};
       values.handle = handle;
       Object.assign(actor, values);
-      
+
       // 添加到管理器
       Actor.allActors[actor.id] = actor;
       return actor;
@@ -77,7 +77,7 @@ export class Actor extends Unit {
     if (existingActor !== undefined) {
       return existingActor;
     }
-    
+
     // 从Unit的handle创建Actor
     return Actor.fromHandle(unit.handle)!;
   }
@@ -91,21 +91,21 @@ export class Actor extends Unit {
     if (handle === undefined) {
       return undefined;
     }
-    
+
     // 检查是否已经存在
     const unitId = GetHandleId(handle);
     const existingActor = Actor.allActors[unitId];
     if (existingActor !== undefined) {
       return existingActor;
     }
-    
+
     // 使用wc3ts的getObject方法创建实例
     const actor = Actor.getObject(handle) as Actor;
     if (actor !== undefined) {
       const values: Record<string, unknown> = {};
       values.handle = handle;
       Object.assign(actor, values);
-      
+
       // 添加到管理器
       Actor.allActors[actor.id] = actor;
       return actor;
@@ -129,10 +129,10 @@ export class Actor extends Unit {
   public destroy(): void {
     // 从全局管理器中移除
     delete Actor.allActors[this.id];
-    
+
     // 移除相关的UI
     UnitBlood.remove(this);
-    
+
     // 调用父类的销毁方法
     super.destroy();
   }

@@ -10782,7 +10782,19 @@ function Console.log(self, message, player)
     if player == nil then
         player = Players[1]
     end
-    DisplayTextToPlayer(player.handle, 0, 0, message)
+    DisplayTextToPlayer(player.handle, 0, 0, ("|cff00ff00" .. message) .. "|r")
+end
+function Console.err(self, message, player)
+    if player == nil then
+        player = Players[1]
+    end
+    DisplayTextToPlayer(player.handle, 0, 0, ("|cffff0000" .. message) .. "|r")
+end
+function Console.warn(self, message, player)
+    if player == nil then
+        player = Players[1]
+    end
+    DisplayTextToPlayer(player.handle, 0, 0, ("|cffffff00" .. message) .. "|r")
 end
 return ____exports
  end,
@@ -11247,7 +11259,6 @@ function UnitBlood.prototype.updatePosition(self)
         self.frame:setVisible(true)
     end
     self.frame:setAbsPoint(FRAME_ALIGN_BOTTOM, screenPos.screenX, finalScreenY)
-    Console:log(((((("UnitBlood for unit " .. tostring(self.actor.id)) .. " position updated to (") .. tostring(screenPos.screenX)) .. ", ") .. tostring(finalScreenY)) .. ")")
 end
 UnitBlood.allUnitBlood = {}
 UnitBlood.isDrawEventRegistered = false

@@ -2,7 +2,6 @@ import { Frame, FRAME_ALIGN_BOTTOM, FRAME_ALIGN_CENTER, FRAME_ALIGN_LEFT_TOP, FR
 import { CameraControl } from "src/utils/CameraControl";
 import { worldToScreen } from "src/utils/helper";
 import { Actor } from "../actor";
-import { Console } from "../console";
 
 
 export class UnitBlood {
@@ -81,8 +80,6 @@ export class UnitBlood {
     }
 
     UnitBlood.allUnitBlood[actor.id] = this;
-
-    Console.log(`UnitBlood for unit ${this.actor.id} created.`);
   }
 
   /**
@@ -191,8 +188,6 @@ export class UnitBlood {
     this.updatePosition();
 
     this.levelFrame.setText(`${this.actor.level}`);
-
-    Console.log(`UnitBlood for unit ${this.actor.id} updated.`);
   }
 
   /**
