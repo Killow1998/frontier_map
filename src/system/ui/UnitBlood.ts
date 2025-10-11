@@ -63,6 +63,7 @@ export class UnitBlood {
     this.nameFrame.setTextAlignment(18, 0);
     this.nameFrame.setFont("hpbar\\ZiTi.ttf", 0.01, 0);
     // this.nameFrame.setSize(0, 0.006)
+    
     this.nameFrame.alpha = 255;
     this.nameFrame.setPoint(FRAME_ALIGN_BOTTOM, this.frame, FRAME_ALIGN_TOP, 0.003, 10 / 1800);
 
@@ -230,8 +231,7 @@ export class UnitBlood {
 
     // 计算最终的屏幕Y坐标
     const finalScreenY = screenPos.screenY + yAdjustment;
-
-
+    
     //判断是否在控制台的位置
     if (finalScreenY >= 1000 / 1800 ||
       finalScreenY <= 300 / 1800 ||

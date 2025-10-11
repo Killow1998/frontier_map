@@ -11050,8 +11050,6 @@ local ____CameraControl = require("src.utils.CameraControl")
 local CameraControl = ____CameraControl.CameraControl
 local ____helper = require("src.utils.helper")
 local worldToScreen = ____helper.worldToScreen
-local ____console = require("src.system.console")
-local Console = ____console.Console
 ____exports.UnitBlood = __TS__Class()
 local UnitBlood = ____exports.UnitBlood
 UnitBlood.name = "UnitBlood"
@@ -11168,7 +11166,6 @@ function UnitBlood.prototype.____constructor(self, actor)
         end
     end
     ____exports.UnitBlood.allUnitBlood[actor.id] = self
-    Console:log(("UnitBlood for unit " .. tostring(self.actor.id)) .. " created.")
 end
 function UnitBlood.create(self, actor)
     if ____exports.UnitBlood.allUnitBlood[actor.id] ~= nil then
@@ -11224,7 +11221,6 @@ function UnitBlood.prototype.updateUI(self)
     self:updateManaBar()
     self:updatePosition()
     self.levelFrame:setText(tostring(self.actor.level))
-    Console:log(("UnitBlood for unit " .. tostring(self.actor.id)) .. " updated.")
 end
 function UnitBlood.prototype.updateLifeBar(self)
     local lifePercent = self.actor.life / self.actor.maxLife
@@ -11323,6 +11319,8 @@ main()
 return ____exports
  end,
 ["src.system.damage"] = function(...) 
+ end,
+["src.system.ui.ConsoleUI"] = function(...) 
  end,
 }
 return require("src.main", ...)
