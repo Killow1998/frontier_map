@@ -26,6 +26,7 @@ async function main(): Promise<void> {
 
     UnitBlood.registerLocalDrawEvent();
 
+
     const unit = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 0)!;
     print(`Created unit: ${unit.name}`);
     SetCameraQuickPosition(unit.x, unit.y);
@@ -48,10 +49,13 @@ async function main(): Promise<void> {
 
 }
 
+/**
+ * 初始化函数 - 供模块化加载使用
+ */
+export function initialize(): void {
+  // register ydlua
+  ydlua.getInstance().initialize();
 
-
-// register ydlua
-ydlua.getInstance().initialize();
-
-// 启动应用程序
-main();
+  // 启动应用程序
+  main();
+}

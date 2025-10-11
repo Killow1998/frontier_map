@@ -18,7 +18,8 @@
       "@eiriksgata/wc3ts/src/types",
       "lua-types/5.3"
     ],
-    "strict": true
+    "strict": true,
+    "outDir": "maps/map"
   },
   "tstl": {
     "luaTarget": "5.3",
@@ -39,9 +40,7 @@
       "jass.runtime",
       "jass.message",
       "jass.bignum"
-    ],
-    "luaBundle": "maps/map/main.lua",
-    "luaBundleEntry": "src/main.ts"
+    ]
   },
   "include": [
     "src",

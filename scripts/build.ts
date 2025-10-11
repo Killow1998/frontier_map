@@ -107,27 +107,34 @@ function compileTypeScriptToLua(): void {
     console.log(">>> Starting TypeScript to Lua compilation...");
     execSync('tstl -p tsconfig.json', { stdio: 'inherit' });
 
-    //TODO: 往maps/map/war3map.j  main 函数 最后一行 注入 call Cheat("exec-lua:main")
+    //TODO: 往maps/map/war3map.j  main 函数 最后一行 注入 call Cheat("exec-lua:bootstrap")
     //检测war3map.j是否存在
     const war3mapJPath = path.join("maps", "map", "war3map.j");
     if (fs.existsSync(war3mapJPath)) {
       let war3mapJContent = fs.readFileSync(war3mapJPath, "utf-8");
-      //需要先检测是否有 call Cheat("exec-lua:main")
-      if (war3mapJContent.includes('call Cheat("exec-lua:main")')) {
+      //需要先检测是否有 call Cheat("exec-lua:bootstrap")
+      if (war3mapJContent.includes('call Cheat("exec-lua:bootstrap")')) {
         console.log(">>> Lua execution call already injected in war3map.j, skipping.");
         return;
       }
-      // 在 main 函数最后一行注入 call Cheat("exec-lua:main")
+      // 移除旧的 main 注入（如果存在）
+      if (war3mapJContent.includes('call Cheat("exec-lua:main")')) {
+        war3mapJContent = war3mapJContent.replace('call Cheat("exec-lua:main")', 'call Cheat("exec-lua:bootstrap")');
+        fs.writeFileSync(war3mapJPath, war3mapJContent);
+        console.log(">>> Updated Lua execution call to use bootstrap.lua");
+        return;
+      }
+      // 在 main 函数最后一行注入 call Cheat("exec-lua:bootstrap")
       const regex = /(function\s+main\s+takes\s+nothing\s+returns\snothing\s*\n)([\s\S]*?)(\nendfunction)/;
       const mainFunctionMatch = regex.exec(war3mapJContent);
       if (!mainFunctionMatch) {
         console.error(`Error: main function not found in ${war3mapJPath}, skipping injection.`);
         return;
       }
-      const newContent = mainFunctionMatch[0].replace(/\nendfunction/, '\n    call Cheat("exec-lua:main")\nendfunction');
+      const newContent = mainFunctionMatch[0].replace(/\nendfunction/, '\n    call Cheat("exec-lua:bootstrap")\nendfunction');
       war3mapJContent = war3mapJContent.replace(mainFunctionMatch[0], newContent);
       fs.writeFileSync(war3mapJPath, war3mapJContent);
-      console.log(">>> Injected Lua execution call into war3map.j");
+      console.log(">>> Injected Lua execution call for bootstrap.lua into war3map.j");
     } else {
       console.error(`Error: ${war3mapJPath} not found, skipping injection.`);
     }
