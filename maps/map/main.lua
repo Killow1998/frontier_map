@@ -10932,7 +10932,7 @@ function Actor.prototype.____constructor(self, owner, unitId, x, y, face)
         y,
         face
     )
-    self._hpBarUIHeight = 100
+    self._hpBarUIHeight = 150
     self._size = 1
     ____exports.Actor.allActors[self.id] = self
 end
@@ -11260,6 +11260,797 @@ UnitBlood.allUnitBlood = {}
 UnitBlood.isDrawEventRegistered = false
 return ____exports
  end,
+["src.system.HotReload"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__New = ____lualib.__TS__New
+local __TS__StringStartsWith = ____lualib.__TS__StringStartsWith
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
+local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+local __TS__Delete = ____lualib.__TS__Delete
+local __TS__ArrayIncludes = ____lualib.__TS__ArrayIncludes
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Timer = _____2A.Timer
+____exports.HotReload = __TS__Class()
+local HotReload = ____exports.HotReload
+HotReload.name = "HotReload"
+function HotReload.prototype.____constructor(self, config)
+    self.lastCheckTime = 0
+    self.moduleVersions = {}
+    self.preservedState = {}
+    self.config = config
+end
+function HotReload.getInstance(self, config)
+    if not ____exports.HotReload.instance then
+        if not config then
+            error(
+                __TS__New(Error, "HotReload: 首次调用需要提供配置"),
+                0
+            )
+        end
+        ____exports.HotReload.instance = __TS__New(____exports.HotReload, config)
+    end
+    return ____exports.HotReload.instance
+end
+function HotReload.prototype.start(self)
+    if not self.config.enabled then
+        print("HotReload: 热更新已禁用")
+        return
+    end
+    print("HotReload: 启动热更新系统")
+    self:registerChatCommands()
+    if self.config.checkInterval > 0 then
+        self.timer = Timer:create()
+        self.timer:start(
+            self.config.checkInterval,
+            true,
+            function()
+                self:checkForUpdates()
+            end
+        )
+    end
+end
+function HotReload.prototype.stop(self)
+    if self.timer then
+        self.timer:destroy()
+        self.timer = nil
+    end
+    print("HotReload: 热更新系统已停止")
+end
+function HotReload.prototype.reload(self, moduleName)
+    print("HotReload: 开始执行热更新 " .. (moduleName or "(全部模块)"))
+    do
+        local function ____catch(____error)
+            print("HotReload: 热更新失败 - " .. tostring(____error))
+        end
+        local ____try, ____hasReturned = pcall(function()
+            self:preserveGlobalState()
+            if moduleName then
+                self:clearModuleCache(moduleName)
+            else
+                self:clearAllWatchedModules()
+            end
+            self:reloadModules(moduleName)
+            self:restoreGlobalState()
+            print("HotReload: 热更新完成")
+        end)
+        if not ____try then
+            ____catch(____hasReturned)
+        end
+    end
+end
+function HotReload.prototype.registerChatCommands(self)
+    local trigger = CreateTrigger()
+    do
+        local i = 0
+        while i < 8 do
+            TriggerRegisterPlayerChatEvent(
+                trigger,
+                Player(i),
+                "-reload",
+                true
+            )
+            TriggerRegisterPlayerChatEvent(
+                trigger,
+                Player(i),
+                "-hotreload",
+                true
+            )
+            i = i + 1
+        end
+    end
+    TriggerAddAction(
+        trigger,
+        function()
+            local chatString = GetEventPlayerChatString()
+            local player = GetTriggerPlayer()
+            if GetPlayerId(player) == 0 then
+                if chatString == "-reload" or chatString == "-hotreload" then
+                    self:reload()
+                elseif __TS__StringStartsWith(chatString, "-reload ") then
+                    local moduleName = __TS__StringSubstring(chatString, 8)
+                    self:reload(moduleName)
+                end
+            end
+        end
+    )
+    print("HotReload: 聊天命令已注册 (-reload, -hotreload)")
+end
+function HotReload.prototype.checkForUpdates(self)
+    local currentTime = os.time()
+    if currentTime - self.lastCheckTime > self.config.checkInterval then
+        self.lastCheckTime = currentTime
+    end
+end
+function HotReload.prototype.preserveGlobalState(self)
+    self.preservedState = {}
+    for ____, globalKey in ipairs(self.config.preserveGlobals) do
+        if _G[globalKey] ~= nil then
+            self.preservedState[globalKey] = _G[globalKey]
+        end
+    end
+    print(("HotReload: 已保存 " .. tostring(#__TS__ObjectKeys(self.preservedState))) .. " 个全局状态")
+end
+function HotReload.prototype.restoreGlobalState(self)
+    for ____, ____value in ipairs(__TS__ObjectEntries(self.preservedState)) do
+        local key = ____value[1]
+        local value = ____value[2]
+        _G[key] = value
+    end
+    print(("HotReload: 已恢复 " .. tostring(#__TS__ObjectKeys(self.preservedState))) .. " 个全局状态")
+end
+function HotReload.prototype.clearModuleCache(self, moduleName)
+    if ____moduleCache and ____moduleCache[moduleName] then
+        __TS__Delete(____moduleCache, moduleName)
+        print("HotReload: 已清除模块缓存 - " .. moduleName)
+    end
+    if package and package.loaded and package.loaded[moduleName] then
+        package.loaded[moduleName] = nil
+    end
+end
+function HotReload.prototype.clearAllWatchedModules(self)
+    for ____, moduleName in ipairs(self.config.watchModules) do
+        self:clearModuleCache(moduleName)
+    end
+end
+function HotReload.prototype.reloadModules(self, specificModule)
+    local modulesToReload = specificModule and ({specificModule}) or self.config.watchModules
+    for ____, moduleName in ipairs(modulesToReload) do
+        do
+            local function ____catch(____error)
+                print((("HotReload: 模块重新加载失败 - " .. moduleName) .. ": ") .. tostring(____error))
+            end
+            local ____try, ____hasReturned = pcall(function()
+                local reloadedModule = require(moduleName)
+                print("HotReload: 模块已重新加载 - " .. moduleName)
+                if reloadedModule and type(reloadedModule.initialize) == "function" then
+                    reloadedModule.initialize()
+                end
+            end)
+            if not ____try then
+                ____catch(____hasReturned)
+            end
+        end
+    end
+end
+function HotReload.prototype.addWatchModule(self, moduleName)
+    if not __TS__ArrayIncludes(self.config.watchModules, moduleName) then
+        local ____self_config_watchModules_0 = self.config.watchModules
+        ____self_config_watchModules_0[#____self_config_watchModules_0 + 1] = moduleName
+        print("HotReload: 已添加监听模块 - " .. moduleName)
+    end
+end
+function HotReload.prototype.removeWatchModule(self, moduleName)
+    local index = __TS__ArrayIndexOf(self.config.watchModules, moduleName)
+    if index > -1 then
+        __TS__ArraySplice(self.config.watchModules, index, 1)
+        print("HotReload: 已移除监听模块 - " .. moduleName)
+    end
+end
+function HotReload.prototype.getConfig(self)
+    return __TS__ObjectAssign({}, self.config)
+end
+function HotReload.prototype.updateConfig(self, newConfig)
+    self.config = __TS__ObjectAssign({}, self.config, newConfig)
+    print("HotReload: 配置已更新")
+end
+--- 默认热更新配置
+____exports.DEFAULT_HOT_RELOAD_CONFIG = {enabled = true, checkInterval = 2, watchModules = {"src/system/ui/UnitBlood", "src/system/actor", "src/utils/CameraControl", "src/main"}, preserveGlobals = {"allActors", "allUnitBlood", "cameraState", "gameState"}}
+--- 快速启动热更新的便捷函数
+function ____exports.startHotReload(config)
+    local fullConfig = __TS__ObjectAssign({}, ____exports.DEFAULT_HOT_RELOAD_CONFIG, config)
+    local hotReload = ____exports.HotReload:getInstance(fullConfig)
+    hotReload:start()
+    return hotReload
+end
+return ____exports
+ end,
+["src.system.TSTLHotReload"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
+local __TS__Delete = ____lualib.__TS__Delete
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local __TS__New = ____lualib.__TS__New
+local Map = ____lualib.Map
+local __TS__StringSplit = ____lualib.__TS__StringSplit
+local __TS__ArrayIncludes = ____lualib.__TS__ArrayIncludes
+local __TS__StringStartsWith = ____lualib.__TS__StringStartsWith
+local ____exports = {}
+local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Timer = _____2A.Timer
+--- TSTL 模块热更新器
+-- 专门为 TypeScript-to-Lua 编译后的代码设计
+____exports.TSTLHotReload = __TS__Class()
+local TSTLHotReload = ____exports.TSTLHotReload
+TSTLHotReload.name = "TSTLHotReload"
+function TSTLHotReload.prototype.____constructor(self)
+end
+function TSTLHotReload.registerModule(self, moduleName, moduleFunction, stateKeys)
+    if stateKeys == nil then
+        stateKeys = {}
+    end
+    self.moduleFunctions[moduleName] = moduleFunction
+    if not self.moduleStates[moduleName] then
+        self.moduleStates[moduleName] = {}
+    end
+    self.moduleStates[moduleName]._stateKeys = stateKeys
+    print("TSTLHotReload: 模块已注册 - " .. moduleName)
+end
+function TSTLHotReload.reloadModule(self, moduleName, newModuleFunction)
+    print("TSTLHotReload: 开始热更新模块 - " .. moduleName)
+    do
+        local function ____catch(____error)
+            print((("TSTLHotReload: 模块热更新失败 - " .. moduleName) .. ": ") .. tostring(____error))
+        end
+        local ____try, ____hasReturned = pcall(function()
+            self:saveModuleState(moduleName)
+            self.moduleFunctions[moduleName] = newModuleFunction
+            newModuleFunction()
+            self:restoreModuleState(moduleName)
+            print("TSTLHotReload: 模块热更新完成 - " .. moduleName)
+        end)
+        if not ____try then
+            ____catch(____hasReturned)
+        end
+    end
+end
+function TSTLHotReload.saveModuleState(self, moduleName)
+    local ____opt_0 = self.moduleStates[moduleName]
+    if ____opt_0 ~= nil then
+        ____opt_0 = ____opt_0._stateKeys
+    end
+    local stateKeys = ____opt_0 or ({})
+    for ____, key in __TS__Iterator(stateKeys) do
+        if _G[key] ~= nil then
+            self.moduleStates[moduleName][key] = _G[key]
+        end
+    end
+end
+function TSTLHotReload.restoreModuleState(self, moduleName)
+    local moduleState = self.moduleStates[moduleName]
+    if not moduleState then
+        return
+    end
+    for ____, ____value in ipairs(__TS__ObjectEntries(moduleState)) do
+        local key = ____value[1]
+        local value = ____value[2]
+        if key ~= "_stateKeys" then
+            _G[key] = value
+        end
+    end
+end
+function TSTLHotReload.getRegisteredModules(self)
+    return __TS__ObjectKeys(self.moduleFunctions)
+end
+function TSTLHotReload.unregisterModule(self, moduleName)
+    __TS__Delete(self.moduleFunctions, moduleName)
+    __TS__Delete(self.moduleStates, moduleName)
+    print("TSTLHotReload: 模块已注销 - " .. moduleName)
+end
+TSTLHotReload.moduleFunctions = {}
+TSTLHotReload.moduleStates = {}
+--- 热更新装饰器
+-- 用于标记可热更新的类和函数
+function ____exports.HotReloadable(moduleName, stateKeys)
+    if stateKeys == nil then
+        stateKeys = {}
+    end
+    return function(constructor)
+        ____exports.TSTLHotReload:registerModule(moduleName, constructor, stateKeys)
+        local ____class_2 = __TS__Class()
+        ____class_2.name = ____class_2.name
+        __TS__ClassExtends(____class_2, constructor)
+        function ____class_2.prototype.____constructor(self, ...)
+            local args = {...}
+            constructor.prototype.____constructor(
+                self,
+                table.unpack(args)
+            )
+            print("HotReloadable: 实例化热更新模块 - " .. moduleName)
+        end
+        return ____class_2
+    end
+end
+--- 创建热更新代理
+-- 为现有的类或对象创建热更新能力
+function ____exports.createHotReloadProxy(target, moduleName, stateKeys)
+    if stateKeys == nil then
+        stateKeys = {}
+    end
+    ____exports.TSTLHotReload:registerModule(
+        moduleName,
+        function() return target end,
+        stateKeys
+    )
+    return __TS__New(
+        Proxy,
+        target,
+        {get = function(self, target, prop)
+            local value = target[prop]
+            if type(value) == "function" then
+                return function(...)
+                    local args = {...}
+                    do
+                        local function ____catch(____error)
+                            print((((("HotReloadProxy[" .. moduleName) .. "]: 函数调用错误 - ") .. tostring(prop)) .. ": ") .. tostring(____error))
+                            error(____error, 0)
+                        end
+                        local ____try, ____hasReturned, ____returnValue = pcall(function()
+                            return true, value.apply(target, args)
+                        end)
+                        if not ____try then
+                            ____hasReturned, ____returnValue = ____catch(____hasReturned)
+                        end
+                        if ____hasReturned then
+                            return ____returnValue
+                        end
+                    end
+                end
+            end
+            return value
+        end}
+    )
+end
+--- 文件监听模拟器
+-- 在魔兽环境中通过游戏机制模拟文件变化检测
+____exports.FileWatchSimulator = __TS__Class()
+local FileWatchSimulator = ____exports.FileWatchSimulator
+FileWatchSimulator.name = "FileWatchSimulator"
+function FileWatchSimulator.prototype.____constructor(self)
+    self.watchers = __TS__New(Map)
+    self.isRunning = false
+end
+function FileWatchSimulator.getInstance(self)
+    if not ____exports.FileWatchSimulator.instance then
+        ____exports.FileWatchSimulator.instance = __TS__New(____exports.FileWatchSimulator)
+    end
+    return ____exports.FileWatchSimulator.instance
+end
+function FileWatchSimulator.prototype.watchFile(self, filePath, callback, checkInterval)
+    if checkInterval == nil then
+        checkInterval = 2
+    end
+    self.watchers:set(
+        filePath,
+        {
+            lastCheck = os.time(),
+            checksum = self:generateChecksum(filePath),
+            callback = callback
+        }
+    )
+    if not self.isRunning then
+        self:start()
+    end
+    print("FileWatchSimulator: 开始监听文件 - " .. filePath)
+end
+function FileWatchSimulator.prototype.unwatchFile(self, filePath)
+    self.watchers:delete(filePath)
+    print("FileWatchSimulator: 停止监听文件 - " .. filePath)
+    if self.watchers.size == 0 then
+        self:stop()
+    end
+end
+function FileWatchSimulator.prototype.start(self)
+    if self.isRunning then
+        return
+    end
+    self.isRunning = true
+    self.timer = Timer:create()
+    self.timer:start(
+        1,
+        true,
+        function()
+            self:checkFiles()
+        end
+    )
+    print("FileWatchSimulator: 文件监听已启动")
+end
+function FileWatchSimulator.prototype.stop(self)
+    if not self.isRunning then
+        return
+    end
+    self.isRunning = false
+    if self.timer then
+        self.timer:destroy()
+        self.timer = nil
+    end
+    print("FileWatchSimulator: 文件监听已停止")
+end
+function FileWatchSimulator.prototype.checkFiles(self)
+    local currentTime = os.time()
+    for ____, ____value in __TS__Iterator(self.watchers) do
+        local filePath = ____value[1]
+        local watcher = ____value[2]
+        local newChecksum = self:generateChecksum(filePath)
+        if newChecksum ~= watcher.checksum then
+            print("FileWatchSimulator: 检测到文件变化 - " .. filePath)
+            watcher.checksum = newChecksum
+            watcher.lastCheck = currentTime
+            Timer:create():start(
+                0.5,
+                false,
+                function()
+                    watcher:callback()
+                end
+            )
+        end
+    end
+end
+function FileWatchSimulator.prototype.generateChecksum(self, filePath)
+    return (tostring(os.time()) .. "_") .. filePath
+end
+--- 魔兽专用热更新命令系统
+____exports.WC3HotReloadCommands = __TS__Class()
+local WC3HotReloadCommands = ____exports.WC3HotReloadCommands
+WC3HotReloadCommands.name = "WC3HotReloadCommands"
+function WC3HotReloadCommands.prototype.____constructor(self)
+end
+function WC3HotReloadCommands.initialize(self)
+    if self.isInitialized then
+        return
+    end
+    local trigger = CreateTrigger()
+    do
+        local i = 0
+        while i < 8 do
+            TriggerRegisterPlayerChatEvent(
+                trigger,
+                Player(i),
+                "-",
+                false
+            )
+            i = i + 1
+        end
+    end
+    TriggerAddAction(
+        trigger,
+        function()
+            local chatString = GetEventPlayerChatString()
+            local player = GetTriggerPlayer()
+            if GetPlayerId(player) == 0 then
+                self:handleCommand(chatString)
+            end
+        end
+    )
+    self.isInitialized = true
+    print("WC3HotReloadCommands: 命令系统已初始化")
+end
+function WC3HotReloadCommands.handleCommand(self, command)
+    local parts = __TS__StringSplit(command, " ")
+    local cmd = parts[1]
+    repeat
+        local ____switch56 = cmd
+        local ____cond56 = ____switch56 == "-reload"
+        if ____cond56 then
+            if #parts > 1 then
+                self:reloadSpecificModule(parts[2])
+            else
+                self:reloadAllModules()
+            end
+            break
+        end
+        ____cond56 = ____cond56 or ____switch56 == "-hotreload"
+        if ____cond56 then
+            self:reloadAllModules()
+            break
+        end
+        ____cond56 = ____cond56 or ____switch56 == "-list-modules"
+        if ____cond56 then
+            self:listModules()
+            break
+        end
+        ____cond56 = ____cond56 or ____switch56 == "-clear-cache"
+        if ____cond56 then
+            self:clearCache()
+            break
+        end
+        do
+            break
+        end
+    until true
+end
+function WC3HotReloadCommands.reloadSpecificModule(self, moduleName)
+    local modules = ____exports.TSTLHotReload:getRegisteredModules()
+    if __TS__ArrayIncludes(modules, moduleName) then
+        print("重新加载模块: " .. moduleName)
+    else
+        print("模块不存在: " .. moduleName)
+    end
+end
+function WC3HotReloadCommands.reloadAllModules(self)
+    local modules = ____exports.TSTLHotReload:getRegisteredModules()
+    print(("开始重新加载 " .. tostring(#modules)) .. " 个模块")
+    for ____, moduleName in ipairs(modules) do
+        self:reloadSpecificModule(moduleName)
+    end
+end
+function WC3HotReloadCommands.listModules(self)
+    local modules = ____exports.TSTLHotReload:getRegisteredModules()
+    print(("已注册的模块 (" .. tostring(#modules)) .. "个):")
+    for ____, moduleName in ipairs(modules) do
+        print("  - " .. moduleName)
+    end
+end
+function WC3HotReloadCommands.clearCache(self)
+    if ____moduleCache then
+        ____moduleCache = {}
+        print("TSTL 模块缓存已清除")
+    end
+    if package ~= nil and package.loaded ~= nil then
+        for key in pairs(package.loaded) do
+            if __TS__StringStartsWith(key, "src/") then
+                package.loaded[key] = nil
+            end
+        end
+        print("Lua package.loaded 缓存已清除")
+    end
+end
+WC3HotReloadCommands.isInitialized = false
+return ____exports
+ end,
+["src.system.HotReloadExample"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local __TS__ObjectEntries = ____lualib.__TS__ObjectEntries
+local __TS__Delete = ____lualib.__TS__Delete
+local Set = ____lualib.Set
+local __TS__ArraySlice = ____lualib.__TS__ArraySlice
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+local __TS__ArrayMap = ____lualib.__TS__ArrayMap
+local __TS__NumberToFixed = ____lualib.__TS__NumberToFixed
+local ____exports = {}
+local _____2A = require("lua_modules.@eiriksgata.wc3ts.src.index")
+local Timer = _____2A.Timer
+local ____HotReload = require("src.system.HotReload")
+local startHotReload = ____HotReload.startHotReload
+local ____TSTLHotReload = require("src.system.TSTLHotReload")
+local TSTLHotReload = ____TSTLHotReload.TSTLHotReload
+local WC3HotReloadCommands = ____TSTLHotReload.WC3HotReloadCommands
+--- 热更新初始化器
+____exports.HotReloadInitializer = __TS__Class()
+local HotReloadInitializer = ____exports.HotReloadInitializer
+HotReloadInitializer.name = "HotReloadInitializer"
+function HotReloadInitializer.prototype.____constructor(self)
+end
+function HotReloadInitializer.initialize(self)
+    if self.initialized then
+        return
+    end
+    print("=== 开始初始化热更新系统 ===")
+    local hotReload = startHotReload({enabled = true, checkInterval = 3, watchModules = {"src/system/ui/UnitBlood", "src/system/actor", "src/utils/CameraControl", "src/main"}, preserveGlobals = {"allActors", "allUnitBlood", "cameraViewLevel", "isDrawEventRegistered"}})
+    WC3HotReloadCommands:initialize()
+    self:registerExistingModules()
+    self:setupDevelopmentMode()
+    self.initialized = true
+    print("=== 热更新系统初始化完成 ===")
+    print("可用命令:")
+    print("  -reload              : 重载所有模块")
+    print("  -reload <module>     : 重载特定模块")
+    print("  -list-modules        : 列出所有模块")
+    print("  -clear-cache         : 清除缓存")
+end
+function HotReloadInitializer.registerExistingModules(self)
+    TSTLHotReload:registerModule(
+        "UnitBlood",
+        function()
+            print("热更新: UnitBlood 模块已重载")
+        end,
+        {"allUnitBlood", "isDrawEventRegistered"}
+    )
+    TSTLHotReload:registerModule(
+        "Actor",
+        function()
+            print("热更新: Actor 模块已重载")
+        end,
+        {"allActors"}
+    )
+    TSTLHotReload:registerModule(
+        "CameraControl",
+        function()
+            print("热更新: CameraControl 模块已重载")
+        end,
+        {"cameraViewLevel", "resetCam", "wideScr"}
+    )
+end
+function HotReloadInitializer.setupDevelopmentMode(self)
+    Timer:create():start(
+        5,
+        true,
+        function()
+        end
+    )
+end
+function HotReloadInitializer.createHotReloadableClass(self)
+    local TestClass = __TS__Class()
+    TestClass.name = "TestClass"
+    function TestClass.prototype.____constructor(self)
+        self.value = 0
+    end
+    function TestClass.prototype.getValue(self)
+        return self.value
+    end
+    function TestClass.prototype.setValue(self, val)
+        self.value = val
+    end
+    TSTLHotReload:registerModule(
+        "TestClass",
+        function() return __TS__New(TestClass) end,
+        {"testState"}
+    )
+    local instance = __TS__New(TestClass)
+    instance:setValue(42)
+    print("TestClass 值: " .. tostring(instance:getValue()))
+end
+HotReloadInitializer.initialized = false
+--- TSTL 特定的热更新辅助函数
+____exports.TSTLHotReloadHelpers = __TS__Class()
+local TSTLHotReloadHelpers = ____exports.TSTLHotReloadHelpers
+TSTLHotReloadHelpers.name = "TSTLHotReloadHelpers"
+function TSTLHotReloadHelpers.prototype.____constructor(self)
+end
+function TSTLHotReloadHelpers.safeReloadModule(self, modulePath)
+    do
+        local function ____catch(____error)
+            print((("模块重载失败: " .. modulePath) .. " - ") .. tostring(____error))
+            return true, false
+        end
+        local ____try, ____hasReturned, ____returnValue = pcall(function()
+            local backup = self:createStateBackup()
+            self:clearModuleFromCache(modulePath)
+            local newModule = require(modulePath)
+            if newModule and type(newModule.initialize) == "function" then
+                newModule.initialize()
+            end
+            self:restoreStateFromBackup(backup)
+            print("模块重载成功: " .. modulePath)
+            return true, true
+        end)
+        if not ____try then
+            ____hasReturned, ____returnValue = ____catch(____hasReturned)
+        end
+        if ____hasReturned then
+            return ____returnValue
+        end
+    end
+end
+function TSTLHotReloadHelpers.createStateBackup(self)
+    local backup = {}
+    local globalKeys = {"allActors", "allUnitBlood", "cameraViewLevel", "isDrawEventRegistered"}
+    for ____, key in ipairs(globalKeys) do
+        if _G[key] ~= nil then
+            backup[key] = _G[key]
+        end
+    end
+    return backup
+end
+function TSTLHotReloadHelpers.restoreStateFromBackup(self, backup)
+    for ____, ____value in ipairs(__TS__ObjectEntries(backup)) do
+        local key = ____value[1]
+        local value = ____value[2]
+        _G[key] = value
+    end
+end
+function TSTLHotReloadHelpers.clearModuleFromCache(self, modulePath)
+    if ____moduleCache and ____moduleCache[modulePath] then
+        __TS__Delete(____moduleCache, modulePath)
+    end
+    if package and package.loaded and package.loaded[modulePath] then
+        package.loaded[modulePath] = nil
+    end
+end
+function TSTLHotReloadHelpers.getModuleDependencies(self)
+    return {["src/main"] = {"src/system/ui/UnitBlood", "src/system/actor", "src/utils/CameraControl"}, ["src/system/ui/UnitBlood"] = {"src/system/actor", "src/utils/CameraControl"}, ["src/system/actor"] = {}, ["src/utils/CameraControl"] = {}}
+end
+function TSTLHotReloadHelpers.reloadModulesInOrder(self, modules)
+    local dependencies = self:getModuleDependencies()
+    local reloadOrder = {}
+    local visited = __TS__New(Set)
+    local function visit(module)
+        if visited:has(module) then
+            return
+        end
+        visited:add(module)
+        local deps = dependencies[module] or ({})
+        for ____, dep in ipairs(deps) do
+            visit(dep)
+        end
+        reloadOrder[#reloadOrder + 1] = module
+    end
+    for ____, module in ipairs(modules) do
+        visit(module)
+    end
+    for ____, module in ipairs(reloadOrder) do
+        self:safeReloadModule(module)
+    end
+end
+--- 热更新监控器
+-- 提供热更新状态的监控和调试信息
+____exports.HotReloadMonitor = __TS__Class()
+local HotReloadMonitor = ____exports.HotReloadMonitor
+HotReloadMonitor.name = "HotReloadMonitor"
+function HotReloadMonitor.prototype.____constructor(self)
+end
+function HotReloadMonitor.recordReload(self, module, success, ____error)
+    self.reloadCount = self.reloadCount + 1
+    self.lastReloadTime = os.time()
+    local ____self_reloadHistory_0 = self.reloadHistory
+    ____self_reloadHistory_0[#____self_reloadHistory_0 + 1] = {module = module, timestamp = self.lastReloadTime, success = success, error = ____error}
+    if #self.reloadHistory > 50 then
+        table.remove(self.reloadHistory, 1)
+    end
+end
+function HotReloadMonitor.getStats(self)
+    local recent = __TS__ArraySlice(self.reloadHistory, -10)
+    local successCount = #__TS__ArrayFilter(
+        recent,
+        function(____, r) return r.success end
+    )
+    local successRate = #recent > 0 and successCount / #recent * 100 or 0
+    local recentErrors = __TS__ArraySlice(
+        __TS__ArrayMap(
+            __TS__ArrayFilter(
+                recent,
+                function(____, r) return not r.success and r.error end
+            ),
+            function(____, r) return r.error end
+        ),
+        -3
+    )
+    return {totalReloads = self.reloadCount, lastReloadTime = self.lastReloadTime, successRate = successRate, recentErrors = recentErrors}
+end
+function HotReloadMonitor.printStats(self)
+    local stats = self:getStats()
+    print("=== 热更新监控信息 ===")
+    print("总重载次数: " .. tostring(stats.totalReloads))
+    print("最后重载时间: " .. tostring(stats.lastReloadTime))
+    print(("成功率: " .. __TS__NumberToFixed(stats.successRate, 1)) .. "%")
+    if #stats.recentErrors > 0 then
+        print("最近的错误:")
+        for ____, ____error in ipairs(stats.recentErrors) do
+            print("  - " .. ____error)
+        end
+    end
+end
+HotReloadMonitor.reloadCount = 0
+HotReloadMonitor.lastReloadTime = 0
+HotReloadMonitor.reloadHistory = {}
+return ____exports
+ end,
 ["src.main"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
@@ -11278,10 +12069,19 @@ local ____CameraControl = require("src.utils.CameraControl")
 local CameraControl = ____CameraControl.CameraControl
 local ____actor = require("src.system.actor")
 local Actor = ____actor.Actor
+local ____HotReloadExample = require("src.system.HotReloadExample")
+local HotReloadInitializer = ____HotReloadExample.HotReloadInitializer
 --- 应用程序主入口
 -- 负责引导整个应用程序的启动
 local function main()
     return __TS__AsyncAwaiter(function(____awaiter_resolve)
+        Timer:create():start(
+            0.5,
+            false,
+            function()
+                HotReloadInitializer:initialize()
+            end
+        )
         Timer:create():start(
             1,
             false,
@@ -11316,6 +12116,244 @@ local function main()
 end
 ydlua:getInstance():initialize()
 main()
+return ____exports
+ end,
+["src.config.DevConfig"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local __TS__StringSplit = ____lualib.__TS__StringSplit
+local __TS__NumberToFixed = ____lualib.__TS__NumberToFixed
+local __TS__StringPadStart = ____lualib.__TS__StringPadStart
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+--- 默认开发配置
+____exports.DEFAULT_DEV_CONFIG = {hotReload = {enabled = true, autoStart = true, checkInterval = 2, preserveState = true}, debug = {enabled = true, logLevel = "info", showTimestamps = true}, commands = {enabled = true, adminOnly = true}}
+--- 开发环境管理器
+____exports.DevEnvironment = __TS__Class()
+local DevEnvironment = ____exports.DevEnvironment
+DevEnvironment.name = "DevEnvironment"
+function DevEnvironment.prototype.____constructor(self, config)
+    self.config = config
+    self.startTime = os.time()
+end
+function DevEnvironment.getInstance(self, config)
+    if not ____exports.DevEnvironment.instance then
+        ____exports.DevEnvironment.instance = __TS__New(____exports.DevEnvironment, config or ____exports.DEFAULT_DEV_CONFIG)
+    end
+    return ____exports.DevEnvironment.instance
+end
+function DevEnvironment.prototype.initialize(self)
+    self:log("info", "=== 开发环境初始化开始 ===")
+    self:printConfig()
+    if self.config.debug.enabled then
+        self:setupDebugEnvironment()
+    end
+    if self.config.commands.enabled then
+        self:setupDevelopmentCommands()
+    end
+    self:log("info", "=== 开发环境初始化完成 ===")
+end
+function DevEnvironment.prototype.printConfig(self)
+    self:log("info", "开发环境配置:")
+    self:log("info", "  热更新: " .. (self.config.hotReload.enabled and "启用" or "禁用"))
+    self:log("info", "  调试模式: " .. (self.config.debug.enabled and "启用" or "禁用"))
+    self:log("info", "  开发命令: " .. (self.config.commands.enabled and "启用" or "禁用"))
+end
+function DevEnvironment.prototype.setupDebugEnvironment(self)
+    if self.config.debug.showTimestamps then
+        local originalPrint = print
+        _G.print = function(message)
+            local timestamp = self:getFormattedTime()
+            originalPrint((("[" .. timestamp) .. "] ") .. message)
+        end
+    end
+    self:log("info", "调试环境已设置")
+end
+function DevEnvironment.prototype.setupDevelopmentCommands(self)
+    local trigger = CreateTrigger()
+    do
+        local i = 0
+        while i < 8 do
+            TriggerRegisterPlayerChatEvent(
+                trigger,
+                Player(i),
+                "-dev",
+                false
+            )
+            i = i + 1
+        end
+    end
+    TriggerAddAction(
+        trigger,
+        function()
+            local chatString = GetEventPlayerChatString()
+            local player = GetTriggerPlayer()
+            if self.config.commands.adminOnly and GetPlayerId(player) ~= 0 then
+                return
+            end
+            self:handleDevCommand(chatString)
+        end
+    )
+    self:log("info", "开发命令已注册")
+    self:log("info", "可用命令: -dev help")
+end
+function DevEnvironment.prototype.handleDevCommand(self, command)
+    local parts = __TS__StringSplit(command, " ")
+    local cmd = parts[2] or "help"
+    repeat
+        local ____switch18 = cmd
+        local ____cond18 = ____switch18 == "help"
+        if ____cond18 then
+            self:showHelpMenu()
+            break
+        end
+        ____cond18 = ____cond18 or ____switch18 == "status"
+        if ____cond18 then
+            self:showStatus()
+            break
+        end
+        ____cond18 = ____cond18 or ____switch18 == "config"
+        if ____cond18 then
+            self:showCurrentConfig()
+            break
+        end
+        ____cond18 = ____cond18 or ____switch18 == "performance"
+        if ____cond18 then
+            self:showPerformanceInfo()
+            break
+        end
+        ____cond18 = ____cond18 or ____switch18 == "memory"
+        if ____cond18 then
+            self:showMemoryInfo()
+            break
+        end
+        ____cond18 = ____cond18 or ____switch18 == "time"
+        if ____cond18 then
+            self:showTimeInfo()
+            break
+        end
+        do
+            self:log("warn", ("未知命令: " .. cmd) .. "。输入 -dev help 查看帮助")
+            break
+        end
+    until true
+end
+function DevEnvironment.prototype.showHelpMenu(self)
+    self:log("info", "=== 开发命令帮助 ===")
+    self:log("info", "-dev help        - 显示此帮助")
+    self:log("info", "-dev status      - 显示系统状态")
+    self:log("info", "-dev config      - 显示当前配置")
+    self:log("info", "-dev performance - 显示性能信息")
+    self:log("info", "-dev memory      - 显示内存信息")
+    self:log("info", "-dev time        - 显示时间信息")
+end
+function DevEnvironment.prototype.showStatus(self)
+    local uptime = os.time() - self.startTime
+    self:log("info", "=== 系统状态 ===")
+    self:log(
+        "info",
+        ("运行时间: " .. tostring(uptime)) .. " 秒"
+    )
+    self:log("info", "热更新: " .. (self.config.hotReload.enabled and "活跃" or "未启用"))
+    self:log("info", "调试模式: " .. (self.config.debug.enabled and "开启" or "关闭"))
+end
+function DevEnvironment.prototype.showCurrentConfig(self)
+    self:log("info", "=== 当前配置 ===")
+    self:log(
+        "info",
+        JSON:stringify(self.config, nil, 2)
+    )
+end
+function DevEnvironment.prototype.showPerformanceInfo(self)
+    self:log("info", "=== 性能信息 ===")
+    local memoryKB = collectgarbage("count")
+    self:log(
+        "info",
+        ("Lua 内存使用: " .. __TS__NumberToFixed(memoryKB, 2)) .. " KB"
+    )
+    self:log(
+        "info",
+        ("FPS: " .. GetLocalizedString("GAMEERR_FRAME_RATE")) .. " (模拟)"
+    )
+end
+function DevEnvironment.prototype.showMemoryInfo(self)
+    self:log("info", "=== 内存信息 ===")
+    local beforeGC = collectgarbage("count")
+    collectgarbage("collect")
+    local afterGC = collectgarbage("count")
+    self:log(
+        "info",
+        ("GC 前: " .. __TS__NumberToFixed(beforeGC, 2)) .. " KB"
+    )
+    self:log(
+        "info",
+        ("GC 后: " .. __TS__NumberToFixed(afterGC, 2)) .. " KB"
+    )
+    self:log(
+        "info",
+        ("释放: " .. __TS__NumberToFixed(beforeGC - afterGC, 2)) .. " KB"
+    )
+end
+function DevEnvironment.prototype.showTimeInfo(self)
+    local current = os.time()
+    local uptime = current - self.startTime
+    self:log("info", "=== 时间信息 ===")
+    self:log(
+        "info",
+        "当前时间戳: " .. tostring(current)
+    )
+    self:log(
+        "info",
+        "启动时间戳: " .. tostring(self.startTime)
+    )
+    self:log(
+        "info",
+        ("运行时长: " .. tostring(uptime)) .. " 秒"
+    )
+    self:log(
+        "info",
+        "格式化时间: " .. self:getFormattedTime()
+    )
+end
+function DevEnvironment.prototype.getFormattedTime(self)
+    local time = os.time()
+    local minutes = math.floor(time / 60) % 60
+    local seconds = time % 60
+    return (__TS__StringPadStart(
+        tostring(minutes),
+        2,
+        "0"
+    ) .. ":") .. __TS__StringPadStart(
+        tostring(seconds),
+        2,
+        "0"
+    )
+end
+function DevEnvironment.prototype.log(self, level, message)
+    if self:shouldLog(level) then
+        local prefix = self:getLogPrefix(level)
+        print(prefix .. message)
+    end
+end
+function DevEnvironment.prototype.shouldLog(self, level)
+    local levels = {"info", "warn", "error"}
+    local currentLevelIndex = __TS__ArrayIndexOf(levels, self.config.debug.logLevel)
+    local messageLevelIndex = __TS__ArrayIndexOf(levels, level)
+    return messageLevelIndex >= currentLevelIndex
+end
+function DevEnvironment.prototype.getLogPrefix(self, level)
+    local prefixes = {info = "[INFO] ", warn = "[WARN] ", error = "[ERROR] "}
+    return prefixes[level]
+end
+function DevEnvironment.prototype.updateConfig(self, newConfig)
+    self.config = __TS__ObjectAssign({}, self.config, newConfig)
+    self:log("info", "开发配置已更新")
+end
+function DevEnvironment.prototype.getConfig(self)
+    return __TS__ObjectAssign({}, self.config)
+end
 return ____exports
  end,
 ["src.system.damage"] = function(...) 

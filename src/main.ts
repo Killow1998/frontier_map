@@ -1,18 +1,18 @@
 
-import { Effect, Unit, Players, Frame, FRAME_ALIGN_BOTTOM, FRAME_ALIGN_CENTER, Timer } from "@eiriksgata/wc3ts/*";
+import { Players, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { FourCC } from "./utils/helper";
-import { Console } from "./system/console";
 import { UnitBlood } from "./system/ui/UnitBlood";
 import { CameraControl } from "./utils/CameraControl";
 import { Actor } from "./system/actor";
-;
+
 
 /**
  * 应用程序主入口
  * 负责引导整个应用程序的启动
  */
 async function main(): Promise<void> {
+
 
 
   Timer.create().start(1, false, () => {
@@ -37,15 +37,13 @@ async function main(): Promise<void> {
 
     const testUnit = Actor.create(Players[1], FourCC('Hpal'), 300, 300, 0)!;
     testUnit.createBloodBar();
-    
+
   });
 
 
 
   // 移动镜头到单位坐标
   // SetCameraTargetController(unit.handle, 0, 0, true);
-
-
 
 
 }
