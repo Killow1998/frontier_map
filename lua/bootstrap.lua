@@ -1,4 +1,3 @@
-package.path = package.path .. ";D:/work/github/wc3-map-ts-template/dist/?.lua;"
 -- Bootstrap script for loading modular TSTL output
 -- This script initializes the main application from the compiled Lua modules
 

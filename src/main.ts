@@ -10,6 +10,7 @@ import { Actor } from "./system/actor";
 /**
  * 应用程序主入口
  * 负责引导整个应用程序的启动
+ * 测试自动重新编译功能
  */
 async function main(): Promise<void> {
 
@@ -29,7 +30,11 @@ async function main(): Promise<void> {
 
     const unit = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 0)!;
     print(`Created unit: ${unit.name}`);
+
+    //移动镜头到目标
+    PanCameraToTimed(unit.x, unit.y, 0);
     SetCameraQuickPosition(unit.x, unit.y);
+
 
     //改变攻击力
     unit.setBaseDamageJAPI(100);
@@ -39,6 +44,7 @@ async function main(): Promise<void> {
     const testUnit = Actor.create(Players[1], FourCC('Hpal'), 300, 300, 0)!;
     testUnit.createBloodBar();
 
+    print("hello ! test")
   });
 
 

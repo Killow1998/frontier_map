@@ -19,7 +19,7 @@
       "lua-types/5.3"
     ],
     "strict": true,
-    "outDir": "maps/map"
+    "outDir": "dist/"
   },
   "tstl": {
     "luaTarget": "5.3",

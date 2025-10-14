@@ -17,6 +17,7 @@ local ____actor = require("src.system.actor")
 local Actor = ____actor.Actor
 --- 应用程序主入口
 -- 负责引导整个应用程序的启动
+-- 测试自动重新编译功能
 local function main()
     return __TS__AsyncAwaiter(function(____awaiter_resolve)
         Timer:create():start(
@@ -36,6 +37,7 @@ local function main()
                     0
                 )
                 print("Created unit: " .. unit.name)
+                PanCameraToTimed(unit.x, unit.y, 0)
                 SetCameraQuickPosition(unit.x, unit.y)
                 unit:setBaseDamageJAPI(100)
                 unit:createBloodBar()
@@ -47,6 +49,7 @@ local function main()
                     0
                 )
                 testUnit:createBloodBar()
+                print("hello ! test")
             end
         )
     end)
