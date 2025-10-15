@@ -2,8 +2,8 @@
 -- This script initializes the main application from the compiled Lua modules
 
 -- Debugging: Enable console output_ar
--- local console = require("jass.console")
--- console.enable = true;
+local console = require("jass.console")
+console.enable = true;
 -- print("Bootstrap script started")
 -- print("package.path:", package.path)
 

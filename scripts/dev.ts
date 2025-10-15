@@ -9,6 +9,7 @@ import { buildW3x, compileTypeScriptToLua, injectLuaExecutionCall, handleBootstr
 // 全局变量
 let tstlWatchProcess: ChildProcess | null = null;
 let isInitialBuildComplete = false;
+let lastNotificationTime = 0; // 记录上次生成通知的时间
 
 /**
  * 执行初始构建
@@ -30,8 +31,17 @@ function performInitialBuild(): void {
     // 4. 打包 w3x 文件
     buildW3x();
     
+    // 5. 清理旧的热更新通知文件（避免初始构建触发热更新）
+    const fs = require('fs');
+    const path = require('path');
+    const notificationPath = path.join("dist", "hot-reload.json");
+    if (fs.existsSync(notificationPath)) {
+      fs.unlinkSync(notificationPath);
+      console.log(">>> Removed old hot reload notification file");
+    }
+    
     console.log(">>> Initial build completed");
-    isInitialBuildComplete = true;
+    // 注意：isInitialBuildComplete 将在 TSTL watch 模式的第一次编译完成后设置为 true
   } catch (error) {
     console.error(">>> Error during initial build:", error);
     process.exit(1);
@@ -60,6 +70,10 @@ function startTstlWatch(): void {
         if (isInitialBuildComplete) {
           console.log(">>> File changed, rebuilding...");
           handleFileChange();
+        } else {
+          // 这是 watch 模式启动后的第一次编译，不应该触发热更新
+          console.log(">>> TSTL watch mode initial compilation completed, skipping hot reload");
+          isInitialBuildComplete = true;
         }
       }
     });
@@ -87,15 +101,98 @@ function handleFileChange(): void {
   try {
     console.log(">>> Handling file change...");
     
-    // 当文件发生变化时，dist/中的lua文件已经被更新
-    // 只需要通知游戏重新加载即可，游戏内固定文件 lua/bootstrap.lua 会加载 dist/ 下的最新文件
-    // 
-
+    // 生成热更新通知文件
+    generateHotReloadNotification();
     
     console.log(">>> File change handled, ready for next change...");
   } catch (error) {
     console.error(">>> Error handling file change:", error);
   }
+}
+
+/**
+ * 生成热更新通知文件
+ */
+function generateHotReloadNotification(): void {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    // 获取最近修改的 Lua 文件
+    const distSrcPath = path.join("dist", "src");
+    if (!fs.existsSync(distSrcPath)) {
+      console.warn(">>> dist/src directory not found, skipping hot reload notification");
+      return;
+    }
+    
+    // 递归获取所有 Lua 文件并按修改时间排序
+    const changedModules = getRecentlyChangedModules(distSrcPath);
+    
+    if (changedModules.length === 0) {
+      console.log(">>> No recently changed modules detected");
+      return;
+    }
+    
+    // 更新上次通知时间
+    lastNotificationTime = Date.now();
+    
+    // 生成热更新通知
+    const hotReloadNotification = {
+      timestamp: lastNotificationTime,
+      action: "reload",
+      modules: changedModules,
+      processed: false
+    };
+    
+    const notificationPath = path.join("dist", "hot-reload.json");
+    fs.writeFileSync(notificationPath, JSON.stringify(hotReloadNotification, null, 2));
+    
+    console.log(`>>> Generated hot reload notification for modules: ${changedModules.join(", ")}`);
+  } catch (error) {
+    console.error(">>> Error generating hot reload notification:", error);
+  }
+}
+
+/**
+ * 获取最近修改的模块列表（排除初始构建时的文件）
+ */
+function getRecentlyChangedModules(distSrcPath: string): string[] {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const modules: string[] = [];
+  const now = Date.now();
+  
+  // 使用更短的阈值，并且排除初始构建时的文件
+  const recentThreshold = 2000; // 2秒内的文件认为是最近修改的
+  const excludeThreshold = lastNotificationTime || (now - 10000); // 排除上次通知之前的文件
+  
+  function scanDirectory(dir: string, basePath: string = ""): void {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      const relativePath = basePath ? `${basePath}.${entry.name}` : entry.name;
+      
+      if (entry.isDirectory()) {
+        scanDirectory(fullPath, relativePath);
+      } else if (entry.name.endsWith('.lua')) {
+        const stats = fs.statSync(fullPath);
+        const fileModTime = stats.mtime.getTime();
+        const timeDiff = now - fileModTime;
+        
+        // 只包含最近修改的文件，并且排除初始构建时的文件
+        if (timeDiff <= recentThreshold && fileModTime > excludeThreshold) {
+          // 转换文件路径为模块路径
+          const moduleName = relativePath.replace(/\.lua$/, '');
+          modules.push(`src.${moduleName}`);
+        }
+      }
+    }
+  }
+  
+  scanDirectory(distSrcPath);
+  return modules;
 }
 
 /**
@@ -108,6 +205,9 @@ function cleanup(): void {
     tstlWatchProcess.kill('SIGTERM');
     tstlWatchProcess = null;
   }
+  
+  // 清理热更新通知文件
+  cleanupHotReloadFile();
 }
 
 /**
@@ -128,6 +228,24 @@ function setupSignalHandlers(): void {
 }
 
 /**
+ * 清理热更新通知文件
+ */
+function cleanupHotReloadFile(): void {
+  const fs = require('fs');
+  const path = require('path');
+  const notificationPath = path.join("dist", "hot-reload.json");
+  
+  if (fs.existsSync(notificationPath)) {
+    try {
+      fs.unlinkSync(notificationPath);
+      console.log(">>> Removed existing hot-reload.json file");
+    } catch (error) {
+      console.warn(`>>> Warning: Failed to remove hot-reload.json: ${error}`);
+    }
+  }
+}
+
+/**
  * 主函数
  */
 function main(): void {
@@ -135,6 +253,9 @@ function main(): void {
   
   // 设置信号处理
   setupSignalHandlers();
+  
+  // 0. 清理旧的热更新通知文件
+  cleanupHotReloadFile();
   
   // 1. 执行初始构建
   performInitialBuild();

@@ -5,6 +5,11 @@ import { FourCC } from "./utils/helper";
 import { UnitBlood } from "./system/ui/UnitBlood";
 import { CameraControl } from "./utils/CameraControl";
 import { Actor } from "./system/actor";
+import { HotReload } from "./system/HotReload";
+import { ModuleManager } from "./system/ModuleManager";
+import { TemplateUI } from "./system/ui/TemplateUi";
+import { PlayersConfig } from "./config/Players";
+import { MAP_UNITS_INIT_CREATE } from "./config/MapUnit";
 
 
 /**
@@ -17,34 +22,19 @@ async function main(): Promise<void> {
 
 
   Timer.create().start(1, false, () => {
-    //禁用黑色阴影和迷雾
-    FogMaskEnable(false)
-    FogEnable(false)
-    // 必须开启宽屏模式
-    DzEnableWideScreen(true)
 
-    CameraControl.initMouseControl();
-
-    UnitBlood.registerLocalDrawEvent();
-
-
-    const unit = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 0)!;
-    print(`Created unit: ${unit.name}`);
 
     //移动镜头到目标
-    PanCameraToTimed(unit.x, unit.y, 0);
-    SetCameraQuickPosition(unit.x, unit.y);
+    PanCameraToTimed(MAP_UNITS_INIT_CREATE.玩家1圣骑士.x, MAP_UNITS_INIT_CREATE.玩家1圣骑士.y, 0);
+    SetCameraQuickPosition(MAP_UNITS_INIT_CREATE.玩家1圣骑士.x, MAP_UNITS_INIT_CREATE.玩家1圣骑士.y);
 
+    MAP_UNITS_INIT_CREATE.玩家1圣骑士.createBloodBar();
 
-    //改变攻击力
-    unit.setBaseDamageJAPI(100);
+    // 确保模块被引用，强制执行模块注册代码
+    // print(`TemplateUI imported: ${typeof TemplateUI}`);
 
-    unit.createBloodBar();
-
-    const testUnit = Actor.create(Players[1], FourCC('Hpal'), 300, 300, 0)!;
-    testUnit.createBloodBar();
-
-    print("hello ! test")
+    // 初始化模块管理器中的所有模块
+    ModuleManager.getInstance().initializeAllModules();
   });
 
 
@@ -64,4 +54,24 @@ export function initialize(): void {
 
   // 启动应用程序
   main();
+
+  // 延迟启动热更新系统，确保所有模块都已注册
+  Timer.create().start(2, false, () => {
+    print(`Starting hot reload system. Registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
+    HotReload.getInstance().start();
+    print("Hot reload system initialized");
+  });
+
+  PlayersConfig.CameraControl();
+
+  UnitBlood.registerLocalDrawEvent();
+}
+
+/**
+ * 热重载处理函数
+ * 当模块被热重载时调用
+ */
+export function onHotReload(): void {
+  print("Main module hot reloaded!");
+  // 这里可以添加主模块热重载后的特殊处理逻辑
 }

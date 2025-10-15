@@ -6,7 +6,7 @@ export class Console {
     DisplayTextToPlayer(player.handle, 0, 0, `|cff00ff00${message}|r`);
   }
 
-  public static err(message: string, player: MapPlayer = Players[0]) {
+  public static error(message: string, player: MapPlayer = Players[0]) {
     DisplayTextToPlayer(player.handle, 0, 0, `|cffff0000${message}|r`);
   }
 
