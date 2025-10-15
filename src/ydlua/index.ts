@@ -72,13 +72,6 @@ export class ydlua {
     this.initializeConsole();
     this.initializeRuntime();
     this.registerGlobals();
-
-    for (let i = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
-      const pl = MapPlayer.fromHandle(Player(i));
-      if (pl) {
-        Players[i] = pl;
-      }
-    }
   }
 
   /**
@@ -100,17 +93,20 @@ export class ydlua {
    * 注册全局变量
    */
   private registerGlobals(): void {
-    // 注册 jass.common 到全局
-    Object.keys(ydcommon).forEach(key => {
-      // @ts-ignore
-      _G[key] = ydcommon[key];
-    });
 
-    // 注册 jass.japi 到全局
-    Object.keys(ydjapi).forEach(key => {
-      // @ts-ignore
-      _G[key] = ydjapi[key];
-    });
+    //这部分已交给 bootstrap 处理
+    
+    // // 注册 jass.common 到全局
+    // Object.keys(ydcommon).forEach(key => {
+    //   // @ts-ignore
+    //   _G[key] = ydcommon[key];
+    // });
+
+    // // 注册 jass.japi 到全局
+    // Object.keys(ydjapi).forEach(key => {
+    //   // @ts-ignore
+    //   _G[key] = ydjapi[key];
+    // });
 
     print('>>> Global APIs registered');
   }

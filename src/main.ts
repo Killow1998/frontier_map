@@ -1,13 +1,9 @@
 
-import { Players, Timer } from "@eiriksgata/wc3ts/*";
+import { bj_MAX_PLAYER_SLOTS, MapPlayer, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
-import { FourCC } from "./utils/helper";
 import { UnitBlood } from "./system/ui/UnitBlood";
-import { CameraControl } from "./utils/CameraControl";
-import { Actor } from "./system/actor";
 import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
-import { TemplateUI } from "./system/ui/TemplateUi";
 import { PlayersConfig } from "./config/Players";
 import { MAP_UNITS_INIT_CREATE } from "./config/MapUnit";
 
@@ -19,14 +15,17 @@ import { MAP_UNITS_INIT_CREATE } from "./config/MapUnit";
  */
 async function main(): Promise<void> {
 
+  Timer.create().start(0.01, false, () => {
 
+    PlayersConfig.CameraControl();
 
-  Timer.create().start(1, false, () => {
+    UnitBlood.registerLocalDrawEvent();
 
 
     //移动镜头到目标
     PanCameraToTimed(MAP_UNITS_INIT_CREATE.玩家1圣骑士.x, MAP_UNITS_INIT_CREATE.玩家1圣骑士.y, 0);
     SetCameraQuickPosition(MAP_UNITS_INIT_CREATE.玩家1圣骑士.x, MAP_UNITS_INIT_CREATE.玩家1圣骑士.y);
+    SetCameraTargetController(MAP_UNITS_INIT_CREATE.玩家1圣骑士.handle, 0, 0, true);
 
     MAP_UNITS_INIT_CREATE.玩家1圣骑士.createBloodBar();
 
@@ -37,11 +36,12 @@ async function main(): Promise<void> {
     ModuleManager.getInstance().initializeAllModules();
   });
 
-
-
-  // 移动镜头到单位坐标
-  // SetCameraTargetController(unit.handle, 0, 0, true);
-
+  // 延迟启动热更新系统，确保所有模块都已注册
+  Timer.create().start(2, false, () => {
+    print(`Starting hot reload system. Registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
+    HotReload.getInstance().start();
+    print("Hot reload system initialized");
+  });
 
 }
 
@@ -55,16 +55,8 @@ export function initialize(): void {
   // 启动应用程序
   main();
 
-  // 延迟启动热更新系统，确保所有模块都已注册
-  Timer.create().start(2, false, () => {
-    print(`Starting hot reload system. Registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
-    HotReload.getInstance().start();
-    print("Hot reload system initialized");
-  });
 
-  PlayersConfig.CameraControl();
 
-  UnitBlood.registerLocalDrawEvent();
 }
 
 /**
@@ -75,3 +67,4 @@ export function onHotReload(): void {
   print("Main module hot reloaded!");
   // 这里可以添加主模块热重载后的特殊处理逻辑
 }
+

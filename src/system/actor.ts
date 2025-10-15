@@ -39,6 +39,9 @@ export class Actor extends Unit {
     facing: number = 0
   ): Actor | undefined {
     // 检查是否已经存在该位置的单位
+    if (owner == undefined || owner == null) {
+      owner = MapPlayer.fromHandle(Player(owner))!;
+    }
     const handle = CreateUnit(owner.handle, unitId, x, y, facing);
     if (handle === undefined) {
       return undefined;
