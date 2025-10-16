@@ -48,7 +48,7 @@ export class UnitBlood {
     this.levelFrame = Frame.createType("LevelFrame", this.frame, 0, "TEXT", "")!;
     this.levelFrame.setTextAlignment(50, 0);
     this.levelFrame.setText(`${actor.level}`);
-    this.levelFrame.setFont("hpbar\\ZiTi.ttf", 0.08, 0);
+    this.levelFrame.setFont("resource\\hpbar\\ZiTi.ttf", 0.01, 0);
 
     this.levelFrame.setPoint(FRAME_ALIGN_CENTER, this.frame, FRAME_ALIGN_LEFT_TOP, 14 / 2400, -14 / 1800);
 
@@ -61,7 +61,7 @@ export class UnitBlood {
     this.nameFrame = Frame.createType("NameFrame", this.nameBoxFrame, 0, "TEXT", "")!;
     this.nameFrame.setText(actor.name);
     this.nameFrame.setTextAlignment(18, 0);
-    this.nameFrame.setFont("hpbar\\ZiTi.ttf", 0.01, 0);
+    this.nameFrame.setFont("resource\\hpbar\\ZiTi.ttf", 0.01, 0);
     // this.nameFrame.setSize(0, 0.006)
     
     this.nameFrame.alpha = 255;

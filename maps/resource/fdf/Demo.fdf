@@ -1,0 +1,8 @@
+Frame "BACKDROP" "Demo_SizeBack" 
+{
+  Width 0.04,
+  Height 0.04,
+  
+  BackdropBackground "ReplaceableTextures\CommandButtons\BTNOrbOfDarkness.blp",
+  BackdropBlendAll,
+}

@@ -81,6 +81,7 @@ export class HotReload {
    */
   private checkForUpdates(): void {
     try {
+      
       // 尝试读取热更新通知文件
       const notificationContent = this.readHotReloadFile();
       if (!notificationContent) {
@@ -91,12 +92,10 @@ export class HotReload {
       if (!notification) {
         return;
       }
-
       // 检查是否是新的通知（仅检查时间戳，忽略文件中的 processed 字段）
       if (notification.timestamp <= this.lastProcessedTimestamp) {
         return;
       }
-
       // 处理热更新
       this.processHotReload(notification);
 
@@ -105,7 +104,6 @@ export class HotReload {
 
     } catch (error) {
       // 静默处理错误，避免在游戏中产生过多日志
-      //Console.error(`Hot reload check failed: ${error}`);
     }
   }
 
@@ -114,8 +112,10 @@ export class HotReload {
    */
   private readHotReloadFile(): string | null {
     try {
+      const filePath = `${PROJECT_PATH}/hot-reload.json`;
+      
       // 使用原生 Lua 代码读取文件
-      const file = io.open(`${PROJECT_PATH}/hot-reload.json`, "r");
+      const file = io.open(filePath, "r");
       if (!file) {
         return null;
       }

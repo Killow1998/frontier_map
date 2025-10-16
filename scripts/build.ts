@@ -52,19 +52,19 @@ function main(): void {
   console.log(`>>> Starting build process (production mode)`);
 
   try {
-    // 1. 编译 TypeScript 到 Lua
+    //编译 TypeScript 到 Lua
     compileTypeScriptToLua();
 
-    // 2. 注入 Lua 执行调用
+    //注入 Lua 执行调用
     injectLuaExecutionCall();
 
-    // 3. 处理 bootstrap.lua
+    //处理 bootstrap.lua
     handleBootstrapLua(false);
 
-    // 4. 压缩 Lua 代码（仅生产模式）
+    //压缩 Lua 代码（仅生产模式）
     minifyLua(); // 暂时禁用压缩
 
-    // 5. 打包 w3x 文件
+    //打包 w3x 文件
     buildW3x();
 
     console.log(">>> Build process completed");

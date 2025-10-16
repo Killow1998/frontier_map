@@ -158,16 +158,9 @@ export function handleBootstrapLua(isDev: boolean = false): void {
 
 /**
  * 编译 TypeScript 到 Lua
- * @param isWatch 是否为 watch 模式
  */
-export function compileTypeScriptToLua(isWatch: boolean = false): void {
+export function compileTypeScriptToLua(): void {
   try {
-    if (isWatch) {
-      console.log(">>> Starting TypeScript to Lua compilation in watch mode...");
-      // watch 模式由调用方处理
-      return;
-    }
-
     console.log(">>> Starting TypeScript to Lua compilation...");
     execSync('tstl -p tsconfig.json', { stdio: 'inherit' });
     console.log(">>> TypeScript to Lua compilation completed");
@@ -176,3 +169,4 @@ export function compileTypeScriptToLua(isWatch: boolean = false): void {
     throw error;
   }
 }
+

@@ -7,3 +7,5 @@ dist/*
 *.log
 *.w3x
 *.w3m
+
+mpq/*
