@@ -184,7 +184,7 @@ export class ModuleManager {
     // 这里需要处理文件名大小写的映射
     
     const pathMappings: { [key: string]: string } = {
-      'TemplateUI': 'src.system.ui.TemplateUi',  // 注意这里是 TemplateUi，不是 TemplateUI
+      'TemplateUI': 'src.examples.TemplateUi',  // 正确路径：src/examples/TemplateUi.ts
       'UnitBlood': 'src.system.ui.UnitBlood',
       'CameraControl': 'src.utils.CameraControl',
       'Actor': 'src.system.actor',

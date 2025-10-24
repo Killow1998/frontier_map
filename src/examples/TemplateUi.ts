@@ -10,7 +10,7 @@ class TemplateUI {
 
 
   public TestButton() {
-    // Console.log("TemplateUI: Button created!");
+    // // Console.log("TemplateUI: Button created!");
     // const backdropFrame = Frame.createType("BackdropButton01", Frame.fromHandle(DzGetGameUI())!, 0, 'BACKDROP', "")!
     //   .setAbsPoint(FRAME_ALIGN_LEFT_TOP, 0.250000, 0.350000)
     //   .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, 0.350000, 0.250000)
@@ -39,13 +39,12 @@ class TemplateUI {
     //   }
     // });
 
-    Console.log("hello1")
+    Frame.createType("name", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "Demo_SizeBack")!
+      .setAbsPoint(FRAME_ALIGN_CENTER, 0.5, 0.5)
+    //.setPoint(FRAME_ALIGN_CENTER, Frame.fromHandle(DzGetGameUI())!, FRAME_ALIGN_CENTER, 0, 0);
 
-    Frame.createType(
-      "name", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "Demo_SizeBack")!
-      .setPoint(FRAME_ALIGN_CENTER,
-        Frame.fromHandle(DzGetGameUI())!,
-        FRAME_ALIGN_CENTER, 0, 0);
+
+
 
 
   }

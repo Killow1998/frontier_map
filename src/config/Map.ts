@@ -7,9 +7,6 @@ export class MapGeneral {
     FogMaskEnable(false)
     FogEnable(false)
 
-    // 必须开启宽屏模式
-    DzEnableWideScreen(true)
-
   }
   
 

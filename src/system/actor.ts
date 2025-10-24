@@ -1,5 +1,5 @@
 import { Unit, MapPlayer } from "@eiriksgata/wc3ts/*";
-import { UnitBlood } from "./ui/UnitBlood";
+import { UnitBlood } from "./ui/component/UnitBlood";
 
 export class Actor extends Unit {
   public static allActors: Record<number, Actor> = {};

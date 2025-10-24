@@ -1,16 +1,17 @@
 
 import { bj_MAX_PLAYER_SLOTS, Frame, FRAME_ALIGN_CENTER, MapPlayer, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
-import { UnitBlood } from "./system/ui/UnitBlood";
+import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
-import { MAP_UNITS_INIT_CREATE } from "./config/MapUnit";
+import { TemplateUI } from "./examples/TemplateUi";
+import { MapGeneral } from "./config/Map";
+import { Console } from "./system/console";
+import { createDynamicMenu, createFDFButtonExamples } from "./examples/FDFButtonExample";
 import { testButton } from "./test/ButtonTest";
 import { Button } from "./system/ui/component/Buttom";
-import { Console } from "./system/console";
-import { TemplateUI } from "./examples/TemplateUi";
-import { createFDFButtonExamples } from "./examples/FDFButtonExample";
+import { ScreenCoordinates } from "./system/ui/ScreenCoordinates";
 
 
 /**
@@ -19,8 +20,7 @@ import { createFDFButtonExamples } from "./examples/FDFButtonExample";
  * 测试自动重新编译功能
  */
 async function main(): Promise<void> {
-  // PlayersConfig.CameraControl();
-  // UnitBlood.registerLocalDrawEvent();
+
 
   // //移动镜头到目标
   // PanCameraToTimed(MAP_UNITS_INIT_CREATE.玩家1圣骑士.x, MAP_UNITS_INIT_CREATE.玩家1圣骑士.y, 0);
@@ -31,13 +31,31 @@ async function main(): Promise<void> {
 
   // 确保所有UI模块被加载（这样它们的注册代码会被执行）
   // 只是引用一下类，确保模块被加载
-  print("Loading UI modules:", typeof TemplateUI);
+
+  Timer.create().start(2, false, () => {
+    //print("Loading UI modules:", typeof TemplateUI);
+
+
+    // Button.createAtPresetPosition(
+    //   "TestButton",
+    //   ScreenCoordinates.ORIGIN_CENTER,
+    //   "LARGE"
+    // )
+    //   .setOnClick(() => {
+    //     Console.log("图标按钮被点击了!");
+    //   })
+    //   .create();
+
+    testButton();
+
+
+    createFDFButtonExamples();
+  });
+
 
 
   // 测试Button组件
-  // testButton();
 
-  //createFDFButtonExamples();
 
 }
 
@@ -48,10 +66,6 @@ export function initialize(): void {
   // register ydlua
   ydlua.getInstance().initialize();
 
-
-  // 启动应用程序
-  main();
-
   // 延迟启动热更新系统，确保所有模块都已注册
   Timer.create().start(2, false, () => {
     print(`Starting hot reload system. Registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
@@ -59,19 +73,30 @@ export function initialize(): void {
     print("Hot reload system initialized");
   });
 
-  // 初始化模块管理器中的所有模块
-  ModuleManager.getInstance().initializeAllModules();
 
   //载入TOC fdf样式模板Frame
   try {
-    Frame.loadTOC("resource/fdf/frame.toc");
+    Frame.loadTOC("UI\\fdf\\path.toc");
+    Console.log("FDF TOC loaded successfully");
   } catch (e) {
     print(`Error loading FDF TOC: ${e}`);
   }
 
+  // 初始化模块管理器中的所有模块
+  ModuleManager.getInstance().initializeAllModules();
+
+  PlayersConfig.CameraControl();
+  UnitBlood.registerLocalDrawEvent();
+
+  MapGeneral.sceneVisionInit();
+
+  DzEnableWideScreen(true)
 
   print("Main module initialized");
 
+
+  // 启动应用程序
+  main();
 }
 
 /**
