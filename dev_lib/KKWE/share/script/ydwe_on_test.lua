@@ -220,6 +220,10 @@ function event.EVENT_TEST_MAP(event_data)
         commandline, n = single_test(commandline, mappath), 1
     end
 
+    if global_config["MapTest"]["LaunchFastLoad"] ~= "0" then
+        commandline = commandline .. ' -fastload'
+    end
+
     ev.emit('测试地图', current_map_path:string())
 
     local result = false

@@ -72,5 +72,6 @@
 #define KKWESetUserData(table_type, table, keytype1,valuetype1, valuetype, value) YDHashSet(YDHASH_HANDLE, valuetype, YDHashAny2I(table_type, table), YDHashAny2I(keytype1, valuetype1), value)
 #define KKWEGetUserData(table_type, table, keytype1, valuetype1, valuetype) YDHashGet(YDHASH_HANDLE, valuetype, YDHashAny2I(table_type, table), YDHashAny2I(keytype1, valuetype1))
 #define KKWEClearUserData(table_type, table, keytype1, valuetype1, value_type) YDHashClear(YDHASH_HANDLE, value_type, YDHashAny2I(table_type, table), YDHashAny2I(keytype1, valuetype1))
+#define KKWEClearAllUserData(table_type, table)              FlushChildHashtable(YDHASH_HANDLE,YDHashAny2I(table_type,table))
 #
 #endif

@@ -66,6 +66,7 @@
 #  define YDTRIGGER_ANY2I_degree(any)                       YDTRIGGERR2I(any)
 #  define YDTRIGGER_ANY2I_imagefile(any)                    YDTRIGGERS2I(any)
 #  define YDTRIGGER_ANY2I_modelfile(any)                    YDTRIGGERS2I(any)
+#  define YDTRIGGER_ANY2I_xlsxworksheet(any)                any
 #
 #
 #endif

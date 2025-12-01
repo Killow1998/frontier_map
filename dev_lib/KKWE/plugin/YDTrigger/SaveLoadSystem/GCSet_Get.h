@@ -72,6 +72,7 @@
 #  define YDTRIGGER_SET_degree                          YDTRIGGER_GCSET_REAL
 #  define YDTRIGGER_SET_imagefile                       YDTRIGGER_GCSET_STRING
 #  define YDTRIGGER_SET_modelfile                       YDTRIGGER_GCSET_STRING
+#  define YDTRIGGER_SET_xlsxworksheet                   YDTRIGGER_GCSET_INTEGER
 #
 #  define YDTRIGGER_GCSET_HANDLE(handle, table, key, value)  StoreInteger(handle, table, key, YDTRIGGER_H2I(value))
 #  define YDTRIGGER_GCSET_INTEGER(handle, table, key, value) StoreInteger(handle, table, key, value)
@@ -101,6 +102,7 @@
 #  define YDTRIGGER_GET_degree                          YDTRIGGER_GCGET_REAL
 #  define YDTRIGGER_GET_imagefile                       YDTRIGGER_GCGET_STRING
 #  define YDTRIGGER_GET_modelfile                       YDTRIGGER_GCGET_STRING
+#  define YDTRIGGER_GET_xlsxworksheet                   YDTRIGGER_GCGET_INTEGER
 #
 #  define YDTRIGGER_GCGET_INTEGER(handle, table, key)   GetStoredInteger(handle, table, key)
 #  define YDTRIGGER_GCGET_REAL(handle, table, key)      GetStoredReal(handle, table, key)

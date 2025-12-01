@@ -1186,3 +1186,479 @@ category = TC_SOUND
 returns = boolean
 [[.args]]
 type = sound
+
+
+
+[DzGetUnitAbilityRange]
+title = "技能 - 获取技能施法距离（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的施法距离"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityArea]
+title = "技能 - 获取技能施法范围（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的施法范围"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityCool]
+title = "技能 - 获取技能当前冷却时间（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的当前冷却时间"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityMaxCool]
+title = "技能 - 获取技能最大冷却时间（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的最大冷却时间"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityDataA]
+title = "技能 - 获取技能数据A（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的数据A"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityDataB]
+title = "技能 - 获取技能数据B（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的数据B"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityDataC]
+title = "技能 - 获取技能数据C（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的数据C"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+
+[DzGetUnitAbilityDataD]
+title = "技能 - 获取技能数据D（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的数据D"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityDataE]
+title = "技能 - 获取技能数据E（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的数据E"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzConvertTargs2Str]
+title = "转化 - 目标允许整数转字符串"
+description = "转换 ${目标允许}为字符串"
+comment = ""
+category = TC_KKAPI
+returns = string
+[[.args]]
+type = integer
+
+[DzConvertStr2Targs]
+title = "转化 - 目标允许字符串转整数"
+description = "转换 ${目标允许}为整数"
+comment = "例如“ground,friend,vuln,invu”"
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = string
+
+[KKConvertInt2AbilId]
+title = "转化 - 整数为技能ID"
+description = "转换 ${整数}为技能ID"
+comment = ""
+category = TC_KKAPI
+returns = abilcode
+[[.args]]
+type = integer
+
+[KKConvertAbilId2Int]
+title = "转化 - 技能ID为整数"
+description = "转换 ${技能ID}为整数"
+comment = ""
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = abilcode
+
+
+[DzGetUnitAbilityTargs]
+title = "技能 - 获取技能目标允许（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的目标允许"
+comment = ""
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityCost]
+title = "技能 - 获取技能魔法消耗（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的魔法消耗"
+comment = ""
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityReqLevel]
+title = "技能 - 获取技能等级要求（通魔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的等级要求"
+comment = ""
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityUnitId]
+title = "技能 - 获取建造技能单位ID（象牙塔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的单位ID"
+comment = "象牙塔或者变身类技能有效"
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+[DzGetUnitAbilityBuildOrderId]
+title = "技能 - 获取建造技能命令ID（象牙塔）"
+description = "获取 单位${unit} 当前拥有的技能${id} 的命令ID"
+comment = "象牙塔类的技能有效"
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = unit
+[[.args]]
+type = ordercode
+
+[KKCreateCommandButton]
+title = "技能 - 创建技能按钮控件"
+description = "创建技能按钮控件"
+comment = "创建的技能按钮可以拿来绑定技能。"
+category = TC_KKAPI
+returns = frame
+
+
+[DzUnitHasAbility]
+title = "技能 - 判断单位是否拥有技能 (包含模版技能)"
+description = "单位${单位}是否拥有技能 ${技能id}"
+comment = "单位拥有指定id 或者 指定模板id, 真实的模板技能id在 编辑器里units\abilitydata.slk 里面的code列里"
+category = TC_KKAPI
+returns = boolean
+[[.args]]
+type = unit
+[[.args]]
+type = abilcode
+
+
+[DzItemGetVertexColor]
+title = "物品 - 获取物品颜色"
+description = "获取 ${物品} 的颜色"
+comment = ""
+category = TC_KKAPI
+returns = rgba2color
+[[.args]]
+type = item
+
+[KKConvertInt2Color]
+title = "转化 - 转整数为颜色"
+description = "转换 ${整数} 为颜色"
+comment = ""
+category = TC_KKAPI
+returns = rgba2color
+[[.args]]
+type = integer
+
+
+[KKConvertColor2Int]
+title = "转化 - 转颜色为整数"
+description = "转换 ${颜色} 为整数"
+comment = ""
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = rgba2color
+
+
+[DzItemGetSize]
+title = "物品 - 获取物品大小"
+description = "获取 ${物品} 的缩放大小"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = item
+
+[DzGetLastSelectedItem]
+title = "物品 - 当前选择的物品(异步)"
+description = "获取主控物品"
+comment = "获取的物品是异步的，请谨慎操作"
+category = TC_KKAPI
+returns = item
+
+
+[DzGetUnitCollisionSize]
+title = "单位 - 获取单位的碰撞体积"
+description = "获取 ${单位} 的碰撞体积"
+comment = ""
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = unit
+
+
+
+
+[DzFrameAddModel]
+title = "界面 - 创建ui模型控件"
+description = "创建ui模型控件 指定父控件${parent}"
+comment = "用来显示3d模型用的，需要手动设置镜头参数，旋转缩放才能正确显示。"
+category = TC_KKAPI
+returns = frame
+[[.args]]
+type = frame
+
+[DzFrameAddModelEffect]
+title = "界面 - ui模型 - 添加绑定特效"
+description = "为ui模型控件${model_frame}绑定特效, 附加点${attach_point}, 特效模型文件路径${model_path}"
+comment = "重置模型后自动失效，只能是ui模型控件, 返回effect_frame"
+category = TC_KKAPI
+returns = frame
+[[.args]]
+type = frame
+[[.args]]
+type = string
+[[.args]]
+type = modelfile
+
+[DzFrameGetModelSize]
+title = "界面 - ui模型 - 获取缩放大小"
+description = "获取ui模型控件${model_frame}的缩放大小"
+comment = "可以是ui模型控件、SPRITE、MODEL类型的控件"
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = frame
+
+
+[DzFrameGetModelX]
+title = "界面 - ui模型 - 获取场景内的坐标X轴"
+description = "获取ui模型控件${model_frame}场景内的坐标X轴"
+comment = "可以是ui模型控件、SPRITE、MODEL类型的控件"
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = frame
+
+[DzFrameGetModelY]
+title = "界面 - ui模型 - 获取场景内的坐标Y轴"
+description = "获取ui模型控件${model_frame}场景内的坐标Y轴"
+comment = "可以是ui模型控件、SPRITE、MODEL类型的控件"
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = frame
+
+[DzFrameGetModelZ]
+title = "界面 - ui模型 - 获取场景内的坐标Z轴"
+description = "获取ui模型控件${model_frame}场景内的坐标Z轴"
+comment = "可以是ui模型控件、SPRITE、MODEL类型的控件"
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = frame
+
+[DzFrameGetModelSpeed]
+title = "界面 - ui模型 - 获取动画播放速度"
+description = "获取ui模型控件${model_frame}场景内的动画播放速度"
+comment = "可以是ui模型控件、SPRITE、MODEL类型的控件"
+category = TC_KKAPI
+returns = real
+[[.args]]
+type = frame
+
+
+[DzFrameGetModelColor]
+title = "界面 - ui模型 - 获取颜色"
+description = "获取ui模型控件 ${model_frame} 的颜色"
+comment = "可以是ui模型控件、SPRITE、MODEL类型的控件"
+category = TC_KKAPI
+returns = rgba2color
+[[.args]]
+type = frame
+
+
+[DzGetGlueUI]
+title = "界面 - 获取游戏外界面底层"
+description = "获取游戏外界面底层"
+comment = "返回GlueUI, 从config房间界面到加载界面完成 都属于GlueUI, 进入游戏后属于GameUI"
+category = TC_KKAPI
+returns = frame
+
+
+[DzFrameGetMouse]
+title = "界面 - 获取鼠标控件"
+description = "获取鼠标控件"
+comment = "返回的是SPRITE模型控件，可以通过缩放大小为0来隐藏鼠标, 需要注意的是游戏内跟游戏外鼠标UI不一样，可以游戏开始0秒之后再获取使用。"
+category = TC_KKAPI
+returns = frame
+
+
+[DzFrameGetContext]
+title = "界面 - 获取控件绑定的整数"
+description = "获取控件${frame}绑定的整数"
+comment = "相当于获取 <<新建Frame [Tag]:DzCreateFrameByTagName>> 函数最后一个参数"
+category = TC_KKAPI
+returns = integer
+[[.args]]
+type = frame
+
+[DzFrameGetName]
+title = "界面 - 获取控件的全局名字"
+description = "获取控件${frame}的全局名字"
+comment = "相当于获取 <<新建Frame [Tag]:DzCreateFrameByTagName>> 函数第2个参数"
+category = TC_KKAPI
+returns = string
+[[.args]]
+type = frame
+
+
+[KKCommandGetCooldownModel]
+title = "界面 - 获取技能/物品按钮的冷却模型控件"
+description = "获取技能/物品按钮${command_button}的冷却模型控件"
+comment = "获取技能或者物品按钮上面的 冷却模型控件，相当于是SPRITE类型的控件"
+category = TC_KKAPI
+returns = frame
+[[.args]]
+type = frame
+
+
+[DzGetPlayerLastSelectedItem]
+title = "物品 - 玩家当前选择的物品(同步)"
+description = "获取玩家${玩家}当前选择的物品(同步)"
+comment = "返回值是同步的。每次选择物品后会延迟0.1秒刷新返回值。"
+category = TC_KKAPI
+returns = item
+[[.args]]
+type = player
+
+
+[DzGetCacheModelCount]
+title = "获取当前缓存模型的数量"
+description = "获取当前缓存模型的数量"
+comment = "返回值异步的，用来检测当前游戏模型数量用的"
+category = TC_KKAPI
+returns = integer
+
+[DzFrameGetLowerLevelFrame]
+title = "界面 - 获取低于控制台的底层Frame"
+description = "获取低于控制台的底层Frame"
+comment = "返回FRAME控件，用来创建比控制台大头像更低级的ui, 例如控制台背景, 血条等。"
+category = TC_KKPRE
+returns = frame
+
+[DzFrameGetCheckBoxState]
+title = "界面 - 获取复选框勾选状态"
+description = "获取复选框${checkbox}勾选状态"
+comment = "只能对CHECKBOX、GLUECHECKBOX 类型使用"
+category = TC_KKPRE
+returns = boolean
+[[.args]]
+type = frame
+
+
+[DzFrameIsFocus]
+title = "界面 - 获取控件是否焦点"
+description = "获取控件${frame}是否焦点"
+comment = "支持Frame控件使用, 不支持SimpleFrame"
+category = TC_KKPRE
+returns = boolean
+[[.args]]
+type = frame
+
+[DzIsWindowMode]
+title = "硬件 - 当前游戏是否窗口化模式"
+description = "当前游戏是否窗口化模式"
+comment = "判断启动参数是否带-window 返回值是异步的，因为每个玩家的窗口都不同"
+category = TC_KKPRE
+returns = boolean
+
+[DzIsWindowActive]
+title = "硬件 - 当前游戏窗口是否活动窗口"
+description = "当前游戏窗口是否活动窗口"
+comment = "切游戏出去后会返回false, 返回值是异步的，因为每个玩家的窗口都不同"
+category = TC_KKPRE
+returns = boolean
+
+
+[DzGetSystemMetricsWidth]
+title = "硬件 - 获取屏幕设备宽度"
+description = "获取屏幕设备宽度"
+comment = "返回值是异步的，因为每个玩家都不同"
+category = TC_KKPRE
+returns = integer
+
+
+[DzGetSystemMetricsHeight]
+title = "硬件 - 获取屏幕设备高度"
+description = "获取屏幕设备高度"
+comment = "返回值是异步的，因为每个玩家都不同"
+category = TC_KKPRE
+returns = integer
+
+[DzGetDoodadsCount]
+title = "装饰物 - 获取当前地形装饰物数量"
+description = "获取当前地形装饰物数量"
+comment = "返回值地形上的装饰物数量"
+category = TC_KKPRE
+returns = integer

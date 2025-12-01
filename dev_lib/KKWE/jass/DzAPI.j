@@ -660,6 +660,35 @@ library DzAPI
     function KKApiEndBatchSaveArchive takes player whichPlayer, boolean abandon returns boolean
         return RequestExtraBooleanData(104, whichPlayer, null, null, abandon, 0, 0, 0)
     endfunction
+    
+    function KKApiAddBatchSaveArchiveInteger takes player whichPlayer, string key, integer value returns nothing
+        set key="I"+key
+        call KKApiAddBatchSaveArchive(whichPlayer,key,I2S(value),false)
+        set key=null
+        set whichPlayer=null
+    endfunction
+    function KKApiAddBatchSaveArchiveReal takes player whichPlayer, string key, real value returns nothing
+        set key="R"+key
+        call KKApiAddBatchSaveArchive(whichPlayer,key,R2S(value),false)
+        set key=null
+        set whichPlayer=null
+    endfunction
+    function KKApiAddBatchSaveArchiveBoolean takes player whichPlayer, string key, boolean value returns nothing
+        set key="B"+key
+        if(value)then
+            call KKApiAddBatchSaveArchive(whichPlayer,key,"1",false)
+        else
+            call KKApiAddBatchSaveArchive(whichPlayer,key,"0",false)
+        endif
+        set key=null
+        set whichPlayer=null
+    endfunction
+    function KKApiAddBatchSaveArchiveString takes player whichPlayer, string key, string value returns nothing
+        set key="S"+key
+        call KKApiAddBatchSaveArchive(whichPlayer,key,value,false)
+        set key=null
+        set whichPlayer=null
+    endfunction
 
     //天梯投降
     function KKApiTriggerRegisterLadderSurrender takes trigger trig returns nothing

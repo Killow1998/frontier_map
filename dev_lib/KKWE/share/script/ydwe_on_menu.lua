@@ -59,11 +59,11 @@ local function open_feedback_site()
     open_web_view("https://create.reckfeng.com/feedback/", 640, 560)
 end
 
-local function crypt_map_jass()
+local function crypt_map_jass(version)
     if gui.yesno_message(nil, _("Test function! Encrypted jass script, please choose a map file")) then
         log.trace("open crypt map")
         local exe = fs.ydwe_path() / "bin" / "YDWEConfig.exe"
-        local command_line = string.format('"%s" -launchdump', exe:string())
+        local command_line = string.format('"%s" -launchdump -dumpversion %d', exe:string(), version)
         sys.spawn(command_line, fs.ydwe_path())
     end
 end
@@ -153,7 +153,12 @@ function event.EVENT_INIT_MENU(event_data)
 	menu:add(_("Show c&Jass version"), show_cjass_version)
 	menu:add(_("&Lua Test"), lua_test)
 	local menu2 = gui.menu(event_data.main_menu_handle, _("&Platform"))
-	menu2:add(_("&Crypt map script"), crypt_map_jass)
+	menu2:add(_("&Crypt map script"), function()
+        return crypt_map_jass(0)
+    end)
+	menu2:add(_("&Crypt map script V2"), function()
+        return crypt_map_jass(1)
+    end)
 	menu2:add(_("Launch Platform &official website"), open_platform_site)
 	menu2:add(_("Launch Author's &Home"), open_authors_home_site)
 	menu2:add(_("Cre&dits"), show_credit)

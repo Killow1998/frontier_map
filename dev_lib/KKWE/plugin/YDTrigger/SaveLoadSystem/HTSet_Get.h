@@ -86,6 +86,7 @@
 #  define YDTRIGGER_buffcode(SG)                        YDTRIGGER_HT##SG##(Integer)
 #  define YDTRIGGER_destructablecode(SG)                YDTRIGGER_HT##SG##(Integer)
 #  define YDTRIGGER_gamekey(SG)                         YDTRIGGER_HT##SG##(Integer)
+#  define YDTRIGGER_xlsxworksheet(SG)                   YDTRIGGER_HT##SG##(Integer)
 //#  define YDTRIGGER_handle(SG)                          YDTRIGGER_HT##SG##(HashtableHandle)
 
 

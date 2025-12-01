@@ -487,6 +487,55 @@ type = string
 [[.args]]
 type = boolean
 
+[KKApiAddBatchSaveArchiveInteger]
+title = "【批量存档】添加条目-整数"
+description = "设置 ${whichPlayer} 批量存档添加条目 ${key} ，数据： ${value}"
+comment = "对添加批量保存存档条目进行保存。KEY不区分大小写"
+category = TC_DZAPI
+[[.args]]
+type = player
+[[.args]]
+type = string
+[[.args]]
+type = integer
+default = "0"
+
+[KKApiAddBatchSaveArchiveReal]
+title = "【批量存档】添加条目-实数"
+description = "设置 ${whichPlayer} 批量存档添加条目 ${key} ，数据： ${value}"
+comment = "对添加批量保存存档条目进行保存。KEY不区分大小写"
+category = TC_DZAPI
+[[.args]]
+type = player
+[[.args]]
+type = string
+[[.args]]
+type = real
+
+[KKApiAddBatchSaveArchiveBoolean]
+title = "【批量存档】添加条目-布尔值"
+description = "设置 ${whichPlayer} 批量存档添加条目 ${key} ，数据： ${value}"
+comment = "对添加批量保存存档条目进行保存。KEY不区分大小写"
+category = TC_DZAPI
+[[.args]]
+type = player
+[[.args]]
+type = string
+[[.args]]
+type = boolean
+
+[KKApiAddBatchSaveArchiveString]
+title = "【批量存档】添加条目-字符串"
+description = "设置 ${whichPlayer} 批量存档添加条目 ${key} ，数据： ${value}"
+comment = "对添加批量保存存档条目进行保存。KEY不区分大小写"
+category = TC_DZAPI
+[[.args]]
+type = player
+[[.args]]
+type = string
+[[.args]]
+type = string
+
 [KKApiEndBatchSaveArchive]
 title = "【批量存档】结束保存"
 description = "设置 ${whichPlayer}  ${abandon} 结束批量保存存档"

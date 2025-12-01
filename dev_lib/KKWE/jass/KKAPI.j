@@ -438,6 +438,144 @@ library LBKKAPI initializer Init
         native DzXlsxWorksheetGetCellBoolean takes integer docHandle, string sheetName, integer row, integer column returns boolean
         native DzXlsxWorksheetGetCellFloat takes integer docHandle, string sheetName, integer row, integer column returns real
     
+        native DzFrameSetTexCoord takes integer frame, real left, real top, real right, real bottom returns nothing
+
+        native DzSetUnitAbilityRange takes unit Unit, integer abil_code, real value returns boolean
+        native DzGetUnitAbilityRange takes unit Unit, integer abil_code returns real
+
+        native DzSetUnitAbilityArea takes unit Unit, integer abil_code, real value returns boolean
+        native DzGetUnitAbilityArea takes unit Unit, integer abil_code returns real
+
+        native DzSetUnitAbilityCool takes unit Unit, integer abil_code, real cool, real max_cool returns boolean
+        native DzGetUnitAbilityCool takes unit Unit, integer abil_code returns real
+        native DzGetUnitAbilityMaxCool takes unit Unit, integer abil_code returns real
+
+        native DzSetUnitAbilityDataA takes unit Unit, integer abil_code, real value returns boolean
+        native DzGetUnitAbilityDataA takes unit Unit, integer abil_code returns real
+
+        native DzSetUnitAbilityDataB takes unit Unit, integer abil_code, real value returns boolean
+        native DzGetUnitAbilityDataB takes unit Unit, integer abil_code returns real
+
+        native DzSetUnitAbilityDataC takes unit Unit, integer abil_code, real value returns boolean
+        native DzGetUnitAbilityDataC takes unit Unit, integer abil_code returns real
+
+        native DzSetUnitAbilityDataD takes unit Unit, integer abil_code, real value returns boolean
+        native DzGetUnitAbilityDataD takes unit Unit, integer abil_code returns real
+
+        native DzSetUnitAbilityDataE takes unit Unit, integer abil_code, real value returns boolean
+        native DzGetUnitAbilityDataE takes unit Unit, integer abil_code returns real
+
+        native DzSetUnitAbilityButtonPos takes unit Unit, integer abil_code, integer x, integer y returns boolean
+        native DzSetUnitAbilityHotkey takes unit Unit, integer abil_code, string key returns boolean
+
+        native DzConvertTargs2Str takes integer targs returns string 
+        native DzConvertStr2Targs takes string targs returns integer 
+
+        native DzSetUnitAbilityTargs takes unit Unit, integer abil_code, integer value returns boolean
+        native DzGetUnitAbilityTargs takes unit Unit, integer abil_code returns integer
+
+        native DzSetUnitAbilityCost takes unit Unit, integer abil_code, integer value returns boolean
+        native DzGetUnitAbilityCost takes unit Unit, integer abil_code returns integer
+
+        native DzSetUnitAbilityReqLevel takes unit Unit, integer abil_code, integer value returns boolean
+        native DzGetUnitAbilityReqLevel takes unit Unit, integer abil_code returns integer
+        
+        native DzSetUnitAbilityUnitId takes unit Unit, integer abil_code, integer value returns boolean
+        native DzGetUnitAbilityUnitId takes unit Unit, integer abil_code returns integer
+
+        native DzSetUnitAbilityBuildOrderId takes unit Unit, integer abil_code, integer value returns boolean
+        native DzGetUnitAbilityBuildOrderId takes unit Unit, integer abil_code returns integer
+        
+        native DzSetUnitAbilityBuildModel takes unit Unit, integer abil_code, string model_path, real model_scale returns boolean 
+
+        native DzUnitHasAbility takes unit Unit, integer abil_code returns boolean 
+        
+        
+        native KKCreateCommandButton takes nothing returns integer 
+        native KKDestroyCommandButton takes integer btn returns nothing 
+        native KKCommandButtonClick takes integer btn, integer mouse_type returns nothing
+        native KKCommandTargetClick takes integer mouse_type, widget target returns boolean 
+        native KKCommandTerrainClick takes integer mouse_type, real x, real y, real z returns boolean 
+        native KKSetCommandUnitAbility takes integer btn, unit Unit, integer abil_code returns nothing 
+
+        native DzItemGetVertexColor takes item Item returns integer 
+        native DzItemSetSize takes item Item, real size returns nothing 
+        native DzItemGetSize takes item Item returns real 
+        native DzItemMatRotateX takes item Item, real x returns nothing
+        native DzItemMatRotateY takes item Item, real y returns nothing
+        native DzItemMatRotateZ takes item Item, real z returns nothing
+        native DzItemMatScale takes item Item, real x, real y, real z returns nothing
+        native DzItemMatReset takes item Item returns nothing 
+        native DzGetLastSelectedItem takes nothing returns item 
+        
+        native DzSetPariticle2Size takes agent Widget, real scale returns nothing 
+
+        native DzSetUnitCollisionSize takes unit Unit, real size returns nothing 
+        native DzGetUnitCollisionSize takes unit Unit returns real 
+
+        native DzSetWidgetTexture takes agent Handle, string TexturePath, integer ReplaceId returns nothing 
+        native DzSetUnitSelectScale takes unit Unit, real scale returns nothing 
+        native DzSetUnitHitIgnore takes unit Unit, boolean ignore returns nothing 
+        native DzEffectBindEffect takes agent Handle, string AttachName, effect eff returns nothing
+
+        function KKConvertInt2AbilId takes integer i returns integer 
+                return i
+        endfunction
+
+        function KKConvertAbilId2Int takes integer i returns integer 
+                return i
+        endfunction
+
+        function KKConvertInt2Color takes integer i returns integer
+                return i
+        endfunction
+
+        function KKConvertColor2Int takes integer i returns integer
+                return i
+        endfunction
+
+        native DzFrameSetIgnoreTrackEvents takes integer frame, boolean ignore returns nothing 
+        native DzFrameAddModel takes integer parent_frame returns integer 
+        native DzFrameSetModel2 takes integer model_frame, string model_file, integer team_color_id returns nothing 
+        native DzFrameAddModelEffect takes integer model_frame, string attach_point, string model_file returns integer 
+        native DzFrameRemoveModelEffect takes integer model_frame, integer effect_frame returns nothing 
+        native DzFrameSetModelAnimationByIndex takes integer model_frame, integer anim_index returns nothing 
+        native DzFrameSetModelAnimation takes integer model_frame, string animation returns nothing 
+        native DzFrameSetModelCameraSource takes integer model_frame, real x, real y, real z returns nothing 
+        native DzFrameSetModelCameraTarget takes integer model_frame, real x, real y, real z returns nothing 
+        native DzFrameSetModelSize takes integer model_frame, real size returns nothing 
+        native DzFrameGetModelSize takes integer model_frame returns real 
+        native DzFrameSetModelPosition takes integer model_frame, real x, real y, real z returns nothing
+        native DzFrameSetModelX takes integer model_frame, real x returns nothing 
+        native DzFrameGetModelX takes integer model_frame returns real 
+        native DzFrameSetModelY takes integer model_frame, real y returns nothing 
+        native DzFrameGetModelY takes integer model_frame returns real 
+        native DzFrameSetModelZ takes integer model_frame, real z returns nothing 
+        native DzFrameGetModelZ takes integer model_frame returns real 
+        native DzFrameSetModelSpeed takes integer model_frame, real speed returns nothing 
+        native DzFrameGetModelSpeed takes integer model_frame returns real 
+        native DzFrameSetModelScale takes integer model_frame, real x, real y, real z returns nothing 
+        native DzFrameSetModelMatReset takes integer model_frame returns nothing 
+        native DzFrameSetModelRotateX takes integer model_frame, real x returns nothing 
+        native DzFrameSetModelRotateY takes integer model_frame, real y returns nothing 
+        native DzFrameSetModelRotateZ takes integer model_frame, real z returns nothing 
+        native DzFrameSetModelColor takes integer model_frame, integer color returns nothing 
+        native DzFrameGetModelColor takes integer model_frame returns integer
+        native DzFrameSetModelTexture takes integer model_frame, string texture_file, integer replace_texutre_id returns nothing 
+        native DzFrameSetModelParticle2Size takes integer model_frame, real scale returns nothing 
+        native DzGetGlueUI takes nothing returns integer 
+        native DzFrameGetMouse takes nothing returns integer 
+        native DzFrameGetContext takes integer frame returns integer 
+        native DzFrameGetName takes integer frame returns string 
+        native DzFrameSetNameContext takes integer frame, string name, integer context returns nothing 
+        native DzFrameSetTextFontSpacing takes integer text_frame, real spacing returns nothing 
+        native KKCommandGetCooldownModel takes integer cmd_btn returns integer 
+        native KKCommandSetCooldownModelSize takes integer cmd_btn, real size returns nothing 
+        native KKCommandSetCooldownModelSize2 takes integer cmd_btn, real width, real height returns nothing 
+        native DzGetPlayerLastSelectedItem takes player p returns item 
+        native DzGetCacheModelCount takes nothing returns integer 
+        native DzSetMaxFps takes integer max_fps returns nothing 
+        
 endlibrary
 
 

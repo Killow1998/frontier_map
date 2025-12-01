@@ -49,7 +49,9 @@ library YDWEAbilityState
 
 	native EXGetUnitAbility        takes unit u, integer abilcode returns ability
 	native EXGetUnitAbilityByIndex takes unit u, integer index returns ability
+	//native ExGetUnitSpellAbility   takes unit u, integer abilcode returns ability
 	native EXGetAbilityId          takes ability abil returns integer
+	//native EXGetAbilityLevel   	   takes ability abil returns integer
 	native EXGetAbilityState       takes ability abil, integer state_type returns real
 	native EXSetAbilityState       takes ability abil, integer state_type, real value returns boolean
 	native EXGetAbilityDataReal    takes ability abil, integer level, integer data_type returns real

@@ -71,6 +71,7 @@
 #  define YDTRIGGER_HC_degree(HC)                           YDTRIGGER_##HC##(Real)
 #  define YDTRIGGER_HC_imagefile(HC)                        YDTRIGGER_##HC##(String)
 #  define YDTRIGGER_HC_modelfile(HC)                        YDTRIGGER_##HC##(String)
+#  define YDTRIGGER_HC_xlsxworksheet(HC)                    YDTRIGGER_##HC##(Integer)
 #
 #
 #endif
