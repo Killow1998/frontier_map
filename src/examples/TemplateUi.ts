@@ -1,9 +1,6 @@
-import { Frame, FRAME_ALIGN_CENTER, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from '@eiriksgata/wc3ts/*';
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
-import { FrameEventUtils } from "../constants/frame";
-import { Button } from 'src/system/ui/component/Buttom';
-import { ScreenCoordinates } from 'src/system/ui/ScreenCoordinates';
+import { Button, ButtonTextures } from 'src/system/ui/component/Buttom';
 
 /**
  * 热更新模板
@@ -45,12 +42,16 @@ class TemplateUI {
     //   .setAbsPoint(FRAME_ALIGN_CENTER, 0.5, 0.5)
     //.setPoint(FRAME_ALIGN_CENTER, Frame.fromHandle(DzGetGameUI())!, FRAME_ALIGN_CENTER, 0, 0);
 
-    Button.createAtPresetPosition("TemplateUIButton", 'CENTER', 'SMALL').setOnClick(() => {
-      Console.log("TemplateUI: 按钮被点击了!");
-    })
+    // const btn = Button.createCentered("Centered Button", "LARGE");
+    // btn.setTexture(ButtonTextures.TRANSPARENT);
+    // btn.setOnClick(() => {
+    //   Console.log("Centered Button clicked!");
+    // });
 
-    Console.log("TemplateUI: Button created!");
 
+    print("Templa12312tBd!asda!!");
+
+    
 
 
   }
@@ -85,21 +86,29 @@ class TemplateUI {
 let templateUIInstance: TemplateUI | null = null;
 
 // 注册模块到 ModuleManager
-print(">>> TemplateUI: About to register module...");
-ModuleManager.getInstance().registerModule("TemplateUI", TemplateUI, {
+print(">>> TemplateUI: Module file loaded, about to register...");
+const manager = ModuleManager.getInstance();
+print(`>>> TemplateUI: Got ModuleManager instance`);
+
+manager.registerModule("TemplateUI", TemplateUI, {
   initialize: () => {
+    print(">>> TemplateUI: Initialize callback called");
     if (!templateUIInstance) {
       templateUIInstance = new TemplateUI();
     }
     templateUIInstance.initialize();
   },
   cleanup: () => {
+    print(">>> TemplateUI: Cleanup callback called");
     if (templateUIInstance) {
       templateUIInstance.cleanup();
       templateUIInstance = null;
     }
   },
-  onHotReload: () => TemplateUI.onHotReload(),
+  onHotReload: () => {
+    print(">>> TemplateUI: onHotReload callback called");
+    TemplateUI.onHotReload();
+  },
   dependencies: [] // 这个模块没有依赖
 });
 print(">>> TemplateUI: Module registration completed");

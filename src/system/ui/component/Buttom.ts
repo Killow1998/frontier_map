@@ -74,29 +74,43 @@ export class Button {
     this.origin = origin;
   }
 
+  /**
+   * 使用尺寸预设创建按钮（自动调用create）
+   * @param label 按钮文本
+   * @param x 像素X坐标
+   * @param y 像素Y坐标
+   * @param sizePreset 尺寸预设
+   * @param origin 坐标原点
+   * @param parent 父级Frame（可选）
+   */
   public static createWithPreset(
     label: string,
     x: number,
     y: number,
     sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
-    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT
+    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT,
+    parent?: Frame
   ): Button {
     const size = UILayout.BUTTON_SIZES[sizePreset];
-    return new Button(label, x, y, size.width, size.height, origin);
+    const button = new Button(label, x, y, size.width, size.height, origin);
+    button.create(parent);
+    return button;
   }
 
   /**
-   * 在预设位置创建按钮
+   * 在预设位置创建按钮（自动调用create）
    * @param label 按钮文本
    * @param positionPreset 位置预设 ('CENTER', 'TOP_LEFT', etc.)
    * @param sizePreset 尺寸预设
    * @param centered 是否将按钮中心对齐到预设位置（默认true）
+   * @param parent 父级Frame（可选）
    */
   public static createAtPresetPosition(
     label: string,
     positionPreset: string,
     sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
-    centered: boolean = true
+    centered: boolean = true,
+    parent?: Frame
   ): Button {
     const position = ScreenCoordinates.getPresetPosition(positionPreset);
     const size = UILayout.BUTTON_SIZES[sizePreset];
@@ -111,17 +125,23 @@ export class Button {
     }
     
     Console.log("Creating button at preset: " + positionPreset + " -> pixel(" + x + ", " + y + "), centered=" + (centered ? "true" : "false"));
-    return new Button(label, x, y, size.width, size.height);
+    const button = new Button(label, x, y, size.width, size.height);
+    button.create(parent);
+    return button;
   }
   
   /**
-   * 在屏幕中心创建按钮（便捷方法）
+   * 在屏幕中心创建按钮（便捷方法，自动调用create）
+   * @param label 按钮文本
+   * @param sizePreset 尺寸预设
+   * @param parent 父级Frame（可选）
    */
   public static createCentered(
     label: string,
-    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM'
+    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
+    parent?: Frame
   ): Button {
-    return Button.createAtPresetPosition(label, 'CENTER', sizePreset, true);
+    return Button.createAtPresetPosition(label, 'CENTER', sizePreset, true, parent);
   }
 
   public create(parent?: Frame): void {
@@ -136,7 +156,7 @@ export class Button {
     const wc3Width = (this.pixelWidth / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
     const wc3Height = (this.pixelHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
 
-    Console.log("Creating button \"" + this.label + "\" at pixel(" + this.pixelX + ", " + this.pixelY + ") with size (" + this.pixelWidth + "x" + this.pixelHeight + ")");
+    //Console.log("Creating button \"" + this.label + "\" at pixel(" + this.pixelX + ", " + this.pixelY + ") with size (" + this.pixelWidth + "x" + this.pixelHeight + ")");
 
     this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")!;
     if (!this.backdropFrame) {

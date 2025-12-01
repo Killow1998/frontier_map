@@ -35,23 +35,25 @@ export class HotReload {
    */
   public start(): void {
     if (!this.enabled) {
-      print("Hot reload is disabled");
+      print(">>> HotReload: Hot reload is disabled");
       return;
     }
 
     if (this.timer) {
-      print("Hot reload is already running");
+      print(">>> HotReload: Hot reload is already running");
       return;
     }
 
-    print("Starting hot reload system...");
+    print(">>> HotReload: Starting hot reload system...");
+    print(`>>> HotReload: Check interval: ${this.checkInterval} seconds`);
+    print(`>>> HotReload: PROJECT_PATH: ${PROJECT_PATH}`);
 
     this.timer = Timer.create();
     this.timer.start(this.checkInterval, true, () => {
       this.checkForUpdates();
     });
 
-    print("Hot reload system started");
+    print(">>> HotReload: Hot reload system started successfully");
   }
 
   /**
@@ -81,7 +83,6 @@ export class HotReload {
    */
   private checkForUpdates(): void {
     try {
-      
       // 尝试读取热更新通知文件
       const notificationContent = this.readHotReloadFile();
       if (!notificationContent) {
@@ -90,12 +91,20 @@ export class HotReload {
 
       const notification = this.parseNotification(notificationContent);
       if (!notification) {
+        print(">>> HotReload: Failed to parse notification");
         return;
       }
+
       // 检查是否是新的通知（仅检查时间戳，忽略文件中的 processed 字段）
       if (notification.timestamp <= this.lastProcessedTimestamp) {
         return;
       }
+
+      print(`>>> HotReload: New notification detected!`);
+      print(`>>> HotReload: Timestamp: ${notification.timestamp}, Last: ${this.lastProcessedTimestamp}`);
+      print(`>>> HotReload: Action: ${notification.action}`);
+      print(`>>> HotReload: Modules: ${notification.modules.join(", ")}`);
+
       // 处理热更新
       this.processHotReload(notification);
 
@@ -103,7 +112,7 @@ export class HotReload {
       this.markAsProcessed(notification);
 
     } catch (error) {
-      // 静默处理错误，避免在游戏中产生过多日志
+      print(`>>> HotReload: Error in checkForUpdates: ${error}`);
     }
   }
 
@@ -133,7 +142,7 @@ export class HotReload {
       file[0]?.close();
       return content;
     } catch (error) {
-      print(`Error reading hot reload file: ${error}`);
+      print(`>>> HotReload: Error reading hot reload file: ${error}`);
       return null;
     }
   }
@@ -284,15 +293,14 @@ export class HotReload {
    * 处理热更新
    */
   private processHotReload(notification: HotReloadNotification): void {
-    print(`Processing hot reload for ${notification.modules.length} modules...`);
-    print(`Raw modules: ${notification.modules.join(", ")}`);
+    print(`>>> HotReload: Processing hot reload for ${notification.modules.length} modules...`);
 
     // 提取模块名称（从路径中获取实际的模块名）
     const moduleNames = notification.modules.map(fullPath => {
-      // 从 "src.system.ui.TemplateUi" 中提取模块名
+      // 从 "src.examples.TemplateUi" 中提取模块名
       const parts = fullPath.split('.');
-      let moduleName = parts[parts.length - 1];
-      
+      const fileName = parts[parts.length - 1];
+
       // 处理文件名的大小写问题，映射到注册时使用的名称
       const nameMapping: { [key: string]: string } = {
         'TemplateUi': 'TemplateUI',  // 文件名 -> 注册名
@@ -302,47 +310,47 @@ export class HotReload {
         'ModuleManager': 'ModuleManager',
         'HotReload': 'HotReload'
       };
-      
-      return nameMapping[moduleName] || moduleName;
+
+      const mappedName = nameMapping[fileName] || fileName;
+      print(`>>> HotReload: Mapping "${fileName}" -> "${mappedName}"`);
+      return mappedName;
     });
 
-    print(`Extracted module names: ${moduleNames.join(", ")}`);
+    print(`>>> HotReload: Extracted module names: ${moduleNames.join(", ")}`);
+
+    // 获取 ModuleManager 实例
+    const moduleManager = ModuleManager.getInstance();
+    const registeredModules = moduleManager.getRegisteredModules();
+    print(`>>> HotReload: All registered modules: ${registeredModules.join(", ")}`);
 
     // 过滤出已注册的模块
-    const moduleManager = ModuleManager.getInstance();
-    print(`All registered modules: ${moduleManager.getRegisteredModules().join(", ")}`);
-    
-    const registeredModules = moduleNames.filter(name => 
-      moduleManager.isModuleRegistered(name)
-    );
+    const matchedModules = moduleNames.filter(name => {
+      const isRegistered = moduleManager.isModuleRegistered(name);
+      print(`>>> HotReload: Checking "${name}" - registered: ${isRegistered}`);
+      return isRegistered;
+    });
 
-    print(`Matched registered modules: ${registeredModules.join(", ")}`);
+    print(`>>> HotReload: Matched registered modules: ${matchedModules.join(", ")}`);
 
-    if (registeredModules.length === 0) {
-      print("  No registered modules to hot reload");
+    if (matchedModules.length === 0) {
+      print(">>> HotReload: No registered modules to hot reload");
+
+      // 尝试直接重载未注册的模块
+      print(">>> HotReload: Attempting direct Lua module reload...");
+      for (const modulePath of notification.modules) {
+        try {
+          this.reloadModule(modulePath);
+          print(`>>> HotReload: ✓ Direct reloaded: ${modulePath}`);
+        } catch (error) {
+          print(`>>> HotReload: ✗ Failed to reload: ${modulePath} - ${error}`);
+        }
+      }
       return;
     }
 
     // 使用 ModuleManager 进行热重载
-    moduleManager.hotReloadModules(registeredModules);
-
-    // 对于未注册的模块，使用传统方式重载
-    const unregisteredModules = notification.modules.filter(fullPath => {
-      const moduleName = fullPath.split('.').pop() || '';
-      return !moduleManager.isModuleRegistered(moduleName);
-    });
-
-    if (unregisteredModules.length > 0) {
-      print(`Processing ${unregisteredModules.length} unregistered modules with traditional reload...`);
-      for (const modulePath of unregisteredModules) {
-        try {
-          this.reloadModule(modulePath);
-          print(`  ✓ Reloaded (traditional): ${modulePath}`);
-        } catch (error) {
-          print(`  ✗ Failed to reload: ${modulePath} - ${error}`);
-        }
-      }
-    }
+    print(`>>> HotReload: Calling ModuleManager.hotReloadModules...`);
+    moduleManager.hotReloadModules(matchedModules);
   }
 
   /**

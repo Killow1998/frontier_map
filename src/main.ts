@@ -1,5 +1,5 @@
 
-import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM, FRAMEPOINT_BOTTOMRIGHT, FRAMEPOINT_TOPLEFT, MapPlayer, Players, Timer } from "@eiriksgata/wc3ts/*";
+import { Frame, FRAMEPOINT_BOTTOMRIGHT, FRAMEPOINT_TOPLEFT, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -8,6 +8,9 @@ import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
 import { Console } from "./system/console";
 import { UILayout } from "./system/ui/UILayout";
+import { Button, ButtonTextures } from "./system/ui/component/Buttom";
+import { TemplateUI } from "./examples/TemplateUi";
+import { ExportUI } from "./test/ExportUI";
 
 
 /**
@@ -31,6 +34,7 @@ async function main(): Promise<void> {
   Timer.create().start(2, false, () => {
     //print("Loading UI modules:", typeof TemplateUI);
 
+    new ExportUI();
 
     // Button.createAtPresetPosition(
     //   "TestButton",
@@ -44,23 +48,9 @@ async function main(): Promise<void> {
 
     //testButton();
 
-
-    //createFDFButtonExamples();
-
-    const result = UILayout.createButton(500, 500);
-    Console.log(`UILayout button created: ${result.x}, ${result.y}, ${result.width}, ${result.height}`);
-    // Frame.createType("name", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "Demo_SizeBack")!
-    // .setPoint(FRAME_ALIGN_CENTER, Frame.fromHandle(DzGetGameUI())!, FRAME_ALIGN_CENTER, 0, 0);
-
-
-
-    // new Frame("QuestButtonBaseTemplate", Frame.fromHandle(DzGetGameUI())!, 0, 0)
-    //   .setAbsPoint(FRAME_ALIGN_LEFT_TOP, 0.353660, 0.388860)
-    //   .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, 0.453660, 0.288860)
-
-    new Frame("QuestButtonBaseTemplate", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0)
-      .setAbsPoint(FRAMEPOINT_TOPLEFT, 0.353660, 0.388860)
-      .setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, 0.453660, 0.288860)
+    // new Frame("QuestButtonBaseTemplate", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0)
+    //   .setAbsPoint(FRAMEPOINT_TOPLEFT, 0.353660, 0.388860)
+    //   .setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, 0.453660, 0.288860)
   });
 
 
@@ -77,14 +67,6 @@ export function initialize(): void {
   // register ydlua
   ydlua.getInstance().initialize();
 
-  // 延迟启动热更新系统，确保所有模块都已注册
-  Timer.create().start(2, false, () => {
-    print(`Starting hot reload system. Registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
-    HotReload.getInstance().start();
-    print("Hot reload system initialized");
-  });
-
-
   //载入TOC fdf样式模板Frame
   try {
     Frame.loadTOC("UI\\fdf\\path.toc");
@@ -94,7 +76,16 @@ export function initialize(): void {
   }
 
   // 初始化模块管理器中的所有模块
+  print(">>> Main: Initializing all modules...");
   ModuleManager.getInstance().initializeAllModules();
+  print(`>>> Main: All registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
+
+  // 延迟启动热更新系统，确保所有模块都已注册
+  Timer.create().start(2, false, () => {
+    print(`>>> Main: Starting hot reload system...`);
+    print(`>>> Main: Registered modules at start: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
+    HotReload.getInstance().start();
+  });
 
   PlayersConfig.CameraControl();
   UnitBlood.registerLocalDrawEvent();
@@ -103,8 +94,7 @@ export function initialize(): void {
 
   DzEnableWideScreen(true)
 
-  print("Main module initialized");
-
+  print(">>> Main: Main module initialized");
 
   // 启动应用程序
   main();
