@@ -1,17 +1,13 @@
 
-import { bj_MAX_PLAYER_SLOTS, Frame, FRAME_ALIGN_CENTER, MapPlayer, Players, Timer } from "@eiriksgata/wc3ts/*";
+import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM, FRAMEPOINT_BOTTOMRIGHT, FRAMEPOINT_TOPLEFT, MapPlayer, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
-import { TemplateUI } from "./examples/TemplateUi";
 import { MapGeneral } from "./config/Map";
 import { Console } from "./system/console";
-import { createDynamicMenu, createFDFButtonExamples } from "./examples/FDFButtonExample";
-import { testButton } from "./test/ButtonTest";
-import { Button } from "./system/ui/component/Buttom";
-import { ScreenCoordinates } from "./system/ui/ScreenCoordinates";
+import { UILayout } from "./system/ui/UILayout";
 
 
 /**
@@ -46,10 +42,25 @@ async function main(): Promise<void> {
     //   })
     //   .create();
 
-    testButton();
+    //testButton();
 
 
-    createFDFButtonExamples();
+    //createFDFButtonExamples();
+
+    const result = UILayout.createButton(500, 500);
+    Console.log(`UILayout button created: ${result.x}, ${result.y}, ${result.width}, ${result.height}`);
+    // Frame.createType("name", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "Demo_SizeBack")!
+    // .setPoint(FRAME_ALIGN_CENTER, Frame.fromHandle(DzGetGameUI())!, FRAME_ALIGN_CENTER, 0, 0);
+
+
+
+    // new Frame("QuestButtonBaseTemplate", Frame.fromHandle(DzGetGameUI())!, 0, 0)
+    //   .setAbsPoint(FRAME_ALIGN_LEFT_TOP, 0.353660, 0.388860)
+    //   .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, 0.453660, 0.288860)
+
+    new Frame("QuestButtonBaseTemplate", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0)
+      .setAbsPoint(FRAMEPOINT_TOPLEFT, 0.353660, 0.388860)
+      .setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, 0.453660, 0.288860)
   });
 
 

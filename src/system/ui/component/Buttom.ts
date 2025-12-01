@@ -5,6 +5,32 @@ import { Console } from "src/system/console";
 import { FrameEventUtils } from "src/constants/frame/utils";
 
 /**
+ * 常用背景纹理预设
+ */
+export const ButtonTextures = {
+  /** 人族命令按钮边框 */
+  HUMAN_BORDER: "UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp",
+  /** 人族命令按钮背景 */
+  HUMAN_BACKGROUND: "UI\\Widgets\\Console\\Human\\human-transport-slot.blp",
+  /** 兽族按钮背景 */
+  ORC_BACKGROUND: "UI\\Widgets\\Console\\Orc\\orc-transport-slot.blp",
+  /** 暗夜精灵按钮背景 */
+  NIGHTELF_BACKGROUND: "UI\\Widgets\\Console\\NightElf\\nightelf-transport-slot.blp",
+  /** 不死族按钮背景 */
+  UNDEAD_BACKGROUND: "UI\\Widgets\\Console\\Undead\\undead-transport-slot.blp",
+  /** 黑色半透明 */
+  BLACK_TRANSPARENT: "UI\\Widgets\\EscMenu\\Human\\editbox-background.blp",
+  /** 工具提示背景 */
+  TOOLTIP_BACKGROUND: "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp",
+  /** 对话框背景 */
+  DIALOG_BACKGROUND: "UI\\Widgets\\Glues\\GlueScreen-DialogBackground.blp",
+  /** 任务背景 */
+  QUEST_BACKGROUND: "UI\\Widgets\\Quests\\QuestMainBackdrop.blp",
+  /** 透明（无背景） */
+  TRANSPARENT: "",
+} as const;
+
+/**
  * Button类 - 三层结构按钮组件
  * 包含: 背景框架(Backdrop) + 文本框架(Text) + 按钮框架(Button)
  */
@@ -26,7 +52,7 @@ export class Button {
   private isEnabled: boolean = true;
   private isVisible: boolean = true;
   
-  private texture: string = "UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp";
+  private texture: string = ButtonTextures.HUMAN_BORDER;
   private textAlignment: number = 50;
   private textColor: string = "FFFFFF";
   private tooltip: string = "";
@@ -59,14 +85,43 @@ export class Button {
     return new Button(label, x, y, size.width, size.height, origin);
   }
 
+  /**
+   * 在预设位置创建按钮
+   * @param label 按钮文本
+   * @param positionPreset 位置预设 ('CENTER', 'TOP_LEFT', etc.)
+   * @param sizePreset 尺寸预设
+   * @param centered 是否将按钮中心对齐到预设位置（默认true）
+   */
   public static createAtPresetPosition(
     label: string,
     positionPreset: string,
-    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM'
+    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
+    centered: boolean = true
   ): Button {
     const position = ScreenCoordinates.getPresetPosition(positionPreset);
     const size = UILayout.BUTTON_SIZES[sizePreset];
-    return new Button(label, position.x, position.y, size.width, size.height);
+    
+    let x = position.x;
+    let y = position.y;
+    
+    // 如果居中对齐，需要减去按钮尺寸的一半
+    if (centered) {
+      x = position.x - size.width / 2;
+      y = position.y - size.height / 2;
+    }
+    
+    Console.log("Creating button at preset: " + positionPreset + " -> pixel(" + x + ", " + y + "), centered=" + (centered ? "true" : "false"));
+    return new Button(label, x, y, size.width, size.height);
+  }
+  
+  /**
+   * 在屏幕中心创建按钮（便捷方法）
+   */
+  public static createCentered(
+    label: string,
+    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM'
+  ): Button {
+    return Button.createAtPresetPosition(label, 'CENTER', sizePreset, true);
   }
 
   public create(parent?: Frame): void {
@@ -217,6 +272,40 @@ export class Button {
       this.backdropFrame.setTexture(texturePath, 0, true);
     }
     return this;
+  }
+
+  /**
+   * 使用预设纹理
+   * @param preset 纹理预设键名
+   */
+  public setTexturePreset(preset: keyof typeof ButtonTextures): Button {
+    return this.setTexture(ButtonTextures[preset]);
+  }
+
+  /**
+   * 设置背景透明度
+   * @param alpha 透明度 (0-255)
+   */
+  public setBackdropAlpha(alpha: number): Button {
+    if (this.backdropFrame) {
+      this.backdropFrame.setAlpha(alpha);
+    }
+    return this;
+  }
+
+  /**
+   * 隐藏背景（使用空纹理）
+   */
+  public hideBackdrop(): Button {
+    return this.setTexture("");
+  }
+
+  /**
+   * 设置自定义背景图片路径
+   * @param path 图片路径（相对于MPQ/地图）
+   */
+  public setBackground(path: string): Button {
+    return this.setTexture(path);
   }
 
   public setTooltip(tooltip: string): Button {

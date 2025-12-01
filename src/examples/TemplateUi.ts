@@ -2,6 +2,8 @@ import { Frame, FRAME_ALIGN_CENTER, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTT
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
 import { FrameEventUtils } from "../constants/frame";
+import { Button } from 'src/system/ui/component/Buttom';
+import { ScreenCoordinates } from 'src/system/ui/ScreenCoordinates';
 
 /**
  * 热更新模板
@@ -39,11 +41,15 @@ class TemplateUI {
     //   }
     // });
 
-    Frame.createType("name", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "Demo_SizeBack")!
-      .setAbsPoint(FRAME_ALIGN_CENTER, 0.5, 0.5)
+    // Frame.createType("name", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "Demo_SizeBack")!
+    //   .setAbsPoint(FRAME_ALIGN_CENTER, 0.5, 0.5)
     //.setPoint(FRAME_ALIGN_CENTER, Frame.fromHandle(DzGetGameUI())!, FRAME_ALIGN_CENTER, 0, 0);
 
+    Button.createAtPresetPosition("TemplateUIButton", 'CENTER', 'SMALL').setOnClick(() => {
+      Console.log("TemplateUI: 按钮被点击了!");
+    })
 
+    Console.log("TemplateUI: Button created!");
 
 
 

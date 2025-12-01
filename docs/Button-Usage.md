@@ -32,22 +32,85 @@ Button (三层结构)
 
 ## 基本用法
 
-### 1. 创建简单按钮
+### 1. 在屏幕中心创建按钮（推荐）
 
 ```typescript
-import { Button } from "src/system/ui/component/Buttom";
+import { Button, ButtonTextures } from "src/system/ui/component/Buttom";
 
-// 创建按钮实例 (label, x, y, width, height)
-const button = new Button("点击我", 400, 300, 120, 40);
+// 使用createCentered在屏幕中心创建按钮
+const centerButton = Button.createCentered("中心按钮", "LARGE");
+
+// 设置背景和事件
+centerButton
+  .setTexturePreset("DIALOG_BACKGROUND")
+  .setOnClick(() => {
+    print("点击了中心按钮!");
+  });
 
 // 显示按钮
+centerButton.create();
+```
+
+### 2. 使用预设位置创建
+
+```typescript
+// 在屏幕预设位置创建按钮
+// 位置: 'CENTER', 'TOP_LEFT', 'TOP_RIGHT', 'BOTTOM_LEFT', 'BOTTOM_RIGHT',
+//       'TOP_CENTER', 'BOTTOM_CENTER', 'LEFT_CENTER', 'RIGHT_CENTER',
+//       'UI_TOP_LEFT', 'UI_TOP_RIGHT', 'UI_BOTTOM_LEFT', 'UI_BOTTOM_RIGHT'
+
+const topLeftBtn = Button.createAtPresetPosition("左上角", "UI_TOP_LEFT", "MEDIUM", true);
+topLeftBtn.create();
+```
+
+### 3. 使用像素坐标创建
+
+```typescript
+// 指定像素坐标 (label, x, y, width, height)
+const button = new Button("自定义位置", 400, 300, 120, 40);
 button.create();
 ```
 
-### 2. 设置事件回调
+## 背景纹理设置
+
+### 预设纹理
 
 ```typescript
-const button = new Button("测试按钮", 400, 300);
+import { ButtonTextures } from "src/system/ui/component/Buttom";
+
+// 使用预设纹理
+button.setTexturePreset("HUMAN_BORDER");       // 人族边框
+button.setTexturePreset("HUMAN_BACKGROUND");   // 人族背景
+button.setTexturePreset("ORC_BACKGROUND");     // 兽族背景
+button.setTexturePreset("NIGHTELF_BACKGROUND"); // 暗夜精灵背景
+button.setTexturePreset("UNDEAD_BACKGROUND");  // 不死族背景
+button.setTexturePreset("BLACK_TRANSPARENT");  // 黑色半透明
+button.setTexturePreset("TOOLTIP_BACKGROUND"); // 工具提示背景
+button.setTexturePreset("DIALOG_BACKGROUND");  // 对话框背景
+button.setTexturePreset("QUEST_BACKGROUND");   // 任务背景
+button.setTexturePreset("TRANSPARENT");        // 透明（无背景）
+```
+
+### 自定义背景
+
+```typescript
+// 设置自定义背景图片
+button.setBackground("UI\\Widgets\\Console\\Human\\CommandButton\\human-activestop-down.blp");
+
+// 或者使用通用方法
+button.setTexture("path/to/custom/texture.blp");
+
+// 隐藏背景
+button.hideBackdrop();
+
+// 设置背景透明度 (0-255)
+button.setBackdropAlpha(200);
+```
+
+## 事件设置
+
+```typescript
+const button = Button.createCentered("测试按钮");
 
 button
   .setOnClick(() => {
@@ -63,28 +126,29 @@ button
 button.create();
 ```
 
-### 3. 自定义样式
+## 样式定制
 
 ```typescript
-const button = new Button("自定义按钮", 400, 300, 150, 48);
+const button = Button.createCentered("自定义样式");
 
 button
   .setTextColor("FF0000") // 红色文字
-  .setTexture("UI\\Widgets\\Console\\Human\\CommandButton\\human-activestop-down.blp")
-  .setTextAlignment(50); // 居中对齐
+  .setTexturePreset("DIALOG_BACKGROUND")
+  .setTextAlignment(50) // 居中对齐
+  .addHoverEffect(200, 255); // 悬停时透明度200，正常时255
 
 button.create();
 ```
 
-### 4. 链式配置
+## 链式配置
 
 ```typescript
-const button = new Button("配置按钮", 400, 300);
+const button = Button.createCentered("配置按钮");
 
 button.configure({
   text: "新文本",
   textColor: "00FF00", // 绿色
-  texture: "path/to/texture.blp",
+  texture: ButtonTextures.HUMAN_BACKGROUND,
   onClick: () => print("点击!"),
   onHover: () => print("悬停!"),
   enabled: true,
@@ -94,69 +158,40 @@ button.configure({
 button.create();
 ```
 
-### 5. 添加悬停效果
-
-```typescript
-const button = new Button("悬停效果", 400, 300);
-
-// 悬停时透明度变为200，正常时255
-button.addHoverEffect(200, 255);
-
-button.create();
-```
-
 ## 完整示例
 
-参考你提供的代码风格:
-
 ```typescript
-import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from "@eiriksgata/wc3ts/*";
-import { FrameEventUtils } from "src/constants/frame/utils";
-import { Console } from "src//system/console";
+import { Button, ButtonTextures } from "src/system/ui/component/Buttom";
+import { Console } from "src/system/console";
 
-// 方式1: 使用原生Frame API (你的代码风格)
-const backdropFrame = Frame.createType("BackdropButton01", Frame.fromHandle(DzGetGameUI())!, 0, 'BACKDROP', "")!
-  .setAbsPoint(FRAME_ALIGN_LEFT_TOP, 0.250000, 0.350000)
-  .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, 0.350000, 0.250000)
-  .setTexture("UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp", 0, true);
+export class ButtonExample {
+  private testButton: Button | null = null;
+  private centerButton: Button | null = null;
 
-const textFrame = Frame.createType("TEXT", backdropFrame, 0, "TEXT", "")!
-  .setAllPoints(backdropFrame)
-  .setText("新常量结构测试")
-  .setTextAlignment(50, 0);
+  public initialize(): void {
+    // 方法1: 像素坐标创建
+    this.testButton = new Button("测试按钮", 400, 300, 100, 36);
+    this.testButton
+      .setTextColor("FFCC00")
+      .setTexturePreset("HUMAN_BACKGROUND")
+      .setOnClick(() => Console.log("测试按钮被点击!"))
+      .addHoverEffect();
+    this.testButton.create();
 
-const frame = Frame.createType("btn", backdropFrame, 3, "BUTTON", "template")!
-  .setAllPoints(backdropFrame);
-
-FrameEventUtils.bindEvents(frame, {
-  onClick: () => {
-    Console.log("TemplateUI: 按钮被点击了!");
-  },
-  onMouseEnter: () => {
-    Console.log("TemplateUI: 鼠标进入按钮区域");
-  },
-  onMouseLeave: () => {
-    Console.log("TemplateUI: 鼠标离开按钮区域");
+    // 方法2: 屏幕中心创建（推荐）
+    this.centerButton = Button.createCentered("屏幕中心按钮", "LARGE");
+    this.centerButton
+      .setTextColor("00FF00")
+      .setBackground(ButtonTextures.DIALOG_BACKGROUND)
+      .setOnClick(() => Console.log("中心按钮被点击!"));
+    this.centerButton.create();
   }
-});
 
-// 方式2: 使用封装的Button类 (等效实现)
-const button = new Button("新常量结构测试", 400, 300, 100, 100);
-
-button
-  .setTexture("UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp")
-  .setTextAlignment(50)
-  .setOnClick(() => {
-    Console.log("TemplateUI: 按钮被点击了!");
-  })
-  .setOnHover(() => {
-    Console.log("TemplateUI: 鼠标进入按钮区域");
-  })
-  .setOnLeave(() => {
-    Console.log("TemplateUI: 鼠标离开按钮区域");
-  });
-
-button.create();
+  public cleanup(): void {
+    this.testButton?.destroy();
+    this.centerButton?.destroy();
+  }
+}
 ```
 
 ## API 参考
@@ -177,7 +212,8 @@ constructor(
 ### 静态方法
 
 - `createWithPreset(label, x, y, sizePreset, origin)` - 使用预设尺寸创建
-- `createAtPresetPosition(label, positionPreset, sizePreset)` - 使用预设位置创建
+- `createAtPresetPosition(label, positionPreset, sizePreset, centered)` - 使用预设位置创建
+- `createCentered(label, sizePreset)` - 在屏幕中心创建（便捷方法）
 
 ### 主要方法
 
@@ -195,7 +231,11 @@ constructor(
 - `setText(text)` - 设置文本
 - `setTextColor(hexColor)` - 设置文本颜色 (如 "FF0000")
 - `setTextAlignment(alignment)` - 设置文本对齐
-- `setTexture(texturePath)` - 设置背景纹理
+- `setTexture(texturePath)` - 设置背景纹理路径
+- `setTexturePreset(preset)` - 使用预设纹理
+- `setBackground(path)` - 设置自定义背景图片
+- `setBackdropAlpha(alpha)` - 设置背景透明度
+- `hideBackdrop()` - 隐藏背景
 - `setTooltip(tooltip)` - 设置工具提示
 
 #### 位置和大小
@@ -221,56 +261,48 @@ constructor(
 - `getTextFrame()` - 获取文本框架
 - `getButtonFrame()` - 获取按钮框架
 
-## 与你的代码对比
+## 预设纹理路径参考
 
-### 你的代码 (原生API)
 ```typescript
-const backdropFrame = Frame.createType("BACKDROP", parent, 0, 'BACKDROP', "")!
-  .setAbsPoint(FRAME_ALIGN_LEFT_TOP, 0.250, 0.350)
-  .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, 0.350, 0.250)
-  .setTexture("path.blp", 0, true);
-
-const textFrame = Frame.createType("TEXT", backdropFrame, 0, "TEXT", "")!
-  .setAllPoints(backdropFrame)
-  .setText("文本")
-  .setTextAlignment(50, 0);
-
-const btnFrame = Frame.createType("btn", backdropFrame, 0, "BUTTON", "")!
-  .setAllPoints(backdropFrame);
-
-FrameEventUtils.bindEvents(btnFrame, {
-  onClick: () => { /* ... */ },
-  onMouseEnter: () => { /* ... */ },
-  onMouseLeave: () => { /* ... */ }
-});
+export const ButtonTextures = {
+  HUMAN_BORDER: "UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp",
+  HUMAN_BACKGROUND: "UI\\Widgets\\Console\\Human\\human-transport-slot.blp",
+  ORC_BACKGROUND: "UI\\Widgets\\Console\\Orc\\orc-transport-slot.blp",
+  NIGHTELF_BACKGROUND: "UI\\Widgets\\Console\\NightElf\\nightelf-transport-slot.blp",
+  UNDEAD_BACKGROUND: "UI\\Widgets\\Console\\Undead\\undead-transport-slot.blp",
+  BLACK_TRANSPARENT: "UI\\Widgets\\EscMenu\\Human\\editbox-background.blp",
+  TOOLTIP_BACKGROUND: "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp",
+  DIALOG_BACKGROUND: "UI\\Widgets\\Glues\\GlueScreen-DialogBackground.blp",
+  QUEST_BACKGROUND: "UI\\Widgets\\Quests\\QuestMainBackdrop.blp",
+  TRANSPARENT: "",
+};
 ```
 
-### 使用Button类 (封装后)
-```typescript
-const button = new Button("文本", 400, 300, 100, 100);
+## 坐标系统说明
 
-button
-  .setTexture("path.blp")
-  .setTextAlignment(50)
-  .setOnClick(() => { /* ... */ })
-  .setOnHover(() => { /* ... */ })
-  .setOnLeave(() => { /* ... */ })
-  .create();
-```
+### 像素坐标
+- 标准屏幕尺寸: 1920 x 1080 像素
+- 原点 (0, 0) 位于左上角
+- X 轴向右增加，Y 轴向下增加
 
-## 优势
+### WC3坐标
+- 屏幕尺寸: 0.8 x 0.6
+- 原点 (0.0, 0.0) 位于左下角
+- X 轴向右增加，Y 轴向上增加
 
-1. **自动管理三层结构** - 不需要手动创建和关联三个Frame
-2. **像素坐标系统** - 自动转换为WC3坐标
-3. **链式API** - 支持流畅的方法链调用
-4. **事件封装** - 简化事件绑定逻辑
-5. **状态管理** - 内置启用/禁用、显示/隐藏状态
-6. **完整生命周期** - 自动清理所有子框架
+### 预设位置
+- `CENTER`: (960, 540) - 屏幕中心
+- `TOP_LEFT`: (0, 0) - 左上角
+- `TOP_RIGHT`: (1820, 0) - 右上角
+- `BOTTOM_LEFT`: (0, 1080) - 左下角
+- `BOTTOM_RIGHT`: (1820, 1080) - 右下角
+- `UI_TOP_LEFT`: (50, 50) - UI安全区左上角
+- 等...
 
 ## 注意事项
 
 1. 必须调用 `create()` 方法才能显示按钮
-2. 销毁时会自动清理所有三层框架
-3. 坐标使用像素值，内部自动转换为WC3坐标
-4. 文本颜色使用十六进制格式 (如 "FF0000" 表示红色)
-5. 纹理路径使用WC3资源路径格式
+2. 使用 `createCentered()` 或 `createAtPresetPosition()` 时，按钮会自动居中对齐到指定位置
+3. 销毁时会自动清理所有三层框架
+4. 文本颜色使用十六进制格式 (如 "FF0000" 表示红色，不含 #)
+5. 纹理路径使用WC3资源路径格式 (双反斜杠)
