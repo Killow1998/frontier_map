@@ -4,64 +4,57 @@ import { Button, ButtonTextures } from 'src/system/ui/component/Buttom';
 
 /**
  * 热更新模板
+ * 
+ * 热重载设计要点：
+ * 1. 需要在热重载时销毁的资源（如UI组件）应保存为类的成员变量
+ * 2. 在 cleanup() 中销毁所有需要清理的资源
+ * 3. 在 initialize() 中重新创建资源
  */
 class TemplateUI {
+  
+  // ========================================
+  // 需要在热重载时保留/销毁的成员变量
+  // ========================================
+  private testButton: Button | null = null;
+  private buttons: Button[] = [];  // 如果有多个按钮，可以用数组管理
 
-
+  /**
+   * 创建测试按钮
+   */
   public TestButton() {
-    // // Console.log("TemplateUI: Button created!");
-    // const backdropFrame = Frame.createType("BackdropButton01", Frame.fromHandle(DzGetGameUI())!, 0, 'BACKDROP', "")!
-    //   .setAbsPoint(FRAME_ALIGN_LEFT_TOP, 0.250000, 0.350000)
-    //   .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, 0.350000, 0.250000)
-    //   .setTexture("UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp", 0, true);
-
-    // const textFrame = Frame.createType("TEXT", backdropFrame, 0, "TEXT", "")!
-    //   .setAllPoints(backdropFrame)
-    //   .setText("新常量结构测试")
-    //   .setTextAlignment(50, 0);
-
-    // const frame = Frame.createType("btn", backdropFrame, 3, "BUTTON", "template")!
-    //   .setAllPoints(backdropFrame);
-
-    // // 使用Frame事件工具类绑定事件
-    // FrameEventUtils.bindEvents(frame, {
-    //   onClick: () => {
-    //     Console.log("TemplateUI: 按钮被点击了!");
-    //   },
-    //   onMouseEnter: () => {
-    //     Console.log("TemplateUI: 鼠标进入按钮区域");
-    //     // 可以在这里改变按钮的视觉效果
-    //   },
-    //   onMouseLeave: () => {
-    //     Console.log("TemplateUI: 鼠标离开按钮区域");
-    //     // 可以在这里恢复按钮的视觉效果
-    //   }
+    // 创建按钮并保存引用
+    // this.testButton = Button.createCentered("Centered Button", "LARGE");
+    // this.testButton.setTexture(ButtonTextures.BLACK_TRANSPARENT);
+    // this.testButton.setOnClick(() => {
+    //   Console.log("按钮点击了！！！123");
     // });
-
-    // Frame.createType("name", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "Demo_SizeBack")!
-    //   .setAbsPoint(FRAME_ALIGN_CENTER, 0.5, 0.5)
-    //.setPoint(FRAME_ALIGN_CENTER, Frame.fromHandle(DzGetGameUI())!, FRAME_ALIGN_CENTER, 0, 0);
-
-    // const btn = Button.createCentered("Centered Button", "LARGE");
-    // btn.setTexture(ButtonTextures.TRANSPARENT);
-    // btn.setOnClick(() => {
-    //   Console.log("Centered Button clicked!");
-    // });
-
-
-    print("Templa12312tBd!asda!!");
-
     
+    // Console.log("TemplateUI: Button created and saved to instance");
 
-
+    // print("TemplateUI: TestButton created");
   }
 
   /**
    * 清理函数 - 热重载时调用
+   * 在这里销毁所有需要清理的资源
    */
   public cleanup(): void {
-    Console.log("TemplateUI: Cleanup called, destroying button if exists.");
-
+    Console.log("TemplateUI: Cleanup called, destroying resources...");
+    
+    // 销毁单个按钮
+    if (this.testButton) {
+      this.testButton.destroy();
+      this.testButton = null;
+      Console.log("TemplateUI: testButton destroyed");
+    }
+    
+    // 销毁按钮数组中的所有按钮
+    for (const btn of this.buttons) {
+      btn.destroy();
+    }
+    this.buttons = [];
+    
+    Console.log("TemplateUI: All resources cleaned up");
   }
 
   /**
@@ -78,14 +71,16 @@ class TemplateUI {
    */
   public static onHotReload(): void {
     Console.log("TemplateUI hot reloaded!");
-    // 可以在这里添加特殊的热重载逻辑
   }
 }
 
-// 创建全局实例
+// ========================================
+// 模块注册 - 关键：保持实例在热重载之间存活
+// ========================================
+
+// 全局实例 - 在模块级别保存，热重载时会被重用
 let templateUIInstance: TemplateUI | null = null;
 
-// 注册模块到 ModuleManager
 print(">>> TemplateUI: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
 print(`>>> TemplateUI: Got ModuleManager instance`);
@@ -101,15 +96,18 @@ manager.registerModule("TemplateUI", TemplateUI, {
   cleanup: () => {
     print(">>> TemplateUI: Cleanup callback called");
     if (templateUIInstance) {
+      // 先清理资源
       templateUIInstance.cleanup();
-      templateUIInstance = null;
+      // 注意：这里不要设置为 null，保持实例以便下次热重载时复用
+      // 如果想完全重建实例，则设置为 null
+      // templateUIInstance = null;
     }
   },
   onHotReload: () => {
     print(">>> TemplateUI: onHotReload callback called");
     TemplateUI.onHotReload();
   },
-  dependencies: [] // 这个模块没有依赖
+  dependencies: []
 });
 print(">>> TemplateUI: Module registration completed");
 
