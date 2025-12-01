@@ -29,39 +29,39 @@ export class UnitBlood {
     //血条UI基底框架
     this.frame = Frame.createType("UnitBloodFrame", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "")!;
     this.frame.setSize(130 / 2400, 28 / 1800);
-    this.frame.setTexture("UI\\hpbar\\01.tga", 0, false);
+    this.frame.setTexture("map\\UI\\hpbar\\01.tga", 0, false);
     this.frame.setVisible(true);
 
     //血条生命值框架
     this.lifeFrame = Frame.createType("LifeFrame", this.frame, 0, "BACKDROP", "")!;
     this.lifeFrame.setSize(100 / 2400, 12 / 1800);
-    this.lifeFrame.setTexture("UI\\hpbar\\02.tga", 0, false);
+    this.lifeFrame.setTexture("map\\UI\\hpbar\\02.tga", 0, false);
     this.lifeFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -4 / 1800);
 
     //血条魔法值框架
     this.manaFrame = Frame.createType("ManaFrame", this.frame, 0, "BACKDROP", "")!;
     this.manaFrame.setSize(100 / 2400, 8 / 1800);
-    this.manaFrame.setTexture("UI\\hpbar\\03.tga", 0, false);
+    this.manaFrame.setTexture("map\\UI\\hpbar\\03.tga", 0, false);
     this.manaFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -16 / 1800);
 
     //血条等级框架
     this.levelFrame = Frame.createType("LevelFrame", this.frame, 0, "TEXT", "")!;
     this.levelFrame.setTextAlignment(50, 0);
     this.levelFrame.setText(`${actor.level}`);
-    this.levelFrame.setFont("resource\\hpbar\\ZiTi.ttf", 0.01, 0);
+    this.levelFrame.setFont("UI\\hpbar\\ZiTi.ttf", 0.01, 0);
 
     this.levelFrame.setPoint(FRAME_ALIGN_CENTER, this.frame, FRAME_ALIGN_LEFT_TOP, 14 / 2400, -14 / 1800);
 
     //血条名称框架
     this.nameBoxFrame = Frame.createType("NameBoxFrame", this.frame, 0, "BACKDROP", "")!;
-    this.nameBoxFrame.setTexture("UI\\hpbar\\07.tga", 0, false);
+    this.nameBoxFrame.setTexture("map\\UI\\hpbar\\07.tga", 0, false);
     this.nameBoxFrame.alpha = 75;
 
     //血条名称文本框架
     this.nameFrame = Frame.createType("NameFrame", this.nameBoxFrame, 0, "TEXT", "")!;
-    this.nameFrame.setText(actor.name);
+    this.nameFrame.setText(actor.getLabel());
     this.nameFrame.setTextAlignment(18, 0);
-    this.nameFrame.setFont("UI\\resource\\hpbar\\ZiTi.ttf", 0.01, 0);
+    this.nameFrame.setFont("UI\\hpbar\\ZiTi.ttf", 0.01, 0);
     // this.nameFrame.setSize(0, 0.006)
     
     this.nameFrame.alpha = 255;
@@ -71,12 +71,12 @@ export class UnitBlood {
     this.nameBoxFrame.setPoint(FRAME_ALIGN_RIGHT_BOTTOM, this.nameFrame, FRAME_ALIGN_RIGHT_BOTTOM, 0.004, -0.004);
 
     if (actor.owner == MapPlayer.fromLocal()) {
-      this.lifeFrame.setTexture("hpbar\\02.tga", 0, false);
+      this.lifeFrame.setTexture("map\\UI\\hpbar\\02.tga", 0, false);
     } else {
       if (actor.isAlly(MapPlayer.fromLocal())) {
-        this.lifeFrame.setTexture("hpbar\\06.tga", 0, false);
+        this.lifeFrame.setTexture("map\\UI\\hpbar\\06.tga", 0, false);
       } else {
-        this.lifeFrame.setTexture("hpbar\\05.tga", 0, false);
+        this.lifeFrame.setTexture("map\\UI\\hpbar\\05.tga", 0, false);
       }
     }
 

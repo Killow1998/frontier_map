@@ -8,6 +8,10 @@ export class Actor extends Unit {
   private _hpBarUIHeight: number = 150; // 默认血条UI高度
   private _size: number = 1.0; // 默认大小倍数
 
+  private label = "";
+
+  private bloodBarUI: UnitBlood | null = null;
+
   /**
    * @deprecated 请使用 Actor.create 或 Actor.fromUnit 或 Actor.fromHandle 静态方法
    * @param owner 单位所有者
@@ -156,11 +160,22 @@ export class Actor extends Unit {
     return this._size;
   }
 
+  public setLabel(value: string) {
+    this.label = value;
+    if (this.bloodBarUI) {
+      this.bloodBarUI.nameFrame.setText(value);
+    }
+  }
+
+  public getLabel(): string {
+    return this.label;
+  }
+
   /**
    * 为当前Actor创建血条UI
    */
   public createBloodBar(): void {
-    UnitBlood.create(this);
+    this.bloodBarUI = UnitBlood.create(this);
   }
 
 }

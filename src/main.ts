@@ -1,5 +1,5 @@
 
-import { Frame, FRAMEPOINT_BOTTOMRIGHT, FRAMEPOINT_TOPLEFT, Timer } from "@eiriksgata/wc3ts/*";
+import { Frame, FRAMEPOINT_BOTTOMRIGHT, FRAMEPOINT_TOPLEFT, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -11,6 +11,8 @@ import { UILayout } from "./system/ui/UILayout";
 import { Button, ButtonTextures } from "./system/ui/component/Buttom";
 import { TemplateUI } from "./examples/TemplateUi";
 import { ExportUI } from "./test/ExportUI";
+import { Actor } from "./system/actor";
+import { FourCC } from "./utils/helper";
 
 
 /**
@@ -28,13 +30,21 @@ async function main(): Promise<void> {
 
   // MAP_UNITS_INIT_CREATE.玩家1圣骑士.createBloodBar();
 
+
+  const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0);
+  if (actor) {
+    actor.createBloodBar();
+    actor.setLabel("英雄单位\n大侠\n我是神");
+  }
+
+
   // 确保所有UI模块被加载（这样它们的注册代码会被执行）
   // 只是引用一下类，确保模块被加载
 
   Timer.create().start(2, false, () => {
     //print("Loading UI modules:", typeof TemplateUI);
 
-    new ExportUI();
+    //new ExportUI();
 
     // Button.createAtPresetPosition(
     //   "TestButton",
