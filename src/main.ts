@@ -29,14 +29,7 @@ async function main(): Promise<void> {
   // SetCameraTargetController(MAP_UNITS_INIT_CREATE.玩家1圣骑士.handle, 0, 0, true);
 
   // MAP_UNITS_INIT_CREATE.玩家1圣骑士.createBloodBar();
-
-
-  const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0);
-  if (actor) {
-    actor.createBloodBar();
-    actor.setLabel("英雄单位\n大侠\n我是神");
-  }
-
+  
 
   // 确保所有UI模块被加载（这样它们的注册代码会被执行）
   // 只是引用一下类，确保模块被加载
