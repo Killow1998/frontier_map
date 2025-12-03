@@ -1,6 +1,8 @@
+import { MapPlayer, Players, Unit } from "@eiriksgata/wc3ts/*";
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
 import { Button, ButtonTextures } from 'src/system/ui/component/Buttom';
+import { FourCC } from "src/utils/helper";
 
 /**
  * 热更新模板
@@ -11,27 +13,38 @@ import { Button, ButtonTextures } from 'src/system/ui/component/Buttom';
  * 3. 在 initialize() 中重新创建资源
  */
 class TemplateUI {
-  
+
   // ========================================
   // 需要在热重载时保留/销毁的成员变量
   // ========================================
   private testButton: Button | null = null;
   private buttons: Button[] = [];  // 如果有多个按钮，可以用数组管理
 
+
   /**
    * 创建测试按钮
    */
   public TestButton() {
-    // 创建按钮并保存引用
-    // this.testButton = Button.createCentered("Centered Button", "LARGE");
-    // this.testButton.setTexture(ButtonTextures.BLACK_TRANSPARENT);
-    // this.testButton.setOnClick(() => {
-    //   Console.log("按钮点击了！！！123");
-    // });
-    
-    // Console.log("TemplateUI: Button created and saved to instance");
+    // 创建10个圣骑士单位
+    const paladins: Unit[] = [];
+    for (let i = 0; i < 10; i++) {
+      const x = -2000 + i * 200; // 水平排列，间隔200
+      const y = 0;
+      const paladin = Unit.create(
+        Players[0],
+        FourCC('Hpal'), // 圣骑士单位ID
+        x,
+        y,
+        270 // 面向角度
+      );
 
-    // print("TemplateUI: TestButton created");
+      if (paladin) {
+        paladins.push(paladin);
+        Console.log(`Created Paladin ${i + 1} at (${x}, ${y})`);
+      }
+    }
+
+
   }
 
   /**
@@ -40,20 +53,20 @@ class TemplateUI {
    */
   public cleanup(): void {
     Console.log("TemplateUI: Cleanup called, destroying resources...");
-    
+
     // 销毁单个按钮
     if (this.testButton) {
       this.testButton.destroy();
       this.testButton = null;
       Console.log("TemplateUI: testButton destroyed");
     }
-    
+
     // 销毁按钮数组中的所有按钮
     for (const btn of this.buttons) {
       btn.destroy();
     }
     this.buttons = [];
-    
+
     Console.log("TemplateUI: All resources cleaned up");
   }
 

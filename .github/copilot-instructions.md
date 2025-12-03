@@ -33,10 +33,47 @@ Follow the library's documentation style:
 - Constants use UPPER_SNAKE_CASE: `UNIT_STATE_LIFE`, `PLAYER_COLOR_RED`
 - Handle properties are readonly: `readonly handle: unit`
 
+### Players 全局数组（重要！）
+
+wc3ts 预定义了 `Players` 全局数组，可以直接通过索引获取玩家对象：
+
+```typescript
+import { Players } from "@eiriksgata/wc3ts";
+
+// Players[0] = 玩家1 (红色)
+// Players[1] = 玩家2 (蓝色)
+// Players[2] = 玩家3 (青色)
+// ...
+// Players[11] = 玩家12
+// Players[PLAYER_NEUTRAL_AGGRESSIVE] = 中立敌对 (索引12)
+// Players[PLAYER_NEUTRAL_PASSIVE] = 中立被动 (索引15)
+
+// 直接使用 Players[n] 获取玩家，无需 MapPlayer.fromIndex()
+const player1 = Players[0];  // 玩家1
+const player2 = Players[1];  // 玩家2
+
+// Unit.create 的第一个参数类型是 MapPlayer，直接用 Players[n] 即可
+const unit = Unit.create(Players[0], FourCC("hfoo"), x, y, facing);
+
+// 遍历所有玩家
+for (let i = 0; i < bj_MAX_PLAYERS; i++) {
+  const player = Players[i];
+  print(`玩家${i + 1}: ${player.name}`);
+}
+```
+
+**注意**：`Players[0]` 对应游戏中的"玩家1"，索引从 0 开始。
+
 ### Code Examples from wc3ts
 ```typescript
-// Unit creation pattern
+// Unit creation pattern - 使用 Players[n] 获取玩家
 const unit = Unit.create(Players[0], FourCC('hfoo'), x, y, facing);
+
+// 为玩家2创建单位
+const unit2 = Unit.create(Players[1], FourCC('hpea'), x, y, facing);
+
+// 中立敌对单位
+const neutralUnit = Unit.create(Players[PLAYER_NEUTRAL_AGGRESSIVE], FourCC('ngnb'), x, y, facing);
 
 // Effect with attachment
 const effect = Effect.createAttachment("path/to/model.mdl", unit, "chest");
@@ -132,18 +169,42 @@ effect.destroy();
 
 ### Player and Color Management
 ```typescript
-import { MapPlayer, Color, playerColors } from "@eiriksgata/wc3ts";
+import { MapPlayer, Color, playerColors, Players } from "@eiriksgata/wc3ts";
 
-// Access predefined players
-const player = Players[0];
-player.setName("New Player Name");
+// ===== 获取玩家的方式 =====
 
-// Use color utilities
+// 方式1（推荐）：使用 Players 全局数组
+const player1 = Players[0];  // 玩家1
+const player2 = Players[1];  // 玩家2
+const localPlayer = Players[GetPlayerId(GetLocalPlayer())];  // 本地玩家
+
+// 方式2：通过 handle 创建
+const player = MapPlayer.fromHandle(Player(0));
+
+// 方式3：通过索引创建
+const playerByIndex = MapPlayer.fromIndex(0);
+
+// ===== Players 索引对照表 =====
+// Players[0]  = 玩家1  (红)     Players[6]  = 玩家7  (绿)
+// Players[1]  = 玩家2  (蓝)     Players[7]  = 玩家8  (粉)
+// Players[2]  = 玩家3  (青)     Players[8]  = 玩家9  (灰)
+// Players[3]  = 玩家4  (紫)     Players[9]  = 玩家10 (浅蓝)
+// Players[4]  = 玩家5  (黄)     Players[10] = 玩家11 (深绿)
+// Players[5]  = 玩家6  (橙)     Players[11] = 玩家12 (棕)
+// Players[PLAYER_NEUTRAL_AGGRESSIVE] = 中立敌对 (索引12)
+// Players[PLAYER_NEUTRAL_PASSIVE]    = 中立被动 (索引15)
+
+// ===== 玩家属性操作 =====
+Players[0].name = "新玩家名";
+Players[0].gold = 1000;
+Players[0].lumber = 500;
+
+// ===== 颜色管理 =====
 const customColor = new Color(255, 128, 0, 255); // Orange
 const coloredText = `${customColor.code}Colored Text|r`;
 
-// Use predefined player colors
-const playerColor = playerColors[player.id];
+// 使用预定义玩家颜色
+const playerColor = playerColors[Players[0].id];
 ```
 
 ### JAPI Integration and Raw Calls

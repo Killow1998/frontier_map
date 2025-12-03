@@ -23,42 +23,14 @@ import { FourCC } from "./utils/helper";
 async function main(): Promise<void> {
 
 
-  // //移动镜头到目标
-  // PanCameraToTimed(MAP_UNITS_INIT_CREATE.玩家1圣骑士.x, MAP_UNITS_INIT_CREATE.玩家1圣骑士.y, 0);
-  // SetCameraQuickPosition(MAP_UNITS_INIT_CREATE.玩家1圣骑士.x, MAP_UNITS_INIT_CREATE.玩家1圣骑士.y);
-  // SetCameraTargetController(MAP_UNITS_INIT_CREATE.玩家1圣骑士.handle, 0, 0, true);
-
-  // MAP_UNITS_INIT_CREATE.玩家1圣骑士.createBloodBar();
-  
-
   // 确保所有UI模块被加载（这样它们的注册代码会被执行）
   // 只是引用一下类，确保模块被加载
 
   Timer.create().start(2, false, () => {
-    //print("Loading UI modules:", typeof TemplateUI);
-
-    //new ExportUI();
-
-    // Button.createAtPresetPosition(
-    //   "TestButton",
-    //   ScreenCoordinates.ORIGIN_CENTER,
-    //   "LARGE"
-    // )
-    //   .setOnClick(() => {
-    //     Console.log("图标按钮被点击了!");
-    //   })
-    //   .create();
-
-    //testButton();
-
-    // new Frame("QuestButtonBaseTemplate", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0)
-    //   .setAbsPoint(FRAMEPOINT_TOPLEFT, 0.353660, 0.388860)
-    //   .setAbsPoint(FRAMEPOINT_BOTTOMRIGHT, 0.453660, 0.288860)
+    print("Loading UI modules:", typeof TemplateUI);
   });
 
 
-
-  // 测试Button组件
 
 
 }
