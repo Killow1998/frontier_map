@@ -15,3 +15,5 @@ mpq/*
 .yarn/install-state.gz
 !.yarn/releases
 !.yarn/plugins
+
+main.lua
