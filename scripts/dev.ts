@@ -246,6 +246,24 @@ function cleanupHotReloadFile(): void {
 }
 
 /**
+ * 清理 prod 模式生成的 main.lua（避免与 dev 模式冲突）
+ */
+function cleanupProdMainLua(): void {
+  const fs = require('fs');
+  const path = require('path');
+  const mainLuaPath = path.join("maps", "map", "main.lua");
+  
+  if (fs.existsSync(mainLuaPath)) {
+    try {
+      fs.unlinkSync(mainLuaPath);
+      console.log(">>> Removed prod main.lua to avoid conflicts with dev mode");
+    } catch (error) {
+      console.warn(`>>> Warning: Failed to remove main.lua: ${error}`);
+    }
+  }
+}
+
+/**
  * 主函数
  */
 function main(): void {
@@ -256,6 +274,9 @@ function main(): void {
   
   // 0. 清理旧的热更新通知文件
   cleanupHotReloadFile();
+  
+  // 0.5 清理 prod 模式生成的 main.lua
+  cleanupProdMainLua();
   
   // 1. 执行初始构建
   performInitialBuild();
