@@ -62,7 +62,7 @@ function main(): void {
     handleBootstrapLua(false);
 
     //压缩 Lua 代码（仅生产模式）
-    minifyLua(); // 暂时禁用压缩
+    //minifyLua(); // 暂时禁用压缩
 
     //打包 w3x 文件
     buildW3x();
