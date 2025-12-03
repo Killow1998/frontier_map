@@ -59,27 +59,83 @@ yarn dev
 3. 如果模块导出了 `initialize()` 函数，会自动调用
 4. 如果模块导出了 `onHotReload()` 函数，会自动调用
 
-### 添加热更新钩子
-在你的模块中添加热更新处理函数：
+### 推荐方式：自注册模块（无需手动添加路径映射）
+
+在模块中注册时提供 `modulePath`，热重载系统会自动识别：
 
 ```typescript
-// 示例：src/system/MySystem.ts
-export class MySystem {
-  // ... 系统逻辑
+// 示例：src/examples/MyModule.ts
+import { ModuleManager } from "../system/ModuleManager";
+
+class MyModule {
+  private resources: any[] = [];
+
+  public initialize(): void {
+    print("MyModule initialized");
+    // 创建资源...
+  }
+
+  public cleanup(): void {
+    // 销毁所有资源
+    for (const res of this.resources) {
+      res.destroy();
+    }
+    this.resources = [];
+  }
+
+  public static onHotReload(): void {
+    print("MyModule hot reloaded!");
+  }
 }
 
-// 热更新钩子函数
-export function onHotReload(): void {
-  print("MySystem module hot reloaded!");
-  // 重新初始化系统状态
-  // 清理旧的事件监听器
-  // 重新注册新的处理器
-}
+// 模块实例
+let instance: MyModule | null = null;
 
-// 初始化函数（可选）
-export function initialize(): void {
-  // 模块初始化逻辑
-}
+// 注册模块 - 关键：指定 modulePath
+ModuleManager.getInstance().registerModule("MyModule", MyModule, {
+  // ⭐ 关键：指定模块路径，格式为 "src.目录.文件名"（不含.ts）
+  modulePath: "src.examples.MyModule",
+  initialize: () => {
+    if (!instance) {
+      instance = new MyModule();
+    }
+    instance.initialize();
+  },
+  cleanup: () => {
+    if (instance) {
+      instance.cleanup();
+    }
+  },
+  onHotReload: () => {
+    MyModule.onHotReload();
+  },
+  dependencies: []
+});
+
+export { MyModule };
+```
+
+### modulePath 格式说明
+
+| 文件路径 | modulePath |
+|---------|------------|
+| `src/examples/TemplateUi.ts` | `"src.examples.TemplateUi"` |
+| `src/system/ui/UnitBlood.ts` | `"src.system.ui.UnitBlood"` |
+| `src/utils/CameraControl.ts` | `"src.utils.CameraControl"` |
+
+**规则**：将文件路径中的 `/` 替换为 `.`，去掉 `.ts` 后缀。
+
+### 旧方式：手动添加路径映射（不推荐）
+
+如果不提供 `modulePath`，需要在 `ModuleManager.ts` 的 `pathMappings` 中手动添加：
+
+```typescript
+// ModuleManager.ts 中的 getModulePathFromName 方法
+const pathMappings: { [key: string]: string } = {
+  'TemplateUI': 'src.examples.TemplateUi',
+  'MyModule': 'src.examples.MyModule',  // 需要手动添加
+  // ...
+};
 ```
 
 ## 🔧 配置选项

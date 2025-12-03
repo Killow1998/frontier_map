@@ -25,7 +25,6 @@ class CreateActorExample {
    */
   public TestButton() {
     // 创建10个圣骑士单位
-
     for (let i = 0; i < 10; i++) {
       const x = -2000 + i * 200; // 水平排列，间隔200
       const y = 0;
@@ -51,30 +50,25 @@ class CreateActorExample {
    * 在这里销毁所有需要清理的资源
    */
   public cleanup(): void {
-    Console.log("TemplateUI: Cleanup called, destroying resources...");
-
     // 销毁所有创建的单位
     for (const actor of this.actorList) {
       actor.destroy();
     }
     this.actorList = [];
-    Console.log("TemplateUI: All resources cleaned up");
   }
 
   /**
    * 初始化函数
    */
   public initialize(): void {
-    Console.log("TemplateUI: Initializing...");
     this.TestButton();
-    print("TemplateUI initialized");
   }
 
   /**
    * 热重载处理函数
    */
   public static onHotReload(): void {
-    Console.log("TemplateUI hot reloaded!");
+    Console.log("CreateActorExample hot reloaded!");
   }
 }
 
@@ -85,20 +79,22 @@ class CreateActorExample {
 // 全局实例 - 在模块级别保存，热重载时会被重用
 let templateUIInstance: CreateActorExample | null = null;
 
-print(">>> TemplateUI: Module file loaded, about to register...");
+print(">>> CreateActorExample: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
-print(`>>> TemplateUI: Got ModuleManager instance`);
+print(`>>> CreateActorExample: Got ModuleManager instance`);
 
-manager.registerModule("TemplateUI", CreateActorExample, {
+manager.registerModule("CreateActorExample", CreateActorExample, {
+  // 关键：指定模块路径，热重载时会自动匹配
+  modulePath: "src.examples.CreateActorExample",
   initialize: () => {
-    print(">>> TemplateUI: Initialize callback called");
+    print(">>> CreateActorExample: Initialize callback called");
     if (!templateUIInstance) {
       templateUIInstance = new CreateActorExample();
     }
     templateUIInstance.initialize();
   },
   cleanup: () => {
-    print(">>> TemplateUI: Cleanup callback called");
+    print(">>> CreateActorExample: Cleanup callback called");
     if (templateUIInstance) {
       // 先清理资源
       templateUIInstance.cleanup();
@@ -108,11 +104,11 @@ manager.registerModule("TemplateUI", CreateActorExample, {
     }
   },
   onHotReload: () => {
-    print(">>> TemplateUI: onHotReload callback called");
+    print(">>> CreateActorExample: onHotReload callback called");
     CreateActorExample.onHotReload();
   },
   dependencies: []
 });
-print(">>> TemplateUI: Module registration completed");
+print(">>> CreateActorExample: Module registration completed");
 
 export { CreateActorExample };

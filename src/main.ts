@@ -9,7 +9,7 @@ import { MapGeneral } from "./config/Map";
 import { Console } from "./system/console";
 import { UILayout } from "./system/ui/UILayout";
 import { Button, ButtonTextures } from "./system/ui/component/Buttom";
-import { TemplateUI } from "./examples/TemplateUi";
+import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { ExportUI } from "./test/ExportUI";
 import { Actor } from "./system/actor";
 import { FourCC } from "./utils/helper";
@@ -27,7 +27,7 @@ async function main(): Promise<void> {
   // 只是引用一下类，确保模块被加载
 
   Timer.create().start(2, false, () => {
-    print("Loading UI modules:", typeof TemplateUI);
+    print("Loading UI modules:", typeof ReloadTemplateExample);
   });
 
 

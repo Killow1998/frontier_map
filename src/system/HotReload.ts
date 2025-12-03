@@ -310,40 +310,63 @@ export class HotReload {
   private processHotReload(notification: HotReloadNotification): void {
     print(`>>> HotReload: Processing hot reload for ${notification.modules.length} modules...`);
 
-    // 提取模块名称（从路径中获取实际的模块名）
-    const moduleNames = notification.modules.map(fullPath => {
-      // 从 "src.examples.TemplateUi" 中提取模块名
-      const parts = fullPath.split('.');
-      const fileName = parts[parts.length - 1];
-
-      // 处理文件名的大小写问题，映射到注册时使用的名称
-      const nameMapping: { [key: string]: string } = {
-        'TemplateUi': 'TemplateUI',  // 文件名 -> 注册名
-        'UnitBlood': 'UnitBlood',
-        'CameraControl': 'CameraControl',
-        'Actor': 'Actor',
-        'ModuleManager': 'ModuleManager',
-        'HotReload': 'HotReload'
-      };
-
-      const mappedName = nameMapping[fileName] || fileName;
-      print(`>>> HotReload: Mapping "${fileName}" -> "${mappedName}"`);
-      return mappedName;
-    });
-
-    print(`>>> HotReload: Extracted module names: ${moduleNames.join(", ")}`);
-
-    // 获取 ModuleManager 实例
     const moduleManager = ModuleManager.getInstance();
     const registeredModules = moduleManager.getRegisteredModules();
     print(`>>> HotReload: All registered modules: ${registeredModules.join(", ")}`);
 
-    // 过滤出已注册的模块
-    const matchedModules = moduleNames.filter(name => {
-      const isRegistered = moduleManager.isModuleRegistered(name);
-      print(`>>> HotReload: Checking "${name}" - registered: ${isRegistered}`);
-      return isRegistered;
-    });
+    // 尝试通过多种方式匹配模块
+    const matchedModules: string[] = [];
+
+    for (const fullPath of notification.modules) {
+      print(`>>> HotReload: Trying to match path: ${fullPath}`);
+
+      // 方式1：直接通过路径匹配（模块注册时提供了 modulePath）
+      const moduleByPath = moduleManager.findModuleByPath(fullPath);
+      if (moduleByPath) {
+        print(`>>> HotReload: ✓ Matched by path: ${moduleByPath}`);
+        if (!matchedModules.includes(moduleByPath)) {
+          matchedModules.push(moduleByPath);
+        }
+        continue;
+      }
+
+      // 方式2：从路径提取文件名，尝试匹配模块名
+      const parts = fullPath.split('.');
+      const fileName = parts[parts.length - 1];
+
+      // 尝试直接匹配
+      if (moduleManager.isModuleRegistered(fileName)) {
+        print(`>>> HotReload: ✓ Matched by filename: ${fileName}`);
+        if (!matchedModules.includes(fileName)) {
+          matchedModules.push(fileName);
+        }
+        continue;
+      }
+
+      // 方式3：尝试常见的大小写变体
+      const variants = [
+        fileName,
+        fileName.toUpperCase(),
+        fileName.toLowerCase(),
+        fileName.charAt(0).toUpperCase() + fileName.slice(1),
+      ];
+
+      let matched = false;
+      for (const variant of variants) {
+        if (moduleManager.isModuleRegistered(variant)) {
+          print(`>>> HotReload: ✓ Matched by variant: ${variant}`);
+          if (!matchedModules.includes(variant)) {
+            matchedModules.push(variant);
+          }
+          matched = true;
+          break;
+        }
+      }
+
+      if (!matched) {
+        print(`>>> HotReload: ✗ No match found for: ${fullPath}`);
+      }
+    }
 
     print(`>>> HotReload: Matched registered modules: ${matchedModules.join(", ")}`);
 

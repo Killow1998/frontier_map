@@ -6,6 +6,7 @@
 interface ModuleInfo {
   name: string;
   module: any;
+  modulePath?: string;  // 模块的 require 路径，用于热重载
   initializeFunction?: () => void;
   cleanupFunction?: () => void;
   hotReloadFunction?: () => void;
@@ -36,11 +37,17 @@ export class ModuleManager {
 
   /**
    * 注册模块
+   * @param name 模块名称（用于热重载时匹配）
+   * @param module 模块类或对象
+   * @param options 配置选项
+   * @param options.modulePath 模块的 require 路径，如 "src.examples.TemplateUi"
+   *                           如果不提供，将自动从文件名推断
    */
   public registerModule(
     name: string, 
     module: any, 
     options: {
+      modulePath?: string;  // 新增：模块路径
       initialize?: () => void;
       cleanup?: () => void;
       onHotReload?: () => void;
@@ -50,6 +57,7 @@ export class ModuleManager {
     const moduleInfo: ModuleInfo = {
       name,
       module,
+      modulePath: options.modulePath,  // 保存模块路径
       initializeFunction: options.initialize,
       cleanupFunction: options.cleanup,
       hotReloadFunction: options.onHotReload,
@@ -59,6 +67,9 @@ export class ModuleManager {
 
     this.modules.set(name, moduleInfo);
     print(`>>> ModuleManager: Module registered: ${name}`);
+    if (options.modulePath) {
+      print(`>>> ModuleManager: Module path: ${options.modulePath}`);
+    }
     print(`>>> ModuleManager: Total registered modules: ${this.modules.size}`);
     print(`>>> ModuleManager: Current modules: ${Array.from(this.modules.keys()).join(", ")}`);
   }
@@ -180,17 +191,20 @@ export class ModuleManager {
    * 将模块路径名转换为实际的 require 路径
    */
   private getModulePathFromName(name: string): string | null {
-    // 根据模块名称查找对应的路径
-    // 这里需要处理文件名大小写的映射
-    
+    // 优先使用注册时提供的路径
+    const moduleInfo = this.modules.get(name);
+    if (moduleInfo?.modulePath) {
+      return moduleInfo.modulePath;
+    }
+
+    // 备用：硬编码的路径映射（兼容旧代码）
     const pathMappings: { [key: string]: string } = {
-      'TemplateUI': 'src.examples.TemplateUi',  // 正确路径：src/examples/TemplateUi.ts
+      'TemplateUI': 'src.examples.TemplateUi',
       'UnitBlood': 'src.system.ui.UnitBlood',
       'CameraControl': 'src.utils.CameraControl',
       'Actor': 'src.system.actor',
       'ModuleManager': 'src.system.ModuleManager',
       'HotReload': 'src.system.HotReload',
-      // 添加更多映射...
     };
 
     if (pathMappings[name]) {
@@ -202,6 +216,7 @@ export class ModuleManager {
       `src.system.ui.${name}`,
       `src.system.${name}`,
       `src.utils.${name}`,
+      `src.examples.${name}`,
       `src.${name}`,
     ];
 
@@ -259,5 +274,19 @@ export class ModuleManager {
    */
   public isModuleRegistered(name: string): boolean {
     return this.modules.has(name);
+  }
+
+  /**
+   * 通过模块路径查找已注册的模块名称
+   * @param path 模块路径，如 "src.examples.TemplateUi"
+   * @returns 模块名称，如果未找到则返回 null
+   */
+  public findModuleByPath(path: string): string | null {
+    for (const [name, info] of this.modules) {
+      if (info.modulePath === path) {
+        return name;
+      }
+    }
+    return null;
   }
 }

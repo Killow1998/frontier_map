@@ -12,12 +12,11 @@ import { FourCC } from "src/utils/helper";
  * 2. 在 cleanup() 中销毁所有需要清理的资源
  * 3. 在 initialize() 中重新创建资源
  */
-class TemplateUI {
+class ReloadTemplateExample {
 
   // ========================================
   // 需要在热重载时保留/销毁的成员变量
   // ========================================
-  private testButton: Button | null = null;
   private buttons: Button[] = [];  // 如果有多个按钮，可以用数组管理
 
 
@@ -25,25 +24,12 @@ class TemplateUI {
    * 创建测试按钮
    */
   public TestButton() {
-    // 创建10个圣骑士单位
-    const paladins: Unit[] = [];
-    for (let i = 0; i < 10; i++) {
-      const x = -2000 + i * 200; // 水平排列，间隔200
-      const y = 0;
-      const paladin = Unit.create(
-        Players[0],
-        FourCC('Hpal'), // 圣骑士单位ID
-        x,
-        y,
-        270 // 面向角度
-      );
-
-      if (paladin) {
-        paladins.push(paladin);
-        Console.log(`Created Paladin ${i + 1} at (${x}, ${y})`);
-      }
-    }
-
+    // 创建一个按钮
+    const btn = Button.createCentered("ReloadTemplate Button");
+    btn.setOnClick(() => {
+      Console.log("ReloadTemplate Button clicked!");
+    });
+    this.buttons.push(btn);
 
   }
 
@@ -52,14 +38,7 @@ class TemplateUI {
    * 在这里销毁所有需要清理的资源
    */
   public cleanup(): void {
-    Console.log("TemplateUI: Cleanup called, destroying resources...");
-
-    // 销毁单个按钮
-    if (this.testButton) {
-      this.testButton.destroy();
-      this.testButton = null;
-      Console.log("TemplateUI: testButton destroyed");
-    }
+    Console.log("ReloadTemplate: Cleanup called, destroying resources...");
 
     // 销毁按钮数组中的所有按钮
     for (const btn of this.buttons) {
@@ -67,23 +46,23 @@ class TemplateUI {
     }
     this.buttons = [];
 
-    Console.log("TemplateUI: All resources cleaned up");
+    Console.log("ReloadTemplate: All resources cleaned up");
   }
 
   /**
    * 初始化函数
    */
   public initialize(): void {
-    Console.log("TemplateUI: Initializing...");
+    Console.log("ReloadTemplate: Initializing...");
     this.TestButton();
-    print("TemplateUI initialized");
+    print("ReloadTemplate initialized");
   }
 
   /**
    * 热重载处理函数
    */
   public static onHotReload(): void {
-    Console.log("TemplateUI hot reloaded!");
+    Console.log("ReloadTemplate hot reloaded!");
   }
 }
 
@@ -92,36 +71,38 @@ class TemplateUI {
 // ========================================
 
 // 全局实例 - 在模块级别保存，热重载时会被重用
-let templateUIInstance: TemplateUI | null = null;
+let reloadTemplateExampleInstance: ReloadTemplateExample | null = null;
 
-print(">>> TemplateUI: Module file loaded, about to register...");
+print(">>> ReloadTemplate: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
-print(`>>> TemplateUI: Got ModuleManager instance`);
+print(`>>> ReloadTemplate: Got ModuleManager instance`);
 
-manager.registerModule("TemplateUI", TemplateUI, {
+manager.registerModule("ReloadTemplate", ReloadTemplateExample, {
+  // 关键：指定模块路径，热重载时会自动匹配
+  modulePath: "src.examples.ReloadTemplateExample",
   initialize: () => {
-    print(">>> TemplateUI: Initialize callback called");
-    if (!templateUIInstance) {
-      templateUIInstance = new TemplateUI();
+    print(">>> ReloadTemplate: Initialize callback called");
+    if (!reloadTemplateExampleInstance) {
+      reloadTemplateExampleInstance = new ReloadTemplateExample();
     }
-    templateUIInstance.initialize();
+    reloadTemplateExampleInstance.initialize();
   },
   cleanup: () => {
-    print(">>> TemplateUI: Cleanup callback called");
-    if (templateUIInstance) {
+    print(">>> ReloadTemplate: Cleanup callback called");
+    if (reloadTemplateExampleInstance) {
       // 先清理资源
-      templateUIInstance.cleanup();
+      reloadTemplateExampleInstance.cleanup();
       // 注意：这里不要设置为 null，保持实例以便下次热重载时复用
       // 如果想完全重建实例，则设置为 null
-      // templateUIInstance = null;
+      // reloadTemplateExampleInstance = null;
     }
   },
   onHotReload: () => {
-    print(">>> TemplateUI: onHotReload callback called");
-    TemplateUI.onHotReload();
+    print(">>> ReloadTemplate: onHotReload callback called");
+    ReloadTemplateExample.onHotReload();
   },
   dependencies: []
 });
-print(">>> TemplateUI: Module registration completed");
+print(">>> ReloadTemplate: Module registration completed");
 
-export { TemplateUI };
+export { ReloadTemplateExample };
