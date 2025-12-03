@@ -1,86 +1,133 @@
-# 魔兽争霸 3 1.27a TypeScripts 开发 模板
+# 魔兽争霸 3 1.27a TypeScript 开发模板
 
-该项目模板默认使用者具有 常规的技术使用，接触相关的编程知识。
+> 使用 TypeScript 开发魔兽争霸 3 地图的现代化模板，支持热重载、模块化开发和自动化构建。
 
-该项目提供了 KKWE(包含 X_JAPI) 、 w2l(w3x2lni) 环境
+## ✨ 特性
 
-构建自动注入 Cheat
+- 🔥 **热重载** - 修改代码后自动更新，无需重启游戏
+- 📦 **模块化** - TypeScript 模块化开发，代码组织清晰
+- 🛠 **自动构建** - 一键编译打包，自动注入 Cheat
+- 🎮 **开箱即用** - 内置 KKWE + w3x2lni 环境
+- 📚 **类型安全** - 完整的 WC3 API 类型定义
 
-wc3ts 提供封装函数使用，对象编程。具体函数使用请参考 wc3ts 相关文档。也可参考 w3ts （重置版本的 ts 文档，但是会少了很多函数）。
+## �� 快速开始
 
-wc3ts 目前还在完善中.
+### 环境要求
 
-KKWE 该项目不一定是最新的，可自行升级 KKWE
+- Node.js 16+
+- Yarn
+- Warcraft III 1.27a
 
-## Future(wc3ts and template)
+### 安装
 
-编写依赖架构，集成不同的模块（主要是针对复用较多的）：
+```bash
+git clone https://github.com/eiriksgata/wc3-map-ts-template.git
+cd wc3-map-ts-template
+yarn install
+```
 
-1. 属性面板 UI
-2. 血条 UI
-3. 伤害系统
-4. 部分技能系统
-5. 热更新
-6. excel 物编
+### 开发
 
-## 开发环境
+```bash
+# 开发模式（支持热重载）
+yarn dev
 
-1. KKWE
-2. w3x2lni
-3. nodejs
-4. npm | yarn
-5. War3 1.27a
+# 运行地图测试
+yarn test:map
+```
 
-## 项目初始化
+### 发布
 
-`yarn install`
-安装项目编译构建所需要的依赖
+```bash
+# 生产构建
+yarn build
+```
 
-## 主要项目依赖
+## 📋 命令说明
 
-1. [@eiriksgata/wc3ts](https://github.com/eiriksgata/wc3ts)
-2. luamin
-3. ts-node
-4. typescript-to-lua
+| 命令 | 说明 |
+|------|------|
+| `yarn dev` | 开发模式，支持热重载和文件监听 |
+| `yarn build` | 生产构建，打包成单文件并压缩 |
+| `yarn test` | 编译并自动运行地图 |
+| `yarn watch` | 仅监听 TypeScript 文件变化 |
+| `yarn build:map` | 仅打包地图（不编译） |
+| `yarn test:map` | 仅运行地图（不编译） |
 
-## 编译
+## ⚡ 开发模式 vs 生产模式
 
-命令： `yarn build`
-生成的 tstl lua 文件 自动放置于 maps/map/main.lua
-编译 打包生成的 文件 位于 dist/map.w3x
+| 特性 | Dev (`yarn dev`) | Prod (`yarn build`) |
+|------|------------------|---------------------|
+| 输出 | 多个模块化 `.lua` 文件 | 单个 `main.lua` |
+| 热重载 | ✅ 支持 | ❌ 不支持 |
+| 代码压缩 | ❌ 否 | ✅ 是 |
+| 适用场景 | 开发调试 | 发布地图 |
 
-## 运行测试
+## 📁 目录结构
 
-命令： `yarn run test`
-编译并且运行 dist/map.w3x 地图
+```
+├── src/                # TypeScript 源代码
+│   ├── main.ts         # 入口文件
+│   ├── system/         # 系统模块（UI、热重载等）
+│   ├── config/         # 配置文件
+│   └── examples/       # 示例代码
+├── maps/               # w3x2lni 地图项目文件
+│   ├── map/            # 地图数据
+│   └── resource/       # 资源文件
+├── lua/                # Lua 启动脚本
+├── dist/               # 构建输出目录
+├── dev_lib/            # 开发工具（KKWE、w3x2lni）
+├── scripts/            # 构建脚本
+└── config.json         # 环境配置
+```
 
-## 更多功能
+## 🔧 配置说明
 
-参考 `package.json` 的 `scripts`
+### config.json
 
-## 目录结构
+```json
+{
+  "w2l": { "path": "dev_lib/w3x2lni" },
+  "kkwe": { "path": "dev_lib/KKWE" }
+}
+```
 
-- `dev_lib` 开发环境库 包含 KKWE 、w2l
-- `dist` 编译生成的文件 w3x 地图运行文件
-- `maps` w2l lni 项目文件 如果需要 编写地形 可用 该目录下的 .w3x 载入到 kkwe 编辑器中，编辑完成后保存 即可
-- `scripts` 脚本文件
-- `src` 地图源文件 ，入口文件为 `main.ts`
-- `config.json` 配置环境目录
+### 地形编辑
 
-## excel 原生物编（未实现）
+1. 用 KKWE 打开 `maps/` 目录下的 `.w3x` 文件
+2. 编辑地形后保存
+3. 运行 `yarn build` 或 `yarn dev`
 
-- native-object-table.xlsx 该文件为原生物编数据表格，可自行拓展定义的属性。转换本质是将 excel 数据 转为 lni 数据，通过 w3x2lni 打包成地图数据。
+## 📦 主要依赖
 
-通过 nodejs 脚本对 表格转为 lni 数据。
+| 依赖 | 说明 |
+|------|------|
+| [@eiriksgata/wc3ts](https://github.com/eiriksgata/wc3ts) | WC3 TypeScript API 封装 |
+| typescript-to-lua | TypeScript 到 Lua 编译器 |
+| luamin | Lua 代码压缩 |
 
-## 自定义框架数据（未实现）
+## 🎯 路线图
 
-**_该系统需要依赖于框架系统，本质是舍弃了魔兽原生物编定义，舍弃魔兽原生的伤害系统，舍弃原生 UI 等，改为自身实现一套新的系统。该实现依赖于 诸多模块 自己重新实现的模块，例如 游戏伤害系统，单位属性面板 UI，单位自身血条等。_**
+- [x] 热重载系统
+- [x] UI 组件系统（Button、FDFButton）
+- [x] 血条 UI
+- [ ] 属性面板 UI
+- [ ] 伤害系统
+- [ ] Excel 物编转换
+- [ ] 技能系统模板
 
-- custom-frame-table.xlsx 文件
+## 🤖 AI 辅助开发
 
-## AI Agent - Github copilot
+项目包含 GitHub Copilot 指令文件，提供项目特定的代码提示：
 
-- `./github/copilot-instructions.md`
+```
+.github/copilot-instructions.md
+```
 
-## Welcome PR
+## 📄 License
+
+MIT
+
+## 🤝 Contributing
+
+欢迎提交 PR 和 Issue！
