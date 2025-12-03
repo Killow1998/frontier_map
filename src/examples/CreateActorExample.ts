@@ -1,0 +1,118 @@
+import { MapPlayer, Players, Unit } from "@eiriksgata/wc3ts/*";
+import { ModuleManager } from "../system/ModuleManager";
+import { Console } from "../system/console";
+import { Button, ButtonTextures } from 'src/system/ui/component/Buttom';
+import { FourCC } from "src/utils/helper";
+
+/**
+ * 热更新模板
+ * 
+ * 热重载设计要点：
+ * 1. 需要在热重载时销毁的资源（如UI组件）应保存为类的成员变量
+ * 2. 在 cleanup() 中销毁所有需要清理的资源
+ * 3. 在 initialize() 中重新创建资源
+ */
+class CreateActorExample {
+
+  // ========================================
+  // 需要在热重载时保留/销毁的成员变量
+  // ========================================
+  private actorList: Unit[] = [];
+
+
+  /**
+   * 创建测试按钮
+   */
+  public TestButton() {
+    // 创建10个圣骑士单位
+
+    for (let i = 0; i < 10; i++) {
+      const x = -2000 + i * 200; // 水平排列，间隔200
+      const y = 0;
+      const paladin = Unit.create(
+        Players[0],
+        FourCC('Hpal'), // 圣骑士单位ID
+        x,
+        y,
+        270 // 面向角度
+      );
+
+      if (paladin) {
+        this.actorList.push(paladin);
+        Console.log(`Created Paladin ${i + 1} at (${x}, ${y})`);
+      }
+    }
+
+
+  }
+
+  /**
+   * 清理函数 - 热重载时调用
+   * 在这里销毁所有需要清理的资源
+   */
+  public cleanup(): void {
+    Console.log("TemplateUI: Cleanup called, destroying resources...");
+
+    // 销毁所有创建的单位
+    for (const actor of this.actorList) {
+      actor.destroy();
+    }
+    this.actorList = [];
+    Console.log("TemplateUI: All resources cleaned up");
+  }
+
+  /**
+   * 初始化函数
+   */
+  public initialize(): void {
+    Console.log("TemplateUI: Initializing...");
+    this.TestButton();
+    print("TemplateUI initialized");
+  }
+
+  /**
+   * 热重载处理函数
+   */
+  public static onHotReload(): void {
+    Console.log("TemplateUI hot reloaded!");
+  }
+}
+
+// ========================================
+// 模块注册 - 关键：保持实例在热重载之间存活
+// ========================================
+
+// 全局实例 - 在模块级别保存，热重载时会被重用
+let templateUIInstance: CreateActorExample | null = null;
+
+print(">>> TemplateUI: Module file loaded, about to register...");
+const manager = ModuleManager.getInstance();
+print(`>>> TemplateUI: Got ModuleManager instance`);
+
+manager.registerModule("TemplateUI", CreateActorExample, {
+  initialize: () => {
+    print(">>> TemplateUI: Initialize callback called");
+    if (!templateUIInstance) {
+      templateUIInstance = new CreateActorExample();
+    }
+    templateUIInstance.initialize();
+  },
+  cleanup: () => {
+    print(">>> TemplateUI: Cleanup callback called");
+    if (templateUIInstance) {
+      // 先清理资源
+      templateUIInstance.cleanup();
+      // 注意：这里不要设置为 null，保持实例以便下次热重载时复用
+      // 如果想完全重建实例，则设置为 null
+      // templateUIInstance = null;
+    }
+  },
+  onHotReload: () => {
+    print(">>> TemplateUI: onHotReload callback called");
+    CreateActorExample.onHotReload();
+  },
+  dependencies: []
+});
+print(">>> TemplateUI: Module registration completed");
+
+export { CreateActorExample };
