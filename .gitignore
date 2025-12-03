@@ -9,4 +9,9 @@ dist/*
 *.w3m
 
 mpq/*
-.yarn
+
+# Yarn Berry - 保留 releases 目录（包含 yarn 可执行文件）
+.yarn/cache
+.yarn/install-state.gz
+!.yarn/releases
+!.yarn/plugins
