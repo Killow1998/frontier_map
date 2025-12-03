@@ -27,7 +27,7 @@ function minifyLua(): void {
     }
 
     const tsconfig: TsConfig = JSON.parse(tsconfigContent);
-    const luaFile: string = tsconfig.tstl.luaBundle;
+    const luaFile: string = `maps/map/${tsconfig.tstl.luaBundle}`;
 
     if (!fs.existsSync(luaFile)) {
       console.error(`Lua file not found: ${luaFile}`);
@@ -62,7 +62,7 @@ function main(): void {
     handleBootstrapLua(false);
 
     // 压缩 Lua 代码（仅生产模式）
-    // minifyLua(); // 可选启用
+    minifyLua(); // 可选启用
 
     // 打包 w3x 文件
     buildW3x();
