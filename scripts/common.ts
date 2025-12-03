@@ -170,3 +170,17 @@ export function compileTypeScriptToLua(): void {
   }
 }
 
+/**
+ * 编译 TypeScript 到 Lua (生产模式 - 单文件打包)
+ */
+export function compileTypeScriptToLuaProd(): void {
+  try {
+    console.log(">>> Starting TypeScript to Lua compilation (production mode - bundled)...");
+    execSync('tstl -p tsconfig.prod.json', { stdio: 'inherit' });
+    console.log(">>> TypeScript to Lua compilation (bundled) completed");
+  } catch (error) {
+    console.error(">>> Error during TypeScript compilation:", error);
+    throw error;
+  }
+}
+

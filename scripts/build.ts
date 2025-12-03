@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { buildW3x, compileTypeScriptToLua, injectLuaExecutionCall, handleBootstrapLua } from './common';
+import { buildW3x, compileTypeScriptToLuaProd, injectLuaExecutionCall, handleBootstrapLua } from './common';
 
 const luamin = require('luamin');
 
@@ -18,11 +18,11 @@ interface Luamin {
  */
 function minifyLua(): void {
   try {
-    // 读取 tsconfig.json 的配置
-    const tsconfigContent: string = fs.readFileSync("tsconfig.json", "utf-8");
+    // 读取 tsconfig.prod.json 的配置
+    const tsconfigContent: string = fs.readFileSync("tsconfig.prod.json", "utf-8");
 
     if (!tsconfigContent) {
-      console.error("Failed to read tsconfig.json");
+      console.error("Failed to read tsconfig.prod.json");
       return;
     }
 
@@ -46,25 +46,25 @@ function minifyLua(): void {
 }
 
 /**
- * 构建项目
+ * 构建项目 (生产模式 - 单文件打包)
  */
 function main(): void {
-  console.log(`>>> Starting build process (production mode)`);
+  console.log(`>>> Starting build process (production mode - bundled)`);
 
   try {
-    //编译 TypeScript 到 Lua
-    compileTypeScriptToLua();
+    // 编译 TypeScript 到 Lua (单文件打包)
+    compileTypeScriptToLuaProd();
 
-    //注入 Lua 执行调用
+    // 注入 Lua 执行调用
     injectLuaExecutionCall();
 
-    //处理 bootstrap.lua
+    // 处理 bootstrap.lua (生产模式，不注入 PROJECT_PATH)
     handleBootstrapLua(false);
 
-    //压缩 Lua 代码（仅生产模式）
-    //minifyLua(); // 暂时禁用压缩
+    // 压缩 Lua 代码（仅生产模式）
+    // minifyLua(); // 可选启用
 
-    //打包 w3x 文件
+    // 打包 w3x 文件
     buildW3x();
 
     console.log(">>> Build process completed");

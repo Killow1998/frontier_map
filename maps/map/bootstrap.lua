@@ -1,11 +1,9 @@
--- Bootstrap script for loading modular TSTL output
--- This script initializes the main application from the compiled Lua modules
+-- Bootstrap script for loading TSTL output
+-- Supports both dev (modular) and prod (bundled) modes
 
--- Debugging: Enable console output_ar
+-- Debugging: Enable console output
 local console = require("jass.console")
 console.enable = true;
--- print("Bootstrap script started")
--- print("package.path:", package.path)
 
 local ydcommon = require("jass.common")
 local ydjapi = require("jass.japi")
@@ -20,9 +18,17 @@ for key, value in pairs(ydjapi) do
   _G[key] = value
 end
 
-
--- Load the main application module
-local main = require("src.main")
+-- 自动检测模式：如果存在 PROJECT_PATH 则为 dev 模式，否则为 prod 模式
+local main
+if PROJECT_PATH then
+  -- Dev mode: 使用模块化加载
+  print(">>> Bootstrap: Dev mode detected")
+  main = require("src.main")
+else
+  -- Prod mode: 使用打包后的单文件
+  print(">>> Bootstrap: Prod mode detected")
+  main = require("main")
+end
 
 -- Initialize the application
 if main and main.initialize then
