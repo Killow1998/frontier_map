@@ -2,12 +2,20 @@ import { Timer } from "@eiriksgata/wc3ts/*";
 import { Console } from "./console";
 import { ModuleManager } from "./ModuleManager";
 
-//程序运行目录路径
-declare const PROJECT_PATH: string;
+// 程序运行目录路径（仅在 dev 模式下由 bootstrap.lua 注入）
+declare const PROJECT_PATH: string | undefined;
+
+/**
+ * 检查是否为开发模式
+ */
+function isDevMode(): boolean {
+  return typeof PROJECT_PATH !== 'undefined' && PROJECT_PATH !== null;
+}
 
 /**
  * 热更新管理器
  * 负责检测外部热更新通知并重新加载指定模块
+ * 注意：仅在开发模式下有效，生产环境会自动禁用
  */
 export class HotReload {
   private static instance: HotReload;
@@ -34,6 +42,13 @@ export class HotReload {
    * 启动热更新监听
    */
   public start(): void {
+    // 检查是否为开发模式
+    if (!isDevMode()) {
+      print(">>> HotReload: Production mode detected, hot reload disabled");
+      this.enabled = false;
+      return;
+    }
+
     if (!this.enabled) {
       print(">>> HotReload: Hot reload is disabled");
       return;
