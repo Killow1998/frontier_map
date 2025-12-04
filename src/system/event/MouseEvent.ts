@@ -124,11 +124,11 @@ export class MouseEventManager extends EventEmitter {
     const eventType = isDown ? MouseEventType.DOWN : MouseEventType.UP;
     // DzTriggerRegisterMouseEventByCode(trig, btn, status, sync, callback)
     // btn: 1=左键, 2=右键
-    // status: 1=按下, 2=松开
+    // status: 1=按下, 0=松开
     DzTriggerRegisterMouseEventByCode(
       trig,
-      button,
-      isDown ? 1 : 2,
+      button,          // btn: 1=左键, 2=右键
+      isDown ? 1 : 0,  // status: 1=按下, 0=松开
       false,
       () => {
         const data = this.createMouseEventData(button, eventType);

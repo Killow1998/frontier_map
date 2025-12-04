@@ -32,6 +32,12 @@ class MouseEventTest {
     }, MouseButton.RIGHT);
     this.subscriptionIds.push(rightDownId);
     
+    // 测试鼠标右键松开事件
+    const rightUpId = mouseEvents.onMouseUp((data: MouseEventData) => {
+      Console.log(`[鼠标右键松开] 屏幕: (${data.screenX}, ${data.screenY})`);
+    }, MouseButton.RIGHT);
+    this.subscriptionIds.push(rightUpId);
+    
     // 测试鼠标左键松开事件
     const leftUpId = mouseEvents.onMouseUp((data: MouseEventData) => {
       Console.log(`[鼠标左键松开] 屏幕: (${data.screenX}, ${data.screenY})`);
@@ -39,16 +45,16 @@ class MouseEventTest {
     this.subscriptionIds.push(leftUpId);
     
     // 测试鼠标移动事件（注意：移动事件触发频繁，这里添加节流）
-    let lastMoveTime = 0;
-    const moveId = mouseEvents.onMouseMove((data: MouseEventData) => {
-      const now = os.clock();
-      // 每 0.5 秒最多输出一次
-      if (now - lastMoveTime > 0.5) {
-        Console.log(`[鼠标移动] 屏幕: (${data.screenX}, ${data.screenY})`);
-        lastMoveTime = now;
-      }
-    });
-    this.subscriptionIds.push(moveId);
+    // let lastMoveTime = 0;
+    // const moveId = mouseEvents.onMouseMove((data: MouseEventData) => {
+    //   const now = os.clock();
+    //   // 每 0.5 秒最多输出一次
+    //   if (now - lastMoveTime > 0.5) {
+    //     Console.log(`[鼠标移动] 屏幕: (${data.screenX}, ${data.screenY})`);
+    //     lastMoveTime = now;
+    //   }
+    // });
+    // this.subscriptionIds.push(moveId);
     
     // 测试鼠标滚轮事件
     const wheelId = mouseEvents.onMouseWheel((data: MouseEventData) => {
