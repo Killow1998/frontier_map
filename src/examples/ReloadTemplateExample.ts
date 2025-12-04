@@ -42,7 +42,7 @@ class ReloadTemplateExample {
       btn.destroy();
     }
     this.buttons = [];
-
+    
     Console.log("ReloadTemplate: All resources cleaned up");
   }
 

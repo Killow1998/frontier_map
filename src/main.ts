@@ -1,5 +1,5 @@
 
-import { Frame, FRAMEPOINT_BOTTOMRIGHT, FRAMEPOINT_TOPLEFT, Players, Timer } from "@eiriksgata/wc3ts/*";
+import { Frame, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -7,13 +7,7 @@ import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
 import { Console } from "./system/console";
-import { UILayout } from "./system/ui/UILayout";
-import { Button, ButtonTextures } from "./system/ui/component/Button";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
-import { ExportUI } from "./test/ExportUI";
-import { Actor } from "./system/actor";
-import { FourCC } from "./utils/helper";
-
 
 /**
  * 应用程序主入口
@@ -28,6 +22,8 @@ async function main(): Promise<void> {
 
   Timer.create().start(2, false, () => {
     print("Loading UI modules:", typeof ReloadTemplateExample);
+    
+
   });
 
 
