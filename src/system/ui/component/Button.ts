@@ -1,4 +1,4 @@
-import { Frame, FRAME_ALIGN_LEFT, FRAME_ALIGN_TOP, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from "@eiriksgata/wc3ts/*";
+import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from "@eiriksgata/wc3ts/*";
 import { ScreenCoordinates } from "../ScreenCoordinates";
 import { UILayout } from "../UILayout";
 import { Console } from "src/system/console";
@@ -57,6 +57,17 @@ export class Button {
   private textColor: string = "FFFFFF";
   private tooltip: string = "";
   private origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT;
+
+  // 拖拽相关属性
+  private isDraggable: boolean = false;
+  private isDragging: boolean = false;
+  private dragTimer: timer | null = null;
+  private dragOffsetX: number = 0;
+  private dragOffsetY: number = 0;
+  private dragTrigger: trigger | null = null;
+  private onDragStart: (() => void) | null = null;
+  private onDragEnd: ((x: number, y: number) => void) | null = null;
+  private onDragging: ((x: number, y: number) => void) | null = null;
 
   constructor(
     label: string,
@@ -389,6 +400,11 @@ export class Button {
   }
 
   public destroy(): void {
+    // 如果正在拖拽，先结束拖拽
+    if (this.isDragging) {
+      this.endDrag();
+    }
+    
     if (this.buttonFrame) {
       this.buttonFrame.destroy();
       this.buttonFrame = null;
@@ -407,27 +423,34 @@ export class Button {
     this.onClick = null;
     this.onHover = null;
     this.onLeave = null;
+    this.onDragStart = null;
+    this.onDragEnd = null;
+    this.onDragging = null;
   }
 
   private setupEventListeners(): void {
     if (!this.buttonFrame) return;
 
     FrameEventUtils.bindEvents(this.buttonFrame, {
-      onClick: this.onClick ? () => {
-        if (this.isEnabled && this.onClick) {
+      onClick: () => {
+        // 如果启用了拖拽，点击时开始拖拽
+        if (this.isDraggable && !this.isDragging) {
+          this.startDrag();
+        } else if (this.isEnabled && this.onClick) {
           this.onClick();
         }
-      } : undefined,
+      },
       onMouseEnter: this.onHover ? () => {
         if (this.isEnabled && this.onHover) {
           this.onHover();
         }
       } : undefined,
-      onMouseLeave: this.onLeave ? () => {
-        if (this.isEnabled && this.onLeave) {
+      onMouseLeave: () => {
+        // 如果正在拖拽且鼠标离开了按钮区域，继续拖拽（不结束）
+        if (this.isEnabled && this.onLeave && !this.isDragging) {
           this.onLeave();
         }
-      } : undefined
+      }
     });
   }
 
@@ -473,6 +496,190 @@ export class Button {
     if (config.enabled !== undefined) this.setEnabled(config.enabled);
     if (config.visible !== undefined) this.setVisible(config.visible);
     
+    return this;
+  }
+
+  // ==================== 拖拽功能 ====================
+
+  /**
+   * 启用/禁用拖拽功能
+   * @param draggable 是否可拖拽
+   */
+  public setDraggable(draggable: boolean): Button {
+    this.isDraggable = draggable;
+    if (this.buttonFrame) {
+      this.setupDragEventListeners();
+    }
+    return this;
+  }
+
+  /**
+   * 获取是否启用了拖拽
+   */
+  public getDraggable(): boolean {
+    return this.isDraggable;
+  }
+
+  /**
+   * 获取是否正在拖拽
+   */
+  public getIsDragging(): boolean {
+    return this.isDragging;
+  }
+
+  /**
+   * 设置拖拽开始回调
+   * @param callback 拖拽开始时调用
+   */
+  public setOnDragStart(callback: () => void): Button {
+    this.onDragStart = callback;
+    return this;
+  }
+
+  /**
+   * 设置拖拽结束回调
+   * @param callback 拖拽结束时调用，参数为最终的像素坐标
+   */
+  public setOnDragEnd(callback: (x: number, y: number) => void): Button {
+    this.onDragEnd = callback;
+    return this;
+  }
+
+  /**
+   * 设置拖拽过程中回调
+   * @param callback 拖拽过程中调用，参数为当前像素坐标
+   */
+  public setOnDragging(callback: (x: number, y: number) => void): Button {
+    this.onDragging = callback;
+    return this;
+  }
+
+  /**
+   * 开始拖拽
+   */
+  private startDrag(): void {
+    if (!this.isDraggable || this.isDragging) return;
+    
+    this.isDragging = true;
+    
+    // 使用 KKWE 的鼠标位置API（获取屏幕像素坐标）
+    const currentMouseX = DzGetMouseX();
+    const currentMouseY = DzGetMouseY();
+    
+    // 计算鼠标相对于按钮左上角的偏移量（像素坐标）
+    this.dragOffsetX = currentMouseX - this.pixelX;
+    this.dragOffsetY = currentMouseY - this.pixelY;
+    
+    Console.log("Drag started at mouse(" + currentMouseX + ", " + currentMouseY + "), offset(" + this.dragOffsetX + ", " + this.dragOffsetY + ")");
+    
+    // 触发拖拽开始回调
+    if (this.onDragStart) {
+      this.onDragStart();
+    }
+    
+    // 创建定时器持续更新位置
+    this.dragTimer = CreateTimer();
+    TimerStart(this.dragTimer, 0.01, true, () => {
+      this.updateDragPosition();
+    });
+    
+    // 注册全局鼠标松开事件
+    this.dragTrigger = CreateTrigger();
+    DzTriggerRegisterMouseEventByCode(this.dragTrigger, 1, 2, true, () => {
+      // 1 = 鼠标左键, 2 = 松开事件
+      this.endDrag();
+    });
+  }
+
+  /**
+   * 更新拖拽过程中的位置
+   */
+  private updateDragPosition(): void {
+    if (!this.isDragging) return;
+    
+    // 获取当前鼠标位置（像素坐标）
+    const currentMouseX = DzGetMouseX();
+    const currentMouseY = DzGetMouseY();
+    
+    // 计算新的按钮位置
+    const newX = currentMouseX - this.dragOffsetX;
+    const newY = currentMouseY - this.dragOffsetY;
+    
+    // 更新按钮位置
+    this.setPosition(newX, newY);
+    
+    // 触发拖拽过程回调
+    if (this.onDragging) {
+      this.onDragging(newX, newY);
+    }
+  }
+
+  /**
+   * 结束拖拽
+   */
+  private endDrag(): void {
+    if (!this.isDragging) return;
+    
+    this.isDragging = false;
+    
+    // 停止定时器
+    if (this.dragTimer) {
+      PauseTimer(this.dragTimer);
+      DestroyTimer(this.dragTimer);
+      this.dragTimer = null;
+    }
+    
+    // 销毁鼠标事件触发器
+    if (this.dragTrigger) {
+      DestroyTrigger(this.dragTrigger);
+      this.dragTrigger = null;
+    }
+    
+    Console.log("Drag ended at position(" + this.pixelX + ", " + this.pixelY + ")");
+    
+    // 触发拖拽结束回调
+    if (this.onDragEnd) {
+      this.onDragEnd(this.pixelX, this.pixelY);
+    }
+  }
+
+  /**
+   * 设置拖拽事件监听器
+   */
+  private setupDragEventListeners(): void {
+    // 拖拽通过 setupEventListeners 中的点击事件触发
+    // 松开通过 startDrag 中注册的全局鼠标事件检测
+    // 这里不需要额外的设置
+  }
+
+  /**
+   * 启用拖拽并配置（便捷方法）
+   * @param config 拖拽配置
+   */
+  public enableDrag(config?: {
+    onDragStart?: () => void;
+    onDragEnd?: (x: number, y: number) => void;
+    onDragging?: (x: number, y: number) => void;
+  }): Button {
+    this.setDraggable(true);
+    
+    if (config) {
+      if (config.onDragStart) this.setOnDragStart(config.onDragStart);
+      if (config.onDragEnd) this.setOnDragEnd(config.onDragEnd);
+      if (config.onDragging) this.setOnDragging(config.onDragging);
+    }
+    
+    return this;
+  }
+
+  /**
+   * 禁用拖拽
+   */
+  public disableDrag(): Button {
+    this.setDraggable(false);
+    if (this.isDragging) {
+      this.endDrag();
+    }
     return this;
   }
 }

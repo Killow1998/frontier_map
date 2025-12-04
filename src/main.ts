@@ -8,6 +8,7 @@ import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
 import { Console } from "./system/console";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
+import { MouseEventTest } from "./test/MouseEventTest";
 
 /**
  * 应用程序主入口
@@ -21,7 +22,7 @@ async function main(): Promise<void> {
   // 只是引用一下类，确保模块被加载
 
   Timer.create().start(2, false, () => {
-    print("Loading UI modules:", typeof ReloadTemplateExample);
+    print("Loading UI modules:", typeof MouseEventTest);
     
 
   });

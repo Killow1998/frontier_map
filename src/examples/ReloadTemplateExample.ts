@@ -23,11 +23,13 @@ class ReloadTemplateExample {
    */
   public TestButton() {
     // 创建一个按钮 - 测试热重载 v1
-    const btn = Button.createCentered("ReloadTemplate Button");
-    btn.setOnClick(() => {
-      Console.log("ReloadTemplate Button clicked!136");
+    const button = Button.createCentered("ReloadTemplate Button");
+    button.setOnClick(() => {
+      Console.log("ReloadTemplate Button clicked!");
     });
-    this.buttons.push(btn);
+    this.buttons.push(button);
+
+    //测试
   }
 
   /**
@@ -42,7 +44,7 @@ class ReloadTemplateExample {
       btn.destroy();
     }
     this.buttons = [];
-    
+
     Console.log("ReloadTemplate: All resources cleaned up");
   }
 

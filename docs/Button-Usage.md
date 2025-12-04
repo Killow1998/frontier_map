@@ -158,6 +158,80 @@ button.configure({
 button.create();
 ```
 
+## 拖拽功能
+
+Button 组件支持拖拽功能，用户可以按住按钮并拖动到新位置。
+
+### 基本用法
+
+```typescript
+const button = Button.createCentered("可拖拽按钮");
+button.setDraggable(true);
+button.create();
+```
+
+### 便捷方法（推荐）
+
+```typescript
+const button = Button.createCentered("拖拽按钮");
+
+button.enableDrag({
+  onDragStart: () => {
+    Console.log("开始拖拽");
+  },
+  onDragging: (x, y) => {
+    Console.log("拖拽中: " + x + ", " + y);
+  },
+  onDragEnd: (x, y) => {
+    Console.log("拖拽结束: " + x + ", " + y);
+  }
+});
+
+button.create();
+```
+
+### 拖拽回调
+
+```typescript
+const button = Button.createCentered("高级拖拽");
+
+// 分别设置各个回调
+button
+  .setDraggable(true)
+  .setOnDragStart(() => {
+    // 拖拽开始时的逻辑
+    button.setTextColor("FF0000"); // 拖拽时变红
+  })
+  .setOnDragging((x, y) => {
+    // 拖拽过程中每帧调用
+    // x, y 是当前按钮的像素坐标
+  })
+  .setOnDragEnd((x, y) => {
+    // 拖拽结束时的逻辑
+    button.setTextColor("FFFFFF"); // 恢复白色
+    Console.log("按钮最终位置: " + x + ", " + y);
+  });
+
+button.create();
+```
+
+### 禁用拖拽
+
+```typescript
+// 禁用拖拽
+button.disableDrag();
+
+// 或者
+button.setDraggable(false);
+```
+
+### 注意事项
+
+1. 启用拖拽后，点击按钮会开始拖拽而不是触发 `onClick`
+2. 拖拽结束通过检测鼠标左键松开实现
+3. 拖拽过程中按钮会实时跟随鼠标移动
+4. 可以同时设置 `onDragEnd` 来保存按钮的最终位置
+
 ## 完整示例
 
 ```typescript
@@ -252,6 +326,16 @@ constructor(
 
 #### 特效
 - `addHoverEffect(hoverAlpha, normalAlpha)` - 添加悬停透明度效果
+
+#### 拖拽功能
+- `setDraggable(draggable)` - 启用/禁用拖拽
+- `getDraggable()` - 获取是否可拖拽
+- `getIsDragging()` - 获取是否正在拖拽
+- `setOnDragStart(callback)` - 设置拖拽开始回调
+- `setOnDragEnd(callback)` - 设置拖拽结束回调（参数为最终坐标）
+- `setOnDragging(callback)` - 设置拖拽过程中回调（参数为当前坐标）
+- `enableDrag(config?)` - 启用拖拽并配置回调（便捷方法）
+- `disableDrag()` - 禁用拖拽
 
 #### 高级配置
 - `configure(config)` - 批量配置按钮属性
