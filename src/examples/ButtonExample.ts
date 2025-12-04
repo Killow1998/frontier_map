@@ -1,4 +1,4 @@
-import { Button, ButtonTextures } from "src/system/ui/component/Buttom";
+import { Button, ButtonTextures } from "src/system/ui/component/Button";
 import { Console } from "src/system/console";
 
 /**

@@ -8,7 +8,7 @@ import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
 import { Console } from "./system/console";
 import { UILayout } from "./system/ui/UILayout";
-import { Button, ButtonTextures } from "./system/ui/component/Buttom";
+import { Button, ButtonTextures } from "./system/ui/component/Button";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { ExportUI } from "./test/ExportUI";
 import { Actor } from "./system/actor";

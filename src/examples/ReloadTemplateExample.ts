@@ -1,6 +1,6 @@
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
-import { Button } from 'src/system/ui/component/Buttom';
+import { Button } from 'src/system/ui/component/Button';
 
 /**
  * 热更新模板
@@ -29,7 +29,7 @@ class ReloadTemplateExample {
     });
     this.buttons.push(btn);
   }
-  
+
   /**
    * 清理函数 - 热重载时调用
    * 在这里销毁所有需要清理的资源

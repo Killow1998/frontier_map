@@ -1,7 +1,6 @@
-import { MapPlayer, Players, Unit } from "@eiriksgata/wc3ts/*";
+import { Players, Unit } from "@eiriksgata/wc3ts/*";
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
-import { Button, ButtonTextures } from 'src/system/ui/component/Buttom';
 import { FourCC } from "src/utils/helper";
 
 /**

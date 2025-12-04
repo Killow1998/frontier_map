@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { Button } from "../system/ui/component/Buttom";
+import { Button } from "../system/ui/component/Button";
 import { ScreenCoordinates } from "../system/ui/ScreenCoordinates";
 import { UILayout } from "../system/ui/UILayout";
 

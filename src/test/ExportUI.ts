@@ -1,6 +1,6 @@
 import { Frame, FRAMEPOINT_BOTTOMRIGHT, FRAMEPOINT_TOPLEFT, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*"
 import { KEY_9 } from "src/constants"
-import { ButtonTextures } from "src/system/ui/component/Buttom"
+import { ButtonTextures } from "src/system/ui/component/Button"
 
 
 type FrameUserData = {
