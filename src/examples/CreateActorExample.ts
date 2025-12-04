@@ -83,7 +83,8 @@ print(">>> CreateActorExample: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
 print(`>>> CreateActorExample: Got ModuleManager instance`);
 
-manager.registerModule("CreateActorExample", CreateActorExample, {
+// 使用类的 name 属性作为模块名
+manager.registerModule(CreateActorExample.name, CreateActorExample, {
   initialize: () => {
     print(">>> CreateActorExample: Initialize callback called");
     if (!reloadInstance) {

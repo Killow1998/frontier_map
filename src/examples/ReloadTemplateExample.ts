@@ -22,7 +22,7 @@ class ReloadTemplateExample {
    * 创建测试按钮
    */
   public TestButton() {
-    // 创建一个按钮 - 测试热重载
+    // 创建一个按钮 - 测试热重载 v3
     const btn = Button.createCentered("ReloadTemplate Button");
     btn.setOnClick(() => {
       Console.log("ReloadTemplate Button clicked!");
@@ -74,7 +74,8 @@ print(">>> ReloadTemplate: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
 print(`>>> ReloadTemplate: Got ModuleManager instance`);
 
-manager.registerModule(typeof reloadInstance, ReloadTemplateExample, {
+// 使用类的 name 属性作为模块名，TSTL 会自动生成 ClassName.name = "ClassName"
+manager.registerModule(ReloadTemplateExample.name, ReloadTemplateExample, {
   // 不再需要 modulePath！dev.ts 会自动从 Lua 文件中提取模块名
   initialize: () => {
     print(">>> ReloadTemplate: Initialize callback called");

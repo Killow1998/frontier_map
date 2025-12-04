@@ -98,8 +98,8 @@ print(">>> TemplateUI: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
 print(`>>> TemplateUI: Got ModuleManager instance`);
 
-manager.registerModule("TemplateUI", TemplateUI, {
-  // 不再需要 modulePath！dev.ts 会自动从 Lua 文件中提取模块名
+// 使用类的 name 属性作为模块名
+manager.registerModule(TemplateUI.name, TemplateUI, {
   initialize: () => {
     print(">>> TemplateUI: Initialize callback called");
     if (!templateUIInstance) {
