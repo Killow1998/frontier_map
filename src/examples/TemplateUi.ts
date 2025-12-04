@@ -98,8 +98,8 @@ print(">>> TemplateUI: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
 print(`>>> TemplateUI: Got ModuleManager instance`);
 
-// 使用类的 name 属性作为模块名
-manager.registerModule(TemplateUI.name, TemplateUI, {
+// 只需传递类，ModuleManager 会自动从 ClassName.name 获取模块名
+manager.registerModule(TemplateUI, {
   initialize: () => {
     print(">>> TemplateUI: Initialize callback called");
     if (!templateUIInstance) {

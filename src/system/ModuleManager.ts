@@ -36,12 +36,10 @@ export class ModuleManager {
 
   /**
    * 注册模块
-   * @param name 模块名称（用于热重载时匹配，dev.ts 会从 Lua 文件中提取此名称）
-   * @param module 模块类或对象
+   * @param module 模块类（TSTL 会自动生成 ClassName.name 属性）
    * @param options 配置选项
    */
   public registerModule(
-    name: string, 
     module: any, 
     options: {
       initialize?: () => void;
@@ -50,6 +48,14 @@ export class ModuleManager {
       dependencies?: string[];
     } = {}
   ): void {
+    // 自动从类中获取名称
+    const name = module.name as string;
+    
+    if (!name) {
+      print(">>> ModuleManager: Error - module has no name property");
+      return;
+    }
+
     const moduleInfo: ModuleInfo = {
       name,
       module,

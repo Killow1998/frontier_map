@@ -164,28 +164,23 @@ function generateHotReloadNotification(): void {
 
 /**
  * 从 Lua 文件内容中提取注册的模块名
- * 支持两种格式：
+ * 支持三种格式：
  * 1. 字符串字面量: registerModule("ModuleName", ...)
  * 2. 类名.name: registerModule(ClassName.name, ...) 会查找 ClassName.name = "ModuleName"
+ * 3. 直接传类: registerModule(ClassName, ...) 会查找 ClassName.name = "ModuleName"
  */
 function extractModuleNameFromLua(luaFilePath: string): string | null {
   const fs = require('fs');
   
   try {
     const content = fs.readFileSync(luaFilePath, 'utf-8');
-    
-    // 方式1: 匹配字符串字面量 registerModule("模块名", ...)
-    const stringMatch = content.match(/registerModule\s*\(\s*["']([^"']+)["']/i);
-    if (stringMatch && stringMatch[1]) {
-      return stringMatch[1];
-    }
-    
-    // 方式2: 匹配 ClassName.name 格式
-    // 先找 registerModule(XXX.name, ...)
-    const nameMatch = content.match(/registerModule\s*\(\s*(\w+)\.name\s*,/i);
-    if (nameMatch && nameMatch[1]) {
-      const className = nameMatch[1];
-      // 再查找 ClassName.name = "ModuleName"
+  
+    // 方式1: 匹配直接传类 registerModule(ClassName, {...})
+    // 格式: registerModule(\n    ClassName,\n    {
+    const classMatch = content.match(/registerModule\s*\(\s*(\w+)\s*,\s*\{/i);
+    if (classMatch && classMatch[1]) {
+      const className = classMatch[1];
+      // 查找 ClassName.name = "ModuleName"
       const nameDefMatch = content.match(new RegExp(`${className}\\.name\\s*=\\s*["']([^"']+)["']`));
       if (nameDefMatch && nameDefMatch[1]) {
         return nameDefMatch[1];
