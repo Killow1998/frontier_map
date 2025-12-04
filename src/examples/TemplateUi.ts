@@ -12,12 +12,13 @@ import { FourCC } from "src/utils/helper";
  * 2. 在 cleanup() 中销毁所有需要清理的资源
  * 3. 在 initialize() 中重新创建资源
  */
-class CreateActorExample {
+class TemplateUI {
 
   // ========================================
   // 需要在热重载时保留/销毁的成员变量
   // ========================================
-  private actorList: Unit[] = [];
+  private testButton: Button | null = null;
+  private buttons: Button[] = [];  // 如果有多个按钮，可以用数组管理
 
 
   /**
@@ -25,6 +26,7 @@ class CreateActorExample {
    */
   public TestButton() {
     // 创建10个圣骑士单位
+    const paladins: Unit[] = [];
     for (let i = 0; i < 10; i++) {
       const x = -2000 + i * 200; // 水平排列，间隔200
       const y = 0;
@@ -37,7 +39,7 @@ class CreateActorExample {
       );
 
       if (paladin) {
-        this.actorList.push(paladin);
+        paladins.push(paladin);
         Console.log(`Created Paladin ${i + 1} at (${x}, ${y})`);
       }
     }
@@ -50,25 +52,38 @@ class CreateActorExample {
    * 在这里销毁所有需要清理的资源
    */
   public cleanup(): void {
-    // 销毁所有创建的单位
-    for (const actor of this.actorList) {
-      actor.destroy();
+    Console.log("TemplateUI: Cleanup called, destroying resources...");
+
+    // 销毁单个按钮
+    if (this.testButton) {
+      this.testButton.destroy();
+      this.testButton = null;
+      Console.log("TemplateUI: testButton destroyed");
     }
-    this.actorList = [];
+
+    // 销毁按钮数组中的所有按钮
+    for (const btn of this.buttons) {
+      btn.destroy();
+    }
+    this.buttons = [];
+
+    Console.log("TemplateUI: All resources cleaned up");
   }
 
   /**
    * 初始化函数
    */
   public initialize(): void {
+    Console.log("TemplateUI: Initializing...");
     this.TestButton();
+    print("TemplateUI initialized");
   }
 
   /**
    * 热重载处理函数
    */
   public static onHotReload(): void {
-    Console.log("CreateActorExample hot reloaded!");
+    Console.log("TemplateUI hot reloaded!");
   }
 }
 
@@ -77,31 +92,32 @@ class CreateActorExample {
 // ========================================
 
 // 全局实例 - 在模块级别保存，热重载时会被重用
-let reloadInstance: CreateActorExample | null = null;
+let templateUIInstance: TemplateUI | null = null;
 
-print(">>> CreateActorExample: Module file loaded, about to register...");
+print(">>> TemplateUI: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
-print(`>>> CreateActorExample: Got ModuleManager instance`);
+print(`>>> TemplateUI: Got ModuleManager instance`);
 
-manager.registerModule("CreateActorExample", CreateActorExample, {
+manager.registerModule("TemplateUI", TemplateUI, {
+  // 不再需要 modulePath！dev.ts 会自动从 Lua 文件中提取模块名
   initialize: () => {
-    print(">>> CreateActorExample: Initialize callback called");
-    if (!reloadInstance) {
-      reloadInstance = new CreateActorExample();
+    print(">>> TemplateUI: Initialize callback called");
+    if (!templateUIInstance) {
+      templateUIInstance = new TemplateUI();
     }
-    reloadInstance.initialize();
+    templateUIInstance.initialize();
   },
   cleanup: () => {
-    print(">>> CreateActorExample: Cleanup callback called");
-    if (reloadInstance) {
-      reloadInstance.cleanup();
+    print(">>> TemplateUI: Cleanup callback called");
+    if (templateUIInstance) {
+      templateUIInstance.cleanup();
     }
   },
   onHotReload: () => {
-    print(">>> CreateActorExample: onHotReload callback called");
-    CreateActorExample.onHotReload();
+    print(">>> TemplateUI: onHotReload callback called");
+    TemplateUI.onHotReload();
   }
 });
-print(">>> CreateActorExample: Module registration completed");
+print(">>> TemplateUI: Module registration completed");
 
-export { CreateActorExample };
+export { TemplateUI };

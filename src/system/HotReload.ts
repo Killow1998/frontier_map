@@ -248,45 +248,68 @@ export class HotReload {
     return str.substring(valueStart, valueEnd);
   }
 
-  private extractModules(str: string): string[] {
-    const modules: string[] = [];
+  private extractModules(str: string): ModuleInfo[] {
+    const modules: ModuleInfo[] = [];
     const startKey = '"modules":[';
     const startIndex = str.indexOf(startKey);
 
     if (startIndex === -1) return modules;
 
     const arrayStart = startIndex + startKey.length;
-    const arrayEnd = str.indexOf(']', arrayStart);
+    // 找到数组结束位置（需要处理嵌套的对象）
+    let depth = 1;
+    let arrayEnd = arrayStart;
+    for (let i = arrayStart; i < str.length && depth > 0; i++) {
+      const char = str.charAt(i);
+      if (char === '[' || char === '{') depth++;
+      else if (char === ']' || char === '}') depth--;
+      if (depth === 0) arrayEnd = i;
+    }
 
-    if (arrayEnd === -1) return modules;
+    if (arrayEnd === arrayStart) return modules;
 
     const arrayContent = str.substring(arrayStart, arrayEnd);
 
-    // 简单解析数组中的字符串
-    let inString = false;
-    let currentString = "";
-
-    for (let i = 0; i < arrayContent.length; i++) {
-      const char = arrayContent.charAt(i);
-
-      if (char === '"') {
-        if (inString) {
-          // 字符串结束
-          if (currentString) {
-            modules.push(currentString);
-            currentString = "";
-          }
-          inString = false;
-        } else {
-          // 字符串开始
-          inString = true;
-        }
-      } else if (inString) {
-        currentString += char;
+    // 解析数组中的对象 {"name":"...","path":"..."}
+    let i = 0;
+    while (i < arrayContent.length) {
+      // 找到对象开始
+      const objStart = arrayContent.indexOf('{', i);
+      if (objStart === -1) break;
+      
+      // 找到对象结束
+      const objEnd = arrayContent.indexOf('}', objStart);
+      if (objEnd === -1) break;
+      
+      const objContent = arrayContent.substring(objStart, objEnd + 1);
+      
+      // 提取 name 和 path
+      const name = this.extractStringFromObject(objContent, '"name":"');
+      const path = this.extractStringFromObject(objContent, '"path":"');
+      
+      if (name && path) {
+        modules.push({ name, path });
       }
+      
+      i = objEnd + 1;
     }
 
     return modules;
+  }
+
+  /**
+   * 从对象字符串中提取字段值
+   */
+  private extractStringFromObject(objStr: string, key: string): string | null {
+    const startIndex = objStr.indexOf(key);
+    if (startIndex === -1) return null;
+
+    const valueStart = startIndex + key.length;
+    const valueEnd = objStr.indexOf('"', valueStart);
+
+    if (valueEnd === -1) return null;
+
+    return objStr.substring(valueStart, valueEnd);
   }
 
   private extractBoolean(str: string, key: string): boolean | null {
@@ -306,6 +329,7 @@ export class HotReload {
 
   /**
    * 处理热更新
+   * notification.modules 包含 {name, path} 对象
    */
   private processHotReload(notification: HotReloadNotification): void {
     print(`>>> HotReload: Processing hot reload for ${notification.modules.length} modules...`);
@@ -314,81 +338,31 @@ export class HotReload {
     const registeredModules = moduleManager.getRegisteredModules();
     print(`>>> HotReload: All registered modules: ${registeredModules.join(", ")}`);
 
-    // 尝试通过多种方式匹配模块
-    const matchedModules: string[] = [];
+    // 匹配已注册的模块，并传递路径信息
+    const matchedModules: ModuleInfo[] = [];
 
-    for (const fullPath of notification.modules) {
-      print(`>>> HotReload: Trying to match path: ${fullPath}`);
+    for (const moduleInfo of notification.modules) {
+      print(`>>> HotReload: Checking module: ${moduleInfo.name} (${moduleInfo.path})`);
 
-      // 方式1：直接通过路径匹配（模块注册时提供了 modulePath）
-      const moduleByPath = moduleManager.findModuleByPath(fullPath);
-      if (moduleByPath) {
-        print(`>>> HotReload: ✓ Matched by path: ${moduleByPath}`);
-        if (!matchedModules.includes(moduleByPath)) {
-          matchedModules.push(moduleByPath);
-        }
-        continue;
-      }
-
-      // 方式2：从路径提取文件名，尝试匹配模块名
-      const parts = fullPath.split('.');
-      const fileName = parts[parts.length - 1];
-
-      // 尝试直接匹配
-      if (moduleManager.isModuleRegistered(fileName)) {
-        print(`>>> HotReload: ✓ Matched by filename: ${fileName}`);
-        if (!matchedModules.includes(fileName)) {
-          matchedModules.push(fileName);
-        }
-        continue;
-      }
-
-      // 方式3：尝试常见的大小写变体
-      const variants = [
-        fileName,
-        fileName.toUpperCase(),
-        fileName.toLowerCase(),
-        fileName.charAt(0).toUpperCase() + fileName.slice(1),
-      ];
-
-      let matched = false;
-      for (const variant of variants) {
-        if (moduleManager.isModuleRegistered(variant)) {
-          print(`>>> HotReload: ✓ Matched by variant: ${variant}`);
-          if (!matchedModules.includes(variant)) {
-            matchedModules.push(variant);
-          }
-          matched = true;
-          break;
-        }
-      }
-
-      if (!matched) {
-        print(`>>> HotReload: ✗ No match found for: ${fullPath}`);
+      if (moduleManager.isModuleRegistered(moduleInfo.name)) {
+        print(`>>> HotReload: ✓ Matched: ${moduleInfo.name}`);
+        matchedModules.push(moduleInfo);
+      } else {
+        print(`>>> HotReload: ✗ Not registered: ${moduleInfo.name}`);
       }
     }
 
-    print(`>>> HotReload: Matched registered modules: ${matchedModules.join(", ")}`);
+    const matchedNames = matchedModules.map(m => m.name).join(", ");
+    print(`>>> HotReload: Matched registered modules: ${matchedNames}`);
 
     if (matchedModules.length === 0) {
       print(">>> HotReload: No registered modules to hot reload");
-
-      // 尝试直接重载未注册的模块
-      print(">>> HotReload: Attempting direct Lua module reload...");
-      for (const modulePath of notification.modules) {
-        try {
-          this.reloadModule(modulePath);
-          print(`>>> HotReload: ✓ Direct reloaded: ${modulePath}`);
-        } catch (error) {
-          print(`>>> HotReload: ✗ Failed to reload: ${modulePath} - ${error}`);
-        }
-      }
       return;
     }
 
-    // 使用 ModuleManager 进行热重载
+    // 使用 ModuleManager 进行热重载，传递完整的模块信息
     print(`>>> HotReload: Calling ModuleManager.hotReloadModules...`);
-    moduleManager.hotReloadModules(matchedModules);
+    moduleManager.hotReloadModulesWithPath(matchedModules);
   }
 
   /**
@@ -424,11 +398,19 @@ export class HotReload {
 }
 
 /**
+ * 模块信息接口
+ */
+interface ModuleInfo {
+  name: string;  // 注册的模块名，如 "ReloadTemplate"
+  path: string;  // require 路径，如 "src.examples.ReloadTemplateExample"
+}
+
+/**
  * 热更新通知接口
  */
 interface HotReloadNotification {
   timestamp: number;
   action: string;
-  modules: string[];
+  modules: ModuleInfo[];  // 改为 ModuleInfo 数组
   processed: boolean;
 }

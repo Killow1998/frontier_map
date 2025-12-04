@@ -1,8 +1,6 @@
-import { MapPlayer, Players, Unit } from "@eiriksgata/wc3ts/*";
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
-import { Button, ButtonTextures } from 'src/system/ui/component/Buttom';
-import { FourCC } from "src/utils/helper";
+import { Button } from 'src/system/ui/component/Buttom';
 
 /**
  * 热更新模板
@@ -24,13 +22,12 @@ class ReloadTemplateExample {
    * 创建测试按钮
    */
   public TestButton() {
-    // 创建一个按钮
+    // 创建一个按钮 - 测试热重载
     const btn = Button.createCentered("ReloadTemplate Button");
     btn.setOnClick(() => {
       Console.log("ReloadTemplate Button clicked!");
     });
     this.buttons.push(btn);
-
   }
 
   /**
@@ -71,37 +68,31 @@ class ReloadTemplateExample {
 // ========================================
 
 // 全局实例 - 在模块级别保存，热重载时会被重用
-let reloadTemplateExampleInstance: ReloadTemplateExample | null = null;
+let reloadInstance: ReloadTemplateExample | null = null;
 
 print(">>> ReloadTemplate: Module file loaded, about to register...");
 const manager = ModuleManager.getInstance();
 print(`>>> ReloadTemplate: Got ModuleManager instance`);
 
-manager.registerModule("ReloadTemplate", ReloadTemplateExample, {
-  // 关键：指定模块路径，热重载时会自动匹配
-  modulePath: "src.examples.ReloadTemplateExample",
+manager.registerModule(typeof reloadInstance, ReloadTemplateExample, {
+  // 不再需要 modulePath！dev.ts 会自动从 Lua 文件中提取模块名
   initialize: () => {
     print(">>> ReloadTemplate: Initialize callback called");
-    if (!reloadTemplateExampleInstance) {
-      reloadTemplateExampleInstance = new ReloadTemplateExample();
+    if (!reloadInstance) {
+      reloadInstance = new ReloadTemplateExample();
     }
-    reloadTemplateExampleInstance.initialize();
+    reloadInstance.initialize();
   },
   cleanup: () => {
     print(">>> ReloadTemplate: Cleanup callback called");
-    if (reloadTemplateExampleInstance) {
-      // 先清理资源
-      reloadTemplateExampleInstance.cleanup();
-      // 注意：这里不要设置为 null，保持实例以便下次热重载时复用
-      // 如果想完全重建实例，则设置为 null
-      // reloadTemplateExampleInstance = null;
+    if (reloadInstance) {
+      reloadInstance.cleanup();
     }
   },
   onHotReload: () => {
     print(">>> ReloadTemplate: onHotReload callback called");
     ReloadTemplateExample.onHotReload();
-  },
-  dependencies: []
+  }
 });
 print(">>> ReloadTemplate: Module registration completed");
 

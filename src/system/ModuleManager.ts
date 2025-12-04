@@ -6,7 +6,6 @@
 interface ModuleInfo {
   name: string;
   module: any;
-  modulePath?: string;  // 模块的 require 路径，用于热重载
   initializeFunction?: () => void;
   cleanupFunction?: () => void;
   hotReloadFunction?: () => void;
@@ -37,17 +36,14 @@ export class ModuleManager {
 
   /**
    * 注册模块
-   * @param name 模块名称（用于热重载时匹配）
+   * @param name 模块名称（用于热重载时匹配，dev.ts 会从 Lua 文件中提取此名称）
    * @param module 模块类或对象
    * @param options 配置选项
-   * @param options.modulePath 模块的 require 路径，如 "src.examples.TemplateUi"
-   *                           如果不提供，将自动从文件名推断
    */
   public registerModule(
     name: string, 
     module: any, 
     options: {
-      modulePath?: string;  // 新增：模块路径
       initialize?: () => void;
       cleanup?: () => void;
       onHotReload?: () => void;
@@ -57,7 +53,6 @@ export class ModuleManager {
     const moduleInfo: ModuleInfo = {
       name,
       module,
-      modulePath: options.modulePath,  // 保存模块路径
       initializeFunction: options.initialize,
       cleanupFunction: options.cleanup,
       hotReloadFunction: options.onHotReload,
@@ -67,11 +62,7 @@ export class ModuleManager {
 
     this.modules.set(name, moduleInfo);
     print(`>>> ModuleManager: Module registered: ${name}`);
-    if (options.modulePath) {
-      print(`>>> ModuleManager: Module path: ${options.modulePath}`);
-    }
     print(`>>> ModuleManager: Total registered modules: ${this.modules.size}`);
-    print(`>>> ModuleManager: Current modules: ${Array.from(this.modules.keys()).join(", ")}`);
   }
 
   /**
@@ -119,9 +110,9 @@ export class ModuleManager {
   }
 
   /**
-   * 热重载指定模块
+   * 热重载指定模块（使用指定路径）
    */
-  public hotReloadModule(name: string): void {
+  public hotReloadModuleWithPath(name: string, requirePath: string): void {
     const moduleInfo = this.modules.get(name);
     if (!moduleInfo) {
       print(`Warning: Module ${name} not registered for hot reload`);
@@ -135,18 +126,15 @@ export class ModuleManager {
         print(`Cleaned up module: ${name}`);
       }
 
-      // 2. 重新加载模块
-      const modulePath = this.getModulePathFromName(name);
-      if (modulePath) {
-        // 清除模块缓存
-        (globalThis as any).package.loaded[modulePath] = undefined;
-        
-        // 重新加载
-        const newModule = require(modulePath);
-        moduleInfo.module = newModule;
-        
-        print(`Reloaded module: ${name} from ${modulePath}`);
-      }
+      // 2. 重新加载模块（使用提供的路径）
+      // 清除模块缓存
+      (globalThis as any).package.loaded[requirePath] = undefined;
+      
+      // 重新加载
+      const newModule = require(requirePath);
+      moduleInfo.module = newModule;
+      
+      print(`Reloaded module: ${name} from ${requirePath}`);
 
       // 3. 调用热重载处理函数
       if (moduleInfo.hotReloadFunction) {
@@ -166,7 +154,41 @@ export class ModuleManager {
   }
 
   /**
-   * 批量热重载多个模块
+   * 批量热重载多个模块（带路径）
+   */
+  public hotReloadModulesWithPath(modules: Array<{name: string, path: string}>): void {
+    print(`Hot reloading ${modules.length} modules...`);
+    
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const mod of modules) {
+      try {
+        this.hotReloadModuleWithPath(mod.name, mod.path);
+        successCount++;
+      } catch (error) {
+        failCount++;
+        print(`Failed to hot reload module ${mod.name}: ${error}`);
+      }
+    }
+
+    print(`Hot reload completed: ${successCount} succeeded, ${failCount} failed`);
+  }
+
+  /**
+   * 热重载指定模块（旧版兼容，自动推断路径）
+   */
+  public hotReloadModule(name: string): void {
+    const modulePath = this.getModulePathFromName(name);
+    if (modulePath) {
+      this.hotReloadModuleWithPath(name, modulePath);
+    } else {
+      print(`Warning: Cannot find path for module ${name}`);
+    }
+  }
+
+  /**
+   * 批量热重载多个模块（旧版兼容）
    */
   public hotReloadModules(moduleNames: string[]): void {
     print(`Hot reloading ${moduleNames.length} modules...`);
@@ -188,38 +210,22 @@ export class ModuleManager {
   }
 
   /**
-   * 将模块路径名转换为实际的 require 路径
+   * 将模块名转换为实际的 require 路径
+   * 按照常见的目录结构尝试查找
    */
   private getModulePathFromName(name: string): string | null {
-    // 优先使用注册时提供的路径
-    const moduleInfo = this.modules.get(name);
-    if (moduleInfo?.modulePath) {
-      return moduleInfo.modulePath;
-    }
-
-    // 备用：硬编码的路径映射（兼容旧代码）
-    const pathMappings: { [key: string]: string } = {
-      'TemplateUI': 'src.examples.TemplateUi',
-      'UnitBlood': 'src.system.ui.UnitBlood',
-      'CameraControl': 'src.utils.CameraControl',
-      'Actor': 'src.system.actor',
-      'ModuleManager': 'src.system.ModuleManager',
-      'HotReload': 'src.system.HotReload',
-    };
-
-    if (pathMappings[name]) {
-      return pathMappings[name];
-    }
-
-    // 如果没有找到映射，尝试一些通用的路径模式
+    // 尝试常见的路径模式
     const possiblePaths = [
+      `src.examples.${name}`,
+      `src.system.ui.component.${name}`,
       `src.system.ui.${name}`,
       `src.system.${name}`,
       `src.utils.${name}`,
-      `src.examples.${name}`,
+      `src.config.${name}`,
       `src.${name}`,
     ];
 
+    // 返回第一个可能的路径，实际的模块加载会验证是否正确
     return possiblePaths[0];
   }
 
@@ -274,19 +280,5 @@ export class ModuleManager {
    */
   public isModuleRegistered(name: string): boolean {
     return this.modules.has(name);
-  }
-
-  /**
-   * 通过模块路径查找已注册的模块名称
-   * @param path 模块路径，如 "src.examples.TemplateUi"
-   * @returns 模块名称，如果未找到则返回 null
-   */
-  public findModuleByPath(path: string): string | null {
-    for (const [name, info] of this.modules) {
-      if (info.modulePath === path) {
-        return name;
-      }
-    }
-    return null;
   }
 }

@@ -124,7 +124,6 @@ export class Button {
       y = position.y - size.height / 2;
     }
     
-    Console.log("Creating button at preset: " + positionPreset + " -> pixel(" + x + ", " + y + "), centered=" + (centered ? "true" : "false"));
     const button = new Button(label, x, y, size.width, size.height);
     button.create(parent);
     return button;

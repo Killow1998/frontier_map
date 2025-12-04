@@ -88,4 +88,3 @@ export function worldToScreen(x: number, y: number, z: number): { screenX: numbe
   
   return { screenX: UIx, screenY: UIy, z: UIz };
 }
-

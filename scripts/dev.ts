@@ -111,6 +111,14 @@ function handleFileChange(): void {
 }
 
 /**
+ * 模块信息接口
+ */
+interface ModuleInfo {
+  name: string;  // 注册的模块名，如 "ReloadTemplate"
+  path: string;  // require 路径，如 "src.examples.ReloadTemplateExample"
+}
+
+/**
  * 生成热更新通知文件
  */
 function generateHotReloadNotification(): void {
@@ -136,7 +144,7 @@ function generateHotReloadNotification(): void {
     // 更新上次通知时间
     lastNotificationTime = Date.now();
     
-    // 生成热更新通知
+    // 生成热更新通知 - 新格式包含 name 和 path
     const hotReloadNotification = {
       timestamp: lastNotificationTime,
       action: "reload",
@@ -147,20 +155,47 @@ function generateHotReloadNotification(): void {
     const notificationPath = path.join("dist", "hot-reload.json");
     fs.writeFileSync(notificationPath, JSON.stringify(hotReloadNotification, null, 2));
     
-    console.log(`>>> Generated hot reload notification for modules: ${changedModules.join(", ")}`);
+    const moduleNames = changedModules.map(m => m.name).join(", ");
+    console.log(`>>> Generated hot reload notification for modules: ${moduleNames}`);
   } catch (error) {
     console.error(">>> Error generating hot reload notification:", error);
   }
 }
 
 /**
- * 获取最近修改的模块列表（排除初始构建时的文件）
+ * 从 Lua 文件内容中提取注册的模块名
+ * 匹配 registerModule("模块名", ...) 或 registerModule('模块名', ...)
  */
-function getRecentlyChangedModules(distSrcPath: string): string[] {
+function extractModuleNameFromLua(luaFilePath: string): string | null {
   const fs = require('fs');
-  const path = require('path');
   
-  const modules: string[] = [];
+  try {
+    const content = fs.readFileSync(luaFilePath, 'utf-8');
+    
+    // 匹配 registerModule("模块名", ...) 或 :registerModule("模块名", ...)
+    // TSTL 编译后的格式: manager:registerModule("ReloadTemplate", ...
+    const match = content.match(/registerModule\s*\(\s*["']([^"']+)["']/i);
+    
+    if (match && match[1]) {
+      return match[1];
+    }
+  } catch (error) {
+    console.warn(`>>> Warning: Failed to read lua file ${luaFilePath}: ${error}`);
+  }
+  
+  return null;
+}
+
+/**
+ * 获取最近修改的模块列表（排除初始构建时的文件）
+ * 返回模块名和对应的 require 路径
+ */
+function getRecentlyChangedModules(distSrcPath: string): ModuleInfo[] {
+  const fs = require('fs');
+  const pathModule = require('path');
+  
+  const modules: ModuleInfo[] = [];
+  const moduleNames = new Set<string>();  // 用于去重
   const now = Date.now();
   
   // 使用更短的阈值，并且排除初始构建时的文件
@@ -171,7 +206,7 @@ function getRecentlyChangedModules(distSrcPath: string): string[] {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     
     for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
+      const fullPath = pathModule.join(dir, entry.name);
       const relativePath = basePath ? `${basePath}.${entry.name}` : entry.name;
       
       if (entry.isDirectory()) {
@@ -183,9 +218,20 @@ function getRecentlyChangedModules(distSrcPath: string): string[] {
         
         // 只包含最近修改的文件，并且排除初始构建时的文件
         if (timeDiff <= recentThreshold && fileModTime > excludeThreshold) {
-          // 转换文件路径为模块路径
-          const moduleName = relativePath.replace(/\.lua$/, '');
-          modules.push(`src.${moduleName}`);
+          // 从 Lua 文件内容中提取模块名
+          const moduleName = extractModuleNameFromLua(fullPath);
+          
+          if (moduleName && !moduleNames.has(moduleName)) {
+            // 计算 require 路径：src.examples.ReloadTemplateExample
+            const requirePath = `src.${relativePath.replace(/\.lua$/, '')}`;
+            
+            modules.push({
+              name: moduleName,
+              path: requirePath
+            });
+            moduleNames.add(moduleName);
+            console.log(`>>> Extracted module: ${moduleName} -> ${requirePath}`);
+          }
         }
       }
     }
