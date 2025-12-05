@@ -8,7 +8,7 @@ import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
 import { Console } from "./system/console";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
-import { MouseEventTest } from "./test/MouseEventTest";
+import { mouseEvents } from "./system/event";
 
 /**
  * 应用程序主入口
@@ -22,9 +22,7 @@ async function main(): Promise<void> {
   // 只是引用一下类，确保模块被加载
 
   Timer.create().start(2, false, () => {
-    print("Loading UI modules:", typeof MouseEventTest);
-    
-
+    print("Loading UI modules:", typeof ReloadTemplateExample);
   });
 
 
@@ -66,10 +64,19 @@ export function initialize(): void {
 
   DzEnableWideScreen(true)
 
+  mouseEvents.initialize();
+
   print(">>> Main: Main module initialized");
 
   // 启动应用程序
   main();
+
+  //隐藏魔兽UI
+  DzFrameHideInterface();
+
+  //调整魔兽渲染黑边
+  DzFrameEditBlackBorders(0, 0);
+
 }
 
 /**

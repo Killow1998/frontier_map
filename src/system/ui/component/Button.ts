@@ -3,6 +3,7 @@ import { ScreenCoordinates } from "../ScreenCoordinates";
 import { UILayout } from "../UILayout";
 import { Console } from "src/system/console";
 import { FrameEventUtils } from "src/constants/frame/utils";
+import { MouseEventManager, MouseButton } from "src/system/event/MouseEvent";
 
 /**
  * 常用背景纹理预设
@@ -64,7 +65,9 @@ export class Button {
   private dragTimer: timer | null = null;
   private dragOffsetX: number = 0;
   private dragOffsetY: number = 0;
-  private dragTrigger: trigger | null = null;
+  private dragMouseDownId: number = -1;  // 全局鼠标按下订阅ID
+  private dragMouseUpId: number = -1;    // 全局鼠标松开订阅ID
+  private isMouseOver: boolean = false;  // 鼠标是否在按钮上
   private onDragStart: (() => void) | null = null;
   private onDragEnd: ((x: number, y: number) => void) | null = null;
   private onDragging: ((x: number, y: number) => void) | null = null;
@@ -433,19 +436,20 @@ export class Button {
 
     FrameEventUtils.bindEvents(this.buttonFrame, {
       onClick: () => {
-        // 如果启用了拖拽，点击时开始拖拽
-        if (this.isDraggable && !this.isDragging) {
-          this.startDrag();
-        } else if (this.isEnabled && this.onClick) {
+        // 如果正在拖拽，不触发点击
+        // 如果启用拖拽，点击由 setupDragEventListeners 处理
+        if (!this.isDragging && !this.isDraggable && this.isEnabled && this.onClick) {
           this.onClick();
         }
       },
-      onMouseEnter: this.onHover ? () => {
+      onMouseEnter: () => {
+        this.isMouseOver = true;
         if (this.isEnabled && this.onHover) {
           this.onHover();
         }
-      } : undefined,
+      },
       onMouseLeave: () => {
+        this.isMouseOver = false;
         // 如果正在拖拽且鼠标离开了按钮区域，继续拖拽（不结束）
         if (this.isEnabled && this.onLeave && !this.isDragging) {
           this.onLeave();
@@ -506,10 +510,16 @@ export class Button {
    * @param draggable 是否可拖拽
    */
   public setDraggable(draggable: boolean): Button {
+    if (this.isDraggable === draggable) return this;
+    
     this.isDraggable = draggable;
-    if (this.buttonFrame) {
+    
+    if (draggable) {
       this.setupDragEventListeners();
+    } else {
+      this.cleanupDragEventListeners();
     }
+    
     return this;
   }
 
@@ -555,6 +565,28 @@ export class Button {
   }
 
   /**
+   * 获取鼠标在标准像素坐标系中的X坐标
+   * 将游戏窗口内的鼠标坐标转换为标准 1920x1080 像素坐标
+   */
+  private getMousePixelX(): number {
+    const windowWidth = DzGetWindowWidth();
+    const mouseRelativeX = DzGetMouseXRelative();
+    // 按比例转换为标准 1920 宽度的像素坐标
+    return (mouseRelativeX / windowWidth) * ScreenCoordinates.STANDARD_WIDTH;
+  }
+
+  /**
+   * 获取鼠标在标准像素坐标系中的Y坐标
+   * 将游戏窗口内的鼠标坐标转换为标准 1920x1080 像素坐标
+   */
+  private getMousePixelY(): number {
+    const windowHeight = DzGetWindowHeight();
+    const mouseRelativeY = DzGetMouseYRelative();
+    // 按比例转换为标准 1080 高度的像素坐标
+    return (mouseRelativeY / windowHeight) * ScreenCoordinates.STANDARD_HEIGHT;
+  }
+
+  /**
    * 开始拖拽
    */
   private startDrag(): void {
@@ -562,9 +594,9 @@ export class Button {
     
     this.isDragging = true;
     
-    // 使用 KKWE 的鼠标位置API（获取屏幕像素坐标）
-    const currentMouseX = DzGetMouseX();
-    const currentMouseY = DzGetMouseY();
+    // 获取游戏窗口内的鼠标坐标，并转换为标准 1920x1080 像素坐标
+    const currentMouseX = this.getMousePixelX();
+    const currentMouseY = this.getMousePixelY();
     
     // 计算鼠标相对于按钮左上角的偏移量（像素坐标）
     this.dragOffsetX = currentMouseX - this.pixelX;
@@ -583,12 +615,11 @@ export class Button {
       this.updateDragPosition();
     });
     
-    // 注册全局鼠标松开事件
-    this.dragTrigger = CreateTrigger();
-    DzTriggerRegisterMouseEventByCode(this.dragTrigger, 1, 2, true, () => {
-      // 1 = 鼠标左键, 2 = 松开事件
+    // 订阅全局鼠标左键松开事件（一次性）
+    const mouseEvents = MouseEventManager.getInstance();
+    this.dragMouseUpId = mouseEvents.onMouseUp(() => {
       this.endDrag();
-    });
+    }, MouseButton.LEFT, { once: true });
   }
 
   /**
@@ -597,9 +628,9 @@ export class Button {
   private updateDragPosition(): void {
     if (!this.isDragging) return;
     
-    // 获取当前鼠标位置（像素坐标）
-    const currentMouseX = DzGetMouseX();
-    const currentMouseY = DzGetMouseY();
+    // 获取游戏窗口内的鼠标坐标，并转换为标准 1920x1080 像素坐标
+    const currentMouseX = this.getMousePixelX();
+    const currentMouseY = this.getMousePixelY();
     
     // 计算新的按钮位置
     const newX = currentMouseX - this.dragOffsetX;
@@ -629,10 +660,11 @@ export class Button {
       this.dragTimer = null;
     }
     
-    // 销毁鼠标事件触发器
-    if (this.dragTrigger) {
-      DestroyTrigger(this.dragTrigger);
-      this.dragTrigger = null;
+    // 取消订阅鼠标松开事件（如果还没有被触发的话）
+    if (this.dragMouseUpId >= 0) {
+      const mouseEvents = MouseEventManager.getInstance();
+      mouseEvents.off(this.dragMouseUpId);
+      this.dragMouseUpId = -1;
     }
     
     Console.log("Drag ended at position(" + this.pixelX + ", " + this.pixelY + ")");
@@ -645,11 +677,44 @@ export class Button {
 
   /**
    * 设置拖拽事件监听器
+   * 订阅全局鼠标按下事件，当鼠标在按钮上按下时开始拖拽
    */
   private setupDragEventListeners(): void {
-    // 拖拽通过 setupEventListeners 中的点击事件触发
-    // 松开通过 startDrag 中注册的全局鼠标事件检测
-    // 这里不需要额外的设置
+    if (this.dragMouseDownId >= 0) return; // 已经订阅了
+    
+    const mouseEvents = MouseEventManager.getInstance();
+    
+    // 订阅全局鼠标左键按下事件
+    this.dragMouseDownId = mouseEvents.onMouseDown(() => {
+      // 检查鼠标是否在按钮上（通过 isMouseOver 状态）
+      if (this.isMouseOver && this.isDraggable && !this.isDragging && this.isEnabled) {
+        this.startDrag();
+      }
+    }, MouseButton.LEFT);
+  }
+
+  /**
+   * 清理拖拽事件监听器
+   */
+  private cleanupDragEventListeners(): void {
+    const mouseEvents = MouseEventManager.getInstance();
+    
+    // 取消鼠标按下订阅
+    if (this.dragMouseDownId >= 0) {
+      mouseEvents.off(this.dragMouseDownId);
+      this.dragMouseDownId = -1;
+    }
+    
+    // 取消鼠标松开订阅（如果正在拖拽）
+    if (this.dragMouseUpId >= 0) {
+      mouseEvents.off(this.dragMouseUpId);
+      this.dragMouseUpId = -1;
+    }
+    
+    // 如果正在拖拽，结束拖拽
+    if (this.isDragging) {
+      this.endDrag();
+    }
   }
 
   /**

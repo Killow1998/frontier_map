@@ -24,6 +24,7 @@ class ReloadTemplateExample {
   public TestButton() {
     // 创建一个按钮 - 测试热重载 v1
     const button = Button.createCentered("ReloadTemplate Button");
+    button.setDraggable(true);
     button.setOnClick(() => {
       Console.log("ReloadTemplate Button clicked!");
     });

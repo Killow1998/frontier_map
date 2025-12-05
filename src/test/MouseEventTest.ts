@@ -16,7 +16,7 @@ class MouseEventTest {
 
   public run() {
     // 初始化鼠标事件系统
-    mouseEvents.initialize();
+
     
     // 测试鼠标左键按下事件
     const leftDownId = mouseEvents.onMouseDown((data: MouseEventData) => {
