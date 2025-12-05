@@ -1,3 +1,4 @@
+import { Text } from "src/system/ui/component/Text";
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
 import { Button } from 'src/system/ui/component/Button';
@@ -23,13 +24,16 @@ class ReloadTemplateExample {
    */
   public TestButton() {
     // 创建一个按钮 - 测试热重载 v1
-    const button = Button.createCentered("ReloadTemplate Button");
-    button.setDraggable(true);
-    button.setOnClick(() => {
-      Console.log("ReloadTemplate Button clicked!");
-    });
-    this.buttons.push(button);
+    // const button = Button.createCentered("ReloadTemplate Button");
+    // button.setDraggable(true);
+    // button.setOnClick(() => {
+    //   Console.log("ReloadTemplate Button clicked!");
+    // });
+    // this.buttons.push(button);
 
+    const text =  Text.createCentered("ReloadTemplate Example v2");
+    text.setBackground("Textures\\UI\\ChatFrame\\ChatFrame-Background.blp");
+    
     //测试
   }
 
