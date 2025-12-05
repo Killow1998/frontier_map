@@ -2,53 +2,56 @@ import { Text } from "src/system/ui/component/Text";
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
 import { Button } from 'src/system/ui/component/Button';
+import { HotReloadHelper } from "src/system/ui/UIComponent";
+import { PositionPreset } from '../system/ui/component/Text';
 
 /**
  * 热更新模板
  * 
  * 热重载设计要点：
- * 1. 需要在热重载时销毁的资源（如UI组件）应保存为类的成员变量
- * 2. 在 cleanup() 中销毁所有需要清理的资源
- * 3. 在 initialize() 中重新创建资源
+ * 1. 使用 HotReloadHelper 自动管理UI组件
+ * 2. 在 cleanup() 中调用 helper.cleanup() 即可销毁所有组件
+ * 3. 使用 helper.register() 注册组件，无需手动管理数组
  */
 class ReloadTemplateExample {
 
   // ========================================
-  // 需要在热重载时保留/销毁的成员变量
+  // 使用 HotReloadHelper 自动管理组件
   // ========================================
-  private buttons: Button[] = [];  // 如果有多个按钮，可以用数组管理
+  private ui = new HotReloadHelper("ReloadTemplate");
 
 
   /**
    * 创建测试按钮
    */
   public TestButton() {
-    // 创建一个按钮 - 测试热重载 v1
-    // const button = Button.createCentered("ReloadTemplate Button");
-    // button.setDraggable(true);
-    // button.setOnClick(() => {
-    //   Console.log("ReloadTemplate Button clicked!");
-    // });
-    // this.buttons.push(button);
+    // 方式1: 使用 helper.create() 创建并自动注册
+    this.ui.create(() => {
+      const button = Button.createCentered("ReloadTemplate Button");
+      button.setDraggable(true);
+      button.setOnClick(() => {
+        Console.log("ReloadTemplate Button clicked!");
+      });
+      return button;
+    });
 
-    const text =  Text.createCentered("ReloadTemplate Example v2");
+    // 方式2: 先创建再注册
+    const text = Text.createAtPresetPosition("ReloadTemplate Example v2", 'TOP_LEFT');
     text.setBackground("Textures\\UI\\ChatFrame\\ChatFrame-Background.blp");
-    
-    //测试
+    this.ui.register(text);  // 注册到热重载管理
+
+    Console.log(`Registered ${this.ui.getComponentCount()} components`);
   }
 
   /**
    * 清理函数 - 热重载时调用
-   * 在这里销毁所有需要清理的资源
+   * 只需要一行代码即可清理所有UI组件
    */
   public cleanup(): void {
-    Console.log("ReloadTemplate: Cleanup called, destroying resources...");
+    Console.log("ReloadTemplate: Cleanup called...");
 
-    // 销毁按钮数组中的所有按钮
-    for (const btn of this.buttons) {
-      btn.destroy();
-    }
-    this.buttons = [];
+    // 一行代码销毁所有已注册的组件！
+    this.ui.cleanup();
 
     Console.log("ReloadTemplate: All resources cleaned up");
   }

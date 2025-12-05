@@ -105,6 +105,24 @@ export const TextFonts = {
 } as const;
 
 /**
+ * 位置预设类型
+ */
+export type PositionPreset = 
+  | 'TOP_LEFT' 
+  | 'TOP_RIGHT' 
+  | 'BOTTOM_LEFT' 
+  | 'BOTTOM_RIGHT'
+  | 'TOP_CENTER' 
+  | 'BOTTOM_CENTER' 
+  | 'LEFT_CENTER' 
+  | 'RIGHT_CENTER'
+  | 'CENTER'
+  | 'UI_TOP_LEFT' 
+  | 'UI_TOP_RIGHT' 
+  | 'UI_BOTTOM_LEFT' 
+  | 'UI_BOTTOM_RIGHT';
+
+/**
  * 字体大小预设（WC3坐标系）
  */
 export const FontSizes = {
@@ -207,10 +225,19 @@ export class Text {
 
   /**
    * 在预设位置创建文本（自动调用create）
+   * @param content 文本内容
+   * @param positionPreset 位置预设，可选值：
+   *   - 角落: 'TOP_LEFT', 'TOP_RIGHT', 'BOTTOM_LEFT', 'BOTTOM_RIGHT'
+   *   - 边缘中心: 'TOP_CENTER', 'BOTTOM_CENTER', 'LEFT_CENTER', 'RIGHT_CENTER'
+   *   - 屏幕中心: 'CENTER'
+   *   - UI安全区域: 'UI_TOP_LEFT', 'UI_TOP_RIGHT', 'UI_BOTTOM_LEFT', 'UI_BOTTOM_RIGHT'
+   * @param sizePreset 尺寸预设
+   * @param centered 是否居中于预设位置
+   * @param parent 父框架
    */
   public static createAtPresetPosition(
     content: string,
-    positionPreset: string,
+    positionPreset: PositionPreset,
     sizePreset: keyof typeof TextSizes = 'MEDIUM',
     centered: boolean = true,
     parent?: Frame
@@ -653,7 +680,7 @@ export class Text {
    */
   private calculateAutoSize(): void {
     // 移除颜色代码来计算实际文本长度
-    const plainText = this.content.replace(/\|c[0-9a-fA-F]{8}/g, '').replace(/\|r/g, '');
+    const plainText = this.removeColorCodes(this.content);
     const lines = plainText.split('\n');
     
     if (this.autoWidth) {
@@ -819,6 +846,36 @@ export class Text {
    */
   private getFormattedText(): string {
     return "|cff" + this.textColor + this.content + "|r";
+  }
+
+  /**
+   * 移除WC3颜色代码
+   * 由于 TSTL 不支持正则表达式，使用手动字符串处理
+   * @param text 包含颜色代码的文本
+   * @returns 移除颜色代码后的纯文本
+   */
+  private removeColorCodes(text: string): string {
+    let result = "";
+    let i = 0;
+    
+    while (i < text.length) {
+      // 检查是否是颜色代码开始 |c
+      if (i + 1 < text.length && text[i] === '|' && text[i + 1] === 'c') {
+        // 跳过 |c 和后面的 8 个十六进制字符 (共10个字符)
+        i += 10;
+      }
+      // 检查是否是颜色结束符 |r
+      else if (i + 1 < text.length && text[i] === '|' && text[i + 1] === 'r') {
+        // 跳过 |r (2个字符)
+        i += 2;
+      }
+      else {
+        result += text[i];
+        i++;
+      }
+    }
+    
+    return result;
   }
 
   /**
