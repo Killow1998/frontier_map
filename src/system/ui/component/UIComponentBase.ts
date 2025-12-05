@@ -23,7 +23,7 @@ export interface IDraggableComponent {
   /** 获取像素Y坐标 */
   getPixelY(): number;
   /** 设置位置 */
-  setPosition(x: number, y: number): this;
+  setPosition(x: number, y: number): IDraggableComponent;
   /** 是否启用 */
   getEnabled(): boolean;
 }

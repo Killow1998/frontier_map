@@ -1,6 +1,8 @@
 import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from "@eiriksgata/wc3ts/*";
 import { ScreenCoordinates } from "../ScreenCoordinates";
 import { Console } from "src/system/console";
+import { DraggableMixin, IDraggableComponent } from "./UIComponentBase";
+import { FrameEventUtils } from "src/constants/frame/utils";
 
 /**
  * 文本对齐方式
@@ -145,8 +147,9 @@ export const FontSizes = {
 /**
  * Text类 - 文本显示组件
  * 包含: 背景框架(Backdrop，可选) + 文本框架(Text)
+ * 支持拖拽功能
  */
-export class Text {
+export class Text implements IDraggableComponent {
   private content: string;
   private pixelX: number;
   private pixelY: number;
@@ -155,8 +158,13 @@ export class Text {
   
   private backdropFrame: Frame | null = null;
   private textFrame: Frame | null = null;
+  private buttonFrame: Frame | null = null;  // 用于事件检测
   
   private isVisible: boolean = true;
+  private isEnabled: boolean = true;
+  
+  // 拖拽功能
+  private draggable: DraggableMixin;
   
   private background: string = TextBackgrounds.NONE;
   private showBackground: boolean = false;
@@ -204,6 +212,9 @@ export class Text {
     this.pixelWidth = width;
     this.pixelHeight = height;
     this.origin = origin;
+    
+    // 初始化拖拽功能
+    this.draggable = new DraggableMixin(this);
   }
 
   // ==================== 静态工厂方法 ====================
@@ -354,9 +365,36 @@ export class Text {
       this.textFrame.setFont(this.fontPath, this.fontSize, this.fontFlags);
     }
 
+    // 创建透明按钮层用于鼠标事件检测（仅在需要拖拽时）
+    this.buttonFrame = Frame.createType("BUTTON", textParent, 0, "BUTTON", "")!;
+    if (this.buttonFrame) {
+      this.buttonFrame
+        .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
+        .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
+      
+      // 设置鼠标事件
+      this.setupMouseEvents();
+    }
+
     this.setVisible(this.isVisible);
 
     Console.log("Text created: \"" + this.content.substring(0, 20) + (this.content.length > 20 ? "..." : "") + "\"");
+  }
+
+  /**
+   * 设置鼠标事件监听
+   */
+  private setupMouseEvents(): void {
+    if (!this.buttonFrame) return;
+
+    FrameEventUtils.bindEvents(this.buttonFrame, {
+      onMouseEnter: () => {
+        this.draggable.setMouseOver(true);
+      },
+      onMouseLeave: () => {
+        this.draggable.setMouseOver(false);
+      }
+    });
   }
 
   // ==================== 文本内容 ====================
@@ -805,6 +843,35 @@ export class Text {
   }
 
   /**
+   * 获取像素X坐标（实现 IDraggableComponent 接口）
+   */
+  public getPixelX(): number {
+    return this.pixelX;
+  }
+
+  /**
+   * 获取像素Y坐标（实现 IDraggableComponent 接口）
+   */
+  public getPixelY(): number {
+    return this.pixelY;
+  }
+
+  /**
+   * 获取启用状态（实现 IDraggableComponent 接口）
+   */
+  public getEnabled(): boolean {
+    return this.isEnabled;
+  }
+
+  /**
+   * 设置启用状态
+   */
+  public setEnabled(enabled: boolean): Text {
+    this.isEnabled = enabled;
+    return this;
+  }
+
+  /**
    * 设置尺寸
    */
   public setSize(width: number, height: number): Text {
@@ -856,6 +923,13 @@ export class Text {
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
     }
 
+    // 更新按钮层（用于鼠标事件）
+    if (this.buttonFrame) {
+      this.buttonFrame
+        .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
+        .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
+    }
+
     // 更新文本（应用 padding）
     this.textFrame
       .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x + paddingLeftWC3, wc3Pos.y - paddingTopWC3)
@@ -874,6 +948,9 @@ export class Text {
     }
     if (this.backdropFrame) {
       this.backdropFrame.setVisible(visible && this.showBackground);
+    }
+    if (this.buttonFrame) {
+      this.buttonFrame.setVisible(visible);
     }
     return this;
   }
@@ -996,6 +1073,7 @@ export class Text {
     alpha?: number;
     fontPath?: string;
     fontSize?: number;
+    draggable?: boolean;
   }): Text {
     if (config.text !== undefined) this.setText(config.text);
     if (config.color !== undefined) this.setColor(config.color);
@@ -1006,7 +1084,84 @@ export class Text {
     if (config.alpha !== undefined) this.setAlpha(config.alpha);
     if (config.fontPath !== undefined) this.setFont(config.fontPath, config.fontSize);
     else if (config.fontSize !== undefined) this.setFontSize(config.fontSize);
+    if (config.draggable !== undefined) this.setDraggable(config.draggable);
     
+    return this;
+  }
+
+  // ==================== 拖拽功能 ====================
+
+  /**
+   * 启用/禁用拖拽功能
+   * @param draggable 是否可拖拽
+   */
+  public setDraggable(draggable: boolean): Text {
+    this.draggable.setEnabled(draggable);
+    return this;
+  }
+
+  /**
+   * 获取是否启用了拖拽
+   */
+  public getDraggable(): boolean {
+    return this.draggable.getEnabled();
+  }
+
+  /**
+   * 获取是否正在拖拽
+   */
+  public getIsDragging(): boolean {
+    return this.draggable.getIsDragging();
+  }
+
+  /**
+   * 设置拖拽开始回调
+   */
+  public setOnDragStart(callback: () => void): Text {
+    this.draggable.setOnDragStart(callback);
+    return this;
+  }
+
+  /**
+   * 设置拖拽结束回调
+   */
+  public setOnDragEnd(callback: (x: number, y: number) => void): Text {
+    this.draggable.setOnDragEnd(callback);
+    return this;
+  }
+
+  /**
+   * 设置拖拽过程回调
+   */
+  public setOnDragging(callback: (x: number, y: number) => void): Text {
+    this.draggable.setOnDragging(callback);
+    return this;
+  }
+
+  /**
+   * 启用拖拽并配置（便捷方法）
+   */
+  public enableDrag(config?: {
+    onDragStart?: () => void;
+    onDragEnd?: (x: number, y: number) => void;
+    onDragging?: (x: number, y: number) => void;
+  }): Text {
+    this.setDraggable(true);
+    
+    if (config) {
+      if (config.onDragStart) this.setOnDragStart(config.onDragStart);
+      if (config.onDragEnd) this.setOnDragEnd(config.onDragEnd);
+      if (config.onDragging) this.setOnDragging(config.onDragging);
+    }
+    
+    return this;
+  }
+
+  /**
+   * 禁用拖拽
+   */
+  public disableDrag(): Text {
+    this.setDraggable(false);
     return this;
   }
 
@@ -1014,6 +1169,14 @@ export class Text {
    * 销毁组件
    */
   public destroy(): void {
+    // 清理拖拽资源
+    this.draggable.cleanup();
+
+    if (this.buttonFrame) {
+      this.buttonFrame.destroy();
+      this.buttonFrame = null;
+    }
+
     if (this.textFrame) {
       this.textFrame.destroy();
       this.textFrame = null;

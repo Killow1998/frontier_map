@@ -41,6 +41,7 @@ class ReloadTemplateExample {
     text.setBackground("UI\\Widgets\\BattleNet\\bnet-userlist-back.blp");
     text.setPaddingTop(30);
     text.setPaddingLeft(30);
+    text.enableDrag();
     //text.center();
 
     this.ui.register(text);  // 注册到热重载管理
