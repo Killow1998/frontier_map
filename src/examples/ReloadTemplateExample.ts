@@ -37,8 +37,15 @@ class ReloadTemplateExample {
 
     // 方式2: 先创建再注册
     const text = Text.createAtPresetPosition("ReloadTemplate Example v2", 'TOP_LEFT');
-    text.setBackground("Textures\\UI\\ChatFrame\\ChatFrame-Background.blp");
+    text.setSize(500, 100);
+    text.setBackground("UI\\Widgets\\BattleNet\\bnet-userlist-back.blp");
+    text.setPaddingTop(30);
+    text.setPaddingLeft(30);
+    //text.center();
+
     this.ui.register(text);  // 注册到热重载管理
+    //text.setBackdropPadding(100);
+
 
     Console.log(`Registered ${this.ui.getComponentCount()} components`);
   }

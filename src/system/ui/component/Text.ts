@@ -160,7 +160,6 @@ export class Text {
   
   private background: string = TextBackgrounds.NONE;
   private showBackground: boolean = false;
-  private backdropPadding: number = 5; // 背景内边距（像素）
   
   private textColor: string = TextColors.WHITE;
   private horizontalAlign: number = TextAlign.LEFT;
@@ -172,6 +171,12 @@ export class Text {
   private fontFlags: number = 0;  // 字体标志
   
   private origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT;
+  
+  // 内边距（像素）
+  private paddingTop: number = 0;
+  private paddingRight: number = 0;
+  private paddingBottom: number = 0;
+  private paddingLeft: number = 0;
   
   // 自适应相关
   private autoWidth: boolean = false;
@@ -312,20 +317,24 @@ export class Text {
     const rightX = wc3Pos.x + wc3Width;
     const bottomY = wc3Pos.y - wc3Height;
 
-    // 如果需要背景，先创建背景框架
+    // 计算 padding 的 WC3 坐标值（用于背景和文本）
+    const paddingTopWC3 = (this.paddingTop / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+    const paddingRightWC3 = (this.paddingRight / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+    const paddingBottomWC3 = (this.paddingBottom / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+    const paddingLeftWC3 = (this.paddingLeft / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+
+    // 如果需要背景，先创建背景框架（背景覆盖整个区域，不受 padding 影响）
     if (this.showBackground && this.background !== "") {
-      const paddingWC3 = (this.backdropPadding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
-      
       this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")!;
       if (this.backdropFrame) {
         this.backdropFrame
-          .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x - paddingWC3, wc3Pos.y + paddingWC3)
-          .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX + paddingWC3, bottomY - paddingWC3)
+          .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
+          .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY)
           .setTexture(this.background, 0, true);
       }
     }
 
-    // 创建文本框架
+    // 创建文本框架（应用 padding 内边距）
     const textParent = this.backdropFrame || parentFrame;
     this.textFrame = Frame.createType("TEXT", textParent, 0, "TEXT", "")!;
     
@@ -335,8 +344,8 @@ export class Text {
     }
 
     this.textFrame
-      .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
-      .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY)
+      .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x + paddingLeftWC3, wc3Pos.y - paddingTopWC3)
+      .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX - paddingRightWC3, bottomY + paddingBottomWC3)
       .setText(this.getFormattedText())
       .setTextAlignment(this.horizontalAlign, this.verticalAlign);
 
@@ -620,17 +629,6 @@ export class Text {
     return this;
   }
 
-  /**
-   * 设置背景内边距
-   * @param padding 内边距（像素）
-   */
-  public setBackdropPadding(padding: number): Text {
-    this.backdropPadding = padding;
-    if (this.backdropFrame) {
-      this.updateFramePositions();
-    }
-    return this;
-  }
 
   /**
    * 设置背景透明度
@@ -641,6 +639,99 @@ export class Text {
       this.backdropFrame.setAlpha(alpha);
     }
     return this;
+  }
+
+  // ==================== 内边距设置 (Padding) ====================
+
+  /**
+   * 设置所有方向的内边距（类似 CSS padding: 10px）
+   * @param padding 内边距（像素）
+   */
+  public setPadding(padding: number): Text {
+    this.paddingTop = padding;
+    this.paddingRight = padding;
+    this.paddingBottom = padding;
+    this.paddingLeft = padding;
+    this.updateFramePositions();
+    return this;
+  }
+
+  /**
+   * 设置垂直和水平方向的内边距（类似 CSS padding: 10px 20px）
+   * @param vertical 上下内边距（像素）
+   * @param horizontal 左右内边距（像素）
+   */
+  public setPaddingVH(vertical: number, horizontal: number): Text {
+    this.paddingTop = vertical;
+    this.paddingBottom = vertical;
+    this.paddingLeft = horizontal;
+    this.paddingRight = horizontal;
+    this.updateFramePositions();
+    return this;
+  }
+
+  /**
+   * 设置四个方向的内边距（类似 CSS padding: 10px 20px 15px 25px）
+   * @param top 上内边距（像素）
+   * @param right 右内边距（像素）
+   * @param bottom 下内边距（像素）
+   * @param left 左内边距（像素）
+   */
+  public setPaddingTRBL(top: number, right: number, bottom: number, left: number): Text {
+    this.paddingTop = top;
+    this.paddingRight = right;
+    this.paddingBottom = bottom;
+    this.paddingLeft = left;
+    this.updateFramePositions();
+    return this;
+  }
+
+  /**
+   * 设置上内边距
+   */
+  public setPaddingTop(padding: number): Text {
+    this.paddingTop = padding;
+    this.updateFramePositions();
+    return this;
+  }
+
+  /**
+   * 设置右内边距
+   */
+  public setPaddingRight(padding: number): Text {
+    this.paddingRight = padding;
+    this.updateFramePositions();
+    return this;
+  }
+
+  /**
+   * 设置下内边距
+   */
+  public setPaddingBottom(padding: number): Text {
+    this.paddingBottom = padding;
+    this.updateFramePositions();
+    return this;
+  }
+
+  /**
+   * 设置左内边距
+   */
+  public setPaddingLeft(padding: number): Text {
+    this.paddingLeft = padding;
+    this.updateFramePositions();
+    return this;
+  }
+
+  /**
+   * 获取内边距
+   */
+  public getPadding(): { top: number; right: number; bottom: number; left: number } {
+    return {
+      top: this.paddingTop,
+      right: this.paddingRight,
+      bottom: this.paddingBottom,
+      left: this.paddingLeft
+    };
   }
 
   // ==================== 自适应尺寸 ====================
@@ -691,12 +782,12 @@ export class Text {
           maxLineLength = line.length;
         }
       }
-      const calculatedWidth = maxLineLength * Text.CHAR_WIDTH + this.backdropPadding * 2;
+      const calculatedWidth = maxLineLength * Text.CHAR_WIDTH + this.paddingLeft + this.paddingRight;
       this.pixelWidth = Math.max(this.minWidth, Math.min(this.maxWidth, calculatedWidth));
     }
     
     if (this.autoHeight) {
-      const calculatedHeight = lines.length * Text.LINE_HEIGHT + this.backdropPadding * 2;
+      const calculatedHeight = lines.length * Text.LINE_HEIGHT + this.paddingTop + this.paddingBottom;
       this.pixelHeight = Math.max(this.minHeight, Math.min(this.maxHeight, calculatedHeight));
     }
   }
@@ -752,18 +843,23 @@ export class Text {
     const rightX = wc3Pos.x + wc3Width;
     const bottomY = wc3Pos.y - wc3Height;
 
-    // 更新背景
+    // 计算 padding 的 WC3 坐标值
+    const paddingTopWC3 = (this.paddingTop / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+    const paddingRightWC3 = (this.paddingRight / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+    const paddingBottomWC3 = (this.paddingBottom / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+    const paddingLeftWC3 = (this.paddingLeft / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+
+    // 更新背景（背景覆盖整个区域）
     if (this.backdropFrame) {
-      const paddingWC3 = (this.backdropPadding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
       this.backdropFrame
-        .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x - paddingWC3, wc3Pos.y + paddingWC3)
-        .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX + paddingWC3, bottomY - paddingWC3);
+        .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
+        .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
     }
 
-    // 更新文本
+    // 更新文本（应用 padding）
     this.textFrame
-      .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
-      .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
+      .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x + paddingLeftWC3, wc3Pos.y - paddingTopWC3)
+      .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX - paddingRightWC3, bottomY + paddingBottomWC3);
   }
 
   // ==================== 可见性 ====================
