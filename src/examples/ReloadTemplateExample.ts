@@ -1,4 +1,4 @@
-import { Text } from "src/system/ui/component/Text";
+import { Text, TextColors } from "src/system/ui/component/Text";
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
 import { Button } from 'src/system/ui/component/Button';
@@ -6,6 +6,9 @@ import { HotReloadHelper } from "src/system/ui/UIComponent";
 import { PositionPreset } from '../system/ui/component/Text';
 import { Panel } from "src/system/ui/component/Panel";
 import { runDialogExamples } from "./DialogExample";
+import { Dialog } from "src/system/ui/component/Dialog";
+import { Frame } from "@eiriksgata/wc3ts/*";
+import { FDFButtonExample } from "./FDFButtonExample";
 
 /**
  * 热更新模板
@@ -56,9 +59,48 @@ class ReloadTemplateExample {
     // panel.setBackground("UI\\Widgets\\ChatFrame\\ChatFrame-Background.blp");
     // this.ui.register(panel); // 注册面板
 
-    //创建对话框
-    runDialogExamples();
 
+    // 直接显示一个简单的对话框进行测试
+    // const testDialog = new Dialog("测试对话框", 500, 300);
+    // testDialog.create();
+
+    // testDialog.addButton({
+    //   text: "选项 1",
+    //   onClick: () => {
+    //     Console.log("点击了选项 1");
+    //   },
+    //   color: TextColors.GREEN
+    // });
+
+    // testDialog.addButton({
+    //   text: "选项 2",
+    //   onClick: () => {
+    //     Console.log("点击了选项 2");
+    //   },
+    //   color: TextColors.YELLOW
+    // });
+
+    // testDialog.addButton({
+    //   text: "关闭",
+    //   onClick: () => {
+    //     Console.log("关闭对话框");
+    //     testDialog.hide();
+    //   },
+    //   color: TextColors.RED
+    // });
+
+    // // 显示对话框
+    // testDialog.show();
+
+    // Console.log("✓ 测试对话框已显示");
+
+    // this.ui.register(testDialog); // 注册对话框
+
+    // 使用frame 创建 按钮模板
+    Frame.createType("test", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, "BACKDROP", "normal_button_up");
+   //const frame =  new Frame("testButtonFrame", Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!, 0, 0, "BACKDROP", "normal_button_up")
+    //new FDFButtonExample().createExampleButtons();
+      //DzCreateFrameByTagName("BACKDROP", "normal_button_up", DzGetGameUI(), "normal_button_up", 0)
     
 
 

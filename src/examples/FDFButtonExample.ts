@@ -15,7 +15,7 @@ export class FDFButtonExample {
     Console.log("Creating FDF button examples...");
 
     // 示例1: 创建标准按钮
-    //this.createStandardButton();
+    this.createStandardButton();
 
     // 示例2: 创建大型按钮
     this.createLargeButton();

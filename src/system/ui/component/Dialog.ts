@@ -283,6 +283,9 @@ export class Dialog {
     // 添加悬停效果
     button.addHoverEffect(200, 255);
 
+    // 同步按钮的可见性状态（如果对话框当前隐藏，按钮也应该隐藏）
+    button.setVisible(this.getVisible());
+
     this.buttons.push(button);
 
     // 如果按钮太多，自动调整对话框高度
@@ -457,6 +460,8 @@ export class Dialog {
    */
   public setVisible(visible: boolean): Dialog {
     this.panel.setVisible(visible);
+    // 同步所有按钮的可见性
+    this.buttons.forEach(button => button.setVisible(visible));
     return this;
   }
 
@@ -471,16 +476,14 @@ export class Dialog {
    * 显示
    */
   public show(): Dialog {
-    this.panel.show();
-    return this;
+    return this.setVisible(true);
   }
 
   /**
    * 隐藏
    */
   public hide(): Dialog {
-    this.panel.hide();
-    return this;
+    return this.setVisible(false);
   }
 
   /**

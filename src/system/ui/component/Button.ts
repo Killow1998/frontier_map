@@ -33,6 +33,24 @@ export const ButtonTextures = {
 } as const;
 
 /**
+ * FDF 模板预设
+ */
+export const ButtonTemplates = {
+  /** 普通按钮（弹起状态） */
+  NORMAL_UP: "normal_button_up",
+  /** 普通按钮（按下状态） */
+  NORMAL_DOWN: "normal_button_down",
+  /** 普通对话框 */
+  NORMAL_DIALOG: "normal_dialog",
+  /** 工具提示样式 */
+  TOOLTIP: "tooltips",
+  /** 工具提示样式2（较小边框） */
+  TOOLTIP2: "tooltips2",
+  /** 按钮样式1 */
+  BUTTON1: "button1",
+} as const;
+
+/**
  * Button类 - 使用 Text 组件的按钮
  * 包含: 背景框架(Backdrop) + Text组件 + 按钮框架(Button)
  */
@@ -60,6 +78,10 @@ export class Button {
   private textColor: string = "FFFFFF";
   private tooltip: string = "";
   private origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT;
+  
+  // FDF 模板相关
+  private useTemplate: boolean = false;
+  private templateName: string = "";
 
   // 拖拽相关属性
   private isDraggable: boolean = false;
@@ -159,6 +181,96 @@ export class Button {
     return Button.createAtPresetPosition(label, 'CENTER', sizePreset, true, parent);
   }
 
+  /**
+   * 使用 FDF 模板创建按钮（自动调用create）
+   * @param label 按钮文本
+   * @param x 像素X坐标
+   * @param y 像素Y坐标
+   * @param width 宽度
+   * @param height 高度
+   * @param template 模板名称（FDF中定义的模板）
+   * @param origin 坐标原点
+   * @param parent 父级Frame（可选）
+   */
+  public static createWithTemplate(
+    label: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    template: string,
+    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT,
+    parent?: Frame
+  ): Button {
+    const button = new Button(label, x, y, width, height, origin);
+    button.useTemplate = true;
+    button.templateName = template;
+    button.create(parent);
+    return button;
+  }
+
+  /**
+   * 使用预定义 FDF 模板创建按钮（自动调用create）
+   * @param label 按钮文本
+   * @param x 像素X坐标
+   * @param y 像素Y坐标
+   * @param width 宽度
+   * @param height 高度
+   * @param templatePreset 模板预设
+   * @param origin 坐标原点
+   * @param parent 父级Frame（可选）
+   */
+  public static createWithTemplatePreset(
+    label: string,
+    x: number,
+    y: number,
+    width: number = 120,
+    height: number = 40,
+    templatePreset: keyof typeof ButtonTemplates = 'NORMAL_UP',
+    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT,
+    parent?: Frame
+  ): Button {
+    return Button.createWithTemplate(
+      label,
+      x,
+      y,
+      width,
+      height,
+      ButtonTemplates[templatePreset],
+      origin,
+      parent
+    );
+  }
+
+  /**
+   * 在屏幕中心使用 FDF 模板创建按钮（便捷方法，自动调用create）
+   * @param label 按钮文本
+   * @param templatePreset 模板预设
+   * @param sizePreset 尺寸预设
+   * @param parent 父级Frame（可选）
+   */
+  public static createCenteredWithTemplate(
+    label: string,
+    templatePreset: keyof typeof ButtonTemplates = 'NORMAL_UP',
+    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
+    parent?: Frame
+  ): Button {
+    const size = UILayout.BUTTON_SIZES[sizePreset];
+    const centerX = (ScreenCoordinates.STANDARD_WIDTH - size.width) / 2;
+    const centerY = (ScreenCoordinates.STANDARD_HEIGHT - size.height) / 2;
+    
+    return Button.createWithTemplate(
+      label,
+      centerX,
+      centerY,
+      size.width,
+      size.height,
+      ButtonTemplates[templatePreset],
+      ScreenCoordinates.ORIGIN_TOP_LEFT,
+      parent
+    );
+  }
+
   public create(parent?: Frame): void {
     if (this.backdropFrame) {
       Console.log("Button already created");
@@ -171,8 +283,16 @@ export class Button {
     const wc3Width = (this.pixelWidth / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
     const wc3Height = (this.pixelHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
 
-    // 创建背景框架
-    this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")!;
+    // 创建背景框架（根据是否使用模板选择不同的创建方式）
+    if (this.useTemplate && this.templateName) {
+      // 使用 FDF 模板创建 - 模板名应该作为 inherits 参数（第4个参数）
+      this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, '', this.templateName)!;
+      Console.log("Creating button with FDF template: " + this.templateName);
+    } else {
+      // 使用普通方式创建
+      this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")!;
+    }
+    
     if (!this.backdropFrame) {
       Console.log("Error: Failed to create backdrop frame");
       return;
@@ -183,8 +303,12 @@ export class Button {
     
     this.backdropFrame
       .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
-      .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY)
-      .setTexture(this.texture, 0, true);
+      .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
+    
+    // 如果不使用模板，设置纹理
+    if (!this.useTemplate) {
+      this.backdropFrame.setTexture(this.texture, 0, true);
+    }
 
     // 使用 Text 组件创建文本
     this.textComponent = new Text(
@@ -318,6 +442,9 @@ export class Button {
   public setTexture(texturePath: string): Button {
     this.texture = texturePath;
     if (this.backdropFrame) {
+      if (this.useTemplate) {
+        Console.log("Warning: Setting texture on a template-based button may override template styles");
+      }
       this.backdropFrame.setTexture(texturePath, 0, true);
     }
     return this;
@@ -420,6 +547,20 @@ export class Button {
 
   public getSize(): { width: number; height: number } {
     return { width: this.pixelWidth, height: this.pixelHeight };
+  }
+
+  /**
+   * 获取是否使用了 FDF 模板
+   */
+  public isUsingTemplate(): boolean {
+    return this.useTemplate;
+  }
+
+  /**
+   * 获取使用的模板名称
+   */
+  public getTemplateName(): string {
+    return this.templateName;
   }
 
   public destroy(): void {
