@@ -4,6 +4,7 @@ import { Console } from "../system/console";
 import { Button } from 'src/system/ui/component/Button';
 import { HotReloadHelper } from "src/system/ui/UIComponent";
 import { PositionPreset } from '../system/ui/component/Text';
+import { Panel } from "src/system/ui/component/Panel";
 
 /**
  * 热更新模板
@@ -25,27 +26,36 @@ class ReloadTemplateExample {
    * 创建测试按钮
    */
   public TestButton() {
-    // 方式1: 使用 helper.create() 创建并自动注册
-    this.ui.create(() => {
-      const button = Button.createCentered("ReloadTemplate Button");
-      button.setDraggable(true);
-      button.setOnClick(() => {
-        Console.log("ReloadTemplate Button clicked!");
-      });
-      return button;
-    });
+    // // 方式1: 使用 helper.create() 创建并自动注册
+    // this.ui.create(() => {
+    //   const button = Button.createCentered("ReloadTemplate Button");
+    //   button.setDraggable(true);
+    //   button.setOnClick(() => {
+    //     Console.log("ReloadTemplate Button clicked!");
+    //   });
+    //   return button;
+    // });
 
-    // 方式2: 先创建再注册
-    const text = Text.createAtPresetPosition("ReloadTemplate Example v2", 'TOP_LEFT');
-    text.setSize(500, 100);
-    text.setBackground("UI\\Widgets\\BattleNet\\bnet-userlist-back.blp");
-    text.setPaddingTop(30);
-    text.setPaddingLeft(30);
-    text.enableDrag();
-    //text.center();
+    // // 方式2: 先创建再注册
+    // const text = Text.createAtPresetPosition("ReloadTemplate Example v2", 'TOP_LEFT');
+    // text.setSize(500, 100);
+    // text.setBackground("UI\\Widgets\\BattleNet\\bnet-userlist-back.blp");
+    // text.setPaddingTop(30);
+    // text.setPaddingLeft(30);
+    // text.enableDrag();
 
-    this.ui.register(text);  // 注册到热重载管理
+    // this.ui.register(text);  // 注册到热重载管理
     //text.setBackdropPadding(100);
+
+
+    // 创建面板
+    const panel = Panel.createWithTitle("ReloadTemplate Panel", 300, 200);
+    panel.setDraggable(true);
+    //panel.setPosition(600, 300);
+    panel.setBackground("UI\\Widgets\\ChatFrame\\ChatFrame-Background.blp");
+    this.ui.register(panel); // 注册面板
+
+    
 
 
     Console.log(`Registered ${this.ui.getComponentCount()} components`);

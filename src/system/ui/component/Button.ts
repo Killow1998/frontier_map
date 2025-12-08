@@ -4,6 +4,7 @@ import { UILayout } from "../UILayout";
 import { Console } from "src/system/console";
 import { FrameEventUtils } from "src/constants/frame/utils";
 import { MouseEventManager, MouseButton } from "src/system/event/MouseEvent";
+import { Text, TextAlign, VerticalAlign } from "./Text";
 
 /**
  * 常用背景纹理预设
@@ -32,8 +33,8 @@ export const ButtonTextures = {
 } as const;
 
 /**
- * Button类 - 三层结构按钮组件
- * 包含: 背景框架(Backdrop) + 文本框架(Text) + 按钮框架(Button)
+ * Button类 - 使用 Text 组件的按钮
+ * 包含: 背景框架(Backdrop) + Text组件 + 按钮框架(Button)
  */
 export class Button {
   private label: string;
@@ -43,7 +44,7 @@ export class Button {
   private pixelHeight: number;
   
   private backdropFrame: Frame | null = null;
-  private textFrame: Frame | null = null;
+  private textComponent: Text | null = null;  // 使用 Text 组件
   private buttonFrame: Frame | null = null;
   
   private onClick: (() => void) | null = null;
@@ -54,7 +55,8 @@ export class Button {
   private isVisible: boolean = true;
   
   private texture: string = ButtonTextures.HUMAN_BORDER;
-  private textAlignment: number = 50;
+  private textAlignment: number = TextAlign.CENTER;  // 使用 TextAlign
+  private verticalAlignment: number = VerticalAlign.MIDDLE;  // 添加垂直对齐
   private textColor: string = "FFFFFF";
   private tooltip: string = "";
   private origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT;
@@ -169,8 +171,7 @@ export class Button {
     const wc3Width = (this.pixelWidth / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
     const wc3Height = (this.pixelHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
 
-    //Console.log("Creating button \"" + this.label + "\" at pixel(" + this.pixelX + ", " + this.pixelY + ") with size (" + this.pixelWidth + "x" + this.pixelHeight + ")");
-
+    // 创建背景框架
     this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")!;
     if (!this.backdropFrame) {
       Console.log("Error: Failed to create backdrop frame");
@@ -185,17 +186,21 @@ export class Button {
       .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY)
       .setTexture(this.texture, 0, true);
 
-    this.textFrame = Frame.createType("TEXT", this.backdropFrame, 0, "TEXT", "")!;
-    if (!this.textFrame) {
-      Console.log("Error: Failed to create text frame");
-      return;
-    }
+    // 使用 Text 组件创建文本
+    this.textComponent = new Text(
+      this.label,
+      this.pixelX,
+      this.pixelY,
+      this.pixelWidth,
+      this.pixelHeight,
+      this.origin
+    );
+    this.textComponent
+      .setColor(this.textColor)
+      .setAlignment(this.textAlignment, this.verticalAlignment);
+    this.textComponent.create(this.backdropFrame);
 
-    this.textFrame
-      .setAllPoints(this.backdropFrame)
-      .setText("|cff" + this.textColor + this.label + "|r")
-      .setTextAlignment(this.textAlignment, 0);
-
+    // 创建按钮框架用于事件检测
     this.buttonFrame = Frame.createType("BUTTON", this.backdropFrame, 0, "BUTTON", "")!;
     if (!this.buttonFrame) {
       Console.log("Error: Failed to create button frame");
@@ -208,7 +213,7 @@ export class Button {
     this.setEnabled(this.isEnabled);
     this.setupEventListeners();
 
-    Console.log("Button \"" + this.label + "\" created successfully with 3-layer structure");
+    Console.log("Button \"" + this.label + "\" created successfully with Text component");
   }
 
   public setOnClick(callback: () => void): Button {
@@ -237,8 +242,8 @@ export class Button {
 
   public setText(text: string): Button {
     this.label = text;
-    if (this.textFrame) {
-      this.textFrame.setText("|cff" + this.textColor + text + "|r");
+    if (this.textComponent) {
+      this.textComponent.setText(text);
     }
     return this;
   }
@@ -249,16 +254,19 @@ export class Button {
 
   public setTextColor(hexColor: string): Button {
     this.textColor = hexColor;
-    if (this.textFrame) {
-      this.textFrame.setText("|cff" + this.textColor + this.label + "|r");
+    if (this.textComponent) {
+      this.textComponent.setColor(hexColor);
     }
     return this;
   }
 
-  public setTextAlignment(alignment: number): Button {
+  public setTextAlignment(alignment: number, verticalAlign?: number): Button {
     this.textAlignment = alignment;
-    if (this.textFrame) {
-      this.textFrame.setTextAlignment(alignment, 0);
+    if (verticalAlign !== undefined) {
+      this.verticalAlignment = verticalAlign;
+    }
+    if (this.textComponent) {
+      this.textComponent.setAlignment(this.textAlignment, this.verticalAlignment);
     }
     return this;
   }
@@ -278,6 +286,10 @@ export class Button {
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
     }
+    // 同步更新 Text 组件位置
+    if (this.textComponent) {
+      this.textComponent.setPosition(x, y);
+    }
     return this;
   }
 
@@ -295,6 +307,10 @@ export class Button {
       this.backdropFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
+    }
+    // 同步更新 Text 组件尺寸
+    if (this.textComponent) {
+      this.textComponent.setSize(width, height);
     }
     return this;
   }
@@ -351,10 +367,10 @@ export class Button {
     if (this.buttonFrame) {
       if (enabled) {
         this.backdropFrame?.setAlpha(255);
-        this.textFrame?.setAlpha(255);
+        this.textComponent?.setAlpha(255);
       } else {
         this.backdropFrame?.setAlpha(128);
-        this.textFrame?.setAlpha(128);
+        this.textComponent?.setAlpha(128);
       }
     }
     return this;
@@ -365,8 +381,8 @@ export class Button {
     if (this.backdropFrame) {
       this.backdropFrame.setVisible(visible);
     }
-    if (this.textFrame) {
-      this.textFrame.setVisible(visible);
+    if (this.textComponent) {
+      this.textComponent.setVisible(visible);
     }
     if (this.buttonFrame) {
       this.buttonFrame.setVisible(visible);
@@ -386,8 +402,12 @@ export class Button {
     return this.backdropFrame;
   }
 
+  public getTextComponent(): Text | null {
+    return this.textComponent;
+  }
+
   public getTextFrame(): Frame | null {
-    return this.textFrame;
+    return this.textComponent?.getTextFrame() || null;
   }
 
   public getButtonFrame(): Frame | null {
@@ -413,9 +433,9 @@ export class Button {
       this.buttonFrame = null;
     }
 
-    if (this.textFrame) {
-      this.textFrame.destroy();
-      this.textFrame = null;
+    if (this.textComponent) {
+      this.textComponent.destroy();
+      this.textComponent = null;
     }
 
     if (this.backdropFrame) {
@@ -490,6 +510,9 @@ export class Button {
     onLeave?: () => void;
     enabled?: boolean;
     visible?: boolean;
+    fontSize?: number;
+    fontPath?: string;
+    padding?: number;
   }): Button {
     if (config.text !== undefined) this.setText(config.text);
     if (config.textColor !== undefined) this.setTextColor(config.textColor);
@@ -499,7 +522,104 @@ export class Button {
     if (config.onLeave !== undefined) this.setOnLeave(config.onLeave);
     if (config.enabled !== undefined) this.setEnabled(config.enabled);
     if (config.visible !== undefined) this.setVisible(config.visible);
+    if (config.fontSize !== undefined) this.setFontSize(config.fontSize);
+    if (config.fontPath !== undefined && this.textComponent) {
+      this.textComponent.setFont(config.fontPath);
+    }
+    if (config.padding !== undefined && this.textComponent) {
+      this.textComponent.setPadding(config.padding);
+    }
     
+    return this;
+  }
+
+  // ==================== Text 组件功能扩展 ====================
+
+  /**
+   * 设置文本字体大小
+   * @param size WC3 坐标系字体大小（如 0.012）
+   */
+  public setFontSize(size: number): Button {
+    if (this.textComponent) {
+      this.textComponent.setFontSize(size);
+    }
+    return this;
+  }
+
+  /**
+   * 设置文本字体大小（像素值）
+   * @param pixelSize 像素大小（如 12, 14, 16）
+   */
+  public setFontSizePixels(pixelSize: number): Button {
+    if (this.textComponent) {
+      this.textComponent.setFontSizePixels(pixelSize);
+    }
+    return this;
+  }
+
+  /**
+   * 设置文本字体
+   * @param fontPath 字体文件路径
+   */
+  public setFont(fontPath: string): Button {
+    if (this.textComponent) {
+      this.textComponent.setFont(fontPath);
+    }
+    return this;
+  }
+
+  /**
+   * 设置文本内边距
+   * @param padding 内边距（像素）
+   */
+  public setTextPadding(padding: number): Button {
+    if (this.textComponent) {
+      this.textComponent.setPadding(padding);
+    }
+    return this;
+  }
+
+  /**
+   * 设置文本内边距（四个方向）
+   */
+  public setTextPaddingTRBL(top: number, right: number, bottom: number, left: number): Button {
+    if (this.textComponent) {
+      this.textComponent.setPaddingTRBL(top, right, bottom, left);
+    }
+    return this;
+  }
+
+  /**
+   * 居中文本（水平+垂直）
+   */
+  public centerText(): Button {
+    this.textAlignment = TextAlign.CENTER;
+    this.verticalAlignment = VerticalAlign.MIDDLE;
+    if (this.textComponent) {
+      this.textComponent.center();
+    }
+    return this;
+  }
+
+  /**
+   * 文本左对齐
+   */
+  public alignTextLeft(): Button {
+    this.textAlignment = TextAlign.LEFT;
+    if (this.textComponent) {
+      this.textComponent.alignLeft();
+    }
+    return this;
+  }
+
+  /**
+   * 文本右对齐
+   */
+  public alignTextRight(): Button {
+    this.textAlignment = TextAlign.RIGHT;
+    if (this.textComponent) {
+      this.textComponent.alignRight();
+    }
     return this;
   }
 

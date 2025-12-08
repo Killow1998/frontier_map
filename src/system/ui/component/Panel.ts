@@ -482,12 +482,41 @@ export class Panel {
     const rightX = wc3Pos.x + wc3Width;
     const bottomY = wc3Pos.y - wc3Height;
 
+    // 更新主背景框架
     this.backdropFrame
       .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
       .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
 
-    // 重新创建子框架（简化处理）
-    // 在实际使用中可能需要更精细的更新逻辑
+    // 更新标题栏位置
+    if (this.titleBarFrame) {
+      const titleBarWC3Height = (this.titleBarHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+      this.titleBarFrame
+        .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
+        .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3Pos.x + wc3Width, wc3Pos.y - titleBarWC3Height);
+    }
+
+    // 更新标题文本位置
+    if (this.titleTextFrame) {
+      const titleBarWC3Height = (this.titleBarHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+      const closeButtonSize = this.titleBarHeight - 4;
+      const closeButtonWC3Size = (closeButtonSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+      const textRightX = this.showCloseButton ? wc3Pos.x + wc3Width - closeButtonWC3Size - 0.005 : wc3Pos.x + wc3Width;
+      
+      this.titleTextFrame
+        .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x + 0.005, wc3Pos.y - 0.002)
+        .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, textRightX, wc3Pos.y - titleBarWC3Height + 0.002);
+    }
+
+    // 更新内容区域位置
+    if (this.contentFrame) {
+      const titleBarWC3Height = this.showTitleBar 
+        ? (this.titleBarHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT 
+        : 0;
+      
+      this.contentFrame
+        .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y - titleBarWC3Height)
+        .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3Pos.x + wc3Width, wc3Pos.y - wc3Height);
+    }
   }
 
   // ==================== 可见性和启用状态 ====================
