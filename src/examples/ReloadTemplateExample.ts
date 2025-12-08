@@ -5,6 +5,7 @@ import { Button } from 'src/system/ui/component/Button';
 import { HotReloadHelper } from "src/system/ui/UIComponent";
 import { PositionPreset } from '../system/ui/component/Text';
 import { Panel } from "src/system/ui/component/Panel";
+import { runDialogExamples } from "./DialogExample";
 
 /**
  * 热更新模板
@@ -49,11 +50,14 @@ class ReloadTemplateExample {
 
 
     // 创建面板
-    const panel = Panel.createWithTitle("ReloadTemplate Panel", 300, 200);
-    panel.setDraggable(true);
-    //panel.setPosition(600, 300);
-    panel.setBackground("UI\\Widgets\\ChatFrame\\ChatFrame-Background.blp");
-    this.ui.register(panel); // 注册面板
+    // const panel = Panel.createWithTitle("ReloadTemplate Panel", 300, 200);
+    // panel.setDraggable(true);
+    // //panel.setPosition(600, 300);
+    // panel.setBackground("UI\\Widgets\\ChatFrame\\ChatFrame-Background.blp");
+    // this.ui.register(panel); // 注册面板
+
+    //创建对话框
+    runDialogExamples();
 
     
 

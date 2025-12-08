@@ -1,5 +1,4 @@
 import { Timer } from "@eiriksgata/wc3ts/*";
-import { Console } from "./console";
 import { ModuleManager } from "./ModuleManager";
 
 // 程序运行目录路径（仅在 dev 模式下由 bootstrap.lua 注入）
