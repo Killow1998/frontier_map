@@ -285,12 +285,25 @@ export class Button {
 
     // 创建背景框架（根据是否使用模板选择不同的创建方式）
     if (this.useTemplate && this.templateName) {
-      // 使用 FDF 模板创建 - 模板名应该作为 inherits 参数（第4个参数）
-      this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, '', this.templateName)!;
+      // 使用 FDF 模板创建
+      // Frame.createType(name, owner, createContext, typeName, inherits)
+      this.backdropFrame = Frame.createType(
+        "ButtonBackdrop_" + Math.random(),  // name - 唯一名称
+        parentFrame,                         // owner - 父框架
+        0,                                   // createContext
+        "BACKDROP",                          // typeName - 框架类型
+        this.templateName                    // inherits - FDF 模板名
+      ) || null;
       Console.log("Creating button with FDF template: " + this.templateName);
     } else {
       // 使用普通方式创建
-      this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")!;
+      this.backdropFrame = Frame.createType(
+        "ButtonBackdrop_" + Math.random(),
+        parentFrame,
+        0,
+        "BACKDROP",
+        ""
+      ) || null;
     }
     
     if (!this.backdropFrame) {
@@ -325,7 +338,13 @@ export class Button {
     this.textComponent.create(this.backdropFrame);
 
     // 创建按钮框架用于事件检测
-    this.buttonFrame = Frame.createType("BUTTON", this.backdropFrame, 0, "BUTTON", "")!;
+    this.buttonFrame = Frame.createType(
+      "ButtonFrame_" + Math.random(),
+      this.backdropFrame,
+      0,
+      "BUTTON",
+      ""
+    ) || null;
     if (!this.buttonFrame) {
       Console.log("Error: Failed to create button frame");
       return;
@@ -336,6 +355,12 @@ export class Button {
     this.setVisible(this.isVisible);
     this.setEnabled(this.isEnabled);
     this.setupEventListeners();
+    
+    // 如果使用模板，强制设置可见性和透明度
+    if (this.useTemplate && this.backdropFrame) {
+      this.backdropFrame.setVisible(true);
+      this.backdropFrame.setAlpha(255);
+    }
 
     Console.log("Button \"" + this.label + "\" created successfully with Text component");
   }

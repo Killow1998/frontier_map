@@ -244,18 +244,15 @@ export class Dialog {
 
     Console.log("Creating button at absolute position: x=" + buttonX + ", y=" + buttonY + ", width=" + buttonWidth);
 
-    // 创建按钮（使用绝对坐标，但父框架是 contentFrame）
-    const button = new Button(
+    // 使用 FDF 模板创建按钮（使用绝对坐标）
+    const button = Button.createWithTemplatePreset(
       config.text,
       buttonX,
       buttonY,
       buttonWidth,
-      this.buttonHeight
+      this.buttonHeight,
+      'NORMAL_UP'  // 使用 normal_button_up 模板
     );
-    
-    // 不传递 parent，让 Button 使用默认的游戏 UI 作为父框架
-    // 这样按钮的坐标就是绝对坐标了
-    button.create();
     
     // 配置按钮
     button.centerText();
