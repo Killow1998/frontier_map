@@ -199,21 +199,20 @@ export class Dialog {
       return;
     }
 
-    // 创建面板
-    this.panel.create(parent);
+    // 在创建前配置面板（标题栏需要在 create() 时就知道要显示）
     this.panel
       .setTitle(this.title)
       .setTitleColor(TextColors.GOLD)
       .setShowTitleBar(true)
       .setShowCloseButton(true)
+      .setBackground("UI\\Widgets\\EscMenu\\Human\\editbox-background.blp")
+      .setAlpha(240)
       .setOnClose(() => {
         this.hide();
       });
 
-    // 设置面板样式
-    this.panel
-      .setBackground("UI\\Widgets\\EscMenu\\Human\\editbox-background.blp")
-      .setAlpha(240);
+    // 创建面板（此时会根据配置创建标题栏）
+    this.panel.create(parent);
 
     this.isCreated = true;
 

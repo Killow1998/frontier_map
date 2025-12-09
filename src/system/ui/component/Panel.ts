@@ -274,7 +274,7 @@ export class Panel {
       closeBackdrop
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3X, wc3Y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3X + wc3Size, wc3Y - wc3Size)
-        .setTexture("UI\\Widgets\\EscMenu\\Human\\human-options-button-close.blp", 0, true);
+        .setTexture("UI\\Widgets\\EscMenu\\Human\\radiobutton-backgroundpressed.blp", 0, true);
     }
 
     // 关闭按钮点击区域
