@@ -65,6 +65,8 @@ export class Panel {
   private titleTextFrame: Frame | null = null;
   private contentFrame: Frame | null = null;
   private closeButtonFrame: Frame | null = null;
+  private closeBackdropFrame: Frame | null = null;
+  private titleBarHitFrame: Frame | null = null;
   
   // 状态
   private isVisible: boolean = true;
@@ -269,18 +271,18 @@ export class Panel {
    */
   private createCloseButton(wc3X: number, wc3Y: number, wc3Size: number): void {
     // 关闭按钮背景
-    const closeBackdrop = Frame.createType("BACKDROP", this.titleBarFrame!, 0, 'BACKDROP', "")!;
-    if (closeBackdrop) {
-      closeBackdrop
+    this.closeBackdropFrame = Frame.createType("BACKDROP", this.titleBarFrame!, 0, 'BACKDROP', "")!;
+    if (this.closeBackdropFrame) {
+      this.closeBackdropFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3X, wc3Y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3X + wc3Size, wc3Y - wc3Size)
-        .setTexture("UI\\Widgets\\EscMenu\\Human\\radiobutton-backgroundpressed.blp", 0, true);
+        .setTexture("UI\\Widgets\\EscMenu\\Human\\human-options-button-close.blp", 0, true);
     }
 
     // 关闭按钮点击区域
-    this.closeButtonFrame = Frame.createType("BUTTON", closeBackdrop, 0, "BUTTON", "")!;
+    this.closeButtonFrame = Frame.createType("BUTTON", this.closeBackdropFrame, 0, "BUTTON", "")!;
     if (this.closeButtonFrame) {
-      this.closeButtonFrame.setAllPoints(closeBackdrop);
+      this.closeButtonFrame.setAllPoints(this.closeBackdropFrame);
       
       // 注册点击事件 (handle, eventType, handler, sync)
       DzFrameSetScriptByCode(this.closeButtonFrame.handle, 1, () => {
@@ -313,15 +315,15 @@ export class Panel {
     if (!this.titleBarFrame) return;
 
     // 使用 BUTTON 类型来接收事件
-    const hitFrame = Frame.createType("BUTTON", this.titleBarFrame, 0, "BUTTON", "")!;
-    if (hitFrame) {
-      hitFrame.setAllPoints(this.titleBarFrame);
+    this.titleBarHitFrame = Frame.createType("BUTTON", this.titleBarFrame, 0, "BUTTON", "")!;
+    if (this.titleBarHitFrame) {
+      this.titleBarHitFrame.setAllPoints(this.titleBarFrame);
       
       // 注册鼠标进入/离开事件 (handle, eventType, handler, sync)
-      DzFrameSetScriptByCode(hitFrame.handle, 3, () => {
+      DzFrameSetScriptByCode(this.titleBarHitFrame.handle, 3, () => {
         this.isMouseOverTitleBar = true;
       }, false);
-      DzFrameSetScriptByCode(hitFrame.handle, 4, () => {
+      DzFrameSetScriptByCode(this.titleBarHitFrame.handle, 4, () => {
         this.isMouseOverTitleBar = false;
       }, false);
     }
@@ -516,6 +518,18 @@ export class Panel {
       this.contentFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y - titleBarWC3Height)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3Pos.x + wc3Width, wc3Pos.y - wc3Height);
+    }
+
+    // 更新关闭按钮位置
+    if (this.closeBackdropFrame) {
+      const closeButtonSize = this.titleBarHeight - 4;
+      const closeButtonWC3Size = (closeButtonSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+      const closeButtonX = wc3Pos.x + wc3Width - closeButtonWC3Size - 0.002;
+      const closeButtonY = wc3Pos.y - 0.002;
+      
+      this.closeBackdropFrame
+        .setAbsPoint(FRAME_ALIGN_LEFT_TOP, closeButtonX, closeButtonY)
+        .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, closeButtonX + closeButtonWC3Size, closeButtonY - closeButtonWC3Size);
     }
   }
 
@@ -851,15 +865,25 @@ export class Panel {
     }
     this.cleanupDragEventListeners();
 
-    // 销毁框架
+    // 销毁框架（注意顺序：先销毁子框架，再销毁父框架）
     if (this.closeButtonFrame) {
       this.closeButtonFrame.destroy();
       this.closeButtonFrame = null;
     }
 
+    if (this.closeBackdropFrame) {
+      this.closeBackdropFrame.destroy();
+      this.closeBackdropFrame = null;
+    }
+
     if (this.titleTextFrame) {
       this.titleTextFrame.destroy();
       this.titleTextFrame = null;
+    }
+
+    if (this.titleBarHitFrame) {
+      this.titleBarHitFrame.destroy();
+      this.titleBarHitFrame = null;
     }
 
     if (this.titleBarFrame) {

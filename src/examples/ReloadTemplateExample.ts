@@ -24,7 +24,7 @@ class ReloadTemplateExample {
   // 使用 HotReloadHelper 自动管理组件
   // ========================================
   private ui = new HotReloadHelper("ReloadTemplate");
-
+  
 
   /**
    * 创建测试按钮
@@ -63,6 +63,7 @@ class ReloadTemplateExample {
     // 直接显示一个简单的对话框进行测试
     const testDialog = new Dialog("测试对话框", 500, 300);
     testDialog.create();
+    testDialog.setDraggable(true);
 
     testDialog.addButton({
       text: "选项 1",
@@ -94,7 +95,7 @@ class ReloadTemplateExample {
 
     Console.log("✓ 测试对话框已显示");
 
-    // this.ui.register(testDialog); // 注册对话框
+    this.ui.register(testDialog); // 注册对话框
 
 
 

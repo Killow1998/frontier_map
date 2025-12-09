@@ -10,6 +10,8 @@ import { TextColors } from "../system/ui/component/Text";
 export function runDialogExamples(): void {
   Console.log("=== Dialog Component Examples ===");
 
+  // 测试对话框 - 包含标题栏隐藏功能测试
+  testDialogWithTitleToggle();
 
   // ==================== 示例 1: 基本对话框 ====================
   // example1_BasicDialog();
@@ -337,3 +339,133 @@ export function quickStartDialog(): void {
 
   Console.log("✓ 快速开始示例完成");
 }
+
+/**
+ * 测试对话框标题栏显示/隐藏功能
+ */
+function testDialogWithTitleToggle(): void {
+  Console.log("\n--- Test: Dialog Title Bar Toggle & Dragging ---");
+
+  // 创建带标题栏的对话框（可拖拽）
+  const dialogWithTitle = new Dialog("可拖拽对话框", 450, 400);
+  dialogWithTitle
+    .setDraggable(true)  // 启用拖拽
+    .create();
+  
+  // 设置拖拽回调
+  dialogWithTitle
+    .setOnDragStart(() => {
+      Console.log("开始拖拽对话框");
+    })
+    .setOnDragEnd((x, y) => {
+      Console.log("拖拽结束，新位置: (" + x + ", " + y + ")");
+    })
+    .setOnDragging((_x, _y) => {
+      // Console.log("拖拽中: (" + _x + ", " + _y + ")");  // 太频繁，注释掉
+    });
+  
+  dialogWithTitle.addButton({
+    text: "隐藏标题栏",
+    onClick: () => {
+      dialogWithTitle.setShowTitleBar(false);
+      Console.log("标题栏已隐藏");
+    }
+  });
+
+  dialogWithTitle.addButton({
+    text: "显示标题栏",
+    onClick: () => {
+      dialogWithTitle.setShowTitleBar(true);
+      Console.log("标题栏已显示");
+    }
+  });
+
+  dialogWithTitle.addButton({
+    text: "禁用拖拽",
+    onClick: () => {
+      dialogWithTitle.setDraggable(false);
+      Console.log("拖拽已禁用");
+    }
+  });
+
+  dialogWithTitle.addButton({
+    text: "启用拖拽",
+    onClick: () => {
+      dialogWithTitle.setDraggable(true);
+      Console.log("拖拽已启用");
+    }
+  });
+
+  dialogWithTitle.addButton({
+    text: "隐藏关闭按钮",
+    onClick: () => {
+      dialogWithTitle.setShowCloseButton(false);
+      Console.log("关闭按钮已隐藏");
+    }
+  });
+
+  dialogWithTitle.addButton({
+    text: "显示关闭按钮",
+    onClick: () => {
+      dialogWithTitle.setShowCloseButton(true);
+      Console.log("关闭按钮已显示");
+    }
+  });
+
+  dialogWithTitle.addButton({
+    text: "关闭",
+    onClick: () => {
+      dialogWithTitle.hide();
+    },
+    color: TextColors.RED
+  });
+
+  dialogWithTitle.show();
+
+  // 创建无标题栏的对话框（不可拖拽）
+  const dialogNoTitle = new Dialog("这个标题不会显示", 400, 300);
+  dialogNoTitle
+    .setShowTitleBar(false)  // 在 create 前设置
+    .create();
+
+  dialogNoTitle.setPosition(100, 100);  // 放在左上角
+
+  dialogNoTitle.addButton({
+    text: "无标题栏对话框",
+    onClick: () => {
+      Console.log("这是一个没有标题栏的对话框");
+    }
+  });
+
+  dialogNoTitle.addButton({
+    text: "显示标题栏",
+    onClick: () => {
+      dialogNoTitle.setShowTitleBar(true);
+      Console.log("标题栏已启用");
+    }
+  });
+
+  dialogNoTitle.addButton({
+    text: "启用拖拽",
+    onClick: () => {
+      dialogNoTitle.setDraggable(true);
+      Console.log("拖拽已启用（需要标题栏才能拖拽）");
+    }
+  });
+
+  dialogNoTitle.addButton({
+    text: "关闭",
+    onClick: () => {
+      dialogNoTitle.hide();
+    },
+    color: TextColors.RED
+  });
+
+  dialogNoTitle.show();
+
+  Console.log("✓ 标题栏切换和拖拽测试对话框创建完成");
+  Console.log("  - 中间对话框: 可拖拽，可切换标题栏");
+  Console.log("  - 左上角对话框: 初始无标题栏，不可拖拽");
+  Console.log("  - 提示: 拖拽对话框需要鼠标在标题栏上按住拖动");
+}
+

@@ -3,6 +3,7 @@ import { Panel } from "./Panel";
 import { Button } from "./Button";
 import { Text, TextColors } from "./Text";
 import { Console } from "src/system/console";
+import { UIComponent } from "src/system/ui/UIComponent";
 
 /**
  * 对话框按钮配置
@@ -53,7 +54,7 @@ export interface DialogButtonConfig {
  * dialog.show();
  * ```
  */
-export class Dialog {
+export class Dialog implements UIComponent {
   private panel: Panel;
   private titleText: Text | null = null;
   private buttons: Button[] = [];
@@ -67,6 +68,11 @@ export class Dialog {
   private buttonWidthRatio: number = 0.8; // 按钮宽度占对话框宽度的比例
   
   private isCreated: boolean = false;
+  
+  // 用户自定义的拖拽回调
+  private userOnDragStart: (() => void) | null = null;
+  private userOnDragEnd: ((x: number, y: number) => void) | null = null;
+  private userOnDragging: ((x: number, y: number) => void) | null = null;
 
   constructor(
     title: string,
@@ -411,6 +417,7 @@ export class Dialog {
    */
   public setPosition(x: number, y: number): Dialog {
     this.panel.setPosition(x, y);
+    this.repositionButtons();
     return this;
   }
 
@@ -516,6 +523,96 @@ export class Dialog {
     return this;
   }
 
+  /**
+   * 设置是否显示标题栏
+   */
+  public setShowTitleBar(show: boolean): Dialog {
+    this.panel.setShowTitleBar(show);
+    return this;
+  }
+
+  /**
+   * 设置是否显示关闭按钮
+   */
+  public setShowCloseButton(show: boolean): Dialog {
+    this.panel.setShowCloseButton(show);
+    return this;
+  }
+
+  // ==================== 拖拽功能 ====================
+
+  /**
+   * 启用/禁用拖拽功能
+   */
+  public setDraggable(draggable: boolean): Dialog {
+    if (draggable) {
+      // 设置内部拖拽回调，确保按钮跟随面板移动
+      this.panel.setOnDragStart(() => {
+        if (this.userOnDragStart) {
+          this.userOnDragStart();
+        }
+      });
+
+      this.panel.setOnDragging((x, y) => {
+        // 重新定位所有按钮
+        this.repositionButtons();
+        // 调用用户设置的回调
+        if (this.userOnDragging) {
+          this.userOnDragging(x, y);
+        }
+      });
+
+      this.panel.setOnDragEnd((x, y) => {
+        // 拖拽结束后确保按钮位置正确
+        this.repositionButtons();
+        // 调用用户设置的回调
+        if (this.userOnDragEnd) {
+          this.userOnDragEnd(x, y);
+        }
+      });
+    }
+    this.panel.setDraggable(draggable);
+    return this;
+  }
+
+  /**
+   * 获取是否可拖拽
+   */
+  public getDraggable(): boolean {
+    return this.panel.getDraggable();
+  }
+
+  /**
+   * 获取是否正在拖拽
+   */
+  public getIsDragging(): boolean {
+    return this.panel.getIsDragging();
+  }
+
+  /**
+   * 设置拖拽开始回调
+   */
+  public setOnDragStart(callback: () => void): Dialog {
+    this.userOnDragStart = callback;
+    return this;
+  }
+
+  /**
+   * 设置拖拽结束回调
+   */
+  public setOnDragEnd(callback: (x: number, y: number) => void): Dialog {
+    this.userOnDragEnd = callback;
+    return this;
+  }
+
+  /**
+   * 设置拖拽过程中回调
+   */
+  public setOnDragging(callback: (x: number, y: number) => void): Dialog {
+    this.userOnDragging = callback;
+    return this;
+  }
+
   // ==================== 获取内部组件 ====================
 
   /**
@@ -554,9 +651,12 @@ export class Dialog {
   public configure(config: {
     title?: string;
     titleColor?: string;
+    showTitleBar?: boolean;
+    showCloseButton?: boolean;
     background?: string;
     alpha?: number;
     visible?: boolean;
+    draggable?: boolean;
     buttonStartY?: number;
     buttonSpacing?: number;
     buttonHeight?: number;
@@ -564,9 +664,12 @@ export class Dialog {
   }): Dialog {
     if (config.title !== undefined) this.setTitle(config.title);
     if (config.titleColor !== undefined) this.setTitleColor(config.titleColor);
+    if (config.showTitleBar !== undefined) this.setShowTitleBar(config.showTitleBar);
+    if (config.showCloseButton !== undefined) this.setShowCloseButton(config.showCloseButton);
     if (config.background !== undefined) this.setBackground(config.background);
     if (config.alpha !== undefined) this.setAlpha(config.alpha);
     if (config.visible !== undefined) this.setVisible(config.visible);
+    if (config.draggable !== undefined) this.setDraggable(config.draggable);
     if (config.buttonStartY !== undefined) this.setButtonStartY(config.buttonStartY);
     if (config.buttonSpacing !== undefined) this.setButtonSpacing(config.buttonSpacing);
     if (config.buttonHeight !== undefined) this.setButtonHeight(config.buttonHeight);
@@ -588,7 +691,12 @@ export class Dialog {
       this.titleText = null;
     }
     
-    // 销毁面板
+    // 清理用户拖拽回调
+    this.userOnDragStart = null;
+    this.userOnDragEnd = null;
+    this.userOnDragging = null;
+    
+    // 销毁面板（会自动销毁所有内部 Frame）
     this.panel.destroy();
     
     this.isCreated = false;
