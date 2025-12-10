@@ -167,7 +167,7 @@ export class Tips {
 
     // 创建背景框架
     Console.log("[Tips] Creating backdrop frame...");
-    this.backdropFrame = Frame.createType(`TipsBackdrop_${timestamp}`, gameUI, 0, "BACKDROP", "") || null;
+    this.backdropFrame = Frame.createType(`TipsBackdrop_${timestamp}`, gameUI, 1000, "BACKDROP", "") || null;
     if (!this.backdropFrame) {
       Console.log("[Tips] Error: Failed to create backdrop frame");
       return;
@@ -179,6 +179,8 @@ export class Tips {
       .setAbsPoint(FRAMEPOINT_TOPLEFT, 0.4, 0.5)
       .setTexture(Tips.DEFAULT_BACKGROUND, 0, true)
       .setAlpha(0); // 初始透明
+
+    DzFrameSetPriority(this.backdropFrame.handle, 1000);
 
     // 创建图标框架（可选，初始隐藏）
     this.iconFrame = Frame.createType(`TipsIcon_${timestamp}`, this.backdropFrame, 0, "BACKDROP", "") || null;

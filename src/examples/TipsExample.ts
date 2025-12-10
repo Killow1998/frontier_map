@@ -26,7 +26,7 @@ export function runTipsExamples(): void {
       width: 320,
       maxHeight: 200,
       position: TipsPosition.AUTO,
-      animation: TipsAnimation.SLIDE_RIGHT,
+      animation: TipsAnimation.NONE,
       delayShow: 0
     }, info);
   });
@@ -51,7 +51,7 @@ export function runTipsExamples(): void {
       icon: "ReplaceableTextures\\CommandButtons\\BTNCrown.blp",
       width: 300,
       position: TipsPosition.AUTO,
-      animation: TipsAnimation.SLIDE_RIGHT,
+      animation: TipsAnimation.NONE,
       delayShow: 0
     }, info.x, info.y, info.width, info.height);
   });
@@ -60,21 +60,21 @@ export function runTipsExamples(): void {
     tips.hide();
   });
 
-  // 示例 3: 简单文本提示（使用 getComponentInfo）
+  // 示例 3: 无动画提示（立即显示/隐藏）
   const infoButton = new Button("信息按钮", 200, 420, 100, 40);
   infoButton.create();
   infoButton.setText("帮助");
 
   infoButton.setOnHover(() => {
-    Console.log("显示帮助提示");
+    Console.log("显示帮助提示 - 无动画");
     const info = infoButton.getComponentInfo();
     tips.show({
       text: "点击查看详细帮助文档\n\n快捷键:\nF1 - 打开帮助\nF2 - 快速保存\nESC - 返回菜单",
       textColor: "00FFFF", // 青色
       width: 280,
       position: TipsPosition.AUTO,
-      animation: TipsAnimation.SLIDE_RIGHT,
-      delayShow: 0
+      animation: TipsAnimation.NONE,  // 无动画，立即显示
+      delayShow: 0  // 无延迟
     }, info.x, info.y, info.width, info.height);
   });
 
