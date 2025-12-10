@@ -1,14 +1,8 @@
 import { Text, TextColors } from "src/system/ui/component/Text";
 import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
-import { Button } from 'src/system/ui/component/Button';
 import { HotReloadHelper } from "src/system/ui/UIComponent";
-import { PositionPreset } from '../system/ui/component/Text';
-import { Panel } from "src/system/ui/component/Panel";
-import { runDialogExamples } from "./DialogExample";
 import { Dialog } from "src/system/ui/component/Dialog";
-import { Tips, TipsAnimation, TipsPosition } from "src/system/ui/component/Tips";
-import { runTipsExamples } from "./TipsExample";
 
 /**
  * 热更新模板
@@ -97,9 +91,6 @@ class ReloadTemplateExample {
 
     // 注册对话框到热重载管理器
     this.ui.register(testDialog);
-
-
-    runTipsExamples();
 
 
     Console.log(`Registered ${this.ui.getComponentCount()} components`);
