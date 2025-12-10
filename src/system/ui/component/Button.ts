@@ -575,6 +575,28 @@ export class Button {
   }
 
   /**
+   * 获取用于定位的主 Frame（优先返回 backdrop，其次 button）
+   * 用于 Tips 等组件的相对定位
+   */
+  public getMainFrame(): Frame | null {
+    return this.backdropFrame || this.buttonFrame;
+  }
+
+  /**
+   * 获取组件信息，用于 Tips 显示
+   * @returns 包含 frame、位置、尺寸的对象
+   */
+  public getComponentInfo(): { frame: Frame | null; x: number; y: number; width: number; height: number } {
+    return {
+      frame: this.getMainFrame(),
+      x: this.pixelX,
+      y: this.pixelY,
+      width: this.pixelWidth,
+      height: this.pixelHeight
+    };
+  }
+
+  /**
    * 获取是否使用了 FDF 模板
    */
   public isUsingTemplate(): boolean {
