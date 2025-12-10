@@ -347,7 +347,7 @@ export class Tips {
       .setTexture(config.background ?? Tips.DEFAULT_BACKGROUND, 0, true);
 
     // 设置图标（如果有）
-    if (config.icon && this.iconFrame) {
+    if (config.icon) {
       const iconSize = 32; // 像素
       const iconPadding = 8; // 图标与文字之间的间距（像素）
       const leftPadding = 8; // 左侧内边距（像素）
@@ -358,13 +358,17 @@ export class Tips {
       const wc3LeftPadding = (leftPadding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
       const wc3TopPadding = (topPadding / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
 
-      // 图标定位：左上角，带内边距
-      this.iconFrame
-        .setSize(wc3IconSize, wc3IconSize)
-        .setTexture(config.icon, 0, true)
-        .clearPoints()
-        .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, wc3LeftPadding, -wc3TopPadding)
-        .setAlpha(0); // 初始透明，动画中会设置
+      if (this.iconFrame) {
+        this.iconFrame.setVisible(true);
+        // 图标定位：左上角，带内边距
+        this.iconFrame!
+          .setSize(wc3IconSize, wc3IconSize)
+          .setTexture(config.icon, 0, true)
+          .clearPoints()
+          .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, wc3LeftPadding, -wc3TopPadding)
+          .setAlpha(0); // 初始透明，动画中会设置
+
+      }
 
       // 文本需要为图标留出空间：图标宽度 + 左边距 + 图标间距
       const textLeftOffset = wc3LeftPadding + wc3IconSize + wc3IconPadding;
@@ -377,7 +381,8 @@ export class Tips {
     } else {
       // 没有图标，文本占满整个区域（带内边距）
       if (this.iconFrame) {
-        this.iconFrame.setAlpha(0);
+        this.iconFrame.setVisible(false);
+        //this.iconFrame.setAlpha(0);
       }
 
       const padding = 8; // 像素

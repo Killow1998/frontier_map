@@ -27,7 +27,7 @@ export function runTipsExamples(): void {
       maxHeight: 200,
       position: TipsPosition.AUTO,
       animation: TipsAnimation.SLIDE_RIGHT,
-      delayShow: 0.3 // 悬停 0.3 秒后显示
+      delayShow: 0
     }, info);
   });
 
@@ -52,7 +52,7 @@ export function runTipsExamples(): void {
       width: 300,
       position: TipsPosition.AUTO,
       animation: TipsAnimation.SLIDE_RIGHT,
-      delayShow: 0.4
+      delayShow: 0
     }, info.x, info.y, info.width, info.height);
   });
 
@@ -74,7 +74,7 @@ export function runTipsExamples(): void {
       width: 280,
       position: TipsPosition.AUTO,
       animation: TipsAnimation.SLIDE_RIGHT,
-      delayShow: 0.2
+      delayShow: 0
     }, info.x, info.y, info.width, info.height);
   });
 
@@ -103,7 +103,7 @@ export function runTipsExamples(): void {
         width: 200,
         position: item.pos,
         animation: item.anim,
-        delayShow: 0.2
+        delayShow: 0
       }, info.x, info.y, info.width, info.height);
     });
 
@@ -175,8 +175,6 @@ export function runTipsExamples(): void {
         icon: skill.icon,
         width: 300,
         position: TipsPosition.AUTO,
-        animation: TipsAnimation.SLIDE_TOP,
-        delayShow: 0.4
       }, info.x, info.y, info.width, info.height);
     });
 
