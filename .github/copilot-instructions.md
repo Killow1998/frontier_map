@@ -98,6 +98,62 @@ if (handle === undefined) {
 
 ### Key Build Process
 1. TypeScript compiles to Lua via tstl into `maps/map/main.lua`
+
+## Frame System (UI) Development
+
+### Frame.createType() 正确用法
+
+**重要**: `Frame.createType()` 的参数顺序和 TypeScript 签名:
+
+```typescript
+Frame.createType(name: string, owner: Frame, createContext: number, typeName: string, inherits: string)
+```
+
+编译为 Lua 后调用:
+```lua
+DzCreateFrameByTagName(typeName, name, owner.handle, inherits, createContext)
+```
+
+**关键注意事项**:
+1. **name 参数必须唯一** - 不要使用类型名作为 name，每个 Frame 实例需要唯一的名称
+2. **typeName 必须是有效的 Frame 类型** - 如 "BACKDROP", "BUTTON", "TEXT", "FRAME" 等
+3. **第四个参数 typeName 不能为空字符串** - 必须指定有效类型
+
+**错误示例** ❌:
+```typescript
+// 错误1: 使用类型名作为 name
+Frame.createType("BACKDROP", parentFrame, 0, "BACKDROP", "")  // name 和 typeName 相同会导致问题
+
+// 错误2: typeName 为空字符串
+Frame.createType("MyFrame", parentFrame, 0, '', "")  // 会导致 War3Func::GetLayoutFrameTypeTagID 错误
+
+// 错误3: 单引号和双引号混用
+Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")  // 虽然能工作，但不一致
+```
+
+**正确示例** ✅:
+```typescript
+// 给每个 Frame 唯一的名称
+const backdropFrame = Frame.createType("PanelBackdrop", parentFrame, 0, "BACKDROP", "")!;
+const titleBarFrame = Frame.createType("PanelTitleBar", backdropFrame, 0, "BACKDROP", "")!;
+const titleTextFrame = Frame.createType("PanelTitleText", titleBarFrame, 0, "TEXT", "")!;
+const closeBackdropFrame = Frame.createType("PanelCloseBackdrop", titleBarFrame, 0, "BACKDROP", "")!;
+const closeButtonFrame = Frame.createType("PanelCloseButton", closeBackdropFrame, 0, "BUTTON", "")!;
+const contentFrame = Frame.createType("PanelContent", backdropFrame, 0, "FRAME", "")!;
+const titleBarHitFrame = Frame.createType("PanelTitleBarHit", titleBarFrame, 0, "BUTTON", "")!;
+```
+
+**常见 Frame 类型**:
+- `BACKDROP` - 背景框架，可设置纹理
+- `BUTTON` - 按钮，可接收点击事件
+- `TEXT` - 文本显示
+- `FRAME` - 通用容器框架
+- `GLUEBUTTON` - 游戏界面按钮
+- `MODEL` - 3D 模型显示
+
+**常见错误信息**:
+- `War3Func::GetLayoutFrameTypeTagID, wrong tag=wj(1892)` - typeName 参数错误或为空字符串
+- `JAPI::GUI::DzCreateFrameByTagName, err tag` - 类型名称无效
 2. w3x2lni packages LNI project files from `maps/` into final `.w3x`
 3. KKWE launches Warcraft III with the compiled map
 

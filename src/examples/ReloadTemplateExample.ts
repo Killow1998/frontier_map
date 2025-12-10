@@ -7,8 +7,6 @@ import { PositionPreset } from '../system/ui/component/Text';
 import { Panel } from "src/system/ui/component/Panel";
 import { runDialogExamples } from "./DialogExample";
 import { Dialog } from "src/system/ui/component/Dialog";
-import { Frame, FRAMEPOINT_CENTER } from "@eiriksgata/wc3ts/*";
-import { FDFButtonExample } from "./FDFButtonExample";
 
 /**
  * 热更新模板
@@ -24,7 +22,7 @@ class ReloadTemplateExample {
   // 使用 HotReloadHelper 自动管理组件
   // ========================================
   private ui = new HotReloadHelper("ReloadTemplate");
-  
+
 
   /**
    * 创建测试按钮
@@ -52,12 +50,12 @@ class ReloadTemplateExample {
     //text.setBackdropPadding(100);
 
 
-    // 创建面板
-    // const panel = Panel.createWithTitle("ReloadTemplate Panel", 300, 200);
-    // panel.setDraggable(true);
-    // //panel.setPosition(600, 300);
-    // panel.setBackground("UI\\Widgets\\ChatFrame\\ChatFrame-Background.blp");
-    // this.ui.register(panel); // 注册面板
+    //创建面板
+    //const panel = Panel.createCentered("SMALL");
+    //panel.setDraggable(true);
+    //panel.setPosition(600, 300);
+    //panel.setBackground("UI\\Widgets\\ChatFrame\\ChatFrame-Background.blp");
+    //this.ui.register(panel); // 注册面板
 
 
     // 直接显示一个简单的对话框进行测试
@@ -66,7 +64,7 @@ class ReloadTemplateExample {
     testDialog.setDraggable(true);
 
     testDialog.addButton({
-      text: "选项 1",
+      text: "选项 12",
       onClick: () => {
         Console.log("点击了选项 1");
       },
@@ -95,8 +93,8 @@ class ReloadTemplateExample {
 
     Console.log("✓ 测试对话框已显示");
 
-    this.ui.register(testDialog); // 注册对话框
-
+    // 注册对话框到热重载管理器
+    this.ui.register(testDialog);
 
 
     Console.log(`Registered ${this.ui.getComponentCount()} components`);

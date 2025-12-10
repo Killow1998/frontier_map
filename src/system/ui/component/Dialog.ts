@@ -682,23 +682,31 @@ export class Dialog implements UIComponent {
    * 销毁对话框
    */
   public destroy(): void {
+    Console.log(`[Dialog] 开始销毁对话框: ${this.titleText}`);
+    
     // 销毁所有按钮
+    Console.log(`[Dialog] 销毁 ${this.buttons.length} 个按钮`);
     this.clearButtons();
     
     // 销毁标题文本
     if (this.titleText) {
+      Console.log(`[Dialog] 销毁标题文本`);
       this.titleText.destroy();
       this.titleText = null;
     }
+
     
     // 清理用户拖拽回调
+    Console.log(`[Dialog] 清理拖拽回调`);
     this.userOnDragStart = null;
     this.userOnDragEnd = null;
     this.userOnDragging = null;
     
     // 销毁面板（会自动销毁所有内部 Frame）
+    Console.log(`[Dialog] 销毁面板`);
     this.panel.destroy();
     
     this.isCreated = false;
+    Console.log(`[Dialog] 对话框销毁完成`);
   }
 }

@@ -58,7 +58,7 @@ export class Panel {
   private pixelY: number;
   private pixelWidth: number;
   private pixelHeight: number;
-  
+
   // 框架
   private backdropFrame: Frame | null = null;
   private titleBarFrame: Frame | null = null;
@@ -67,11 +67,11 @@ export class Panel {
   private closeButtonFrame: Frame | null = null;
   private closeBackdropFrame: Frame | null = null;
   private titleBarHitFrame: Frame | null = null;
-  
+
   // 状态
   private isVisible: boolean = true;
   private isEnabled: boolean = true;
-  
+
   // 外观
   private background: string = PanelBackgrounds.DIALOG;
   private titleBarHeight: number = 30;
@@ -79,10 +79,10 @@ export class Panel {
   private title: string = "";
   private titleColor: string = "FFFFFF";
   private showCloseButton: boolean = false;
-  
+
   private origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT;
   private alpha: number = 255;
-  
+
   // 拖拽相关
   private isDraggable: boolean = false;
   private isDragging: boolean = false;
@@ -92,7 +92,7 @@ export class Panel {
   private dragMouseDownId: number = -1;
   private dragMouseUpId: number = -1;
   private isMouseOverTitleBar: boolean = false;
-  
+
   // 回调
   private onClose: (() => void) | null = null;
   private onDragStart: (() => void) | null = null;
@@ -141,7 +141,7 @@ export class Panel {
     const size = PanelSizes[sizePreset];
     const centerX = (ScreenCoordinates.STANDARD_WIDTH - size.width) / 2;
     const centerY = (ScreenCoordinates.STANDARD_HEIGHT - size.height) / 2;
-    
+
     const panel = new Panel(centerX, centerY, size.width, size.height);
     panel.create(parent);
     return panel;
@@ -203,7 +203,7 @@ export class Panel {
     const bottomY = wc3Pos.y - wc3Height;
 
     // 创建主背景框架
-    this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")!;
+    this.backdropFrame = Frame.createType("PanelBackdrop", parentFrame, 0, "BACKDROP", "")!;
     if (!this.backdropFrame) {
       Console.log("Error: Failed to create panel backdrop frame");
       return;
@@ -237,7 +237,7 @@ export class Panel {
     const closeButtonWC3Size = (closeButtonSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
 
     // 标题栏背景
-    this.titleBarFrame = Frame.createType("BACKDROP", this.backdropFrame!, 0, 'BACKDROP', "")!;
+    this.titleBarFrame = Frame.createType("PanelTitleBar", this.backdropFrame!, 0, "BACKDROP", "")!;
     if (this.titleBarFrame) {
       this.titleBarFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3X, wc3Y)
@@ -250,7 +250,7 @@ export class Panel {
     }
 
     // 标题文本
-    this.titleTextFrame = Frame.createType("TEXT", this.titleBarFrame!, 0, "TEXT", "")!;
+    this.titleTextFrame = Frame.createType("PanelTitleText", this.titleBarFrame!, 0, "TEXT", "")!;
     if (this.titleTextFrame) {
       const textRightX = this.showCloseButton ? wc3X + wc3Width - closeButtonWC3Size - 0.005 : wc3X + wc3Width;
       this.titleTextFrame
@@ -271,7 +271,7 @@ export class Panel {
    */
   private createCloseButton(wc3X: number, wc3Y: number, wc3Size: number): void {
     // 关闭按钮背景
-    this.closeBackdropFrame = Frame.createType("BACKDROP", this.titleBarFrame!, 0, 'BACKDROP', "")!;
+    this.closeBackdropFrame = Frame.createType("PanelCloseBackdrop", this.titleBarFrame!, 0, "BACKDROP", "")!;
     if (this.closeBackdropFrame) {
       this.closeBackdropFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3X, wc3Y)
@@ -280,10 +280,10 @@ export class Panel {
     }
 
     // 关闭按钮点击区域
-    this.closeButtonFrame = Frame.createType("BUTTON", this.closeBackdropFrame, 0, "BUTTON", "")!;
+    this.closeButtonFrame = Frame.createType("PanelCloseButton", this.closeBackdropFrame, 0, "BUTTON", "")!;
     if (this.closeButtonFrame) {
       this.closeButtonFrame.setAllPoints(this.closeBackdropFrame);
-      
+
       // 注册点击事件 (handle, eventType, handler, sync)
       DzFrameSetScriptByCode(this.closeButtonFrame.handle, 1, () => {
         this.close();
@@ -295,12 +295,12 @@ export class Panel {
    * 创建内容区域
    */
   private createContentArea(wc3X: number, wc3Y: number, wc3Width: number, wc3Height: number): void {
-    const titleBarWC3Height = this.showTitleBar 
-      ? (this.titleBarHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT 
+    const titleBarWC3Height = this.showTitleBar
+      ? (this.titleBarHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT
       : 0;
 
     // 内容区域框架（透明，仅作为子组件容器）
-    this.contentFrame = Frame.createType("FRAME", this.backdropFrame!, 0, '', "")!;
+    this.contentFrame = Frame.createType("PanelContent", this.backdropFrame!, 0, "FRAME", "")!;
     if (this.contentFrame) {
       this.contentFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3X, wc3Y - titleBarWC3Height)
@@ -315,10 +315,10 @@ export class Panel {
     if (!this.titleBarFrame) return;
 
     // 使用 BUTTON 类型来接收事件
-    this.titleBarHitFrame = Frame.createType("BUTTON", this.titleBarFrame, 0, "BUTTON", "")!;
+    this.titleBarHitFrame = Frame.createType("PanelTitleBarHit", this.titleBarFrame, 0, "BUTTON", "")!;
     if (this.titleBarHitFrame) {
       this.titleBarHitFrame.setAllPoints(this.titleBarFrame);
-      
+
       // 注册鼠标进入/离开事件 (handle, eventType, handler, sync)
       DzFrameSetScriptByCode(this.titleBarHitFrame.handle, 3, () => {
         this.isMouseOverTitleBar = true;
@@ -480,7 +480,7 @@ export class Panel {
     const wc3Pos = ScreenCoordinates.pixelToWC3(this.pixelX, this.pixelY, this.origin);
     const wc3Width = (this.pixelWidth / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
     const wc3Height = (this.pixelHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
-    
+
     const rightX = wc3Pos.x + wc3Width;
     const bottomY = wc3Pos.y - wc3Height;
 
@@ -503,7 +503,7 @@ export class Panel {
       const closeButtonSize = this.titleBarHeight - 4;
       const closeButtonWC3Size = (closeButtonSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
       const textRightX = this.showCloseButton ? wc3Pos.x + wc3Width - closeButtonWC3Size - 0.005 : wc3Pos.x + wc3Width;
-      
+
       this.titleTextFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x + 0.005, wc3Pos.y - 0.002)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, textRightX, wc3Pos.y - titleBarWC3Height + 0.002);
@@ -511,10 +511,10 @@ export class Panel {
 
     // 更新内容区域位置
     if (this.contentFrame) {
-      const titleBarWC3Height = this.showTitleBar 
-        ? (this.titleBarHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT 
+      const titleBarWC3Height = this.showTitleBar
+        ? (this.titleBarHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT
         : 0;
-      
+
       this.contentFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y - titleBarWC3Height)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3Pos.x + wc3Width, wc3Pos.y - wc3Height);
@@ -526,7 +526,7 @@ export class Panel {
       const closeButtonWC3Size = (closeButtonSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
       const closeButtonX = wc3Pos.x + wc3Width - closeButtonWC3Size - 0.002;
       const closeButtonY = wc3Pos.y - 0.002;
-      
+
       this.closeBackdropFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, closeButtonX, closeButtonY)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, closeButtonX + closeButtonWC3Size, closeButtonY - closeButtonWC3Size);
@@ -599,15 +599,15 @@ export class Panel {
    */
   public setDraggable(draggable: boolean): Panel {
     if (this.isDraggable === draggable) return this;
-    
+
     this.isDraggable = draggable;
-    
+
     if (draggable) {
       this.setupDragEventListeners();
     } else {
       this.cleanupDragEventListeners();
     }
-    
+
     return this;
   }
 
@@ -672,24 +672,24 @@ export class Panel {
    */
   private startDrag(): void {
     if (!this.isDraggable || this.isDragging) return;
-    
+
     this.isDragging = true;
-    
+
     const currentMouseX = this.getMousePixelX();
     const currentMouseY = this.getMousePixelY();
-    
+
     this.dragOffsetX = currentMouseX - this.pixelX;
     this.dragOffsetY = currentMouseY - this.pixelY;
-    
+
     if (this.onDragStart) {
       this.onDragStart();
     }
-    
+
     this.dragTimer = CreateTimer();
     TimerStart(this.dragTimer, 0.01, true, () => {
       this.updateDragPosition();
     });
-    
+
     const mouseEvents = MouseEventManager.getInstance();
     this.dragMouseUpId = mouseEvents.onMouseUp(() => {
       this.endDrag();
@@ -701,15 +701,15 @@ export class Panel {
    */
   private updateDragPosition(): void {
     if (!this.isDragging) return;
-    
+
     const currentMouseX = this.getMousePixelX();
     const currentMouseY = this.getMousePixelY();
-    
+
     const newX = currentMouseX - this.dragOffsetX;
     const newY = currentMouseY - this.dragOffsetY;
-    
+
     this.setPosition(newX, newY);
-    
+
     if (this.onDragging) {
       this.onDragging(newX, newY);
     }
@@ -720,21 +720,21 @@ export class Panel {
    */
   private endDrag(): void {
     if (!this.isDragging) return;
-    
+
     this.isDragging = false;
-    
+
     if (this.dragTimer) {
       PauseTimer(this.dragTimer);
       DestroyTimer(this.dragTimer);
       this.dragTimer = null;
     }
-    
+
     if (this.dragMouseUpId >= 0) {
       const mouseEvents = MouseEventManager.getInstance();
       mouseEvents.off(this.dragMouseUpId);
       this.dragMouseUpId = -1;
     }
-    
+
     if (this.onDragEnd) {
       this.onDragEnd(this.pixelX, this.pixelY);
     }
@@ -745,9 +745,9 @@ export class Panel {
    */
   private setupDragEventListeners(): void {
     if (this.dragMouseDownId >= 0) return;
-    
+
     const mouseEvents = MouseEventManager.getInstance();
-    
+
     this.dragMouseDownId = mouseEvents.onMouseDown(() => {
       // 只有在标题栏上按下才开始拖拽
       if (this.isMouseOverTitleBar && this.isDraggable && !this.isDragging && this.isEnabled) {
@@ -761,17 +761,17 @@ export class Panel {
    */
   private cleanupDragEventListeners(): void {
     const mouseEvents = MouseEventManager.getInstance();
-    
+
     if (this.dragMouseDownId >= 0) {
       mouseEvents.off(this.dragMouseDownId);
       this.dragMouseDownId = -1;
     }
-    
+
     if (this.dragMouseUpId >= 0) {
       mouseEvents.off(this.dragMouseUpId);
       this.dragMouseUpId = -1;
     }
-    
+
     if (this.isDragging) {
       this.endDrag();
     }
@@ -851,7 +851,7 @@ export class Panel {
     if (config.visible !== undefined) this.setVisible(config.visible);
     if (config.enabled !== undefined) this.setEnabled(config.enabled);
     if (config.onClose !== undefined) this.setOnClose(config.onClose);
-    
+
     return this;
   }
 
