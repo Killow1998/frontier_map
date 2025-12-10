@@ -73,14 +73,16 @@ export interface TipsConfig {
  * // 获取 Tips 单例
  * const tips = Tips.getInstance();
  * 
- * // 显示提示
+ * // 显示提示（使用组件的 getComponentInfo 方法）
+ * const button = new Button("技能", 200, 200, 100, 100);
+ * const info = button.getComponentInfo();
  * tips.show({
  *   text: "这是一个强力技能\n冷却时间: 10秒\n魔法消耗: 100",
  *   textColor: "FFD700",
  *   icon: "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp",
  *   position: TipsPosition.AUTO,
  *   animation: TipsAnimation.FADE
- * }, targetFrame);
+ * }, info.x, info.y, info.width, info.height);
  * 
  * // 隐藏提示
  * tips.hide();
@@ -98,7 +100,6 @@ export class Tips {
   private isVisible: boolean = false;
   private isCreated: boolean = false;
   private currentConfig: TipsConfig | null = null;
-  private targetFrame: Frame | null = null;
   private componentWidth: number = 100;  // 目标组件宽度（像素）
   private componentHeight: number = 40;  // 目标组件高度（像素）
 
@@ -119,7 +120,7 @@ export class Tips {
   // 默认配置
   private static readonly DEFAULT_WIDTH = 300;
   private static readonly DEFAULT_MAX_HEIGHT = 400;
-  private static readonly DEFAULT_BACKGROUND = "UI\\Widgets\\ToolTips\\Human\\tooltip-background.blp";
+  private static readonly DEFAULT_BACKGROUND = "UI\\Widgets\\EscMenu\\Human\\editbox-background.blp";
   private static readonly DEFAULT_TEXT_COLOR = "FFFFFF";
   private static readonly DEFAULT_DELAY_SHOW = 0.3; // 秒
   private static readonly DEFAULT_DELAY_HIDE = 0.1; // 秒
@@ -209,17 +210,27 @@ export class Tips {
   }
 
   /**
+   * 从组件信息显示 Tips（推荐使用 Button.getComponentInfo()）
+   * @param config Tips 配置
+   * @param componentInfo 组件信息对象 { frame, x, y, width, height }
+   */
+  public showFromComponentInfo(
+    config: TipsConfig,
+    componentInfo: { frame?: Frame | null; x: number; y: number; width: number; height: number }
+  ): void {
+    this.show(config, componentInfo.x, componentInfo.y, componentInfo.width, componentInfo.height);
+  }
+
+  /**
    * 显示 Tips
    * @param config Tips 配置
-   * @param targetFrame 目标 Frame（用于定位）
-   * @param targetPixelX 目标像素 X 坐标（如果没有 targetFrame）
-   * @param targetPixelY 目标像素 Y 坐标（如果没有 targetFrame）
+   * @param targetPixelX 目标像素 X 坐标
+   * @param targetPixelY 目标像素 Y 坐标
    * @param componentWidth 目标组件宽度（像素）
    * @param componentHeight 目标组件高度（像素）
    */
   public show(
     config: TipsConfig,
-    targetFrame?: Frame,
     targetPixelX?: number,
     targetPixelY?: number,
     componentWidth: number = 100,
@@ -240,21 +251,20 @@ export class Tips {
 
     // 保存配置和目标
     this.currentConfig = config;
-    this.targetFrame = targetFrame || null;
     this.componentWidth = componentWidth;
     this.componentHeight = componentHeight;
 
     // 设置延迟显示
     const delayShow = config.delayShow ?? Tips.DEFAULT_DELAY_SHOW;
-    
+
     if (delayShow > 0) {
       const timer = CreateTimer();
       this.showTimer = timer;
       TimerStart(timer, delayShow, false, () => {
-        this.doShow(config, targetFrame, targetPixelX, targetPixelY);
+        this.doShow(config, targetPixelX, targetPixelY);
       });
     } else {
-      this.doShow(config, targetFrame, targetPixelX, targetPixelY);
+      this.doShow(config, targetPixelX, targetPixelY);
     }
   }
 
@@ -263,7 +273,6 @@ export class Tips {
    */
   private doShow(
     config: TipsConfig,
-    targetFrame?: Frame,
     targetPixelX?: number,
     targetPixelY?: number
   ): void {
@@ -273,8 +282,8 @@ export class Tips {
     this.updateContent(config);
 
     // 计算位置
-    const position = this.calculatePosition(config, targetFrame, targetPixelX, targetPixelY);
-    
+    const position = this.calculatePosition(config, targetPixelX, targetPixelY);
+
     // 设置位置
     this.backdropFrame.setAbsPoint(FRAMEPOINT_TOPLEFT, position.x, position.y);
 
@@ -318,7 +327,6 @@ export class Tips {
 
     this.isVisible = false;
     this.currentConfig = null;
-    this.targetFrame = null;
   }
 
   /**
@@ -341,26 +349,45 @@ export class Tips {
     // 设置图标（如果有）
     if (config.icon && this.iconFrame) {
       const iconSize = 32; // 像素
+      const iconPadding = 8; // 图标与文字之间的间距（像素）
+      const leftPadding = 8; // 左侧内边距（像素）
+      const topPadding = 8; // 顶部内边距（像素）
+
       const wc3IconSize = (iconSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
-      
+      const wc3IconPadding = (iconPadding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+      const wc3LeftPadding = (leftPadding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+      const wc3TopPadding = (topPadding / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+
+      // 图标定位：左上角，带内边距
       this.iconFrame
         .setSize(wc3IconSize, wc3IconSize)
         .setTexture(config.icon, 0, true)
+        .clearPoints()
+        .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, wc3LeftPadding, -wc3TopPadding)
         .setAlpha(0); // 初始透明，动画中会设置
 
-      // 文本需要为图标留出空间
+      // 文本需要为图标留出空间：图标宽度 + 左边距 + 图标间距
+      const textLeftOffset = wc3LeftPadding + wc3IconSize + wc3IconPadding;
+      const wc3RightPadding = (8 / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+
       this.textFrame
-        .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, 0.005 + wc3IconSize + 0.002, -0.005)
-        .setPoint(FRAMEPOINT_BOTTOMRIGHT, this.backdropFrame, FRAMEPOINT_BOTTOMRIGHT, -0.005, 0.005);
+        .clearPoints()
+        .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, textLeftOffset, -wc3TopPadding)
+        .setPoint(FRAMEPOINT_BOTTOMRIGHT, this.backdropFrame, FRAMEPOINT_BOTTOMRIGHT, -wc3RightPadding, wc3TopPadding);
     } else {
-      // 没有图标，文本占满整个区域
+      // 没有图标，文本占满整个区域（带内边距）
       if (this.iconFrame) {
         this.iconFrame.setAlpha(0);
       }
-      
+
+      const padding = 8; // 像素
+      const wc3Padding = (padding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+      const wc3PaddingY = (padding / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+
       this.textFrame
-        .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, 0.005, -0.005)
-        .setPoint(FRAMEPOINT_BOTTOMRIGHT, this.backdropFrame, FRAMEPOINT_BOTTOMRIGHT, -0.005, 0.005);
+        .clearPoints()
+        .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, wc3Padding, -wc3PaddingY)
+        .setPoint(FRAMEPOINT_BOTTOMRIGHT, this.backdropFrame, FRAMEPOINT_BOTTOMRIGHT, -wc3Padding, wc3PaddingY);
     }
 
     // 设置文本
@@ -373,7 +400,6 @@ export class Tips {
    */
   private calculatePosition(
     config: TipsConfig,
-    targetFrame?: Frame,
     targetPixelX?: number,
     targetPixelY?: number
   ): { x: number; y: number } {
@@ -381,14 +407,7 @@ export class Tips {
     let pixelX: number;
     let pixelY: number;
 
-    if (targetFrame) {
-      // 如果传入了 targetFrame，说明调用方期望从 Frame 获取位置
-      // 但由于 WC3 API 限制，建议直接传递像素坐标
-      // 这里使用默认屏幕中心，调用方应该使用 getComponentInfo() 获取准确坐标
-      Console.warn("[Tips] targetFrame is provided but position extraction from Frame is not fully supported. Please use pixel coordinates instead.");
-      pixelX = ScreenCoordinates.STANDARD_WIDTH / 2;
-      pixelY = ScreenCoordinates.STANDARD_HEIGHT / 2;
-    } else if (targetPixelX !== undefined && targetPixelY !== undefined) {
+    if (targetPixelX !== undefined && targetPixelY !== undefined) {
       pixelX = targetPixelX;
       pixelY = targetPixelY;
     } else {
@@ -404,7 +423,7 @@ export class Tips {
 
     // 确定显示位置
     let position = config.position ?? TipsPosition.AUTO;
-    
+
     if (position === TipsPosition.AUTO) {
       // 自动检测最佳位置
       position = this.detectBestPosition(pixelX, pixelY, tipsWidth, tipsHeight, offset);
@@ -491,7 +510,7 @@ export class Tips {
 
     // 根据位置选择最佳方向
     // 优先级：远离边缘的方向
-    
+
     // 右上角 -> 优先左侧或下方
     if (isRight && isTop) {
       if (spaceLeft >= tipsWidth) {
@@ -500,7 +519,7 @@ export class Tips {
         return TipsPosition.BOTTOM;
       }
     }
-    
+
     // 右下角 -> 优先左侧或上方
     if (isRight && isBottom) {
       if (spaceLeft >= tipsWidth) {
@@ -509,7 +528,7 @@ export class Tips {
         return TipsPosition.TOP;
       }
     }
-    
+
     // 左上角 -> 优先右侧或下方
     if (isLeft && isTop) {
       if (spaceRight >= tipsWidth) {
@@ -518,7 +537,7 @@ export class Tips {
         return TipsPosition.BOTTOM;
       }
     }
-    
+
     // 左下角 -> 优先右侧或上方
     if (isLeft && isBottom) {
       if (spaceRight >= tipsWidth) {
@@ -628,13 +647,13 @@ export class Tips {
         // 动画完成
         this.animationProgress = 1.0;
         this.setAlpha(this.targetAlpha);
-        
+
         // 确保位置回到目标位置
         if (this.backdropFrame && animation !== TipsAnimation.FADE) {
           this.backdropFrame.clearPoints();
           this.backdropFrame.setAbsPoint(FRAMEPOINT_TOPLEFT, targetX, targetY);
         }
-        
+
         if (this.animationTimer) {
           DestroyTimer(this.animationTimer as any);
           this.animationTimer = null;
@@ -644,7 +663,7 @@ export class Tips {
 
       // 计算缓动进度（easeOutCubic）
       const eased = 1 - Math.pow(1 - this.animationProgress, 3);
-      
+
       // 更新透明度
       const alpha = this.currentAlpha + (this.targetAlpha - this.currentAlpha) * eased;
       this.setAlpha(Math.floor(alpha));
@@ -653,7 +672,7 @@ export class Tips {
       if (animation !== TipsAnimation.FADE && this.backdropFrame) {
         const currentOffsetX = startOffsetX * (1 - eased);
         const currentOffsetY = startOffsetY * (1 - eased);
-        
+
         this.backdropFrame.clearPoints();
         this.backdropFrame.setAbsPoint(
           FRAMEPOINT_TOPLEFT,
@@ -674,7 +693,8 @@ export class Tips {
     if (this.textFrame) {
       this.textFrame.setAlpha(alpha);
     }
-    if (this.iconFrame) {
+    // 只在有图标配置时才设置图标透明度
+    if (this.iconFrame && this.currentConfig?.icon) {
       this.iconFrame.setAlpha(alpha);
     }
   }

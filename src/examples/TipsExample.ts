@@ -11,24 +11,24 @@ export function runTipsExamples(): void {
   // 获取 Tips 单例
   const tips = Tips.getInstance();
 
-  // 示例 1: 创建一个按钮，鼠标悬停显示技能提示（使用 getComponentInfo）
+  // 示例 1: 使用 getComponentInfo()（推荐方式）
   const skillButton = new Button("技能按钮", 200, 200, 100, 40);
   skillButton.create();
   skillButton.setText("火焰之球");
-  
+
   skillButton.setOnHover(() => {
-    Console.log("显示技能提示");
+    Console.log("显示技能提示 - 使用 getComponentInfo");
     const info = skillButton.getComponentInfo();
-    tips.show({
+    tips.showFromComponentInfo({
       text: "火焰之球\n\n向目标发射一颗火球\n造成 150 点火焰伤害\n\n冷却时间: 10 秒\n魔法消耗: 100",
       textColor: "FFD700", // 金色
-      //icon: "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp",
       width: 320,
       maxHeight: 200,
       position: TipsPosition.AUTO,
       animation: TipsAnimation.SLIDE_RIGHT,
       delayShow: 0.3 // 悬停 0.3 秒后显示
-    }, undefined, info.x, info.y, info.width, info.height);
+    }, info);
   });
 
   skillButton.setOnLeave(() => {
@@ -37,21 +37,23 @@ export function runTipsExamples(): void {
   });
 
   // 示例 2: 创建物品按钮
+  // 示例 2: 直接传入 Frame（简化方式）
   const itemButton = new Button("物品按钮", 200, 260, 100, 40);
   itemButton.create();
   itemButton.setText("力量之冠");
-  
+
   itemButton.setOnHover(() => {
-    Console.log("显示物品提示");
+    Console.log("显示物品提示 - 直接使用 Frame");
+    const info = itemButton.getComponentInfo();
     tips.show({
       text: "力量之冠\n\n+15 力量\n+8 护甲\n+200 生命值\n\n稀有度: 史诗\n\n一顶蕴含强大力量的王冠",
       textColor: "A335EE", // 紫色（史诗）
-      //icon: "ReplaceableTextures\\CommandButtons\\BTNCrown.blp",
+      icon: "ReplaceableTextures\\CommandButtons\\BTNCrown.blp",
       width: 300,
-      position: TipsPosition.RIGHT,
-      animation: TipsAnimation.FADE,
+      position: TipsPosition.AUTO,
+      animation: TipsAnimation.SLIDE_RIGHT,
       delayShow: 0.4
-    }, undefined, 200, 260, 100, 100);
+    }, info.x, info.y, info.width, info.height);
   });
 
   itemButton.setOnLeave(() => {
@@ -62,7 +64,7 @@ export function runTipsExamples(): void {
   const infoButton = new Button("信息按钮", 200, 420, 100, 40);
   infoButton.create();
   infoButton.setText("帮助");
-  
+
   infoButton.setOnHover(() => {
     Console.log("显示帮助提示");
     const info = infoButton.getComponentInfo();
@@ -73,7 +75,7 @@ export function runTipsExamples(): void {
       position: TipsPosition.AUTO,
       animation: TipsAnimation.SLIDE_RIGHT,
       delayShow: 0.2
-    }, undefined, info.x, info.y, info.width, info.height);
+    }, info.x, info.y, info.width, info.height);
   });
 
   infoButton.setOnLeave(() => {
@@ -92,7 +94,7 @@ export function runTipsExamples(): void {
     const btn = new Button(`位置测试${index}`, item.x, item.y, 80, 30);
     btn.create();
     btn.setText(item.name);
-    
+
     btn.setOnHover(() => {
       const info = btn.getComponentInfo();
       tips.show({
@@ -102,7 +104,7 @@ export function runTipsExamples(): void {
         position: item.pos,
         animation: item.anim,
         delayShow: 0.2
-      }, undefined, info.x, info.y, info.width, info.height);
+      }, info.x, info.y, info.width, info.height);
     });
 
     btn.setOnLeave(() => {
@@ -155,7 +157,7 @@ export function runTipsExamples(): void {
     const skillBtn = new Button(`技能${index}`, 100 + index * 110, 900, 100, 100);
     skillBtn.create();
     skillBtn.setBackground(skill.icon);
-    
+
     skillBtn.setOnHover(() => {
       let text = `${skill.name}\n\n${skill.description}\n\n`;
       if (skill.damage > 0) {
@@ -175,7 +177,7 @@ export function runTipsExamples(): void {
         position: TipsPosition.AUTO,
         animation: TipsAnimation.SLIDE_TOP,
         delayShow: 0.4
-      }, undefined, info.x, info.y, info.width, info.height);
+      }, info.x, info.y, info.width, info.height);
     });
 
     skillBtn.setOnLeave(() => {
