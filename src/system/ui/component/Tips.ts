@@ -246,13 +246,19 @@ export class Tips {
       }
     }
 
-    // 取消之前的定时器
+    // 取消之前的定时器和动画（立即停止任何进行中的动画）
     this.cancelTimers();
 
     // 保存配置和目标
     this.currentConfig = config;
     this.componentWidth = componentWidth;
     this.componentHeight = componentHeight;
+
+    // 如果已经可见，直接更新内容，不重新播放动画（避免抖动）
+    if (this.isVisible) {
+      this.doShow(config, targetPixelX, targetPixelY);
+      return;
+    }
 
     // 设置延迟显示
     const delayShow = config.delayShow ?? Tips.DEFAULT_DELAY_SHOW;
@@ -287,6 +293,13 @@ export class Tips {
     // 设置位置
     this.backdropFrame.setAbsPoint(FRAMEPOINT_TOPLEFT, position.x, position.y);
 
+    // 如果已经可见，只更新内容和位置，不重新播放动画
+    if (this.isVisible && this.currentAlpha >= 200) {
+      // 确保完全可见
+      this.setAlpha(255);
+      return;
+    }
+
     // 执行动画
     const animation = config.animation ?? TipsAnimation.FADE;
     this.playAnimation(animation, true);
@@ -298,10 +311,13 @@ export class Tips {
    * 隐藏 Tips
    */
   public hide(): void {
-    if (!this.isVisible || !this.isCreated) return;
+    if (!this.isCreated) return;
 
-    // 取消定时器
+    // 取消所有定时器（包括延迟显示）
     this.cancelTimers();
+
+    // 如果当前不可见或已经在隐藏中，直接返回
+    if (!this.isVisible) return;
 
     const delayHide = this.currentConfig?.delayHide ?? Tips.DEFAULT_DELAY_HIDE;
 
