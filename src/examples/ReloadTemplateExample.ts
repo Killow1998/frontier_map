@@ -3,6 +3,10 @@ import { ModuleManager } from "../system/ModuleManager";
 import { Console } from "../system/console";
 import { HotReloadHelper } from "src/system/ui/UIComponent";
 import { Dialog } from "src/system/ui/component/Dialog";
+import { DamageTextExample } from "./DamageTextExample";
+import { Actor } from "src/system/actor";
+import { Players } from "@eiriksgata/wc3ts/*";
+import { FourCC } from "src/utils/helper";
 
 /**
  * 热更新模板
@@ -54,42 +58,46 @@ class ReloadTemplateExample {
     //this.ui.register(panel); // 注册面板
 
 
-    // 直接显示一个简单的对话框进行测试
-    const testDialog = new Dialog("测试对话框", 500, 600);
-    testDialog.create();
-    testDialog.setDraggable(true);
+    // // 直接显示一个简单的对话框进行测试
+    // const testDialog = new Dialog("测试对话框", 500, 600);
+    // testDialog.create();
+    // testDialog.setDraggable(true);
 
-    testDialog.addButton({
-      text: "选项 12",
-      onClick: () => {
-        Console.log("点击了选项 1");
-      },
-      color: TextColors.GREEN
-    });
+    // testDialog.addButton({
+    //   text: "选项 12",
+    //   onClick: () => {
+    //     Console.log("点击了选项 1");
+    //   },
+    //   color: TextColors.GREEN
+    // });
 
-    testDialog.addButton({
-      text: "选项 2",
-      onClick: () => {
-        Console.log("点击了选项 2");
-      },
-      color: TextColors.YELLOW
-    });
+    // testDialog.addButton({
+    //   text: "选项 2",
+    //   onClick: () => {
+    //     Console.log("点击了选项 2");
+    //   },
+    //   color: TextColors.YELLOW
+    // });
 
-    testDialog.addButton({
-      text: "关闭",
-      onClick: () => {
-        Console.log("关闭对话框");
-        testDialog.hide();
-      },
-      color: TextColors.RED
-    });
+    // testDialog.addButton({
+    //   text: "关闭",
+    //   onClick: () => {
+    //     Console.log("关闭对话框");
+    //     testDialog.hide();
+    //   },
+    //   color: TextColors.RED
+    // });
 
-    // 显示对话框
-    testDialog.show();
+    // // 显示对话框
+    // testDialog.show();
 
-    // 注册对话框到热重载管理器
-    this.ui.register(testDialog);
+    // // 注册对话框到热重载管理器
+    // this.ui.register(testDialog);
 
+    //创建圣骑士单位
+    const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
+    actor?.createBloodBar();
+    typeof DamageTextExample;
 
     Console.log(`Registered ${this.ui.getComponentCount()} components`);
   }

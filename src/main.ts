@@ -21,6 +21,8 @@ async function main(): Promise<void> {
   // 确保所有UI模块被加载（这样它们的注册代码会被执行）
   // 只是引用一下类，确保模块被加载
 
+  //移动镜头到0,0位置
+  PanCameraToTimed(0, 0, 0);
   Timer.create().start(2, false, () => {
     print("Loading UI modules:", typeof ReloadTemplateExample);
   });
