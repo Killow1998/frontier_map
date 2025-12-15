@@ -249,8 +249,8 @@ class DamageText {
     const screenPos = worldToScreen(this.worldX, this.height, this.worldY);
 
     // 调试输出
-    print(`[DamageText] 世界坐标: X=${this.worldX}, Y=${this.worldY}, H=${this.height}`);
-    print(`[DamageText] 屏幕坐标: screenX=${screenPos.screenX}, screenY=${screenPos.screenY}, z=${screenPos.z}`);
+    // print(`[DamageText] 世界坐标: X=${this.worldX}, Y=${this.worldY}, H=${this.height}`);
+    // print(`[DamageText] 屏幕坐标: screenX=${screenPos.screenX}, screenY=${screenPos.screenY}, z=${screenPos.z}`);
 
     // 应用偏移（像素转 WC3 屏幕坐标）
     // WC3 屏幕坐标范围是 0.8 x 0.6，而不是 1.0 x 1.0
@@ -260,7 +260,7 @@ class DamageText {
     const finalX = screenPos.screenX + offsetXScreen;
     const finalY = screenPos.screenY + offsetYScreen;
 
-    print(`[DamageText] 最终坐标: finalX=${finalX}, finalY=${finalY}`);
+    // print(`[DamageText] 最终坐标: finalX=${finalX}, finalY=${finalY}`);
 
     // 检测是否在屏幕外
     if (this.isOffScreen(finalX, finalY)) {
