@@ -1,2 +1,0 @@
-UI\fdf\EricButtom.fdf
-UI\fdf\FrameTemplate.fdf

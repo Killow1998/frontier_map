@@ -39,7 +39,7 @@ export function initialize(): void {
 
   //载入TOC fdf样式模板Frame
   try {
-    Frame.loadTOC("UI\\fdf\\path.toc");
+    Frame.loadTOC("resource\\fdf\\path.toc");
     Console.log("FDF TOC loaded successfully");
   } catch (e) {
     print(`Error loading FDF TOC: ${e}`);

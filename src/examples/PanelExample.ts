@@ -1,11 +1,12 @@
 /** @noSelfInFile */
 
-import { Panel, PanelBackgrounds } from "../system/ui/component/Panel";
+import { Panel } from "../system/ui/component/Panel";
 import { Button } from "../system/ui/component/Button";
 import { Text, TextColors } from "../system/ui/component/Text";
 import { Console } from "../system/console";
 import { ModuleManager } from "../system/ModuleManager";
 import { HotReloadHelper } from "../system/ui/UIComponent";
+import { UIBackgrounds } from "src/constants/ui/preset";
 
 /**
  * Panel 组件使用示例（支持热重载）
@@ -50,9 +51,9 @@ class PanelExample {
     Console.log(`✓ Registered ${this.ui.getComponentCount()} components for hot reload`);
   }
 
-/**
-   * 示例 1: 基本面板创建
-   */
+  /**
+     * 示例 1: 基本面板创建
+     */
   private example1_BasicPanel(): void {
     Console.log("\n--- Example 1: Basic Panel ---");
 
@@ -67,16 +68,16 @@ class PanelExample {
 
     // 设置背景和透明度
     panel
-      .setBackground(PanelBackgrounds.DIALOG)
+      .setBackground(UIBackgrounds.DIALOG)
       .setAlpha(200);
 
     this.ui.register(panel);  // 注册到热重载管理
     Console.log("✓ 创建了基本面板");
   }
 
-/**
-   * 示例 2: 带标题栏的面板
-   */
+  /**
+     * 示例 2: 带标题栏的面板
+     */
   private example2_PanelWithTitle(): void {
     Console.log("\n--- Example 2: Panel with Title ---");
 
@@ -102,9 +103,9 @@ class PanelExample {
     Console.log("✓ 创建了带标题栏的面板");
   }
 
-/**
-   * 示例 3: 可拖拽的面板
-   */
+  /**
+     * 示例 3: 可拖拽的面板
+     */
   private example3_DraggablePanel(): void {
     Console.log("\n--- Example 3: Draggable Panel ---");
 
@@ -137,9 +138,9 @@ class PanelExample {
     Console.log("  提示: 拖动标题栏可以移动面板");
   }
 
-/**
-   * 示例 4: 在面板中添加子组件
-   */
+  /**
+     * 示例 4: 在面板中添加子组件
+     */
   private example4_PanelWithChildren(): void {
     Console.log("\n--- Example 4: Panel with Children ---");
 
@@ -154,13 +155,13 @@ class PanelExample {
 
     panel
       .setShowCloseButton(true)
-      .setBackground(PanelBackgrounds.QUEST)
+      .setBackground(UIBackgrounds.QUEST)
       .setAlpha(220);
 
     // 获取内容区域的位置和大小
     const contentPos = panel.getContentPosition();
     const contentSize = panel.getContentSize();
-    
+
     Console.log(`内容区域: (${contentPos.x}, ${contentPos.y}), ${contentSize.width}x${contentSize.height}`);
 
     // 在面板内容区域添加文本
@@ -236,9 +237,9 @@ class PanelExample {
     Console.log("✓ 创建了包含子组件的面板");
   }
 
-/**
-   * 示例 5: 使用预设创建面板
-   */
+  /**
+     * 示例 5: 使用预设创建面板
+     */
   private example5_PanelPresets(): void {
     Console.log("\n--- Example 5: Panel Presets ---");
 
@@ -249,13 +250,13 @@ class PanelExample {
       "SMALL"  // 小面板预设
     );
     smallPanel
-      .setBackground(PanelBackgrounds.BLACK_TRANSPARENT)
+      .setBackground(UIBackgrounds.BLACK_TRANSPARENT)
       .setAlpha(200);
 
     // 创建居中的大面板
     const centerPanel = Panel.createCentered("LARGE");
     centerPanel
-      .setBackground(PanelBackgrounds.ESC_MENU)
+      .setBackground(UIBackgrounds.ESC_MENU)
       .setAlpha(230)
       .hide();  // 先隐藏
 
@@ -279,9 +280,9 @@ class PanelExample {
     Console.log("  TALL: 300x500");
   }
 
-/**
-   * 示例 6: 完整配置的面板
-   */
+  /**
+     * 示例 6: 完整配置的面板
+     */
   private example6_FullyConfiguredPanel(): void {
     Console.log("\n--- Example 6: Fully Configured Panel ---");
 
@@ -294,7 +295,7 @@ class PanelExample {
       titleColor: TextColors.CYAN,
       showTitleBar: true,
       showCloseButton: true,
-      background: PanelBackgrounds.DIALOG,
+      background: UIBackgrounds.DIALOG,
       alpha: 240,
       draggable: true,
       visible: true,
@@ -379,10 +380,10 @@ class PanelExample {
    */
   public cleanup(): void {
     Console.log("PanelExample: Cleanup called...");
-    
+
     // 一行代码销毁所有已注册的组件！
     this.ui.cleanup();
-    
+
     Console.log("PanelExample: All resources cleaned up");
   }
 
@@ -447,13 +448,13 @@ export function quickStartPanel(): void {
   // 方式 1: 最简单的面板
   const simplePanel = new Panel(100, 100, 300, 200);
   simplePanel.create();
-  
+
   // 方式 2: 带标题的面板
   const _titlePanel = Panel.createWithTitle("我的面板", 500, 100, 300, 200);
-  
+
   // 方式 3: 可拖拽的面板
   const _dragPanel = Panel.createDraggable("可拖拽", 100, 400, 300, 200);
-  
+
   // 方式 4: 居中显示的面板
   const _centerPanel = Panel.createCentered("MEDIUM");
 

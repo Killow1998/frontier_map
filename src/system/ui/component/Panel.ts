@@ -2,34 +2,7 @@ import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from "@eiriksga
 import { ScreenCoordinates } from "../ScreenCoordinates";
 import { Console } from "src/system/console";
 import { MouseEventManager, MouseButton } from "src/system/event/MouseEvent";
-
-/**
- * 面板背景纹理预设
- */
-export const PanelBackgrounds = {
-  /** 无背景（透明） */
-  NONE: "",
-  /** 黑色半透明 */
-  BLACK_TRANSPARENT: "UI\\Widgets\\EscMenu\\Human\\editbox-background.blp",
-  /** 工具提示背景 */
-  TOOLTIP: "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp",
-  /** 对话框背景 */
-  DIALOG: "UI\\Widgets\\Glues\\GlueScreen-DialogBackground.blp",
-  /** 任务背景 */
-  QUEST: "UI\\Widgets\\Quests\\QuestMainBackdrop.blp",
-  /** 人族边框 */
-  HUMAN_BORDER: "UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp",
-  /** 人族背景 */
-  HUMAN_BACKGROUND: "UI\\Widgets\\Console\\Human\\human-transport-slot.blp",
-  /** 兽族背景 */
-  ORC_BACKGROUND: "UI\\Widgets\\Console\\Orc\\orc-transport-slot.blp",
-  /** 暗夜精灵背景 */
-  NIGHTELF_BACKGROUND: "UI\\Widgets\\Console\\NightElf\\nightelf-transport-slot.blp",
-  /** 不死族背景 */
-  UNDEAD_BACKGROUND: "UI\\Widgets\\Console\\Undead\\undead-transport-slot.blp",
-  /** ESC菜单背景 */
-  ESC_MENU: "UI\\Widgets\\EscMenu\\Human\\human-options-menu-background.blp",
-} as const;
+import { UIBackgrounds } from "src/constants/ui/preset";
 
 /**
  * 面板尺寸预设
@@ -73,7 +46,7 @@ export class Panel {
   private isEnabled: boolean = true;
 
   // 外观
-  private background: string = PanelBackgrounds.DIALOG;
+  private background: string = UIBackgrounds.BLACK_TRANSPARENT;
   private titleBarHeight: number = 30;
   private showTitleBar: boolean = false;
   private title: string = "";
@@ -242,7 +215,7 @@ export class Panel {
       this.titleBarFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3X, wc3Y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3X + wc3Width, wc3Y - titleBarWC3Height)
-        .setTexture(PanelBackgrounds.BLACK_TRANSPARENT, 0, true)
+        .setTexture(UIBackgrounds.SHUIMO_STYLE_PANEL_TITLE_BACKGROUND, 0, true)
         .setAlpha(200);
 
       // 注册标题栏的鼠标事件（用于拖拽检测）
@@ -276,7 +249,7 @@ export class Panel {
       this.closeBackdropFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3X, wc3Y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3X + wc3Size, wc3Y - wc3Size)
-        .setTexture("UI\\Widgets\\EscMenu\\Human\\human-options-button-close.blp", 0, true);
+        .setTexture(UIBackgrounds.SHUIMO_STYLE_CLOSE_BUTTON_BACKGROUND, 0, true);
     }
 
     // 关闭按钮点击区域
@@ -420,8 +393,8 @@ export class Panel {
   /**
    * 使用预设背景
    */
-  public setBackgroundPreset(preset: keyof typeof PanelBackgrounds): Panel {
-    return this.setBackground(PanelBackgrounds[preset]);
+  public setBackgroundPreset(preset: keyof typeof UIBackgrounds): Panel {
+    return this.setBackground(UIBackgrounds[preset]);
   }
 
   /**

@@ -4,6 +4,7 @@ import { Button } from "./Button";
 import { Text, TextColors } from "./Text";
 import { Console } from "src/system/console";
 import { UIComponent } from "src/system/ui/UIComponent";
+import { UIBackgrounds } from "src/constants/ui/preset";
 
 /**
  * 对话框按钮配置
@@ -37,7 +38,7 @@ export interface DialogButtonConfig {
  * dialog.addButton({
  *   text: "简单",
  *   onClick: () => {
- *     Console.log("选择了简单难度");
+ *     print("选择了简单难度");
  *     dialog.hide();
  *   }
  * });
@@ -45,7 +46,7 @@ export interface DialogButtonConfig {
  * dialog.addButton({
  *   text: "困难",
  *   onClick: () => {
- *     Console.log("选择了困难难度");
+ *     print("选择了困难难度");
  *     dialog.hide();
  *   }
  * });
@@ -58,7 +59,7 @@ export class Dialog implements UIComponent {
   private panel: Panel;
   private titleText: Text | null = null;
   private buttons: Button[] = [];
-  
+
   private title: string;
   private dialogWidth: number;
   private dialogHeight: number;
@@ -66,9 +67,9 @@ export class Dialog implements UIComponent {
   private buttonSpacing: number = 65;
   private buttonHeight: number = 50;
   private buttonWidthRatio: number = 0.8; // 按钮宽度占对话框宽度的比例
-  
+
   private isCreated: boolean = false;
-  
+
   // 用户自定义的拖拽回调
   private userOnDragStart: (() => void) | null = null;
   private userOnDragEnd: ((x: number, y: number) => void) | null = null;
@@ -82,11 +83,11 @@ export class Dialog implements UIComponent {
     this.title = title;
     this.dialogWidth = width;
     this.dialogHeight = height;
-    
+
     // 创建居中的面板
     const centerX = (1920 - width) / 2;
     const centerY = (1080 - height) / 2;
-    
+
     this.panel = new Panel(centerX, centerY, width, height);
   }
 
@@ -127,11 +128,11 @@ export class Dialog implements UIComponent {
   ): Dialog {
     const dialog = new Dialog(title, 400, 250);
     dialog.create(parent);
-    
+
     // 添加消息文本
     const contentPos = dialog.getContentPosition();
     const contentSize = dialog.getContentSize();
-    
+
     const messageText = new Text(
       message,
       contentPos.x + 30,
@@ -144,7 +145,7 @@ export class Dialog implements UIComponent {
       .setColor(TextColors.WHITE)
       .setAlignment(50, 50) // 居中
       .setFontSizePixels(14);
-    
+
     // 添加按钮
     dialog.addButton({
       text: "是",
@@ -154,7 +155,7 @@ export class Dialog implements UIComponent {
       },
       color: TextColors.GREEN
     });
-    
+
     dialog.addButton({
       text: "否",
       onClick: () => {
@@ -163,7 +164,7 @@ export class Dialog implements UIComponent {
       },
       color: TextColors.RED
     });
-    
+
     return dialog;
   }
 
@@ -183,7 +184,7 @@ export class Dialog implements UIComponent {
     const height = Math.min(300 + options.length * 50, 700);
     const dialog = new Dialog(title, 450, height);
     dialog.create(parent);
-    
+
     options.forEach((option, index) => {
       dialog.addButton({
         text: option,
@@ -193,7 +194,7 @@ export class Dialog implements UIComponent {
         }
       });
     });
-    
+
     return dialog;
   }
 
@@ -201,17 +202,16 @@ export class Dialog implements UIComponent {
 
   public create(parent?: Frame): void {
     if (this.isCreated) {
-      Console.log("Dialog already created");
       return;
     }
 
     // 在创建前配置面板（标题栏需要在 create() 时就知道要显示）
     this.panel
       .setTitle(this.title)
-      .setTitleColor(TextColors.GOLD)
+      .setTitleColor(TextColors.BLACK)
       .setShowTitleBar(true)
       .setShowCloseButton(true)
-      .setBackground("UI\\Widgets\\EscMenu\\Human\\editbox-background.blp")
+      .setBackground(UIBackgrounds.SHUIMO_STYLE_PANEL_BACKGROUND)
       .setAlpha(240)
       .setOnClose(() => {
         this.hide();
@@ -222,7 +222,7 @@ export class Dialog implements UIComponent {
 
     this.isCreated = true;
 
-    Console.log("Dialog \"" + this.title + "\" created with size " + this.dialogWidth + "x" + this.dialogHeight);
+
   }
 
   // ==================== 按钮管理 ====================
@@ -233,21 +233,21 @@ export class Dialog implements UIComponent {
    */
   public addButton(config: DialogButtonConfig): Button {
     if (!this.isCreated) {
-      Console.log("Error: Dialog not created yet. Call create() first.");
+      print("Error: Dialog not created yet. Call create() first.");
       throw new Error("Dialog not created");
     }
 
     const buttonIndex = this.buttons.length;
-    
+
     // 获取内容区域的绝对位置
     const contentPos = this.panel.getContentPosition();
-    
+
     // 计算按钮位置（使用绝对屏幕坐标）
     const buttonWidth = this.dialogWidth * this.buttonWidthRatio;
     const buttonX = contentPos.x + (this.dialogWidth - buttonWidth) / 2;
     const buttonY = contentPos.y + this.buttonStartY + buttonIndex * this.buttonSpacing;
 
-    Console.log("Creating button at absolute position: x=" + buttonX + ", y=" + buttonY + ", width=" + buttonWidth);
+    print("Creating button at absolute position: x=" + buttonX + ", y=" + buttonY + ", width=" + buttonWidth);
 
     // 使用 FDF 模板创建按钮（使用绝对坐标）
     const button = Button.createWithTemplatePreset(
@@ -258,30 +258,30 @@ export class Dialog implements UIComponent {
       this.buttonHeight,
       'NORMAL_UP'  // 使用 normal_button_up 模板
     );
-    
+
     // 配置按钮
     button.centerText();
-    
+
     if (config.color) {
       button.setTextColor(config.color);
     }
-    
+
     if (config.onClick) {
       button.setOnClick(config.onClick);
     }
-    
+
     if (config.onHover) {
       button.setOnHover(config.onHover);
     }
-    
+
     if (config.onLeave) {
       button.setOnLeave(config.onLeave);
     }
-    
+
     if (config.enabled !== undefined) {
       button.setEnabled(config.enabled);
     }
-    
+
     // 添加悬停效果
     button.addHoverEffect(200, 255);
 
@@ -324,7 +324,7 @@ export class Dialog implements UIComponent {
     if (button) {
       button.destroy();
       this.buttons.splice(index, 1);
-      
+
       // 重新排列剩余按钮
       this.repositionButtons();
     }
@@ -674,7 +674,7 @@ export class Dialog implements UIComponent {
     if (config.buttonSpacing !== undefined) this.setButtonSpacing(config.buttonSpacing);
     if (config.buttonHeight !== undefined) this.setButtonHeight(config.buttonHeight);
     if (config.buttonWidthRatio !== undefined) this.setButtonWidthRatio(config.buttonWidthRatio);
-    
+
     return this;
   }
 
@@ -682,31 +682,31 @@ export class Dialog implements UIComponent {
    * 销毁对话框
    */
   public destroy(): void {
-    Console.log(`[Dialog] 开始销毁对话框: ${this.titleText}`);
-    
+    print(`[Dialog] 开始销毁对话框: ${this.titleText}`);
+
     // 销毁所有按钮
-    Console.log(`[Dialog] 销毁 ${this.buttons.length} 个按钮`);
+    print(`[Dialog] 销毁 ${this.buttons.length} 个按钮`);
     this.clearButtons();
-    
+
     // 销毁标题文本
     if (this.titleText) {
-      Console.log(`[Dialog] 销毁标题文本`);
+      print(`[Dialog] 销毁标题文本`);
       this.titleText.destroy();
       this.titleText = null;
     }
 
-    
+
     // 清理用户拖拽回调
-    Console.log(`[Dialog] 清理拖拽回调`);
+    print(`[Dialog] 清理拖拽回调`);
     this.userOnDragStart = null;
     this.userOnDragEnd = null;
     this.userOnDragging = null;
-    
+
     // 销毁面板（会自动销毁所有内部 Frame）
-    Console.log(`[Dialog] 销毁面板`);
+    print(`[Dialog] 销毁面板`);
     this.panel.destroy();
-    
+
     this.isCreated = false;
-    Console.log(`[Dialog] 对话框销毁完成`);
+    print(`[Dialog] 对话框销毁完成`);
   }
 }

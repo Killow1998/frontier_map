@@ -55,7 +55,7 @@ class ReloadTemplateExample {
 
 
     // 直接显示一个简单的对话框进行测试
-    const testDialog = new Dialog("测试对话框", 500, 300);
+    const testDialog = new Dialog("测试对话框", 500, 600);
     testDialog.create();
     testDialog.setDraggable(true);
 
@@ -86,8 +86,6 @@ class ReloadTemplateExample {
 
     // 显示对话框
     testDialog.show();
-
-    Console.log("✓ 测试对话框已显示");
 
     // 注册对话框到热重载管理器
     this.ui.register(testDialog);
