@@ -63,8 +63,9 @@ class DamageText {
   private currentAlpha: number = 255;
 
   // 数字尺寸（像素）
-  private static readonly DIGIT_WIDTH = 40;
-  private static readonly DIGIT_HEIGHT = 64;
+  private static readonly DIGIT_WIDTH = 40;      // 单个数字纹理的实际宽度
+  private static readonly DIGIT_HEIGHT = 64;     // 单个数字纹理的实际高度
+  private static readonly DIGIT_SPACING = -12;   // 数字间距偏移（负数=更紧凑，正数=更稀疏）
   private static readonly STANDARD_WIDTH = 1920;
   private static readonly STANDARD_HEIGHT = 1080;
 
@@ -144,9 +145,13 @@ class DamageText {
     // 计算缩放后的尺寸（先转为比例，再转为 WC3 坐标）
     const scaledWidth = ((DamageText.DIGIT_WIDTH * this.scale) / DamageText.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
     const scaledHeight = ((DamageText.DIGIT_HEIGHT * this.scale) / DamageText.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+    // 计算间距偏移（应用缩放）
+    const scaledSpacing = ((DamageText.DIGIT_SPACING * this.scale) / DamageText.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
 
+    // 每个数字的步进宽度 = 纹理宽度 + 间距偏移
+    const stepWidth = scaledWidth + scaledSpacing;
     // 总宽度
-    const totalWidth = scaledWidth * digitCount;
+    const totalWidth = stepWidth * digitCount;
 
     // 设置每个数字
     for (let i = 0; i < this.digitFrames.length; i++) {
@@ -159,7 +164,7 @@ class DamageText {
         digitFrame.setSize(scaledWidth, scaledHeight);
 
         // 设置位置（从左到右排列，相对于容器）
-        const xOffset = (i * scaledWidth) - (totalWidth / 2);
+        const xOffset = (i * stepWidth) - (totalWidth / 2);
         digitFrame.clearPoints();
         // 使用 setPoint 相对于父容器定位，而不是 setAbsPoint 绝对定位
         digitFrame.setPoint(FRAME_ALIGN_BOTTOM, this.containerFrame!, FRAME_ALIGN_BOTTOM, xOffset, 0);
