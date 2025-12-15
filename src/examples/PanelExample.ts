@@ -90,17 +90,18 @@ class PanelExample {
       250          // 高度
     );
 
-    // 自定义标题样式
+    // 自定义标题样式和关闭按钮
     panel
       .setTitleColor(TextColors.GOLD)
       .setShowCloseButton(true)
+      .setCloseButtonSize(32)  // 设置关闭按钮大小为 32px（默认 26px）
       .setOnClose(() => {
         Console.log("面板被关闭");
         panel.hide();
       });
 
     this.ui.register(panel);  // 注册到热重载管理
-    Console.log("✓ 创建了带标题栏的面板");
+    Console.log("✓ 创建了带标题栏的面板（关闭按钮: 32px）");
   }
 
   /**
@@ -295,6 +296,7 @@ class PanelExample {
       titleColor: TextColors.CYAN,
       showTitleBar: true,
       showCloseButton: true,
+      closeButtonSize: 28,  // 自定义关闭按钮大小
       background: UIBackgrounds.DIALOG,
       alpha: 240,
       draggable: true,

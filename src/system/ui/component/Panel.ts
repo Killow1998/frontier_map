@@ -48,6 +48,7 @@ export class Panel {
   // 外观
   private background: string = UIBackgrounds.BLACK_TRANSPARENT;
   private titleBarHeight: number = 30;
+  private closeButtonSize: number = 26; // 关闭按钮大小（像素），默认为 titleBarHeight - 4
   private showTitleBar: boolean = false;
   private title: string = "";
   private titleColor: string = "FFFFFF";
@@ -206,8 +207,7 @@ export class Panel {
    */
   private createTitleBar(wc3X: number, wc3Y: number, wc3Width: number): void {
     const titleBarWC3Height = (this.titleBarHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
-    const closeButtonSize = this.titleBarHeight - 4;
-    const closeButtonWC3Size = (closeButtonSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+    const closeButtonWC3Size = (this.closeButtonSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
 
     // 标题栏背景
     this.titleBarFrame = Frame.createType("PanelTitleBar", this.backdropFrame!, 0, "BACKDROP", "")!;
@@ -215,7 +215,7 @@ export class Panel {
       this.titleBarFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3X, wc3Y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, wc3X + wc3Width, wc3Y - titleBarWC3Height)
-        .setTexture(UIBackgrounds.SHUIMO_STYLE_PANEL_TITLE_BACKGROUND, 0, true)
+        .setTexture(UIBackgrounds.BLACK_TRANSPARENT, 0, true)
         .setAlpha(200);
 
       // 注册标题栏的鼠标事件（用于拖拽检测）
@@ -356,6 +356,21 @@ export class Panel {
    */
   public setShowCloseButton(show: boolean): Panel {
     this.showCloseButton = show;
+    return this;
+  }
+
+  /**
+   * 设置关闭按钮大小（像素）
+   * @param size 关闭按钮的像素大小，建议范围：16-40，默认 26
+   * @note 调用此方法前需要先调用 create()，因为需要重新创建标题栏
+   */
+  public setCloseButtonSize(size: number): Panel {
+    this.closeButtonSize = size;
+    // 如果已经创建了标题栏，需要重新创建以应用新大小
+    if (this.titleBarFrame && this.showTitleBar) {
+      Console.log(`Panel: 更新关闭按钮大小为 ${size}px，需要重新创建标题栏`);
+      // 注意：动态更新需要重新创建，建议在 create() 之前调用此方法
+    }
     return this;
   }
 
@@ -807,6 +822,7 @@ export class Panel {
     titleColor?: string;
     showTitleBar?: boolean;
     showCloseButton?: boolean;
+    closeButtonSize?: number;
     background?: string;
     alpha?: number;
     draggable?: boolean;
@@ -818,6 +834,7 @@ export class Panel {
     if (config.titleColor !== undefined) this.setTitleColor(config.titleColor);
     if (config.showTitleBar !== undefined) this.setShowTitleBar(config.showTitleBar);
     if (config.showCloseButton !== undefined) this.setShowCloseButton(config.showCloseButton);
+    if (config.closeButtonSize !== undefined) this.setCloseButtonSize(config.closeButtonSize);
     if (config.background !== undefined) this.setBackground(config.background);
     if (config.alpha !== undefined) this.setAlpha(config.alpha);
     if (config.draggable !== undefined) this.setDraggable(config.draggable);

@@ -2,7 +2,6 @@ import { Frame } from "@eiriksgata/wc3ts/*";
 import { Panel } from "./Panel";
 import { Button } from "./Button";
 import { Text, TextColors } from "./Text";
-import { Console } from "src/system/console";
 import { UIComponent } from "src/system/ui/UIComponent";
 import { UIBackgrounds } from "src/constants/ui/preset";
 
