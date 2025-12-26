@@ -6,6 +6,7 @@
 
 import { bj_MAX_PLAYER_SLOTS } from "@eiriksgata/wc3ts/src/globals/define";
 import { EventEmitter, EventHandler, SubscribeOptions } from "./EventEmitter";
+import { Actor } from "../actor";
 
 /**
  * 玩家单位事件 ID（用于 ConvertPlayerUnitEvent）
@@ -60,14 +61,14 @@ export const PlayerUnitEventId = {
  */
 export const enum GameEventType {
   // 单位事件
-  UNIT_DEATH = "game:unit:death",
-  UNIT_DAMAGED = "game:unit:damaged",
-  UNIT_ATTACKED = "game:unit:attacked",
-  UNIT_SELECTED = "game:unit:selected",
-  UNIT_DESELECTED = "game:unit:deselected",
-  UNIT_SPELL_CAST = "game:unit:spellCast",
-  UNIT_SPELL_EFFECT = "game:unit:spellEffect",
-  UNIT_SPELL_FINISH = "game:unit:spellFinish",
+  UNIT_DEATH = "game:Actor:death",
+  UNIT_DAMAGED = "game:Actor:damaged",
+  UNIT_ATTACKED = "game:Actor:attacked",
+  UNIT_SELECTED = "game:Actor:selected",
+  UNIT_DESELECTED = "game:Actor:deselected",
+  UNIT_SPELL_CAST = "game:Actor:spellCast",
+  UNIT_SPELL_EFFECT = "game:Actor:spellEffect",
+  UNIT_SPELL_FINISH = "game:Actor:spellFinish",
   
   // 玩家事件
   PLAYER_CHAT = "game:player:chat",
@@ -86,7 +87,7 @@ export const enum GameEventType {
  */
 export interface UnitEventData {
   /** 触发事件的单位 */
-  unit: unit;
+  Actor: Actor | undefined;
   /** 单位类型 ID */
   unitTypeId: number;
   /** 所属玩家 */
@@ -98,7 +99,7 @@ export interface UnitEventData {
  */
 export interface UnitDeathEventData extends UnitEventData {
   /** 击杀者 */
-  killer?: unit;
+  killer?: Actor;
 }
 
 /**
@@ -106,7 +107,7 @@ export interface UnitDeathEventData extends UnitEventData {
  */
 export interface UnitDamageEventData extends UnitEventData {
   /** 伤害来源 */
-  source: unit;
+  source: Actor | undefined;
   /** 伤害值 */
   damage: number;
   /** 攻击类型 */
@@ -122,7 +123,7 @@ export interface SpellEventData extends UnitEventData {
   /** 技能 ID */
   abilityId: number;
   /** 目标单位（可选） */
-  targetUnit?: unit;
+  targetUnit?: Actor;
   /** 目标点 X */
   targetX?: number;
   /** 目标点 Y */
@@ -206,10 +207,10 @@ export class GameEventManager extends EventEmitter {
       const killingUnit = GetKillingUnit();
       
       const data: UnitDeathEventData = {
-        unit: dyingUnit,
+        Actor: Actor.fromHandle(dyingUnit),
         unitTypeId: GetUnitTypeId(dyingUnit),
         owner: GetOwningPlayer(dyingUnit),
-        killer: killingUnit,
+        killer: Actor.fromHandle(killingUnit),
       };
       
       this.emit(GameEventType.UNIT_DEATH, data);
@@ -233,10 +234,10 @@ export class GameEventManager extends EventEmitter {
       const attacker = GetAttacker();
       
       const data: UnitDamageEventData = {
-        unit: attackedUnit,
+        Actor: Actor.fromHandle(attackedUnit),
         unitTypeId: GetUnitTypeId(attackedUnit),
         owner: GetOwningPlayer(attackedUnit),
-        source: attacker,
+        source: Actor.fromHandle(attacker),
         damage: 0, // 攻击事件没有具体伤害值
       };
       
@@ -261,11 +262,11 @@ export class GameEventManager extends EventEmitter {
       const targetUnit = GetSpellTargetUnit();
       
       const data: SpellEventData = {
-        unit: caster,
+        Actor: Actor.fromHandle(caster),
         unitTypeId: GetUnitTypeId(caster),
         owner: GetOwningPlayer(caster),
         abilityId: GetSpellAbilityId(),
-        targetUnit: targetUnit,
+        targetUnit: Actor.fromHandle(targetUnit),
         targetX: GetSpellTargetX(),
         targetY: GetSpellTargetY(),
       };

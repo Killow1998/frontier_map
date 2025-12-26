@@ -5,8 +5,10 @@ import { HotReloadHelper } from "src/system/ui/UIComponent";
 import { Dialog } from "src/system/ui/component/Dialog";
 import { DamageTextExample } from "./DamageTextExample";
 import { Actor } from "src/system/actor";
-import { Players } from "@eiriksgata/wc3ts/*";
+import { EVENT_PLAYER_UNIT_TRAIN_CANCEL, Players, Trigger, Unit } from "@eiriksgata/wc3ts/*";
 import { FourCC } from "src/utils/helper";
+import { GameEventManager, PlayerUnitEventId } from "src/system/event/GameEvent";
+import { DamageTextManager } from "src/system/ui/DamageTexttag";
 
 /**
  * 热更新模板
@@ -96,9 +98,18 @@ class ReloadTemplateExample {
 
     //创建圣骑士单位
     const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
+
+    // 单位受到伤害
+    GameEventManager.getInstance().onUnitAttacked((data) => {
+      if (data.Actor == undefined) return;
+      const damage = GetRandomInt(1, 100000000);
+      DamageTextManager.showDamage(damage, data.Actor.x, data.Actor.y, data.Actor.hpBarUIHeight);
+    });
+
+
     actor?.createBloodBar();
     typeof DamageTextExample;
-    
+
     Console.log(`Registered ${this.ui.getComponentCount()} components`);
   }
 
