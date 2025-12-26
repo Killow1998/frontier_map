@@ -216,29 +216,22 @@ export class UnitBlood {
     const unitX = this.actor.x;
     const unitY = this.actor.y;
 
-    //使用原生函数转换
-
-
-    // 转换为屏幕坐标
-    const screenPos = worldToScreen(unitX, 0, unitY);
-
-    // 获取单位的高度和体积倍数
-    const unitHeight = this.actor.hpBarUIHeight; // 单位高度数据
-    const sizeMultiplier = this.actor.size; // 体积倍数数据
-
+    // 计算单位高度偏移量
     const baseOffset = 2200.00 + 800.00; // 基础偏移量
-    const unitHeightOffset = unitHeight * sizeMultiplier; // 单位高度偏移
+    const unitHeightOffset = this.actor.hpBarUIHeight * this.actor.size; // 单位高度偏移
     const totalHeight = baseOffset + unitHeightOffset; // 总高度
     const cameraEyeZ = GetCameraEyePositionZ(); // 摄像机视点Z坐标
     const heightDifference = totalHeight - cameraEyeZ; // 高度差
     const yAdjustment = heightDifference * 0.00006; // Y坐标调整量
 
-    // 计算最终的屏幕Y坐标
-    const finalScreenY = screenPos.screenY + yAdjustment;
+    // 转换为屏幕坐标（传入计算好的偏移量）
+    const screenPos = worldToScreen(unitX, unitY, 0, {
+      offsetScreenY: yAdjustment
+    });
 
     //判断是否在控制台的位置
-    if (finalScreenY >= 1000 / 1800 ||
-      finalScreenY <= 300 / 1800 ||
+    if (screenPos.screenY >= 1000 / 1800 ||
+      screenPos.screenY <= 300 / 1800 ||
       this.actor.life < 0.05 ||
       this.actor.isUnitType(UNIT_TYPE_DEAD()) ||
       screenPos.screenX >= 1850 / 2400 ||
@@ -256,7 +249,7 @@ export class UnitBlood {
       this.frame.setVisible(true);
     }
 
-    this.frame.setAbsPoint(FRAME_ALIGN_BOTTOM, screenPos.screenX, finalScreenY);
+    this.frame.setAbsPoint(FRAME_ALIGN_BOTTOM, screenPos.screenX, screenPos.screenY);
 
   }
 
