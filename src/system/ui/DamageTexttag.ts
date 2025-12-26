@@ -249,8 +249,8 @@ class DamageText {
    */
   private updatePosition(): void {
     // 世界坐标转屏幕坐标
-    // worldToScreen(地图X, 高度, 地图Y) - 参考 UnitBlood 的用法
-    const screenPos = worldToScreen(this.worldX, this.height, this.worldY);
+    // worldToScreen(地图X, 地图Y, 高度) - 正确的参数顺序
+    const screenPos = worldToScreen(this.worldX, this.worldY, this.height);
 
     // 调试输出
     // print(`[DamageText] 世界坐标: X=${this.worldX}, Y=${this.worldY}, H=${this.height}`);

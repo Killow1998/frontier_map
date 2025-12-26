@@ -1,6 +1,6 @@
 import { Frame, FRAME_ALIGN_BOTTOM, FRAME_ALIGN_CENTER, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM, FRAME_ALIGN_TOP, MapPlayer, Timer, Unit, UNIT_TYPE_DEAD } from "@eiriksgata/wc3ts/*";
 import { CameraControl } from "src/utils/CameraControl";
-import { worldToScreen, worldToScreenNative } from "src/utils/helper";
+import { worldToScreen } from "src/utils/helper";
 import { Actor } from "../../actor";
 
 
