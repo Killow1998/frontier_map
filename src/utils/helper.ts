@@ -12,7 +12,7 @@ export function FourCC(id: string) {
 }
 
 /**
- * 将世界坐标转换为屏幕坐标
+ * 将世界坐标转换为屏幕坐标 原生方法（不推荐使用，效率低下）
  * @param x 世界坐标 X
  * @param y 世界坐标 Y
  * @param z 世界坐标 Z
@@ -31,6 +31,15 @@ export function worldToScreenNative(
     callback({ screenX, screenY, screenZ });
   });
 }
+
+
+export function worldToScreenByOffset(x: number, y: number , z: number = 0, offsetScreenX = 0, offsetScreenY = 0): { screenX: number, screenY: number } {
+
+  const screenPos = worldToScreen(x, y, z);
+  return { screenX: screenPos.screenX + offsetScreenX, screenY: screenPos.screenY + offsetScreenY };
+
+}
+
 
 export function worldToScreen(x: number, y: number, z: number): { screenX: number, screenY: number, z: number } {
   const eyex = GetCameraEyePositionX();
