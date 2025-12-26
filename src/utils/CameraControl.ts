@@ -17,7 +17,7 @@ export class CameraControl {
   // 默认X轴角度
   private static xAngle: number = 306;
   // 视野等级上限
-  private static viewLevelMax: number = 13;
+  private static viewLevelMax: number = 30;
   // 视野等级下限
   private static viewLevelMin: number = 4;
 
@@ -51,6 +51,9 @@ export class CameraControl {
     
     // 标记需要重置镜头属性
     this.resetCam = true;
+
+    //获取视角角度
+    Console.log(`CameraControl: 视角角度: ${GetCameraField(ConvertCameraField(2))}`);
 
     if (delta < 0) {
       // 滚轮下滑 - 拉远镜头
