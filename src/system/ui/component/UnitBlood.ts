@@ -1,6 +1,6 @@
 import { Frame, FRAME_ALIGN_BOTTOM, FRAME_ALIGN_CENTER, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM, FRAME_ALIGN_TOP, MapPlayer, Timer, Unit, UNIT_TYPE_DEAD } from "@eiriksgata/wc3ts/*";
 import { CameraControl } from "src/utils/CameraControl";
-import { worldToScreen } from "src/utils/helper";
+import { worldToScreen, worldToScreenNative } from "src/utils/helper";
 import { Actor } from "../../actor";
 
 
@@ -63,7 +63,7 @@ export class UnitBlood {
     this.nameFrame.setTextAlignment(18, 0);
     this.nameFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf", 0.01, 0);
     // this.nameFrame.setSize(0, 0.006)
-    
+
     this.nameFrame.alpha = 255;
     this.nameFrame.setPoint(FRAME_ALIGN_BOTTOM, this.frame, FRAME_ALIGN_TOP, 0.003, 10 / 1800);
 
@@ -186,6 +186,7 @@ export class UnitBlood {
     this.updateLifeBar();
     this.updateManaBar();
 
+    //this.updatePositionByNative();
     this.updatePosition();
 
     this.levelFrame.setText(`${this.actor.level}`);
@@ -215,6 +216,9 @@ export class UnitBlood {
     const unitX = this.actor.x;
     const unitY = this.actor.y;
 
+    //使用原生函数转换
+
+
     // 转换为屏幕坐标
     const screenPos = worldToScreen(unitX, 0, unitY);
 
@@ -231,7 +235,7 @@ export class UnitBlood {
 
     // 计算最终的屏幕Y坐标
     const finalScreenY = screenPos.screenY + yAdjustment;
-    
+
     //判断是否在控制台的位置
     if (finalScreenY >= 1000 / 1800 ||
       finalScreenY <= 300 / 1800 ||

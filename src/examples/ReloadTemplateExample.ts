@@ -98,7 +98,7 @@ class ReloadTemplateExample {
     const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
     actor?.createBloodBar();
     typeof DamageTextExample;
-
+    
     Console.log(`Registered ${this.ui.getComponentCount()} components`);
   }
 

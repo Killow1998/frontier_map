@@ -11,6 +11,27 @@ export function FourCC(id: string) {
   return c2i(id)
 }
 
+/**
+ * 将世界坐标转换为屏幕坐标
+ * @param x 世界坐标 X
+ * @param y 世界坐标 Y
+ * @param z 世界坐标 Z
+ * @param callback 转换完成后的回调函数
+ */
+export function worldToScreenNative(
+  x: number,
+  y: number,
+  z: number,
+  callback: (result: { screenX: number, screenY: number, screenZ: number }) => void
+): void {
+  DzConvertWorldPosition(x, y, z, () => {
+    const screenX = DzGetConvertWorldPositionX();
+    const screenY = DzGetConvertWorldPositionY();
+    const screenZ = 0;
+    callback({ screenX, screenY, screenZ });
+  });
+}
+
 export function worldToScreen(x: number, y: number, z: number): { screenX: number, screenY: number, z: number } {
   const eyex = GetCameraEyePositionX();
   const eyey = GetCameraEyePositionZ(); // 修正为 Z 轴
@@ -21,7 +42,7 @@ export function worldToScreen(x: number, y: number, z: number): { screenX: numbe
   const centerx = GetCameraTargetPositionX();
   const centery = GetCameraTargetPositionZ(); // 修正为 Z 轴
   const centerz = GetCameraTargetPositionY(); // 修正为 Y 轴
-  
+
   let z0 = eyex - centerx;
   let z1 = eyey - centery;
   let z2 = eyez - centerz;
@@ -85,6 +106,6 @@ export function worldToScreen(x: number, y: number, z: number): { screenX: numbe
   const UIx = 0.8 - ((2.00 / ratio) * (x0 * x + x1 * y + x2 * z - (x0 * eyex + x1 * eyey + x2 * eyez)) * rhw + 1.0) * 0.4;
   const UIy = (2.5613 * (y0 * x + y1 * y + y2 * z - (y0 * eyex + y1 * eyey + y2 * eyez)) * rhw + 1.0) * 0.3;
   const UIz = (1001.0 / -999.0 * (z0 * x + z1 * y + z2 * z + 2.0 - (z0 * eyex + z1 * eyey + z2 * eyez)) * rhw + 1.0) * 0.5;
-  
+
   return { screenX: UIx, screenY: UIy, z: UIz };
 }

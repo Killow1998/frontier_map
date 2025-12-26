@@ -23,7 +23,7 @@ async function main(): Promise<void> {
 
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
-  Timer.create().start(2, false, () => {
+  Timer.create().start(1, false, () => {
     print("Loading UI modules:", typeof ReloadTemplateExample);
   });
 
@@ -53,7 +53,7 @@ export function initialize(): void {
   print(`>>> Main: All registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
 
   // 延迟启动热更新系统，确保所有模块都已注册
-  Timer.create().start(2, false, () => {
+  Timer.create().start(0.1, false, () => {
     print(`>>> Main: Starting hot reload system...`);
     print(`>>> Main: Registered modules at start: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
     HotReload.getInstance().start();

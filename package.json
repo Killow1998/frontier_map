@@ -25,7 +25,7 @@
     "typescript-to-lua": "^1.32.0"
   },
   "dependencies": {
-    "@eiriksgata/wc3ts": "3.2.6",
+    "@eiriksgata/wc3ts": "3.2.7",
     "fs-extra": "^11.3.2",
     "luamin": "^1.0.4"
   },

@@ -25,6 +25,8 @@ export interface DamageTextConfig {
   worldY: number;
   /** 高度偏移（垂直方向） */
   height?: number;
+  /** 颜色 */
+  color?: 'red' | 'yellow' | 'gray' | 'blue';
   /** 漂浮方向 */
   direction?: FloatDirection;
   /** 移动速度（像素/秒） */
@@ -61,7 +63,8 @@ class DamageText {
   private offsetX: number = 0;
   private offsetY: number = 0;
   private currentAlpha: number = 255;
-
+  private color: 'red' | 'yellow' | 'gray' | 'blue' = 'gray';
+  
   // 数字尺寸（像素）
   private static readonly DIGIT_WIDTH = 40;      // 单个数字纹理的实际宽度
   private static readonly DIGIT_HEIGHT = 64;     // 单个数字纹理的实际高度
@@ -80,7 +83,7 @@ class DamageText {
     )!;
 
     this.containerFrame.setTexture(`Texture\\ui\\dmg\\transparent.tga`, 0, true);
-    
+
     // 设置容器尺寸（重要！没有尺寸的话子 frame 相对定位无效）
     // 尺寸设置为能容纳最大数字位数的宽度和高度
     const containerWidth = (DamageText.DIGIT_WIDTH * maxDigits) / DamageText.STANDARD_WIDTH;
@@ -90,7 +93,7 @@ class DamageText {
       containerWidth * ScreenCoordinates.WC3_SCREEN_WIDTH,
       containerHeight * ScreenCoordinates.WC3_SCREEN_HEIGHT
     );
-
+    
     // 预创建数字 Frame（最多 maxDigits 位）
     for (let i = 0; i < maxDigits; i++) {
       const digitFrame = Frame.createType(
@@ -120,6 +123,7 @@ class DamageText {
     this.duration = config.duration || 1.5;
     this.scale = config.scale || 0.8;
     this.fadeOut = config.fadeOut !== undefined ? config.fadeOut : true;
+    this.color = config.color || 'gray';
 
     this.elapsedTime = 0;
     this.offsetX = 0;
@@ -160,7 +164,7 @@ class DamageText {
         const digitFrame = this.digitFrames[i];
 
         // 设置纹理
-        digitFrame.setTexture(`Texture\\ui\\dmg\\${digit}.tga`, 0, true);
+        digitFrame.setTexture(`Texture\\ui\\dmg\\${this.color}\\${digit}.tga`, 0, true);
         digitFrame.setSize(scaledWidth, scaledHeight);
 
         // 设置位置（从左到右排列，相对于容器）
