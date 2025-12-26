@@ -48,7 +48,7 @@ export class CameraControl {
 
     // 如果鼠标不在游戏内，就不响应鼠标滚轮
     if (!DzIsMouseOverUI()) return;
-
+    
     // 标记需要重置镜头属性
     this.resetCam = true;
 
@@ -154,5 +154,37 @@ export class CameraControl {
     } else {
       print("CameraControl: 镜头平滑度必须在 0-1 之间");
     }
+  }
+
+  /**
+   * 获取当前镜头高度（Z坐标）
+   * @returns 镜头高度
+   */
+  public static getCameraHeight(): number {
+    return GetCameraEyePositionZ();
+  }
+
+  /**
+   * 获取当前镜头位置
+   * @returns 镜头位置 {x, y, z}
+   */
+  public static getCameraPosition(): { x: number, y: number, z: number } {
+    return {
+      x: GetCameraEyePositionX(),
+      y: GetCameraEyePositionY(),
+      z: GetCameraEyePositionZ()
+    };
+  }
+
+  /**
+   * 获取当前镜头目标位置
+   * @returns 镜头目标位置 {x, y, z}
+   */
+  public static getCameraTargetPosition(): { x: number, y: number, z: number } {
+    return {
+      x: GetCameraTargetPositionX(),
+      y: GetCameraTargetPositionY(),
+      z: GetCameraTargetPositionZ()
+    };
   }
 }

@@ -217,6 +217,7 @@ export class UnitBlood {
     const unitY = this.actor.y;
 
     // 计算单位高度偏移量
+    // 获取镜头高度
     const baseOffset = 2200.00 + 800.00; // 基础偏移量
     const unitHeightOffset = this.actor.hpBarUIHeight * this.actor.size; // 单位高度偏移
     const totalHeight = baseOffset + unitHeightOffset; // 总高度
