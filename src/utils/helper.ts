@@ -316,10 +316,9 @@ export function worldToScreen2(
     aspectRatio = clientWidth / clientHeight;
   }
 
-  // WC3默认视野角度约70度
-  const fovDegrees = 70;
-  const fovRadians = fovDegrees * Math.PI / 180;
-  const tanHalfFov = Math.tan(fovRadians / 2);
+  // 使用 GetCameraField 动态获取视野角度（弧度）
+  const fieldOfView = GetCameraField(ConvertCameraField(3)); // CAMERA_FIELD_FIELD_OF_VIEW
+  const tanHalfFov = Math.tan(fieldOfView / 2);
 
   // 透视除法：将3D坐标投影到2D平面
   // NDC坐标范围 [-1, 1]
