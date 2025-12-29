@@ -69,7 +69,7 @@ export function worldToScreen1(
   const cameraEyeX = GetCameraEyePositionX();
   const cameraEyeY = GetCameraEyePositionY(); // Y 轴：南北方向
   const cameraEyeZ = GetCameraEyePositionZ(); // Z 轴：垂直高度
-  
+
   const cameraTargetX = GetCameraTargetPositionX();
   const cameraTargetY = GetCameraTargetPositionY();
   const cameraTargetZ = GetCameraTargetPositionZ();
@@ -78,7 +78,7 @@ export function worldToScreen1(
   let forwardX = cameraEyeX - cameraTargetX;
   let forwardY = cameraEyeY - cameraTargetY;
   let forwardZ = cameraEyeZ - cameraTargetZ;
-  
+
   // 归一化朝向向量
   let forwardLength = Math.sqrt(forwardX * forwardX + forwardY * forwardY + forwardZ * forwardZ);
   if (forwardLength > 0) {
@@ -94,11 +94,11 @@ export function worldToScreen1(
   const upX = 0;
   const upY = 1;
   const upZ = 0;
-  
+
   let rightX = upY * forwardZ - upZ * forwardY;
   let rightY = upZ * forwardX - upX * forwardZ;
   let rightZ = upX * forwardY - upY * forwardX;
-  
+
   // 归一化右向量
   let rightLength = Math.sqrt(rightX * rightX + rightY * rightY + rightZ * rightZ);
   if (rightLength > 0) {
@@ -141,10 +141,10 @@ export function worldToScreen1(
 
   // 计算屏幕坐标（NDC 坐标，范围 0-1）
   // 注意：反转X轴方向以匹配魔兽争霸3的坐标系统
-  const screenX = 0.8 - ((2.00 / aspectRatio) * 
+  const screenX = 0.8 - ((2.00 / aspectRatio) *
     (-rightX * worldToEyeX - rightY * worldToEyeY - rightZ * worldToEyeZ) * depth + 1.0) * 0.4;
-  
-  const screenY = (2.5613 * 
+
+  const screenY = (2.5613 *
     (upVecX * worldToEyeX + upVecY * worldToEyeY + upVecZ * worldToEyeZ) * depth + 1.0) * 0.3;
 
   // 应用屏幕偏移
@@ -186,8 +186,8 @@ export function worldToScreen(
   // 经验公式（Antares 校准）
   const yCenterScreenShift = 0.1284 * cosAttack;
   const scaleFactor = 0.0524 * fieldOfView * fieldOfView * fieldOfView
-                    - 0.0283 * fieldOfView * fieldOfView
-                    + 1.061 * fieldOfView;
+    - 0.0283 * fieldOfView * fieldOfView
+    + 1.061 * fieldOfView;
 
   // 矩阵元素预计算
   const cosAttackCosRot = cosAttack * cosRot;
@@ -214,4 +214,131 @@ export function worldToScreen(
   const finalScreenY = screenY + (options.offsetScreenY || 0);
 
   return { screenX: finalScreenX, screenY: finalScreenY, onScreen };
+}
+
+
+
+export function worldToScreen2(
+  worldX: number,
+  worldY: number,
+  worldZ: number = 0,
+  options: WorldToScreenOptions = {}
+): { screenX: number, screenY: number } {
+
+  // ============================================
+  // 1. 获取相机信息
+  // ============================================
+  const camEyeX = GetCameraEyePositionX();
+  const camEyeY = GetCameraEyePositionY();
+  const camEyeZ = GetCameraEyePositionZ();
+
+  const camTargetX = GetCameraTargetPositionX();
+  const camTargetY = GetCameraTargetPositionY();
+  const camTargetZ = GetCameraTargetPositionZ();
+
+  // ============================================
+  // 2. 构建相机坐标系（View Matrix 的基础）
+  // ============================================
+
+  // 前向向量（从相机指向目标，即相机看的方向）
+  let forwardX = camTargetX - camEyeX;
+  let forwardY = camTargetY - camEyeY;
+  let forwardZ = camTargetZ - camEyeZ;
+
+  // 归一化前向向量
+  const forwardLen = Math.sqrt(forwardX * forwardX + forwardY * forwardY + forwardZ * forwardZ);
+  if (forwardLen < 0.0001) {
+    return { screenX: 0, screenY: 0 }; // 相机位置和目标重合，无法计算
+  }
+  forwardX /= forwardLen;
+  forwardY /= forwardLen;
+  forwardZ /= forwardLen;
+
+  // 世界上方向（WC3中Z轴是垂直方向）
+  const worldUpX = 0;
+  const worldUpY = 0;
+  const worldUpZ = 1;
+
+  // 右向量 = 前向 × 世界上（叉积）
+  let rightX = forwardY * worldUpZ - forwardZ * worldUpY;
+  let rightY = forwardZ * worldUpX - forwardX * worldUpZ;
+  let rightZ = forwardX * worldUpY - forwardY * worldUpX;
+
+  // 归一化右向量
+  let rightLen = Math.sqrt(rightX * rightX + rightY * rightY + rightZ * rightZ);
+  if (rightLen < 0.0001) {
+    // 前向与上方向平行（俯视/仰视），使用替代上方向
+    rightX = 1;
+    rightY = 0;
+    rightZ = 0;
+    rightLen = 1;
+  }
+  rightX /= rightLen;
+  rightY /= rightLen;
+  rightZ /= rightLen;
+
+  // 相机上向量 = 右向 × 前向（叉积）
+  const camUpX = rightY * forwardZ - rightZ * forwardY;
+  const camUpY = rightZ * forwardX - rightX * forwardZ;
+  const camUpZ = rightX * forwardY - rightY * forwardX;
+
+  // ============================================
+  // 3. 计算世界点在相机坐标系中的位置
+  // ============================================
+
+  // 世界点相对于相机的向量
+  const relX = worldX - camEyeX;
+  const relY = worldY - camEyeY;
+  const relZ = worldZ - camEyeZ;
+
+  // 投影到相机坐标系
+  // viewX = 点在右向量方向的投影（屏幕X方向）
+  // viewY = 点在上向量方向的投影（屏幕Y方向）
+  // viewZ = 点在前向向量方向的投影（深度）
+  const viewX = relX * rightX + relY * rightY + relZ * rightZ;
+  const viewY = relX * camUpX + relY * camUpY + relZ * camUpZ;
+  const viewZ = relX * forwardX + relY * forwardY + relZ * forwardZ;
+
+  // ============================================
+  // 4. 透视投影
+  // ============================================
+
+  // 如果点在相机后面，返回null
+  if (viewZ <= 0) {
+    return { screenX: 0, screenY: 0 };
+  }
+
+  // 获取屏幕宽高比
+  const clientWidth = DzGetClientWidth();
+  const clientHeight = DzGetClientHeight();
+  let aspectRatio = 1.333; // 默认4:3
+  if (clientHeight > 0) {
+    aspectRatio = clientWidth / clientHeight;
+  }
+
+  // WC3默认视野角度约70度
+  const fovDegrees = 70;
+  const fovRadians = fovDegrees * Math.PI / 180;
+  const tanHalfFov = Math.tan(fovRadians / 2);
+
+  // 透视除法：将3D坐标投影到2D平面
+  // NDC坐标范围 [-1, 1]
+  const ndcX = viewX / (viewZ * tanHalfFov * aspectRatio);
+  const ndcY = viewY / (viewZ * tanHalfFov);
+
+  // ============================================
+  // 5. 映射到WC3屏幕坐标系
+  // ============================================
+
+  // WC3屏幕坐标范围：X [0, 0.8]，Y [0, 0.6]
+  // 屏幕中心：(0.4, 0.3)
+  // NDC [-1, 1] 映射到 WC3 屏幕坐标
+  const wc3ScreenX = 0.4 + ndcX * 0.4;
+  const wc3ScreenY = 0.3 + ndcY * 0.3;
+
+  // 应用偏移量
+  const finalScreenX = wc3ScreenX + (options.offsetScreenX || 0);
+  const finalScreenY = wc3ScreenY + (options.offsetScreenY || 0);
+
+  return { screenX: finalScreenX, screenY: finalScreenY };
 }
