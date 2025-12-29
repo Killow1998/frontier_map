@@ -27,8 +27,12 @@ async function main(): Promise<void> {
     print("Loading UI modules:", typeof ReloadTemplateExample);
   });
 
+  // Timer.create().start(5, false, () => {
+  //   DamageTextManager.showDamage(1234, 0, 0, 100);
+  // })
 
-  
+
+
 
 
 

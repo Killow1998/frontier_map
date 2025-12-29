@@ -20,7 +20,7 @@ export class FrameEventUtils {
      * @param handler 事件处理函数
      */
     static bindClickEvent(frame: any, handler: FrameEventHandler): void {
-        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_CONTROL_CLICK, handler, false);
+        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_CONTROL_CLICK, handler, true);
     }
 
     /**
@@ -29,7 +29,7 @@ export class FrameEventUtils {
      * @param handler 事件处理函数
      */
     static bindMouseEnterEvent(frame: any, handler: FrameEventHandler): void {
-        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_MOUSE_ENTER, handler, false);
+        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_MOUSE_ENTER, handler, true);
     }
 
     /**
@@ -38,7 +38,7 @@ export class FrameEventUtils {
      * @param handler 事件处理函数
      */
     static bindMouseLeaveEvent(frame: any, handler: FrameEventHandler): void {
-        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_MOUSE_LEAVE, handler, false);
+        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_MOUSE_LEAVE, handler, true);
     }
 
     /**
@@ -47,7 +47,7 @@ export class FrameEventUtils {
      * @param handler 事件处理函数
      */
     static bindMouseUpEvent(frame: any, handler: FrameEventHandler): void {
-        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_MOUSE_UP, handler, false);
+        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_MOUSE_UP, handler, true);
     }
 
     /**
@@ -56,7 +56,7 @@ export class FrameEventUtils {
      * @param handler 事件处理函数
      */
     static bindMouseWheelEvent(frame: any, handler: FrameEventHandler): void {
-        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_MOUSE_WHEEL, handler, false);
+        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_MOUSE_WHEEL, handler, true);
     }
 
     /**
@@ -65,7 +65,7 @@ export class FrameEventUtils {
      * @param handler 事件处理函数
      */
     static bindCheckboxCheckedEvent(frame: any, handler: FrameEventHandler): void {
-        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_CHECKBOX_CHECKED, handler, false);
+        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_CHECKBOX_CHECKED, handler, true);
     }
 
     /**
@@ -74,7 +74,7 @@ export class FrameEventUtils {
      * @param handler 事件处理函数
      */
     static bindTextChangedEvent(frame: any, handler: FrameEventHandler): void {
-        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_EDITBOX_TEXT_CHANGED, handler, false);
+        DzFrameSetScriptByCode(frame.handle, FRAMEEVENT_EDITBOX_TEXT_CHANGED, handler, true);
     }
 
     /**
@@ -124,7 +124,7 @@ export class FrameEventUtils {
         
         const emptyHandler = () => {};
         events.forEach(eventType => {
-            DzFrameSetScriptByCode(frame.handle, eventType, emptyHandler, false);
+            DzFrameSetScriptByCode(frame.handle, eventType, emptyHandler, true);
         });
     }
 }
