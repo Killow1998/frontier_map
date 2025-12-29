@@ -218,6 +218,17 @@ export function worldToScreen(
 
 
 
+/**
+ * 世界坐标转屏幕坐标（基于标准透视投影，使用 Antares 的校正因子）
+ * 
+ * 使用标准透视投影的框架，但应用 Antares 的经验公式以确保与 WC3 引擎行为一致
+ * 
+ * @param worldX 世界坐标 X
+ * @param worldY 世界坐标 Y
+ * @param worldZ 世界坐标 Z（垂直高度）
+ * @param options 可选的偏移配置
+ * @returns 屏幕坐标 { screenX, screenY }
+ */
 export function worldToScreen2(
   worldX: number,
   worldY: number,
@@ -226,118 +237,79 @@ export function worldToScreen2(
 ): { screenX: number, screenY: number } {
 
   // ============================================
-  // 1. 获取相机信息
+  // 1. 获取相机参数（与 worldToScreen 一致）
   // ============================================
-  const camEyeX = GetCameraEyePositionX();
-  const camEyeY = GetCameraEyePositionY();
-  const camEyeZ = GetCameraEyePositionZ();
-
-  const camTargetX = GetCameraTargetPositionX();
-  const camTargetY = GetCameraTargetPositionY();
-  const camTargetZ = GetCameraTargetPositionZ();
-
-  // ============================================
-  // 2. 构建相机坐标系（View Matrix 的基础）
-  // ============================================
-
-  // 前向向量（从相机指向目标，即相机看的方向）
-  let forwardX = camTargetX - camEyeX;
-  let forwardY = camTargetY - camEyeY;
-  let forwardZ = camTargetZ - camEyeZ;
-
-  // 归一化前向向量
-  const forwardLen = Math.sqrt(forwardX * forwardX + forwardY * forwardY + forwardZ * forwardZ);
-  if (forwardLen < 0.0001) {
-    return { screenX: 0, screenY: 0 }; // 相机位置和目标重合，无法计算
-  }
-  forwardX /= forwardLen;
-  forwardY /= forwardLen;
-  forwardZ /= forwardLen;
-
-  // 世界上方向（WC3中Z轴是垂直方向）
-  const worldUpX = 0;
-  const worldUpY = 0;
-  const worldUpZ = 1;
-
-  // 右向量 = 前向 × 世界上（叉积）
-  let rightX = forwardY * worldUpZ - forwardZ * worldUpY;
-  let rightY = forwardZ * worldUpX - forwardX * worldUpZ;
-  let rightZ = forwardX * worldUpY - forwardY * worldUpX;
-
-  // 归一化右向量
-  let rightLen = Math.sqrt(rightX * rightX + rightY * rightY + rightZ * rightZ);
-  if (rightLen < 0.0001) {
-    // 前向与上方向平行（俯视/仰视），使用替代上方向
-    rightX = 1;
-    rightY = 0;
-    rightZ = 0;
-    rightLen = 1;
-  }
-  rightX /= rightLen;
-  rightY /= rightLen;
-  rightZ /= rightLen;
-
-  // 相机上向量 = 右向 × 前向（叉积）
-  const camUpX = rightY * forwardZ - rightZ * forwardY;
-  const camUpY = rightZ * forwardX - rightX * forwardZ;
-  const camUpZ = rightX * forwardY - rightY * forwardX;
+  const eyeX = GetCameraEyePositionX();
+  const eyeY = GetCameraEyePositionY();
+  const eyeZ = GetCameraEyePositionZ();
+  const angleOfAttack = GetCameraField(ConvertCameraField(2)); // CAMERA_FIELD_ANGLE_OF_ATTACK
+  const rotation = GetCameraField(ConvertCameraField(5));      // CAMERA_FIELD_ROTATION
+  const fieldOfView = GetCameraField(ConvertCameraField(3));   // CAMERA_FIELD_FIELD_OF_VIEW
 
   // ============================================
-  // 3. 计算世界点在相机坐标系中的位置
+  // 2. 预计算三角函数（与 worldToScreen 一致）
   // ============================================
+  const cosAttack = Math.cos(angleOfAttack);
+  const sinAttack = Math.sin(angleOfAttack);
+  const cosRot = Math.cos(rotation);
+  const sinRot = Math.sin(rotation);
 
-  // 世界点相对于相机的向量
-  const relX = worldX - camEyeX;
-  const relY = worldY - camEyeY;
-  const relZ = worldZ - camEyeZ;
-
-  // 投影到相机坐标系
-  // viewX = 点在右向量方向的投影（屏幕X方向）
-  // viewY = 点在上向量方向的投影（屏幕Y方向）
-  // viewZ = 点在前向向量方向的投影（深度）
-  const viewX = relX * rightX + relY * rightY + relZ * rightZ;
-  const viewY = relX * camUpX + relY * camUpY + relZ * camUpZ;
-  const viewZ = relX * forwardX + relY * forwardY + relZ * forwardZ;
+  // 矩阵元素预计算（与 worldToScreen 一致）
+  const cosAttackCosRot = cosAttack * cosRot;
+  const cosAttackSinRot = cosAttack * sinRot;
+  const sinAttackCosRot = sinAttack * cosRot;
+  const sinAttackSinRot = sinAttack * sinRot;
 
   // ============================================
-  // 4. 透视投影
+  // 3. 计算世界点到相机的向量
+  // ============================================
+  const dx = worldX - eyeX;
+  const dy = worldY - eyeY;
+  const dz = worldZ - eyeZ;
+
+  // ============================================
+  // 4. 投影到相机坐标系（与 worldToScreen 完全一致）
+  // ============================================
+  // 使用与 worldToScreen 相同的投影方式
+  // viewX = 右向量方向的投影（屏幕X方向）
+  const viewX = cosRot * dy - sinRot * dx;
+  
+  // viewY = 上向量方向的投影（屏幕Y方向）
+  const viewY = sinAttackCosRot * dx + sinAttackSinRot * dy - cosAttack * dz;
+  
+  // viewZ = 前向向量方向的投影（深度）
+  const viewZ = -cosAttackCosRot * dx - cosAttackSinRot * dy - sinAttack * dz;
+
+  // ============================================
+  // 5. 透视投影（使用 Antares 的 scaleFactor）
   // ============================================
 
-  // 如果点在相机后面，返回null
+  // 如果点在相机后面，返回默认值
   if (viewZ <= 0) {
     return { screenX: 0, screenY: 0 };
   }
 
-  // 获取屏幕宽高比
-  const clientWidth = DzGetClientWidth();
-  const clientHeight = DzGetClientHeight();
-  let aspectRatio = 1.333; // 默认4:3
-  if (clientHeight > 0) {
-    aspectRatio = clientWidth / clientHeight;
-  }
+  // 使用 Antares 的经验公式（关键：替代标准的 tan(fov/2)）
+  const yCenterScreenShift = 0.1284 * cosAttack;
+  const scaleFactor = 0.0524 * fieldOfView * fieldOfView * fieldOfView
+    - 0.0283 * fieldOfView * fieldOfView
+    + 1.061 * fieldOfView;
 
-  // 使用 GetCameraField 动态获取视野角度（弧度）
-  const fieldOfView = GetCameraField(ConvertCameraField(3)); // CAMERA_FIELD_FIELD_OF_VIEW
-  const tanHalfFov = Math.tan(fieldOfView / 2);
-
-  // 透视除法：将3D坐标投影到2D平面
-  // NDC坐标范围 [-1, 1]
-  const ndcX = viewX / (viewZ * tanHalfFov * aspectRatio);
-  const ndcY = viewY / (viewZ * tanHalfFov);
+  // 使用 scaleFactor 计算 xPrime（而不是 viewZ * tan(fov/2)）
+  // 这是与标准透视投影的关键差异
+  const xPrime = scaleFactor * viewZ;
 
   // ============================================
-  // 5. 映射到WC3屏幕坐标系
+  // 6. 透视除法并映射到WC3屏幕坐标系
   // ============================================
 
-  // WC3屏幕坐标范围：X [0, 0.8]，Y [0, 0.6]
-  // 屏幕中心：(0.4, 0.3)
-  // NDC [-1, 1] 映射到 WC3 屏幕坐标
-  const wc3ScreenX = 0.4 + ndcX * 0.4;
-  const wc3ScreenY = 0.3 + ndcY * 0.3;
+  // 透视除法：直接除以 xPrime（与 worldToScreen 一致）
+  const screenX = 0.4 + viewX / xPrime;
+  const screenY = 0.42625 - yCenterScreenShift + viewY / xPrime;
 
   // 应用偏移量
-  const finalScreenX = wc3ScreenX + (options.offsetScreenX || 0);
-  const finalScreenY = wc3ScreenY + (options.offsetScreenY || 0);
+  const finalScreenX = screenX + (options.offsetScreenX || 0);
+  const finalScreenY = screenY + (options.offsetScreenY || 0);
 
   return { screenX: finalScreenX, screenY: finalScreenY };
 }

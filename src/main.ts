@@ -62,7 +62,7 @@ export function initialize(): void {
     HotReload.getInstance().start();
   });
 
-  //PlayersConfig.CameraControl();
+  PlayersConfig.CameraControl();
   UnitBlood.registerLocalDrawEvent();
 
   MapGeneral.sceneVisionInit();

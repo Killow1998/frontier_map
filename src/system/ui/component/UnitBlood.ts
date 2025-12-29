@@ -226,7 +226,7 @@ export class UnitBlood {
     const yAdjustment = heightDifference * 0.00006; // Y坐标调整量
 
     // 转换为屏幕坐标（传入计算好的偏移量）
-    const screenPos = worldToScreen2(unitX, unitY, 0);
+    const screenPos = worldToScreen(unitX, unitY, 0);
 
     //判断是否在控制台的位置
     if (screenPos.screenY >= 1000 / 1800 ||
