@@ -21,6 +21,9 @@ export class CameraControl {
   // 视野等级下限
   private static viewLevelMin: number = 4;
 
+  //记录游戏初始化镜头角度
+  private static gameStartXAngle: number = GetCameraField(ConvertCameraField(2));
+
   /**
    * 初始化鼠标控制
    * 设置迷雾和镜头截断距离，注册鼠标滚轮事件
@@ -48,7 +51,7 @@ export class CameraControl {
 
     // 如果鼠标不在游戏内，就不响应鼠标滚轮
     if (!DzIsMouseOverUI()) return;
-    
+
     // 标记需要重置镜头属性
     this.resetCam = true;
 
@@ -68,7 +71,10 @@ export class CameraControl {
     }
 
     // 记录滚动前的镜头角度
-    this.xAngle = this.rad2Deg(GetCameraField(ConvertCameraField(1))); // CAMERA_FIELD_ANGLE_OF_ATTACK = 1
+    //this.xAngle = this.rad2Deg(GetCameraField(ConvertCameraField(1))); // CAMERA_FIELD_ANGLE_OF_ATTACK = 1
+
+    //并且修改镜头角度
+
   }
 
   /**
@@ -77,7 +83,8 @@ export class CameraControl {
   public static update(): void {
     if (this.resetCam) {
       // 重设镜头角度和高度
-      SetCameraField(ConvertCameraField(1), this.degToRad(this.xAngle), 0); // CAMERA_FIELD_ANGLE_OF_ATTACK
+      SetCameraField(ConvertCameraField(1), 9999999, 0); // CAMERA_FIELD_ANGLE_OF_ATTACK
+      SetCameraField(ConvertCameraField(2), 305, 0);
       SetCameraField(ConvertCameraField(0), this.viewLevel * 200, this.wheelSpeed); // CAMERA_FIELD_TARGET_DISTANCE = 0
       this.resetCam = false;
     }
