@@ -99,6 +99,7 @@ class ReloadTemplateExample {
     //创建圣骑士单位
     const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
 
+
     // 单位受到伤害
     GameEventManager.getInstance().onUnitAttacked((data) => {
       if (data.Actor == undefined) return;
@@ -107,10 +108,13 @@ class ReloadTemplateExample {
     });
 
 
+
     actor?.createBloodBar();
     typeof DamageTextExample;
 
     Console.log(`Registered ${this.ui.getComponentCount()} components`);
+
+    Console.log(`time: ${os.time()}`);
   }
 
   /**
