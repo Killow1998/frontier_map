@@ -218,7 +218,7 @@ export class UnitBlood {
 
     // 计算单位高度偏移量
     // 获取镜头高度
-    const baseOffset = 2200.00 + 800.00; // 基础偏移量
+    const baseOffset = 0 // 基础偏移量
     const unitHeightOffset = this.actor.hpBarUIHeight * this.actor.size; // 单位高度偏移
     const totalHeight = baseOffset + unitHeightOffset; // 总高度
     const cameraEyeZ = GetCameraEyePositionZ(); // 摄像机视点Z坐标
@@ -226,9 +226,7 @@ export class UnitBlood {
     const yAdjustment = heightDifference * 0.00006; // Y坐标调整量
 
     // 转换为屏幕坐标（传入计算好的偏移量）
-    const screenPos = worldToScreen(unitX, unitY, 0, {
-      offsetScreenY: yAdjustment
-    });
+    const screenPos = worldToScreen(unitX, unitY, 0);
 
     //判断是否在控制台的位置
     if (screenPos.screenY >= 1000 / 1800 ||
