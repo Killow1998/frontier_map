@@ -5,7 +5,7 @@ export class Actor extends Unit {
   public static allActors: Record<number, Actor> = {};
 
   // 私有字段存储实际值，并设置默认值
-  private _hpBarUIHeight: number = 150; // 默认血条UI高度
+  private _hpBarUIHeight: number = 100; // 默认血条UI高度
   private _size: number = 1.0; // 默认大小倍数
 
   private label = "";
