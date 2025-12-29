@@ -21,6 +21,7 @@ export class HotReload {
   private timer: Timer | null = null;
   private checkInterval: number = 1; // 检查间隔（秒）
   private lastProcessedTimestamp: number = 0;
+  private gameStartTimestamp: number = 0; // 游戏启动时间戳（秒，10位）
   private enabled: boolean = true;
 
   private constructor() {
@@ -58,7 +59,10 @@ export class HotReload {
       return;
     }
 
+    // 记录游戏启动时间戳（os.time() 返回 10 位秒级时间戳）
+    this.gameStartTimestamp = os.time();
     print(">>> HotReload: Starting hot reload system...");
+    print(`>>> HotReload: Game start timestamp: ${this.gameStartTimestamp} (seconds, 10 digits)`);
     print(`>>> HotReload: Check interval: ${this.checkInterval} seconds`);
     print(`>>> HotReload: PROJECT_PATH: ${PROJECT_PATH}`);
 
@@ -109,21 +113,37 @@ export class HotReload {
         return;
       }
 
+      // 将通知时间戳转换为秒级（如果文件中的是毫秒级，则除以1000）
+      // os.time() 返回 10 位秒级时间戳，文件中的可能是 13 位毫秒级
+      let notificationTimestampSeconds = notification.timestamp;
+      if (notificationTimestampSeconds > 10000000000) {
+        // 如果大于 10 位，说明是毫秒级，转换为秒级
+        notificationTimestampSeconds = Math.floor(notificationTimestampSeconds / 1000);
+      }
+
+      // 检查时间戳是否在游戏启动之前
+      if (notificationTimestampSeconds < this.gameStartTimestamp) {
+        //print(`>>> HotReload: Notification timestamp (${notificationTimestampSeconds}) is before game start (${this.gameStartTimestamp}), ignoring`);
+        return;
+      }
+
       // 检查是否是新的通知（仅检查时间戳，忽略文件中的 processed 字段）
-      if (notification.timestamp <= this.lastProcessedTimestamp) {
+      if (notificationTimestampSeconds <= this.lastProcessedTimestamp) {
         return;
       }
 
       print(`>>> HotReload: New notification detected!`);
-      print(`>>> HotReload: Timestamp: ${notification.timestamp}, Last: ${this.lastProcessedTimestamp}`);
+      print(`>>> HotReload: Notification timestamp: ${notificationTimestampSeconds} (original: ${notification.timestamp})`);
+      print(`>>> HotReload: Game start timestamp: ${this.gameStartTimestamp}`);
+      print(`>>> HotReload: Last processed: ${this.lastProcessedTimestamp}`);
       print(`>>> HotReload: Action: ${notification.action}`);
-      print(`>>> HotReload: Modules: ${notification.modules.join(", ")}`);
+      print(`>>> HotReload: Modules: ${notification.modules.map(m => m.name).join(", ")}`);
 
       // 处理热更新
       this.processHotReload(notification);
 
-      // 标记为已处理（仅在内存中）
-      this.markAsProcessed(notification);
+      // 标记为已处理（仅在内存中，使用秒级时间戳）
+      this.markAsProcessed(notificationTimestampSeconds);
 
     } catch (error) {
       print(`>>> HotReload: Error in checkForUpdates: ${error}`);
@@ -387,12 +407,13 @@ export class HotReload {
 
   /**
    * 标记通知为已处理（仅在内存中标记）
+   * @param timestampSeconds 时间戳（秒级，10位）
    */
-  private markAsProcessed(notification: HotReloadNotification): void {
+  private markAsProcessed(timestampSeconds: number): void {
     // 由于 Lua 引擎不支持文件写入模式，我们只在内存中标记已处理的时间戳
     // 通过更新 lastProcessedTimestamp 来避免重复处理相同的通知
-    this.lastProcessedTimestamp = notification.timestamp;
-    print(`Marked notification with timestamp ${notification.timestamp} as processed in memory`);
+    this.lastProcessedTimestamp = timestampSeconds;
+    print(`>>> HotReload: Marked notification with timestamp ${timestampSeconds} as processed in memory`);
   }
 }
 

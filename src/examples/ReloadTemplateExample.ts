@@ -114,7 +114,7 @@ class ReloadTemplateExample {
 
     Console.log(`Registered ${this.ui.getComponentCount()} components`);
 
-    Console.log(`time: ${os.time()}`);
+    Console.log(`time 123: ${os.time()}`);
   }
 
   /**
