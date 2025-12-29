@@ -218,15 +218,17 @@ export class UnitBlood {
 
     // 计算单位高度偏移量
     // 获取镜头高度
-    const baseOffset = 0 // 基础偏移量
+    const baseOffset = 500 // 基础偏移量
     const unitHeightOffset = this.actor.hpBarUIHeight * this.actor.size; // 单位高度偏移
     const totalHeight = baseOffset + unitHeightOffset; // 总高度
-    const cameraEyeZ = GetCameraEyePositionZ(); // 摄像机视点Z坐标
-    const heightDifference = totalHeight - cameraEyeZ; // 高度差
-    const yAdjustment = heightDifference * 0.00006; // Y坐标调整量
+    let yAdjustment = totalHeight * 0.00006; // Y坐标调整量
+
+    if (GetCameraEyePositionZ() > 2000) {
+      yAdjustment = 0;
+    }
 
     // 转换为屏幕坐标（传入计算好的偏移量）
-    const screenPos = worldToScreen(unitX, unitY, 0);
+    const screenPos = worldToScreen(unitX, unitY, 0, { offsetScreenX: 0, offsetScreenY: yAdjustment });
 
     //判断是否在控制台的位置
     if (screenPos.screenY >= 1000 / 1800 ||
