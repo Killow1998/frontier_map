@@ -4,12 +4,13 @@ import { HotReloadHelper } from "src/system/ui/UIComponent";
 import { Dialog } from "src/system/ui/component/Dialog";
 import { DamageTextExample } from "./DamageTextExample";
 import { Actor } from "src/system/actor";
-import { EVENT_PLAYER_UNIT_TRAIN_CANCEL, Players, Trigger, Unit } from "@eiriksgata/wc3ts/*";
+import { EVENT_PLAYER_UNIT_TRAIN_CANCEL, Players, Timer, Trigger, Unit } from "@eiriksgata/wc3ts/*";
 import { FourCC } from "src/utils/helper";
 import { GameEventManager, PlayerUnitEventId } from "src/system/event/GameEvent";
 import { DamageTextManager } from "src/system/ui/DamageTexttag";
 import { MessageList } from "src/system/ui/component/MessageList";
 import { Button } from "src/system/ui/component/Button";
+import { Console } from "src/system/console";
 
 /**
  * 热更新模板
@@ -114,12 +115,17 @@ class ReloadTemplateExample {
 
 
 
-    // const button = Button.createAtPresetPosition("测试按钮", "CENTER");
-    // button.setOnClick(() => {
-    //   print("测试按钮被点击!");
-    // });
-    // button.create();
-    // this.ui.register(button);
+    const button = Button.createAtPresetPosition("测试按钮", "CENTER");
+    button.setOnClick(() => {
+      Console.log("测试按钮被点击!111");
+    });
+    button.create();
+    this.ui.register(button);
+
+
+    Timer.create().start(1, true, () => {
+      Console.log("测试按钮被点击!");
+    });
     print(`Registered ${this.ui.getComponentCount()} components`);
 
   }

@@ -8,6 +8,7 @@ import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { EventBus, mouseEvents } from "./system/event";
+import { Console } from "./system/console";
 
 /**
  * 应用程序主入口
@@ -45,6 +46,9 @@ export function initialize(): void {
   // register ydlua
   ydlua.getInstance().initialize();
 
+  //log 初始化
+  Console.init();
+  
   //载入TOC fdf样式模板Frame
   try {
     Frame.loadTOC("resource\\fdf\\path.toc");
@@ -76,6 +80,7 @@ export function initialize(): void {
 
   print(">>> Main: Main module initialized");
 
+
   // 启动应用程序
   main();
 
@@ -84,6 +89,8 @@ export function initialize(): void {
 
   //调整魔兽渲染黑边
   //DzFrameEditBlackBorders(0, 0);
+
+
 
 }
 
