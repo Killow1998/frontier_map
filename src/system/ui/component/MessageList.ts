@@ -440,6 +440,7 @@ export class MessageList {
   /**
    * 更新所有消息的目标位置
    * 参考Dialog的repositionButtons方法，使用绝对屏幕坐标
+   * 只计算可见消息的位置，不可见消息不占用空间
    */
   private updateAllMessageTargetPositions(): void {
     const contentPos = this.panel.getContentPosition();
@@ -452,16 +453,31 @@ export class MessageList {
     // 消息的X坐标始终对齐内容区域的左边缘
     const messageX = contentPos.x;
 
+    // 只计算可见消息的位置
+    const visibleMessages = this.messages.filter(msg => msg.textComponent.getVisible());
+    let visibleIndex = 0;
+
     for (let i = 0; i < this.messages.length; i++) {
       const message = this.messages[i];
-      // 从底部向上排列：第一条消息在baseY，第二条在baseY - (height + spacing)，以此类推
-      const targetY = baseY - (this.messages.length - 1 - i) * (this.messageHeight + this.messageSpacing);
-      message.setTargetY(targetY);
+      const isVisible = message.textComponent.getVisible();
       
-      // 更新X坐标和宽度（确保消息在正确的位置和宽度）
-      // 使用绝对坐标，与Dialog的按钮定位方式一致
-      message.textComponent.setPosition(messageX, message.textComponent.getPixelY());
-      message.textComponent.setSize(contentSize.width, this.messageHeight);
+      if (isVisible) {
+        // 只对可见消息计算位置
+        // 从底部向上排列：第一条可见消息在baseY，第二条在baseY - (height + spacing)，以此类推
+        const targetY = baseY - (visibleMessages.length - 1 - visibleIndex) * (this.messageHeight + this.messageSpacing);
+        message.setTargetY(targetY);
+        
+        // 更新X坐标和宽度（确保消息在正确的位置和宽度）
+        // 使用绝对坐标，与Dialog的按钮定位方式一致
+        message.textComponent.setPosition(messageX, message.textComponent.getPixelY());
+        message.textComponent.setSize(contentSize.width, this.messageHeight);
+        
+        visibleIndex++;
+      } else {
+        // 不可见消息不占用位置，但保持其当前Y坐标（避免动画问题）
+        // 可以将其移到屏幕外或保持原位置
+        // 这里选择保持原位置，但不会参与位置计算
+      }
     }
   }
 
@@ -497,7 +513,7 @@ export class MessageList {
         return;
       }
 
-      // 更新所有消息的位置
+      // 更新所有消息的位置（只有可见消息会更新）
       for (const message of this.messages) {
         message.updatePosition(this.animationProgress);
       }
@@ -506,10 +522,14 @@ export class MessageList {
 
   /**
    * 完成位置动画
+   * 只有可见消息才完成位置动画
    */
   private finishPositionAnimation(): void {
     for (const message of this.messages) {
-      message.finishPositionAnimation();
+      // 只有可见消息才完成位置动画
+      if (message.textComponent.getVisible()) {
+        message.finishPositionAnimation();
+      }
     }
   }
 
