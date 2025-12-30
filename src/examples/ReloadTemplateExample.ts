@@ -1,6 +1,5 @@
 import { Text, TextColors } from "src/system/ui/component/Text";
 import { ModuleManager } from "../system/ModuleManager";
-import { Console } from "../system/console";
 import { HotReloadHelper } from "src/system/ui/UIComponent";
 import { Dialog } from "src/system/ui/component/Dialog";
 import { DamageTextExample } from "./DamageTextExample";
@@ -9,6 +8,8 @@ import { EVENT_PLAYER_UNIT_TRAIN_CANCEL, Players, Trigger, Unit } from "@eiriksg
 import { FourCC } from "src/utils/helper";
 import { GameEventManager, PlayerUnitEventId } from "src/system/event/GameEvent";
 import { DamageTextManager } from "src/system/ui/DamageTexttag";
+import { MessageList } from "src/system/ui/component/MessageList";
+import { Button } from "src/system/ui/component/Button";
 
 /**
  * 热更新模板
@@ -35,7 +36,7 @@ class ReloadTemplateExample {
     //   const button = Button.createCentered("ReloadTemplate Button");
     //   button.setDraggable(true);
     //   button.setOnClick(() => {
-    //     Console.log("ReloadTemplate Button clicked!");
+    //     print("ReloadTemplate Button clicked!");
     //   });
     //   return button;
     // });
@@ -68,7 +69,7 @@ class ReloadTemplateExample {
     // testDialog.addButton({
     //   text: "选项 12",
     //   onClick: () => {
-    //     Console.log("点击了选项 1");
+    //     print("点击了选项 1");
     //   },
     //   color: TextColors.GREEN
     // });
@@ -76,7 +77,7 @@ class ReloadTemplateExample {
     // testDialog.addButton({
     //   text: "选项 2",
     //   onClick: () => {
-    //     Console.log("点击了选项 2");
+    //     print("点击了选项 2");
     //   },
     //   color: TextColors.YELLOW
     // });
@@ -84,7 +85,7 @@ class ReloadTemplateExample {
     // testDialog.addButton({
     //   text: "关闭",
     //   onClick: () => {
-    //     Console.log("关闭对话框");
+    //     print("关闭对话框");
     //     testDialog.hide();
     //   },
     //   color: TextColors.RED
@@ -97,24 +98,30 @@ class ReloadTemplateExample {
     // this.ui.register(testDialog);
 
     //创建圣骑士单位
-    const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
+    // const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
 
 
-    // 单位受到伤害
-    GameEventManager.getInstance().onUnitAttacked((data) => {
-      if (data.Actor == undefined) return;
-      const damage = GetRandomInt(1, 100000000);
-      DamageTextManager.showDamage(damage, data.Actor.x, data.Actor.y, data.Actor.hpBarUIHeight);
-    });
+    // // 单位受到伤害
+    // GameEventManager.getInstance().onUnitAttacked((data) => {
+    //   if (data.Actor == undefined) return;
+    //   const damage = GetRandomInt(1, 100000000);
+    //   DamageTextManager.showDamage(damage, data.Actor.x, data.Actor.y, data.Actor.hpBarUIHeight);
+    // });
+
+    // actor?.createBloodBar();
+    // typeof DamageTextExample;
 
 
 
-    actor?.createBloodBar();
-    typeof DamageTextExample;
 
-    Console.log(`Registered ${this.ui.getComponentCount()} components`);
+    // const button = Button.createAtPresetPosition("测试按钮", "CENTER");
+    // button.setOnClick(() => {
+    //   print("测试按钮被点击!");
+    // });
+    // button.create();
+    // this.ui.register(button);
+    print(`Registered ${this.ui.getComponentCount()} components`);
 
-    Console.log(`time 123: ${os.time()}`);
   }
 
   /**
@@ -122,19 +129,19 @@ class ReloadTemplateExample {
    * 只需要一行代码即可清理所有UI组件
    */
   public cleanup(): void {
-    Console.log("ReloadTemplate: Cleanup called...");
+    print("ReloadTemplate: Cleanup called...");
 
     // 一行代码销毁所有已注册的组件！
     this.ui.cleanup();
 
-    Console.log("ReloadTemplate: All resources cleaned up");
+    print("ReloadTemplate: All resources cleaned up");
   }
 
   /**
    * 初始化函数
    */
   public initialize(): void {
-    Console.log("ReloadTemplate: Initializing...");
+    print("ReloadTemplate: Initializing...");
     this.TestButton();
     print("ReloadTemplate initialized");
   }
@@ -143,7 +150,7 @@ class ReloadTemplateExample {
    * 热重载处理函数
    */
   public static onHotReload(): void {
-    Console.log("ReloadTemplate hot reloaded!");
+    print("ReloadTemplate hot reloaded!");
   }
 }
 

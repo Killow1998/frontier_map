@@ -1,5 +1,5 @@
 import { Frame, FRAMEPOINT_TOPLEFT, FRAMEPOINT_BOTTOMRIGHT } from "@eiriksgata/wc3ts/*";
-import { Console } from "src/system/console";
+
 import { ScreenCoordinates } from "../ScreenCoordinates";
 
 /**
@@ -152,27 +152,27 @@ export class Tips {
   private create(): void {
     if (this.isCreated) return;
 
-    Console.log("[Tips] Starting Tips creation...");
+    print("[Tips] Starting Tips creation...");
 
     const gameUI = Frame.fromHandle(DzGetGameUI());
     if (!gameUI) {
-      Console.log("[Tips] Error: Cannot get game UI frame");
+      print("[Tips] Error: Cannot get game UI frame");
       return;
     }
-    Console.log("[Tips] ✓ Got game UI frame");
+    print("[Tips] ✓ Got game UI frame");
 
     // 使用时间戳确保 Frame 名称唯一
     const timestamp = math.floor(os.clock() * 1000);
-    Console.log(`[Tips] Using timestamp: ${timestamp}`);
+    print(`[Tips] Using timestamp: ${timestamp}`);
 
     // 创建背景框架
-    Console.log("[Tips] Creating backdrop frame...");
+    print("[Tips] Creating backdrop frame...");
     this.backdropFrame = Frame.createType(`TipsBackdrop_${timestamp}`, gameUI, 1000, "BACKDROP", "") || null;
     if (!this.backdropFrame) {
-      Console.log("[Tips] Error: Failed to create backdrop frame");
+      print("[Tips] Error: Failed to create backdrop frame");
       return;
     }
-    Console.log("[Tips] ✓ Backdrop frame created");
+    print("[Tips] ✓ Backdrop frame created");
 
     this.backdropFrame
       .setSize(0.2, 0.15)
@@ -194,7 +194,7 @@ export class Tips {
     // 创建文本框架
     this.textFrame = Frame.createType(`TipsText_${timestamp}`, this.backdropFrame, 0, "TEXT", "") || null;
     if (!this.textFrame) {
-      Console.log("[Tips] Error: Failed to create text frame");
+      print("[Tips] Error: Failed to create text frame");
       return;
     }
 
@@ -208,7 +208,7 @@ export class Tips {
     this.isCreated = true;
     this.isVisible = false;
 
-    Console.log("[Tips] Tips component created successfully");
+    print("[Tips] Tips component created successfully");
   }
 
   /**
@@ -240,10 +240,10 @@ export class Tips {
   ): void {
     // 确保已创建
     if (!this.isCreated) {
-      Console.log("[Tips] Tips not created, attempting to create...");
+      print("[Tips] Tips not created, attempting to create...");
       this.create();
       if (!this.isCreated) {
-        Console.log("[Tips] Error: Failed to create Tips");
+        print("[Tips] Error: Failed to create Tips");
         return;
       }
     }
@@ -763,7 +763,7 @@ export class Tips {
     this.isVisible = false;
     Tips.instance = null;
 
-    Console.log("[Tips] Tips component destroyed");
+    print("[Tips] Tips component destroyed");
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Frame, FRAME_ALIGN_CENTER, FRAME_ALIGN_TOP } from "@eiriksgata/wc3ts/*";
 import { FDFButtonBuilder, ButtonGroup } from "../system/ui/fdf/FDFButton";
-import { Console } from "../system/console";
+
 
 /**
  * FDF按钮使用示例
@@ -12,7 +12,7 @@ export class FDFButtonExample {
    * 创建示例按钮集合
    */
   public createExampleButtons(): void {
-    Console.log("Creating FDF button examples...");
+    print("Creating FDF button examples...");
 
     // 示例1: 创建标准按钮
     this.createStandardButton();
@@ -29,7 +29,7 @@ export class FDFButtonExample {
     // 示例5: 创建按钮组
     this.createButtonArray();
 
-    Console.log("FDF button examples created!");
+    print("FDF button examples created!");
   }
 
   /**
@@ -49,14 +49,14 @@ export class FDFButtonExample {
       },
       {
         onClick: () => {
-          Console.log("标准按钮被点击了!");
+          print("标准按钮被点击了!");
           DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 5, "标准按钮被点击!");
         },
         onMouseEnter: () => {
-          Console.log("鼠标进入标准按钮");
+          print("鼠标进入标准按钮");
         },
         onMouseLeave: () => {
-          Console.log("鼠标离开标准按钮");
+          print("鼠标离开标准按钮");
         }
       }
     );
@@ -82,7 +82,7 @@ export class FDFButtonExample {
       },
       {
         onClick: () => {
-          Console.log("大型按钮被点击了!");
+          print("大型按钮被点击了!");
           DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 5, "大型按钮被点击!");
         }
       }
@@ -106,7 +106,7 @@ export class FDFButtonExample {
       },
       {
         onClick: () => {
-          Console.log("小型按钮被点击了!");
+          print("小型按钮被点击了!");
           DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 5, "小型按钮被点击!");
         }
       }
@@ -130,7 +130,7 @@ export class FDFButtonExample {
       },
       {
         onClick: () => {
-          Console.log("图标按钮被点击了!");
+          print("图标按钮被点击了!");
           DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 5, "图标按钮被点击!");
         }
       }
@@ -159,7 +159,7 @@ export class FDFButtonExample {
         },
         {
           onClick: () => {
-            Console.log(`技能按钮 ${i + 1} 被点击!`);
+            print(`技能按钮 ${i + 1} 被点击!`);
             DisplayTimedTextToPlayer(
               GetLocalPlayer(),
               0,
@@ -203,7 +203,7 @@ export class FDFButtonExample {
    */
   public showAllButtons(): void {
     this.buttonGroup.showAll();
-    Console.log("All buttons shown");
+    print("All buttons shown");
   }
 
   /**
@@ -211,7 +211,7 @@ export class FDFButtonExample {
    */
   public hideAllButtons(): void {
     this.buttonGroup.hideAll();
-    Console.log("All buttons hidden");
+    print("All buttons hidden");
   }
 
   /**
@@ -219,7 +219,7 @@ export class FDFButtonExample {
    */
   public enableAllButtons(): void {
     this.buttonGroup.enableAll();
-    Console.log("All buttons enabled");
+    print("All buttons enabled");
   }
 
   /**
@@ -227,7 +227,7 @@ export class FDFButtonExample {
    */
   public disableAllButtons(): void {
     this.buttonGroup.disableAll();
-    Console.log("All buttons disabled");
+    print("All buttons disabled");
   }
 
   /**
@@ -235,7 +235,7 @@ export class FDFButtonExample {
    */
   public cleanup(): void {
     this.buttonGroup.destroyAll();
-    Console.log("All buttons destroyed");
+    print("All buttons destroyed");
   }
 }
 
@@ -293,7 +293,7 @@ export class DynamicMenuExample {
    * 开始游戏
    */
   private startGame(): void {
-    Console.log("Starting game...");
+    print("Starting game...");
     DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 3, "游戏开始!");
     this.clearMenu();
   }
@@ -302,7 +302,7 @@ export class DynamicMenuExample {
    * 显示选项
    */
   private showOptions(): void {
-    Console.log("Showing options...");
+    print("Showing options...");
     DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 3, "打开选项菜单");
     // 这里可以创建选项子菜单
   }
@@ -311,7 +311,7 @@ export class DynamicMenuExample {
    * 显示关于
    */
   private showAbout(): void {
-    Console.log("Showing about...");
+    print("Showing about...");
     DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 3, "关于本游戏");
   }
 
@@ -319,7 +319,7 @@ export class DynamicMenuExample {
    * 退出游戏
    */
   private exitGame(): void {
-    Console.log("Exiting game...");
+    print("Exiting game...");
     DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 3, "退出游戏");
   }
 }

@@ -1,6 +1,6 @@
 import { Frame } from "@eiriksgata/wc3ts/*";
 import { ScreenCoordinates } from "../ScreenCoordinates";
-import { Console } from "src/system/console";
+
 import { MouseEventManager, MouseButton } from "src/system/event/MouseEvent";
 import { UIComponent } from "../UIComponent";
 
@@ -182,7 +182,7 @@ export class DraggableMixin {
     this.dragOffsetX = currentMouseX - this.component.getPixelX();
     this.dragOffsetY = currentMouseY - this.component.getPixelY();
     
-    Console.log("Drag started");
+    print("Drag started");
     
     if (this.onDragStartCallback) {
       this.onDragStartCallback();
@@ -232,7 +232,7 @@ export class DraggableMixin {
       this.dragMouseUpId = -1;
     }
     
-    Console.log("Drag ended");
+    print("Drag ended");
     
     if (this.onDragEndCallback) {
       this.onDragEndCallback(this.component.getPixelX(), this.component.getPixelY());
@@ -653,7 +653,7 @@ export abstract class UIComponentBase implements UIComponent, IDraggableComponen
     this.dragOffsetX = currentMouseX - this.pixelX;
     this.dragOffsetY = currentMouseY - this.pixelY;
     
-    Console.log("Drag started at mouse(" + currentMouseX + ", " + currentMouseY + ")");
+    print("Drag started at mouse(" + currentMouseX + ", " + currentMouseY + ")");
     
     if (this.onDragStartCallback) {
       this.onDragStartCallback();
@@ -709,7 +709,7 @@ export abstract class UIComponentBase implements UIComponent, IDraggableComponen
       this.dragMouseUpId = -1;
     }
     
-    Console.log("Drag ended at position(" + this.pixelX + ", " + this.pixelY + ")");
+    print("Drag ended at position(" + this.pixelX + ", " + this.pixelY + ")");
     
     if (this.onDragEndCallback) {
       this.onDragEndCallback(this.pixelX, this.pixelY);

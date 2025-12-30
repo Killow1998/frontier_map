@@ -1,5 +1,5 @@
 import { ModuleManager } from "../system/ModuleManager";
-import { Console } from "../system/console";
+
 import { mouseEvents, MouseButton, MouseEventData } from "../system/event";
 
 /**
@@ -20,27 +20,27 @@ class MouseEventTest {
     
     // 测试鼠标左键按下事件
     const leftDownId = mouseEvents.onMouseDown((data: MouseEventData) => {
-      Console.log(`[鼠标左键按下] 屏幕: (${data.screenX}, ${data.screenY})`);
-      Console.log(`  地形坐标: (${math.floor(data.terrainX)}, ${math.floor(data.terrainY)})`);
-      Console.log(`  是否在UI上: ${data.isOverUI}`);
+      print(`[鼠标左键按下] 屏幕: (${data.screenX}, ${data.screenY})`);
+      print(`  地形坐标: (${math.floor(data.terrainX)}, ${math.floor(data.terrainY)})`);
+      print(`  是否在UI上: ${data.isOverUI}`);
     }, MouseButton.LEFT);
     this.subscriptionIds.push(leftDownId);
     
     // 测试鼠标右键按下事件
     const rightDownId = mouseEvents.onMouseDown((data: MouseEventData) => {
-      Console.log(`[鼠标右键按下] 屏幕: (${data.screenX}, ${data.screenY})`);
+      print(`[鼠标右键按下] 屏幕: (${data.screenX}, ${data.screenY})`);
     }, MouseButton.RIGHT);
     this.subscriptionIds.push(rightDownId);
     
     // 测试鼠标右键松开事件
     const rightUpId = mouseEvents.onMouseUp((data: MouseEventData) => {
-      Console.log(`[鼠标右键松开] 屏幕: (${data.screenX}, ${data.screenY})`);
+      print(`[鼠标右键松开] 屏幕: (${data.screenX}, ${data.screenY})`);
     }, MouseButton.RIGHT);
     this.subscriptionIds.push(rightUpId);
     
     // 测试鼠标左键松开事件
     const leftUpId = mouseEvents.onMouseUp((data: MouseEventData) => {
-      Console.log(`[鼠标左键松开] 屏幕: (${data.screenX}, ${data.screenY})`);
+      print(`[鼠标左键松开] 屏幕: (${data.screenX}, ${data.screenY})`);
     }, MouseButton.LEFT);
     this.subscriptionIds.push(leftUpId);
     
@@ -50,7 +50,7 @@ class MouseEventTest {
     //   const now = os.clock();
     //   // 每 0.5 秒最多输出一次
     //   if (now - lastMoveTime > 0.5) {
-    //     Console.log(`[鼠标移动] 屏幕: (${data.screenX}, ${data.screenY})`);
+    //     print(`[鼠标移动] 屏幕: (${data.screenX}, ${data.screenY})`);
     //     lastMoveTime = now;
     //   }
     // });
@@ -59,15 +59,15 @@ class MouseEventTest {
     // 测试鼠标滚轮事件
     const wheelId = mouseEvents.onMouseWheel((data: MouseEventData) => {
       const direction = data.wheelDelta && data.wheelDelta > 0 ? "向上" : "向下";
-      Console.log(`[鼠标滚轮] ${direction}滚动, delta: ${data.wheelDelta}`);
+      print(`[鼠标滚轮] ${direction}滚动, delta: ${data.wheelDelta}`);
     });
     this.subscriptionIds.push(wheelId);
     
-    Console.log("=== 鼠标事件测试已启动 ===");
-    Console.log("- 左键按下/松开: 显示坐标信息");
-    Console.log("- 右键按下: 显示屏幕坐标");
-    Console.log("- 鼠标移动: 每0.5秒显示一次");
-    Console.log("- 滚轮: 显示滚动方向");
+    print("=== 鼠标事件测试已启动 ===");
+    print("- 左键按下/松开: 显示坐标信息");
+    print("- 右键按下: 显示屏幕坐标");
+    print("- 鼠标移动: 每0.5秒显示一次");
+    print("- 滚轮: 显示滚动方向");
   }
 
   /**
@@ -75,7 +75,7 @@ class MouseEventTest {
    * 在这里销毁所有需要清理的资源
    */
   public cleanup(): void {
-    Console.log("MouseEventTest: Cleanup called, destroying resources...");
+    print("MouseEventTest: Cleanup called, destroying resources...");
     
     // 取消所有订阅
     for (const id of this.subscriptionIds) {
@@ -83,14 +83,14 @@ class MouseEventTest {
     }
     this.subscriptionIds = [];
 
-    Console.log("MouseEventTest: All subscriptions cleaned up");
+    print("MouseEventTest: All subscriptions cleaned up");
   }
 
   /**
    * 初始化函数
    */
   public initialize(): void {
-    Console.log("MouseEventTest: Initializing...");
+    print("MouseEventTest: Initializing...");
     this.run();
     print("MouseEventTest initialized");
   }
@@ -99,7 +99,7 @@ class MouseEventTest {
    * 热重载处理函数
    */
   public static onHotReload(): void {
-    Console.log("MouseEventTest hot reloaded!");
+    print("MouseEventTest hot reloaded!");
   }
 }
 

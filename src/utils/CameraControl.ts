@@ -1,5 +1,5 @@
 import { Timer } from "@eiriksgata/wc3ts/*";
-import { Console } from "src/system/console";
+
 
 /**
  * 镜头控制工具类
@@ -56,7 +56,7 @@ export class CameraControl {
     this.resetCam = true;
 
     //获取视角角度
-    Console.log(`CameraControl: 视角角度: ${GetCameraField(ConvertCameraField(2))}`);
+    print(`CameraControl: 视角角度: ${GetCameraField(ConvertCameraField(2))}`);
 
     if (delta < 0) {
       // 滚轮下滑 - 拉远镜头

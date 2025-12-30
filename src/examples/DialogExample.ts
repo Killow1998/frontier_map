@@ -1,14 +1,14 @@
 /** @noSelfInFile */
 
 import { Dialog } from "../system/ui/component/Dialog";
-import { Console } from "../system/console";
+
 import { TextColors } from "../system/ui/component/Text";
 
 /**
  * Dialog 组件使用示例
  */
 export function runDialogExamples(): void {
-  Console.log("=== Dialog Component Examples ===");
+  print("=== Dialog Component Examples ===");
 
   // 测试对话框 - 包含标题栏隐藏功能测试
   testDialogWithTitleToggle();
@@ -28,14 +28,14 @@ export function runDialogExamples(): void {
   // ==================== 示例 5: 动态添加按钮 ====================
   // example5_DynamicButtons();
 
-  Console.log("=== Dialog Examples Complete ===");
+  print("=== Dialog Examples Complete ===");
 }
 
 /**
  * 示例 1: 基本对话框
  */
 /* function example1_BasicDialog(): void {
-  Console.log("\n--- Example 1: Basic Dialog ---");
+  print("\n--- Example 1: Basic Dialog ---");
 
   const dialog = new Dialog("选择难度", 500, 300);
   dialog.create();
@@ -44,7 +44,7 @@ export function runDialogExamples(): void {
   dialog.addButton({
     text: "简单",
     onClick: () => {
-      Console.log("选择了简单难度");
+      print("选择了简单难度");
       dialog.hide();
     },
     color: TextColors.GREEN
@@ -53,7 +53,7 @@ export function runDialogExamples(): void {
   dialog.addButton({
     text: "普通",
     onClick: () => {
-      Console.log("选择了普通难度");
+      print("选择了普通难度");
       dialog.hide();
     },
     color: TextColors.YELLOW
@@ -62,7 +62,7 @@ export function runDialogExamples(): void {
   dialog.addButton({
     text: "困难",
     onClick: () => {
-      Console.log("选择了困难难度");
+      print("选择了困难难度");
       dialog.hide();
     },
     color: TextColors.RED
@@ -71,39 +71,39 @@ export function runDialogExamples(): void {
   // 默认隐藏，等待显示
   dialog.hide();
 
-  Console.log("✓ 创建了基本对话框");
-  Console.log("  提示: 调用 dialog.show() 显示对话框");
+  print("✓ 创建了基本对话框");
+  print("  提示: 调用 dialog.show() 显示对话框");
 } */
 
 /**
  * 示例 2: 确认对话框
  */
 /* function example2_ConfirmDialog(): void {
-  Console.log("\n--- Example 2: Confirm Dialog ---");
+  print("\n--- Example 2: Confirm Dialog ---");
 
   const confirmDialog = Dialog.createConfirm(
     "确认操作",
     "你确定要继续吗？",
     () => {
-      Console.log('用户点击了"是"');
+      print('用户点击了"是"');
       // 执行确认操作
     },
     () => {
-      Console.log('用户点击了"否"');
+      print('用户点击了"否"');
       // 取消操作
     }
   );
 
   confirmDialog.hide(); // 默认隐藏
 
-  Console.log("✓ 创建了确认对话框");
+  print("✓ 创建了确认对话框");
 } */
 
 /**
  * 示例 3: 选择对话框
  */
 /* function example3_ChoiceDialog(): void {
-  Console.log("\n--- Example 3: Choice Dialog ---");
+  print("\n--- Example 3: Choice Dialog ---");
 
   const options = ["战士", "法师", "刺客", "牧师", "猎人"];
 
@@ -111,21 +111,21 @@ export function runDialogExamples(): void {
     "选择职业",
     options,
     (index) => {
-      Console.log("选择了: " + options[index] + " (索引 " + index + ")");
+      print("选择了: " + options[index] + " (索引 " + index + ")");
       // 根据选择执行相应逻辑
     }
   );
 
   choiceDialog.hide();
 
-  Console.log("✓ 创建了选择对话框，包含 " + options.length + " 个选项");
+  print("✓ 创建了选择对话框，包含 " + options.length + " 个选项");
 } */
 
 /**
  * 示例 4: 自定义样式对话框
  */
 /* function example4_CustomDialog(): void {
-  Console.log("\n--- Example 4: Custom Styled Dialog ---");
+  print("\n--- Example 4: Custom Styled Dialog ---");
 
   const customDialog = new Dialog("设置", 450, 400);
   customDialog.create();
@@ -145,7 +145,7 @@ export function runDialogExamples(): void {
   customDialog.addButton({
     text: "音效设置",
     onClick: () => {
-      Console.log("打开音效设置");
+      print("打开音效设置");
     },
     color: TextColors.WHITE
   });
@@ -153,7 +153,7 @@ export function runDialogExamples(): void {
   customDialog.addButton({
     text: "画面设置",
     onClick: () => {
-      Console.log("打开画面设置");
+      print("打开画面设置");
     },
     color: TextColors.WHITE
   });
@@ -161,7 +161,7 @@ export function runDialogExamples(): void {
   customDialog.addButton({
     text: "控制设置",
     onClick: () => {
-      Console.log("打开控制设置");
+      print("打开控制设置");
     },
     color: TextColors.WHITE
   });
@@ -169,7 +169,7 @@ export function runDialogExamples(): void {
   customDialog.addButton({
     text: "返回",
     onClick: () => {
-      Console.log("关闭设置");
+      print("关闭设置");
       customDialog.hide();
     },
     color: TextColors.ORANGE
@@ -177,14 +177,14 @@ export function runDialogExamples(): void {
 
   customDialog.hide();
 
-  Console.log("✓ 创建了自定义样式对话框");
+  print("✓ 创建了自定义样式对话框");
 } */
 
 /**
  * 示例 5: 动态添加/移除按钮
  */
 /* function example5_DynamicButtons(): void {
-  Console.log("\n--- Example 5: Dynamic Buttons ---");
+  print("\n--- Example 5: Dynamic Buttons ---");
 
   const dynamicDialog = new Dialog("动态按钮", 500, 400);
   dynamicDialog.create();
@@ -199,11 +199,11 @@ export function runDialogExamples(): void {
       dynamicDialog.addButton({
         text: "按钮 " + buttonCount,
         onClick: () => {
-          Console.log("点击了按钮 " + buttonCount);
+          print("点击了按钮 " + buttonCount);
         },
         color: TextColors.CYAN
       });
-      Console.log("添加了按钮 " + buttonCount);
+      print("添加了按钮 " + buttonCount);
     },
     color: TextColors.GREEN
   });
@@ -215,9 +215,9 @@ export function runDialogExamples(): void {
       const buttons = dynamicDialog.getButtons();
       if (buttons.length > 2) { // 保留前两个控制按钮
         dynamicDialog.removeButton(buttons.length - 1);
-        Console.log("移除了最后一个按钮");
+        print("移除了最后一个按钮");
       } else {
-        Console.log("没有可移除的按钮");
+        print("没有可移除的按钮");
       }
     },
     color: TextColors.RED
@@ -225,15 +225,15 @@ export function runDialogExamples(): void {
 
   dynamicDialog.hide();
 
-  Console.log("✓ 创建了动态按钮对话框");
-  Console.log("  提示: 可以动态添加和移除按钮");
+  print("✓ 创建了动态按钮对话框");
+  print("  提示: 可以动态添加和移除按钮");
 } */
 
 /**
  * 完整示例：游戏菜单
  */
 export function createGameMenuDialog(): Dialog {
-  Console.log("\n=== Creating Game Menu Dialog ===");
+  print("\n=== Creating Game Menu Dialog ===");
 
   const menuDialog = Dialog.createCentered("游戏菜单", 450, 450);
 
@@ -247,7 +247,7 @@ export function createGameMenuDialog(): Dialog {
   menuDialog.addButton({
     text: "继续游戏",
     onClick: () => {
-      Console.log("继续游戏");
+      print("继续游戏");
       menuDialog.hide();
     },
     color: TextColors.GREEN
@@ -257,7 +257,7 @@ export function createGameMenuDialog(): Dialog {
   menuDialog.addButton({
     text: "保存游戏",
     onClick: () => {
-      Console.log("保存游戏");
+      print("保存游戏");
       // 显示保存对话框
     },
     color: TextColors.CYAN
@@ -267,7 +267,7 @@ export function createGameMenuDialog(): Dialog {
   menuDialog.addButton({
     text: "读取存档",
     onClick: () => {
-      Console.log("读取存档");
+      print("读取存档");
       // 显示读取对话框
     },
     color: TextColors.CYAN
@@ -277,7 +277,7 @@ export function createGameMenuDialog(): Dialog {
   menuDialog.addButton({
     text: "设置",
     onClick: () => {
-      Console.log("打开设置");
+      print("打开设置");
       // 显示设置对话框
     },
     color: TextColors.WHITE
@@ -287,13 +287,13 @@ export function createGameMenuDialog(): Dialog {
   menuDialog.addButton({
     text: "退出游戏",
     onClick: () => {
-      Console.log("退出游戏");
+      print("退出游戏");
       // 显示退出确认对话框
       const exitConfirm = Dialog.createConfirm(
         "退出确认",
         "确定要退出游戏吗？",
         () => {
-          Console.log("退出游戏确认");
+          print("退出游戏确认");
           // 执行退出逻辑
         }
       );
@@ -304,7 +304,7 @@ export function createGameMenuDialog(): Dialog {
 
   menuDialog.hide();
 
-  Console.log("✓ 游戏菜单对话框创建完成");
+  print("✓ 游戏菜单对话框创建完成");
 
   return menuDialog;
 }
@@ -313,7 +313,7 @@ export function createGameMenuDialog(): Dialog {
  * 快速开始 - 最简单的用法
  */
 export function quickStartDialog(): void {
-  Console.log("\n=== Quick Start: Dialog ===");
+  print("\n=== Quick Start: Dialog ===");
 
   // 方式 1: 基本对话框
   const dialog1 = new Dialog("标题", 500, 300);
@@ -327,24 +327,24 @@ export function quickStartDialog(): void {
   Dialog.createConfirm(
     "确认",
     "确定要执行此操作吗？",
-    () => Console.log("确认")
+    () => print("确认")
   );
 
   // 方式 3: 选择对话框
   Dialog.createChoice(
     "选择",
     ["选项1", "选项2", "选项3"],
-    (index) => Console.log("选择了选项" + (index + 1))
+    (index) => print("选择了选项" + (index + 1))
   );
 
-  Console.log("✓ 快速开始示例完成");
+  print("✓ 快速开始示例完成");
 }
 
 /**
  * 测试对话框标题栏显示/隐藏功能
  */
 function testDialogWithTitleToggle(): void {
-  Console.log("\n--- Test: Dialog Title Bar Toggle & Dragging ---");
+  print("\n--- Test: Dialog Title Bar Toggle & Dragging ---");
 
   // 创建带标题栏的对话框（可拖拽）
   const dialogWithTitle = new Dialog("可拖拽对话框", 450, 400);
@@ -355,20 +355,20 @@ function testDialogWithTitleToggle(): void {
   // 设置拖拽回调
   dialogWithTitle
     .setOnDragStart(() => {
-      Console.log("开始拖拽对话框");
+      print("开始拖拽对话框");
     })
     .setOnDragEnd((x, y) => {
-      Console.log("拖拽结束，新位置: (" + x + ", " + y + ")");
+      print("拖拽结束，新位置: (" + x + ", " + y + ")");
     })
     .setOnDragging((_x, _y) => {
-      // Console.log("拖拽中: (" + _x + ", " + _y + ")");  // 太频繁，注释掉
+      // print("拖拽中: (" + _x + ", " + _y + ")");  // 太频繁，注释掉
     });
   
   dialogWithTitle.addButton({
     text: "隐藏标题栏",
     onClick: () => {
       dialogWithTitle.setShowTitleBar(false);
-      Console.log("标题栏已隐藏");
+      print("标题栏已隐藏");
     }
   });
 
@@ -376,7 +376,7 @@ function testDialogWithTitleToggle(): void {
     text: "显示标题栏",
     onClick: () => {
       dialogWithTitle.setShowTitleBar(true);
-      Console.log("标题栏已显示");
+      print("标题栏已显示");
     }
   });
 
@@ -384,7 +384,7 @@ function testDialogWithTitleToggle(): void {
     text: "禁用拖拽",
     onClick: () => {
       dialogWithTitle.setDraggable(false);
-      Console.log("拖拽已禁用");
+      print("拖拽已禁用");
     }
   });
 
@@ -392,7 +392,7 @@ function testDialogWithTitleToggle(): void {
     text: "启用拖拽",
     onClick: () => {
       dialogWithTitle.setDraggable(true);
-      Console.log("拖拽已启用");
+      print("拖拽已启用");
     }
   });
 
@@ -400,7 +400,7 @@ function testDialogWithTitleToggle(): void {
     text: "隐藏关闭按钮",
     onClick: () => {
       dialogWithTitle.setShowCloseButton(false);
-      Console.log("关闭按钮已隐藏");
+      print("关闭按钮已隐藏");
     }
   });
 
@@ -408,7 +408,7 @@ function testDialogWithTitleToggle(): void {
     text: "显示关闭按钮",
     onClick: () => {
       dialogWithTitle.setShowCloseButton(true);
-      Console.log("关闭按钮已显示");
+      print("关闭按钮已显示");
     }
   });
 
@@ -433,7 +433,7 @@ function testDialogWithTitleToggle(): void {
   dialogNoTitle.addButton({
     text: "无标题栏对话框",
     onClick: () => {
-      Console.log("这是一个没有标题栏的对话框");
+      print("这是一个没有标题栏的对话框");
     }
   });
 
@@ -441,7 +441,7 @@ function testDialogWithTitleToggle(): void {
     text: "显示标题栏",
     onClick: () => {
       dialogNoTitle.setShowTitleBar(true);
-      Console.log("标题栏已启用");
+      print("标题栏已启用");
     }
   });
 
@@ -449,7 +449,7 @@ function testDialogWithTitleToggle(): void {
     text: "启用拖拽",
     onClick: () => {
       dialogNoTitle.setDraggable(true);
-      Console.log("拖拽已启用（需要标题栏才能拖拽）");
+      print("拖拽已启用（需要标题栏才能拖拽）");
     }
   });
 
@@ -463,9 +463,9 @@ function testDialogWithTitleToggle(): void {
 
   dialogNoTitle.show();
 
-  Console.log("✓ 标题栏切换和拖拽测试对话框创建完成");
-  Console.log("  - 中间对话框: 可拖拽，可切换标题栏");
-  Console.log("  - 左上角对话框: 初始无标题栏，不可拖拽");
-  Console.log("  - 提示: 拖拽对话框需要鼠标在标题栏上按住拖动");
+  print("✓ 标题栏切换和拖拽测试对话框创建完成");
+  print("  - 中间对话框: 可拖拽，可切换标题栏");
+  print("  - 左上角对话框: 初始无标题栏，不可拖拽");
+  print("  - 提示: 拖拽对话框需要鼠标在标题栏上按住拖动");
 }
 

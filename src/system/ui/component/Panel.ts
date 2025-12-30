@@ -1,6 +1,6 @@
 import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from "@eiriksgata/wc3ts/*";
 import { ScreenCoordinates } from "../ScreenCoordinates";
-import { Console } from "src/system/console";
+
 import { MouseEventManager, MouseButton } from "src/system/event/MouseEvent";
 import { UIBackgrounds } from "src/constants/ui/preset";
 
@@ -163,7 +163,7 @@ export class Panel {
 
   public create(parent?: Frame): void {
     if (this.backdropFrame) {
-      Console.log("Panel already created");
+      print("Panel already created");
       return;
     }
 
@@ -179,7 +179,7 @@ export class Panel {
     // 创建主背景框架
     this.backdropFrame = Frame.createType("PanelBackdrop", parentFrame, 0, "BACKDROP", "")!;
     if (!this.backdropFrame) {
-      Console.log("Error: Failed to create panel backdrop frame");
+      print("Error: Failed to create panel backdrop frame");
       return;
     }
 
@@ -199,7 +199,7 @@ export class Panel {
 
     this.setVisible(this.isVisible);
 
-    Console.log("Panel created at (" + this.pixelX + ", " + this.pixelY + ") with size " + this.pixelWidth + "x" + this.pixelHeight);
+    print("Panel created at (" + this.pixelX + ", " + this.pixelY + ") with size " + this.pixelWidth + "x" + this.pixelHeight);
   }
 
   /**
@@ -368,7 +368,7 @@ export class Panel {
     this.closeButtonSize = size;
     // 如果已经创建了标题栏，需要重新创建以应用新大小
     if (this.titleBarFrame && this.showTitleBar) {
-      Console.log(`Panel: 更新关闭按钮大小为 ${size}px，需要重新创建标题栏`);
+      print(`Panel: 更新关闭按钮大小为 ${size}px，需要重新创建标题栏`);
       // 注意：动态更新需要重新创建，建议在 create() 之前调用此方法
     }
     return this;

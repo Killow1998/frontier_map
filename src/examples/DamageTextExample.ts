@@ -1,6 +1,6 @@
 import { DamageTextManager, FloatDirection } from "src/system/ui/DamageTexttag";
 import { Button } from "src/system/ui/component/Button";
-import { Console } from "src/system/console";
+
 import { Timer } from "@eiriksgata/wc3ts/*";
 import { ModuleManager } from "src/system/ModuleManager";
 import { HotReloadHelper } from "src/system/ui/UIComponent";
@@ -16,7 +16,7 @@ class DamageTextExample {
    * 创建示例按钮和测试
    */
   public createExamples(): void {
-    Console.log("=== Damage Text Examples ===");
+    print("=== Damage Text Examples ===");
 
     // 初始化伤害文字管理器
     DamageTextManager.getInstance(50); // 对象池大小 50
@@ -30,7 +30,7 @@ class DamageTextExample {
       const centerX = 0;
       const centerY = 0;
       DamageTextManager.showDamage(1234, centerX, centerY, 100);
-      Console.log("显示快速伤害: 1234");
+      print("显示快速伤害: 1234");
     });
     this.ui.register(button1);
 
@@ -52,7 +52,7 @@ class DamageTextExample {
         scale: 1.0,
         fadeOut: true
       });
-      Console.log("向上漂浮: 999");
+      print("向上漂浮: 999");
     });
     this.ui.register(button2);
 
@@ -74,7 +74,7 @@ class DamageTextExample {
         scale: 0.9,
         fadeOut: true
       });
-      Console.log("向右漂浮: 777");
+      print("向右漂浮: 777");
     });
     this.ui.register(button3);
 
@@ -96,7 +96,7 @@ class DamageTextExample {
         scale: 0.9,
         fadeOut: true
       });
-      Console.log("向左漂浮: 555");
+      print("向左漂浮: 555");
     });
     this.ui.register(button4);
 
@@ -118,7 +118,7 @@ class DamageTextExample {
         scale: 1.2, // 更大的数字
         fadeOut: true
       });
-      Console.log("暴击伤害: 99999");
+      print("暴击伤害: 99999");
     });
     this.ui.register(button5);
 
@@ -140,7 +140,7 @@ class DamageTextExample {
         scale: 0.8,
         fadeOut: true
       });
-      Console.log("静态显示: 333");
+      print("静态显示: 333");
     });
     this.ui.register(button6);
 
@@ -149,7 +149,7 @@ class DamageTextExample {
     button7.create();
     button7.setText("压力测试");
     button7.setOnClick(() => {
-      Console.log("开始连续伤害测试...");
+      print("开始连续伤害测试...");
       
       const centerX = 0;
       const centerY = 0;
@@ -164,7 +164,7 @@ class DamageTextExample {
             this.testTimer.destroy();
             this.testTimer = null;
           }
-          Console.log("连续伤害测试完成");
+          print("连续伤害测试完成");
           return;
         }
         
@@ -195,19 +195,19 @@ class DamageTextExample {
     button8.setText("清理");
     button8.setOnClick(() => {
       DamageTextManager.getInstance().clear();
-      Console.log("已清理所有伤害文字");
+      print("已清理所有伤害文字");
     });
     this.ui.register(button8);
 
-    Console.log("=== Damage Text Examples Created ===");
-    Console.log(`✓ Registered ${this.ui.getComponentCount()} components`);
+    print("=== Damage Text Examples Created ===");
+    print(`✓ Registered ${this.ui.getComponentCount()} components`);
   }
 
   /**
    * 清理函数
    */
   public cleanup(): void {
-    Console.log("DamageTextExample: Cleanup...");
+    print("DamageTextExample: Cleanup...");
     
     // 停止测试定时器
     if (this.testTimer) {
@@ -218,14 +218,14 @@ class DamageTextExample {
     // 清理 UI 组件
     this.ui.cleanup();
     
-    Console.log("DamageTextExample: Cleanup complete");
+    print("DamageTextExample: Cleanup complete");
   }
 
   /**
    * 初始化函数
    */
   public initialize(): void {
-    Console.log("DamageTextExample: Initializing...");
+    print("DamageTextExample: Initializing...");
     this.createExamples();
     print("DamageTextExample initialized");
   }
@@ -234,7 +234,7 @@ class DamageTextExample {
    * 热重载处理函数
    */
   public static onHotReload(): void {
-    Console.log("DamageTextExample hot reloaded!");
+    print("DamageTextExample hot reloaded!");
   }
 }
 

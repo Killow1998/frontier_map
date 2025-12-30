@@ -158,7 +158,7 @@ export interface AutoRegisterOptions {
  * // 创建按钮并自动注册
  * const button = UIComponents.create(() => {
  *   const btn = Button.createCentered("Test");
- *   btn.setOnClick(() => Console.log("clicked"));
+ *   btn.setOnClick(() => print("clicked"));
  *   return btn;
  * }, "myModule");
  * 

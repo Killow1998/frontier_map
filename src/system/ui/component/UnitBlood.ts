@@ -122,7 +122,7 @@ export class UnitBlood {
     this.frame.destroy();
     this.actor.setPreselectUIVisible(true);
     delete UnitBlood.allUnitBlood[this.actor.id];
-    // console.log(`UnitBlood for unit ${this.unit.id} destroyed.`);
+    // print(`UnitBlood for unit ${this.unit.id} destroyed.`);
     // 其他清理工作...
   }
 

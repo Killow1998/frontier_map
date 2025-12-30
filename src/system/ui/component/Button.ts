@@ -1,7 +1,7 @@
 import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from "@eiriksgata/wc3ts/*";
 import { ScreenCoordinates } from "../ScreenCoordinates";
 import { UILayout } from "../UILayout";
-import { Console } from "src/system/console";
+
 import { FrameEventUtils } from "src/constants/frame/utils";
 import { MouseEventManager, MouseButton } from "src/system/event/MouseEvent";
 import { Text, TextAlign, VerticalAlign } from "./Text";
@@ -11,15 +11,15 @@ import { Text, TextAlign, VerticalAlign } from "./Text";
  */
 export const ButtonTextures = {
   /** 人族命令按钮边框 */
-  HUMAN_BORDER: "UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp",
+  HUMAN_BORDER: "UI\\Widgets\\print\\Human\\CommandButton\\human-multipleselection-border.blp",
   /** 人族命令按钮背景 */
-  HUMAN_BACKGROUND: "UI\\Widgets\\Console\\Human\\human-transport-slot.blp",
+  HUMAN_BACKGROUND: "UI\\Widgets\\print\\Human\\human-transport-slot.blp",
   /** 兽族按钮背景 */
-  ORC_BACKGROUND: "UI\\Widgets\\Console\\Orc\\orc-transport-slot.blp",
+  ORC_BACKGROUND: "UI\\Widgets\\print\\Orc\\orc-transport-slot.blp",
   /** 暗夜精灵按钮背景 */
-  NIGHTELF_BACKGROUND: "UI\\Widgets\\Console\\NightElf\\nightelf-transport-slot.blp",
+  NIGHTELF_BACKGROUND: "UI\\Widgets\\print\\NightElf\\nightelf-transport-slot.blp",
   /** 不死族按钮背景 */
-  UNDEAD_BACKGROUND: "UI\\Widgets\\Console\\Undead\\undead-transport-slot.blp",
+  UNDEAD_BACKGROUND: "UI\\Widgets\\print\\Undead\\undead-transport-slot.blp",
   /** 黑色半透明 */
   BLACK_TRANSPARENT: "UI\\Widgets\\EscMenu\\Human\\editbox-background.blp",
   /** 工具提示背景 */
@@ -273,7 +273,7 @@ export class Button {
 
   public create(parent?: Frame): void {
     if (this.backdropFrame) {
-      Console.log("Button already created");
+      print("Button already created");
       return;
     }
 
@@ -294,7 +294,7 @@ export class Button {
         "BACKDROP",                          // typeName - 框架类型
         this.templateName                    // inherits - FDF 模板名
       ) || null;
-      Console.log("Creating button with FDF template: " + this.templateName);
+      print("Creating button with FDF template: " + this.templateName);
     } else {
       // 使用普通方式创建
       this.backdropFrame = Frame.createType(
@@ -307,7 +307,7 @@ export class Button {
     }
     
     if (!this.backdropFrame) {
-      Console.log("Error: Failed to create backdrop frame");
+      print("Error: Failed to create backdrop frame");
       return;
     }
 
@@ -346,7 +346,7 @@ export class Button {
       ""
     ) || null;
     if (!this.buttonFrame) {
-      Console.log("Error: Failed to create button frame");
+      print("Error: Failed to create button frame");
       return;
     }
 
@@ -362,7 +362,7 @@ export class Button {
       this.backdropFrame.setAlpha(255);
     }
 
-    Console.log("Button \"" + this.label + "\" created successfully with Text component");
+    print("Button \"" + this.label + "\" created successfully with Text component");
   }
 
   public setOnClick(callback: () => void): Button {
@@ -468,7 +468,7 @@ export class Button {
     this.texture = texturePath;
     if (this.backdropFrame) {
       if (this.useTemplate) {
-        Console.log("Warning: Setting texture on a template-based button may override template styles");
+        print("Warning: Setting texture on a template-based button may override template styles");
       }
       this.backdropFrame.setTexture(texturePath, 0, true);
     }
@@ -669,7 +669,7 @@ export class Button {
   public click(): void {
     if (this.isEnabled && this.onClick) {
       this.onClick();
-      Console.log("Button \"" + this.label + "\" clicked");
+      print("Button \"" + this.label + "\" clicked");
     }
   }
 
@@ -910,7 +910,7 @@ export class Button {
     this.dragOffsetX = currentMouseX - this.pixelX;
     this.dragOffsetY = currentMouseY - this.pixelY;
     
-    Console.log("Drag started at mouse(" + currentMouseX + ", " + currentMouseY + "), offset(" + this.dragOffsetX + ", " + this.dragOffsetY + ")");
+    print("Drag started at mouse(" + currentMouseX + ", " + currentMouseY + "), offset(" + this.dragOffsetX + ", " + this.dragOffsetY + ")");
     
     // 触发拖拽开始回调
     if (this.onDragStart) {
@@ -975,7 +975,7 @@ export class Button {
       this.dragMouseUpId = -1;
     }
     
-    Console.log("Drag ended at position(" + this.pixelX + ", " + this.pixelY + ")");
+    print("Drag ended at position(" + this.pixelX + ", " + this.pixelY + ")");
     
     // 触发拖拽结束回调
     if (this.onDragEnd) {

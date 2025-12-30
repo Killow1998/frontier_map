@@ -1,6 +1,6 @@
 import { Frame, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM } from "@eiriksgata/wc3ts/*";
 import { ScreenCoordinates } from "../ScreenCoordinates";
-import { Console } from "src/system/console";
+
 import { DraggableMixin, IDraggableComponent } from "./UIComponentBase";
 import { FrameEventUtils } from "src/constants/frame/utils";
 
@@ -41,7 +41,7 @@ export const TextBackgrounds = {
   /** 对话框背景 */
   DIALOG: "UI\\Widgets\\Glues\\GlueScreen-DialogBackground.blp",
   /** 人族边框 */
-  HUMAN_BORDER: "UI\\Widgets\\Console\\Human\\CommandButton\\human-multipleselection-border.blp",
+  HUMAN_BORDER: "UI\\Widgets\\print\\Human\\CommandButton\\human-multipleselection-border.blp",
   /** 任务背景 */
   QUEST: "UI\\Widgets\\Quests\\QuestMainBackdrop.blp",
 } as const;
@@ -310,11 +310,12 @@ export class Text implements IDraggableComponent {
 
   public create(parent?: Frame): void {
     if (this.textFrame) {
-      Console.log("Text already created");
+      // Text already created
       return;
     }
 
     const parentFrame = parent || Frame.fromHandle(DzGetGameUI())!;
+    const isGameUI = !parent || parent.handle === DzGetGameUI();
 
     // 如果启用自适应，先计算尺寸
     if (this.autoWidth || this.autoHeight) {
@@ -338,6 +339,7 @@ export class Text implements IDraggableComponent {
     if (this.showBackground && this.background !== "") {
       this.backdropFrame = Frame.createType("BACKDROP", parentFrame, 0, 'BACKDROP', "")!;
       if (this.backdropFrame) {
+        // 总是使用绝对坐标（setAbsPoint在WC3中始终是绝对坐标，即使有parent）
         this.backdropFrame
           .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
           .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY)
@@ -350,10 +352,12 @@ export class Text implements IDraggableComponent {
     this.textFrame = Frame.createType("TEXT", textParent, 0, "TEXT", "")!;
     
     if (!this.textFrame) {
-      Console.log("Error: Failed to create text frame");
+      // Error: Failed to create text frame
       return;
     }
 
+    // 总是使用绝对坐标（setAbsPoint在WC3中始终是绝对坐标，即使有parent）
+    // 因此传入的pixelX和pixelY必须是绝对屏幕坐标
     this.textFrame
       .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x + paddingLeftWC3, wc3Pos.y - paddingTopWC3)
       .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX - paddingRightWC3, bottomY + paddingBottomWC3)
@@ -368,6 +372,7 @@ export class Text implements IDraggableComponent {
     // 创建透明按钮层用于鼠标事件检测（仅在需要拖拽时）
     this.buttonFrame = Frame.createType("BUTTON", textParent, 0, "BUTTON", "")!;
     if (this.buttonFrame) {
+      // 总是使用绝对坐标
       this.buttonFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
@@ -377,8 +382,6 @@ export class Text implements IDraggableComponent {
     }
 
     this.setVisible(this.isVisible);
-
-    Console.log("Text created: \"" + this.content.substring(0, 20) + (this.content.length > 20 ? "..." : "") + "\"");
   }
 
   /**

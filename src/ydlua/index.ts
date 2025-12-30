@@ -84,7 +84,7 @@ export class ydlua {
     if (isConsoleEnabled) {
       // 设置全局 print 函数
       _G["print"] = (message: string) => ydconsole.write(message);
-      print('>>> Console enabled');
+      print('>>> print enabled');
     }
   }
 

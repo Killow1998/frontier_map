@@ -1,6 +1,5 @@
 import { Players, Unit } from "@eiriksgata/wc3ts/*";
 import { ModuleManager } from "../system/ModuleManager";
-import { Console } from "../system/console";
 import { FourCC } from "src/utils/helper";
 
 /**
@@ -37,7 +36,7 @@ class CreateActorExample {
 
       if (paladin) {
         this.actorList.push(paladin);
-        Console.log(`Created Paladin ${i + 1} at (${x}, ${y})`);
+        print(`Created Paladin ${i + 1} at (${x}, ${y})`);
       }
     }
 
@@ -67,7 +66,7 @@ class CreateActorExample {
    * 热重载处理函数
    */
   public static onHotReload(): void {
-    Console.log("CreateActorExample hot reloaded!");
+    print("CreateActorExample hot reloaded!");
   }
 }
 

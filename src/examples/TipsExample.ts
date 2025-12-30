@@ -1,12 +1,12 @@
 import { Tips, TipsAnimation, TipsPosition } from "src/system/ui/component/Tips";
 import { Button } from "src/system/ui/component/Button";
-import { Console } from "src/system/console";
+
 
 /**
  * Tips 组件使用示例
  */
 export function runTipsExamples(): void {
-  Console.log("=== Tips 组件示例 ===");
+  print("=== Tips 组件示例 ===");
 
   // 获取 Tips 单例
   const tips = Tips.getInstance();
@@ -17,7 +17,7 @@ export function runTipsExamples(): void {
   skillButton.setText("火焰之球");
 
   skillButton.setOnHover(() => {
-    Console.log("显示技能提示 - 使用 getComponentInfo");
+    print("显示技能提示 - 使用 getComponentInfo");
     const info = skillButton.getComponentInfo();
     tips.showFromComponentInfo({
       text: "火焰之球\n\n向目标发射一颗火球\n造成 150 点火焰伤害\n\n冷却时间: 10 秒\n魔法消耗: 100",
@@ -32,7 +32,7 @@ export function runTipsExamples(): void {
   });
 
   skillButton.setOnLeave(() => {
-    Console.log("隐藏技能提示");
+    print("隐藏技能提示");
     tips.hide();
   });
 
@@ -43,7 +43,7 @@ export function runTipsExamples(): void {
   itemButton.setText("力量之冠");
 
   itemButton.setOnHover(() => {
-    Console.log("显示物品提示 - 直接使用 Frame");
+    print("显示物品提示 - 直接使用 Frame");
     const info = itemButton.getComponentInfo();
     tips.show({
       text: "力量之冠\n\n+15 力量\n+8 护甲\n+200 生命值\n\n稀有度: 史诗\n\n一顶蕴含强大力量的王冠",
@@ -66,7 +66,7 @@ export function runTipsExamples(): void {
   infoButton.setText("帮助");
 
   infoButton.setOnHover(() => {
-    Console.log("显示帮助提示 - 无动画");
+    print("显示帮助提示 - 无动画");
     const info = infoButton.getComponentInfo();
     tips.show({
       text: "点击查看详细帮助文档\n\n快捷键:\nF1 - 打开帮助\nF2 - 快速保存\nESC - 返回菜单",
@@ -113,7 +113,7 @@ export function runTipsExamples(): void {
   });
 
   // 示例 5: 模拟技能栏
-  Console.log("创建技能栏示例");
+  print("创建技能栏示例");
   const skills = [
     {
       name: "雷霆一击",
@@ -183,6 +183,6 @@ export function runTipsExamples(): void {
     });
   });
 
-  Console.log("✓ Tips 示例创建完成");
+  print("✓ Tips 示例创建完成");
 }
 

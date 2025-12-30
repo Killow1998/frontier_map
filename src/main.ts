@@ -1,14 +1,13 @@
 
-import { Frame, Timer } from "@eiriksgata/wc3ts/*";
+import { Frame, Timer, Trigger } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
-import { Console } from "./system/console";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
-import { mouseEvents } from "./system/event";
+import { EventBus, mouseEvents } from "./system/event";
 
 /**
  * 应用程序主入口
@@ -49,7 +48,7 @@ export function initialize(): void {
   //载入TOC fdf样式模板Frame
   try {
     Frame.loadTOC("resource\\fdf\\path.toc");
-    Console.log("FDF TOC loaded successfully");
+    print("FDF TOC loaded successfully");
   } catch (e) {
     print(`Error loading FDF TOC: ${e}`);
   }

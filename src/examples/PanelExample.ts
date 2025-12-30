@@ -3,7 +3,7 @@
 import { Panel } from "../system/ui/component/Panel";
 import { Button } from "../system/ui/component/Button";
 import { Text, TextColors } from "../system/ui/component/Text";
-import { Console } from "../system/console";
+
 import { ModuleManager } from "../system/ModuleManager";
 import { HotReloadHelper } from "../system/ui/UIComponent";
 import { UIBackgrounds } from "src/constants/ui/preset";
@@ -27,7 +27,7 @@ class PanelExample {
    * 创建所有示例
    */
   public createExamples(): void {
-    Console.log("=== Panel Component Examples ===");
+    print("=== Panel Component Examples ===");
 
     // ==================== 示例 1: 基本面板创建 ====================
     this.example1_BasicPanel();
@@ -47,15 +47,15 @@ class PanelExample {
     // ==================== 示例 6: 完整配置的面板 ====================
     this.example6_FullyConfiguredPanel();
 
-    Console.log("=== Panel Examples Complete ===");
-    Console.log(`✓ Registered ${this.ui.getComponentCount()} components for hot reload`);
+    print("=== Panel Examples Complete ===");
+    print(`✓ Registered ${this.ui.getComponentCount()} components for hot reload`);
   }
 
   /**
      * 示例 1: 基本面板创建
      */
   private example1_BasicPanel(): void {
-    Console.log("\n--- Example 1: Basic Panel ---");
+    print("\n--- Example 1: Basic Panel ---");
 
     // 创建一个简单的面板
     const panel = new Panel(
@@ -72,14 +72,14 @@ class PanelExample {
       .setAlpha(200);
 
     this.ui.register(panel);  // 注册到热重载管理
-    Console.log("✓ 创建了基本面板");
+    print("✓ 创建了基本面板");
   }
 
   /**
      * 示例 2: 带标题栏的面板
      */
   private example2_PanelWithTitle(): void {
-    Console.log("\n--- Example 2: Panel with Title ---");
+    print("\n--- Example 2: Panel with Title ---");
 
     // 使用静态方法创建带标题的面板
     const panel = Panel.createWithTitle(
@@ -96,19 +96,19 @@ class PanelExample {
       .setShowCloseButton(true)
       .setCloseButtonSize(32)  // 设置关闭按钮大小为 32px（默认 26px）
       .setOnClose(() => {
-        Console.log("面板被关闭");
+        print("面板被关闭");
         panel.hide();
       });
 
     this.ui.register(panel);  // 注册到热重载管理
-    Console.log("✓ 创建了带标题栏的面板（关闭按钮: 32px）");
+    print("✓ 创建了带标题栏的面板（关闭按钮: 32px）");
   }
 
   /**
      * 示例 3: 可拖拽的面板
      */
   private example3_DraggablePanel(): void {
-    Console.log("\n--- Example 3: Draggable Panel ---");
+    print("\n--- Example 3: Draggable Panel ---");
 
     // 创建可拖拽的面板（自动包含标题栏和关闭按钮）
     const panel = Panel.createDraggable(
@@ -122,28 +122,28 @@ class PanelExample {
     // 设置拖拽回调
     panel
       .setOnDragStart(() => {
-        Console.log("开始拖拽面板");
+        print("开始拖拽面板");
         panel.setAlpha(180);  // 拖拽时降低透明度
       })
       .setOnDragEnd((x, y) => {
-        Console.log(`面板拖拽到: (${x}, ${y})`);
+        print(`面板拖拽到: (${x}, ${y})`);
         panel.setAlpha(255);  // 恢复透明度
       })
       .setOnDragging((_x, _y) => {
         // 拖拽过程中的回调（可选）
-        // Console.log(`拖拽中: (${_x}, ${_y})`);
+        // print(`拖拽中: (${_x}, ${_y})`);
       });
 
     this.ui.register(panel);  // 注册到热重载管理
-    Console.log("✓ 创建了可拖拽面板");
-    Console.log("  提示: 拖动标题栏可以移动面板");
+    print("✓ 创建了可拖拽面板");
+    print("  提示: 拖动标题栏可以移动面板");
   }
 
   /**
      * 示例 4: 在面板中添加子组件
      */
   private example4_PanelWithChildren(): void {
-    Console.log("\n--- Example 4: Panel with Children ---");
+    print("\n--- Example 4: Panel with Children ---");
 
     // 创建面板
     const panel = Panel.createWithTitle(
@@ -163,7 +163,7 @@ class PanelExample {
     const contentPos = panel.getContentPosition();
     const contentSize = panel.getContentSize();
 
-    Console.log(`内容区域: (${contentPos.x}, ${contentPos.y}), ${contentSize.width}x${contentSize.height}`);
+    print(`内容区域: (${contentPos.x}, ${contentPos.y}), ${contentSize.width}x${contentSize.height}`);
 
     // 在面板内容区域添加文本
     const title = new Text(
@@ -202,7 +202,7 @@ class PanelExample {
     );
     button1.create(panel.getContentFrame()!);
     button1.setOnClick(() => {
-      Console.log("点击了选项 1");
+      print("点击了选项 1");
       description.setText("你选择了选项 1");
     });
 
@@ -215,7 +215,7 @@ class PanelExample {
     );
     button2.create(panel.getContentFrame()!);
     button2.setOnClick(() => {
-      Console.log("点击了选项 2");
+      print("点击了选项 2");
       description.setText("你选择了选项 2");
     });
 
@@ -231,18 +231,18 @@ class PanelExample {
       .setTextColor(TextColors.RED)
       .setOnClick(() => {
         panel.hide();
-        Console.log("面板已隐藏");
+        print("面板已隐藏");
       });
 
     this.ui.register(panel);  // 注册到热重载管理
-    Console.log("✓ 创建了包含子组件的面板");
+    print("✓ 创建了包含子组件的面板");
   }
 
   /**
      * 示例 5: 使用预设创建面板
      */
   private example5_PanelPresets(): void {
-    Console.log("\n--- Example 5: Panel Presets ---");
+    print("\n--- Example 5: Panel Presets ---");
 
     // 使用尺寸预设创建面板
     const smallPanel = Panel.createWithPreset(
@@ -266,26 +266,26 @@ class PanelExample {
     showButton.create();
     showButton.setOnClick(() => {
       centerPanel.toggle();  // 切换显示/隐藏
-      Console.log(centerPanel.getVisible() ? "显示大面板" : "隐藏大面板");
+      print(centerPanel.getVisible() ? "显示大面板" : "隐藏大面板");
     });
 
     this.ui.register(smallPanel);  // 注册到热重载管理
     this.ui.register(centerPanel);
     this.ui.register(showButton);
 
-    Console.log("✓ 创建了预设尺寸的面板");
-    Console.log("  SMALL: 200x150");
-    Console.log("  MEDIUM: 400x300");
-    Console.log("  LARGE: 600x450");
-    Console.log("  WIDE: 800x200");
-    Console.log("  TALL: 300x500");
+    print("✓ 创建了预设尺寸的面板");
+    print("  SMALL: 200x150");
+    print("  MEDIUM: 400x300");
+    print("  LARGE: 600x450");
+    print("  WIDE: 800x200");
+    print("  TALL: 300x500");
   }
 
   /**
      * 示例 6: 完整配置的面板
      */
   private example6_FullyConfiguredPanel(): void {
-    Console.log("\n--- Example 6: Fully Configured Panel ---");
+    print("\n--- Example 6: Fully Configured Panel ---");
 
     const panel = new Panel(1200, 400, 450, 400);
     panel.create();
@@ -303,7 +303,7 @@ class PanelExample {
       visible: true,
       enabled: true,
       onClose: () => {
-        Console.log("设置面板已关闭");
+        print("设置面板已关闭");
         panel.hide();
       }
     });
@@ -351,7 +351,7 @@ class PanelExample {
       .setTextColor(TextColors.GREEN)
       .centerText()
       .setOnClick(() => {
-        Console.log("设置已保存");
+        print("设置已保存");
       });
 
     // 重置按钮
@@ -369,11 +369,11 @@ class PanelExample {
       .setOnClick(() => {
         volumeLabel.setText("音量: 100%");
         resolutionLabel.setText("分辨率: 1920x1080");
-        Console.log("设置已重置");
+        print("设置已重置");
       });
 
     this.ui.register(panel);  // 注册到热重载管理
-    Console.log("✓ 创建了完整配置的面板");
+    print("✓ 创建了完整配置的面板");
   }
 
   /**
@@ -381,19 +381,19 @@ class PanelExample {
    * 只需要一行代码即可清理所有UI组件
    */
   public cleanup(): void {
-    Console.log("PanelExample: Cleanup called...");
+    print("PanelExample: Cleanup called...");
 
     // 一行代码销毁所有已注册的组件！
     this.ui.cleanup();
 
-    Console.log("PanelExample: All resources cleaned up");
+    print("PanelExample: All resources cleaned up");
   }
 
   /**
    * 初始化函数
    */
   public initialize(): void {
-    Console.log("PanelExample: Initializing...");
+    print("PanelExample: Initializing...");
     this.createExamples();
     print("PanelExample initialized");
   }
@@ -402,7 +402,7 @@ class PanelExample {
    * 热重载处理函数
    */
   public static onHotReload(): void {
-    Console.log("PanelExample hot reloaded!");
+    print("PanelExample hot reloaded!");
   }
 }
 
@@ -445,7 +445,7 @@ export { PanelExample };
  * 快速开始示例 - 最简单的用法（独立导出函数）
  */
 export function quickStartPanel(): void {
-  Console.log("\n=== Quick Start: Simple Panel ===");
+  print("\n=== Quick Start: Simple Panel ===");
 
   // 方式 1: 最简单的面板
   const simplePanel = new Panel(100, 100, 300, 200);
@@ -460,5 +460,5 @@ export function quickStartPanel(): void {
   // 方式 4: 居中显示的面板
   const _centerPanel = Panel.createCentered("MEDIUM");
 
-  Console.log("✓ 快速开始示例完成");
+  print("✓ 快速开始示例完成");
 }

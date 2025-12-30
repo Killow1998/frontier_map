@@ -40,7 +40,7 @@ import {
 
 // 使用Frame事件工具类
 FrameEventUtils.bindClickEvent(frame, () => {
-  console.log('按钮被点击');
+  print('按钮被点击');
 });
 ```
 
