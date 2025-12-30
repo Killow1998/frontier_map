@@ -117,7 +117,7 @@ class ReloadTemplateExample {
 
     const button = Button.createAtPresetPosition("测试按钮", "CENTER");
     button.setOnClick(() => {
-      Console.log("测试按钮被点击!111");
+      Console.log("测试按钮被点击!111", 5, Players[0]);
     });
     button.create();
     this.ui.register(button);
