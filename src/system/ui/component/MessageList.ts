@@ -1,4 +1,4 @@
-import { Frame } from "@eiriksgata/wc3ts/*";
+import { Frame, MapPlayer } from "@eiriksgata/wc3ts/*";
 import { ScreenCoordinates } from "../ScreenCoordinates";
 
 import { Panel } from "./Panel";
@@ -32,6 +32,7 @@ class MessageItem {
   public fadeStartTime: number = 0;
   public fadeAnimationDuration: number = 0.3;
   public currentAlpha: number = 255;
+  public targetPlayer: MapPlayer | undefined; // 目标玩家（可选）
 
   constructor(
     text: string,
@@ -42,17 +43,42 @@ class MessageItem {
     duration: number,
     color: string = "FFFFFF",
     origin: string,
-    parent: Frame
+    parent: Frame,
+    targetPlayer?: MapPlayer
   ) {
     this.duration = duration;
     this.targetY = y;
     this.currentY = y;
     this.currentAlpha = 255;
+    this.targetPlayer = targetPlayer;
 
     // 创建Text组件（使用与MessageList相同的origin）
+    // 所有客户端都创建，但通过可见性控制显示
     this.textComponent = new Text(text, x, y, width, height, origin);
     this.textComponent.setColor(color);
     this.textComponent.create(parent);
+
+    // 根据目标玩家设置可见性（在UI层面做区分，避免不同步）
+    this.updateVisibility();
+  }
+
+  /**
+   * 更新可见性（根据目标玩家和本地玩家）
+   * 所有客户端都执行，但只有符合条件的客户端才显示
+   */
+  private updateVisibility(): void {
+    if (this.targetPlayer) {
+      // 如果指定了目标玩家，只有当该玩家是本地玩家时才显示
+      const localPlayer = MapPlayer.fromLocal();
+      if (this.targetPlayer === localPlayer) {
+        this.textComponent.setVisible(true);
+      } else {
+        this.textComponent.setVisible(false);
+      }
+    } else {
+      // 如果没有指定目标玩家，所有玩家都能看到
+      this.textComponent.setVisible(true);
+    }
   }
 
   /**
@@ -340,8 +366,17 @@ export class MessageList {
 
   /**
    * 添加消息
+   * 
+   * 注意：所有客户端都会执行相同的代码（创建消息、添加到列表等），
+   * 但在UI显示层面会根据目标玩家做区分，避免不同步掉线。
+   * 
+   * @param text 消息文本
+   * @param duration 显示时长（秒，可选）
+   * @param color 文本颜色（十六进制，不含#，可选）
+   * @param player 目标玩家（可选，如果指定则只有该玩家能看到，其他玩家看不到）
    */
-  public addMessage(text: string, duration?: number, color?: string): void {
+  public addMessage(text: string, duration?: number, color?: string, player?: MapPlayer): void {
+    // 所有客户端都执行相同的代码，避免不同步
     const messageDuration = duration !== undefined ? duration : this.defaultDuration;
     const messageColor = color || "FFFFFF";
 
@@ -377,7 +412,8 @@ export class MessageList {
     const newMessageY = baseY;
     const messageWidth = contentSizeWidth;
 
-    // 创建新消息项（传入origin以确保坐标系统一致）
+    // 创建新消息项（传入origin和目标玩家以确保坐标系统一致）
+    // 所有客户端都创建，但MessageItem内部会根据目标玩家设置可见性
     const newMessage = new MessageItem(
       text,
       newMessageX,
@@ -387,7 +423,8 @@ export class MessageList {
       messageDuration,
       messageColor,
       this.origin,
-      contentFrame
+      contentFrame,
+      player // 传递目标玩家参数
     );
 
     // 添加到列表

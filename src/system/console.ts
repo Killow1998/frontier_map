@@ -89,7 +89,8 @@ export class Console {
       return;
     }
 
-    Console.messageList.addMessage(message.text, message.duration, message.color);
+    // 传递player参数给addMessage，如果指定了player则只有该玩家能看到
+    Console.messageList.addMessage(message.text, message.duration, message.color, message.player);
    
   }
 
