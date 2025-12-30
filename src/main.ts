@@ -1,5 +1,5 @@
 
-import { Frame, Timer, Trigger } from "@eiriksgata/wc3ts/*";
+import { Frame, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -9,6 +9,8 @@ import { MapGeneral } from "./config/Map";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { EventBus, mouseEvents } from "./system/event";
 import { Console } from "./system/console";
+import { Actor } from "./system/actor";
+import { FourCC } from "./utils/helper";
 
 /**
  * 应用程序主入口
@@ -25,11 +27,17 @@ async function main(): Promise<void> {
   PanCameraToTimed(0, 0, 0);
   Timer.create().start(1, false, () => {
     print("Loading UI modules:", typeof ReloadTemplateExample);
+
+    for (let i = 0; i < 1000; i++) {
+      Actor.create(Players[0], FourCC('hfoo'), 0, 0, 270);
+    }
   });
 
   // Timer.create().start(5, false, () => {
   //   DamageTextManager.showDamage(1234, 0, 0, 100);
   // })
+
+
 
 
 
@@ -48,7 +56,7 @@ export function initialize(): void {
 
   //log 初始化
   Console.init();
-  
+
   //载入TOC fdf样式模板Frame
   try {
     Frame.loadTOC("resource\\fdf\\path.toc");
