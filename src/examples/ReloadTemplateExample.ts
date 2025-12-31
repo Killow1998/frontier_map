@@ -143,36 +143,7 @@ class ReloadTemplateExample {
     // })
 
     //this.ui.register(btn);
-
-    // 获取 Tips 单例
-    const tips = Tips.getInstance();
-
-    // 示例 1: 使用 getComponentInfo()（推荐方式）
-    const skillButton = new Button("技能按钮", 200, 200, 100, 40);
-    skillButton.create();
-    skillButton.setText("火焰之球");
-
-    skillButton.setOnHover(() => {
-      print("显示技能提示 - 使用 getComponentInfo");
-      const info = skillButton.getComponentInfo();
-      tips.showFromComponentInfo({
-        text: "火焰之球\n\n向目标发射一颗火球\n造成 150 点火焰伤害\n\n冷却时间: 10 秒\n魔法消耗: 100",
-        textColor: "FFD700", // 金色
-        icon: "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp",
-        width: 320,
-        maxHeight: 200,
-        position: TipsPosition.AUTO,
-        animation: TipsAnimation.NONE,
-        delayShow: 0
-      }, info);
-    });
-
-    skillButton.setOnLeave(() => {
-      print("隐藏技能提示");
-      tips.hide();
-    });
-
-    this.ui.register(skillButton);
+    runTipsExamples();
 
     print(`Registered ${this.ui.getComponentCount()} components`);
 

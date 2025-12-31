@@ -302,6 +302,9 @@ export class Tips {
       return;
     }
 
+    // 设置为可见（避免阻挡鼠标事件）
+    this.setVisible(true);
+
     // 执行动画
     const animation = config.animation ?? TipsAnimation.FADE;
     this.playAnimation(animation, true);
@@ -345,6 +348,9 @@ export class Tips {
 
     this.isVisible = false;
     this.currentConfig = null;
+
+    // 设置为不可见（避免阻挡鼠标事件）
+    this.setVisible(false);
   }
 
   /**
@@ -626,6 +632,10 @@ export class Tips {
     if (animation === TipsAnimation.NONE) {
       // 无动画，直接设置
       this.setAlpha(this.targetAlpha);
+      // 如果是隐藏，设置为不可见（避免阻挡鼠标事件）
+      if (!isShowing) {
+        this.setVisible(false);
+      }
       return;
     }
 
@@ -677,6 +687,11 @@ export class Tips {
           this.backdropFrame.setAbsPoint(FRAMEPOINT_TOPLEFT, targetX, targetY);
         }
 
+        // 如果是隐藏动画，设置为不可见（避免阻挡鼠标事件）
+        if (!isShowing) {
+          this.setVisible(false);
+        }
+
         if (this.animationTimer) {
           DestroyTimer(this.animationTimer as any);
           this.animationTimer = null;
@@ -719,6 +734,22 @@ export class Tips {
     // 只在有图标配置时才设置图标透明度
     if (this.iconFrame && this.currentConfig?.icon) {
       this.iconFrame.setAlpha(alpha);
+    }
+  }
+
+  /**
+   * 设置可见性（避免透明 Frame 阻挡鼠标事件）
+   */
+  private setVisible(visible: boolean): void {
+    if (this.backdropFrame) {
+      this.backdropFrame.setVisible(visible);
+    }
+    if (this.textFrame) {
+      this.textFrame.setVisible(visible);
+    }
+    // iconFrame 的可见性由 updateContent 控制，这里只在隐藏时统一设置
+    if (!visible && this.iconFrame) {
+      this.iconFrame.setVisible(false);
     }
   }
 

@@ -5,32 +5,7 @@ import { UILayout } from "../UILayout";
 import { FrameEventUtils } from "src/constants/frame/utils";
 import { MouseEventManager, MouseButton } from "src/system/event/MouseEvent";
 import { Text, TextAlign, VerticalAlign } from "./Text";
-
-/**
- * 常用背景纹理预设
- */
-export const ButtonTextures = {
-  /** 人族命令按钮边框 */
-  HUMAN_BORDER: "UI\\Widgets\\print\\Human\\CommandButton\\human-multipleselection-border.blp",
-  /** 人族命令按钮背景 */
-  HUMAN_BACKGROUND: "UI\\Widgets\\print\\Human\\human-transport-slot.blp",
-  /** 兽族按钮背景 */
-  ORC_BACKGROUND: "UI\\Widgets\\print\\Orc\\orc-transport-slot.blp",
-  /** 暗夜精灵按钮背景 */
-  NIGHTELF_BACKGROUND: "UI\\Widgets\\print\\NightElf\\nightelf-transport-slot.blp",
-  /** 不死族按钮背景 */
-  UNDEAD_BACKGROUND: "UI\\Widgets\\print\\Undead\\undead-transport-slot.blp",
-  /** 黑色半透明 */
-  BLACK_TRANSPARENT: "UI\\Widgets\\EscMenu\\Human\\editbox-background.blp",
-  /** 工具提示背景 */
-  TOOLTIP_BACKGROUND: "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp",
-  /** 对话框背景 */
-  DIALOG_BACKGROUND: "UI\\Widgets\\Glues\\GlueScreen-DialogBackground.blp",
-  /** 任务背景 */
-  QUEST_BACKGROUND: "UI\\Widgets\\Quests\\QuestMainBackdrop.blp",
-  /** 透明（无背景） */
-  TRANSPARENT: "",
-} as const;
+import { UIBackgrounds } from "src/constants/ui/preset";
 
 /**
  * FDF 模板预设
@@ -60,25 +35,25 @@ export class Button {
   private pixelY: number;
   private pixelWidth: number;
   private pixelHeight: number;
-  
+
   private backdropFrame: Frame | null = null;
   private textComponent: Text | null = null;  // 使用 Text 组件
   private buttonFrame: Frame | null = null;
-  
+
   private onClick: (() => void) | null = null;
   private onHover: (() => void) | null = null;
   private onLeave: (() => void) | null = null;
-  
+
   private isEnabled: boolean = true;
   private isVisible: boolean = true;
-  
-  private texture: string = ButtonTextures.HUMAN_BORDER;
+
+  private texture: string = UIBackgrounds.BLACK_TRANSPARENT;
   private textAlignment: number = TextAlign.CENTER;  // 使用 TextAlign
   private verticalAlignment: number = VerticalAlign.MIDDLE;  // 添加垂直对齐
   private textColor: string = "FFFFFF";
   private tooltip: string = "";
   private origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT;
-  
+
   // FDF 模板相关
   private useTemplate: boolean = false;
   private templateName: string = "";
@@ -152,21 +127,21 @@ export class Button {
   ): Button {
     const position = ScreenCoordinates.getPresetPosition(positionPreset);
     const size = UILayout.BUTTON_SIZES[sizePreset];
-    
+
     let x = position.x;
     let y = position.y;
-    
+
     // 如果居中对齐，需要减去按钮尺寸的一半
     if (centered) {
       x = position.x - size.width / 2;
       y = position.y - size.height / 2;
     }
-    
+
     const button = new Button(label, x, y, size.width, size.height);
     button.create(parent);
     return button;
   }
-  
+
   /**
    * 在屏幕中心创建按钮（便捷方法，自动调用create）
    * @param label 按钮文本
@@ -258,7 +233,7 @@ export class Button {
     const size = UILayout.BUTTON_SIZES[sizePreset];
     const centerX = (ScreenCoordinates.STANDARD_WIDTH - size.width) / 2;
     const centerY = (ScreenCoordinates.STANDARD_HEIGHT - size.height) / 2;
-    
+
     return Button.createWithTemplate(
       label,
       centerX,
@@ -305,7 +280,7 @@ export class Button {
         ""
       ) || null;
     }
-    
+
     if (!this.backdropFrame) {
       print("Error: Failed to create backdrop frame");
       return;
@@ -313,11 +288,11 @@ export class Button {
 
     const rightX = wc3Pos.x + wc3Width;
     const bottomY = wc3Pos.y - wc3Height;
-    
+
     this.backdropFrame
       .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
       .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
-    
+
     // 如果不使用模板，设置纹理
     if (!this.useTemplate) {
       this.backdropFrame.setTexture(this.texture, 0, true);
@@ -355,7 +330,7 @@ export class Button {
     this.setVisible(this.isVisible);
     this.setEnabled(this.isEnabled);
     this.setupEventListeners();
-    
+
     // 如果使用模板，强制设置可见性和透明度
     if (this.useTemplate && this.backdropFrame) {
       this.backdropFrame.setVisible(true);
@@ -427,10 +402,10 @@ export class Button {
       const wc3Pos = ScreenCoordinates.pixelToWC3(this.pixelX, this.pixelY, this.origin);
       const wc3Width = (this.pixelWidth / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
       const wc3Height = (this.pixelHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
-      
+
       const rightX = wc3Pos.x + wc3Width;
       const bottomY = wc3Pos.y - wc3Height;
-      
+
       this.backdropFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
@@ -449,10 +424,10 @@ export class Button {
       const wc3Pos = ScreenCoordinates.pixelToWC3(this.pixelX, this.pixelY, this.origin);
       const wc3Width = (this.pixelWidth / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
       const wc3Height = (this.pixelHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
-      
+
       const rightX = wc3Pos.x + wc3Width;
       const bottomY = wc3Pos.y - wc3Height;
-      
+
       this.backdropFrame
         .setAbsPoint(FRAME_ALIGN_LEFT_TOP, wc3Pos.x, wc3Pos.y)
         .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
@@ -479,8 +454,8 @@ export class Button {
    * 使用预设纹理
    * @param preset 纹理预设键名
    */
-  public setTexturePreset(preset: keyof typeof ButtonTextures): Button {
-    return this.setTexture(ButtonTextures[preset]);
+  public setTexturePreset(preset: keyof typeof UIBackgrounds): Button {
+    return this.setTexture(UIBackgrounds[preset]);
   }
 
   /**
@@ -615,7 +590,7 @@ export class Button {
     if (this.isDragging) {
       this.endDrag();
     }
-    
+
     if (this.buttonFrame) {
       this.buttonFrame.destroy();
       this.buttonFrame = null;
@@ -685,7 +660,7 @@ export class Button {
         this.backdropFrame.setAlpha(normalAlpha);
       }
     });
-    
+
     return this;
   }
 
@@ -717,7 +692,7 @@ export class Button {
     if (config.padding !== undefined && this.textComponent) {
       this.textComponent.setPadding(config.padding);
     }
-    
+
     return this;
   }
 
@@ -819,15 +794,15 @@ export class Button {
    */
   public setDraggable(draggable: boolean): Button {
     if (this.isDraggable === draggable) return this;
-    
+
     this.isDraggable = draggable;
-    
+
     if (draggable) {
       this.setupDragEventListeners();
     } else {
       this.cleanupDragEventListeners();
     }
-    
+
     return this;
   }
 
@@ -899,30 +874,30 @@ export class Button {
    */
   private startDrag(): void {
     if (!this.isDraggable || this.isDragging) return;
-    
+
     this.isDragging = true;
-    
+
     // 获取游戏窗口内的鼠标坐标，并转换为标准 1920x1080 像素坐标
     const currentMouseX = this.getMousePixelX();
     const currentMouseY = this.getMousePixelY();
-    
+
     // 计算鼠标相对于按钮左上角的偏移量（像素坐标）
     this.dragOffsetX = currentMouseX - this.pixelX;
     this.dragOffsetY = currentMouseY - this.pixelY;
-    
+
     print("Drag started at mouse(" + currentMouseX + ", " + currentMouseY + "), offset(" + this.dragOffsetX + ", " + this.dragOffsetY + ")");
-    
+
     // 触发拖拽开始回调
     if (this.onDragStart) {
       this.onDragStart();
     }
-    
+
     // 创建定时器持续更新位置
     this.dragTimer = CreateTimer();
     TimerStart(this.dragTimer, 0.01, true, () => {
       this.updateDragPosition();
     });
-    
+
     // 订阅全局鼠标左键松开事件（一次性）
     const mouseEvents = MouseEventManager.getInstance();
     this.dragMouseUpId = mouseEvents.onMouseUp(() => {
@@ -935,18 +910,18 @@ export class Button {
    */
   private updateDragPosition(): void {
     if (!this.isDragging) return;
-    
+
     // 获取游戏窗口内的鼠标坐标，并转换为标准 1920x1080 像素坐标
     const currentMouseX = this.getMousePixelX();
     const currentMouseY = this.getMousePixelY();
-    
+
     // 计算新的按钮位置
     const newX = currentMouseX - this.dragOffsetX;
     const newY = currentMouseY - this.dragOffsetY;
-    
+
     // 更新按钮位置
     this.setPosition(newX, newY);
-    
+
     // 触发拖拽过程回调
     if (this.onDragging) {
       this.onDragging(newX, newY);
@@ -958,25 +933,25 @@ export class Button {
    */
   private endDrag(): void {
     if (!this.isDragging) return;
-    
+
     this.isDragging = false;
-    
+
     // 停止定时器
     if (this.dragTimer) {
       PauseTimer(this.dragTimer);
       DestroyTimer(this.dragTimer);
       this.dragTimer = null;
     }
-    
+
     // 取消订阅鼠标松开事件（如果还没有被触发的话）
     if (this.dragMouseUpId >= 0) {
       const mouseEvents = MouseEventManager.getInstance();
       mouseEvents.off(this.dragMouseUpId);
       this.dragMouseUpId = -1;
     }
-    
+
     print("Drag ended at position(" + this.pixelX + ", " + this.pixelY + ")");
-    
+
     // 触发拖拽结束回调
     if (this.onDragEnd) {
       this.onDragEnd(this.pixelX, this.pixelY);
@@ -989,9 +964,9 @@ export class Button {
    */
   private setupDragEventListeners(): void {
     if (this.dragMouseDownId >= 0) return; // 已经订阅了
-    
+
     const mouseEvents = MouseEventManager.getInstance();
-    
+
     // 订阅全局鼠标左键按下事件
     this.dragMouseDownId = mouseEvents.onMouseDown(() => {
       // 检查鼠标是否在按钮上（通过 isMouseOver 状态）
@@ -1006,19 +981,19 @@ export class Button {
    */
   private cleanupDragEventListeners(): void {
     const mouseEvents = MouseEventManager.getInstance();
-    
+
     // 取消鼠标按下订阅
     if (this.dragMouseDownId >= 0) {
       mouseEvents.off(this.dragMouseDownId);
       this.dragMouseDownId = -1;
     }
-    
+
     // 取消鼠标松开订阅（如果正在拖拽）
     if (this.dragMouseUpId >= 0) {
       mouseEvents.off(this.dragMouseUpId);
       this.dragMouseUpId = -1;
     }
-    
+
     // 如果正在拖拽，结束拖拽
     if (this.isDragging) {
       this.endDrag();
@@ -1035,13 +1010,13 @@ export class Button {
     onDragging?: (x: number, y: number) => void;
   }): Button {
     this.setDraggable(true);
-    
+
     if (config) {
       if (config.onDragStart) this.setOnDragStart(config.onDragStart);
       if (config.onDragEnd) this.setOnDragEnd(config.onDragEnd);
       if (config.onDragging) this.setOnDragging(config.onDragging);
     }
-    
+
     return this;
   }
 

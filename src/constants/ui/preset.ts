@@ -4,22 +4,10 @@ export const UIBackgrounds = {
   NONE: "",
   /** 黑色半透明 */
   BLACK_TRANSPARENT: "UI\\Widgets\\EscMenu\\Human\\editbox-background.blp",
-  /** 工具提示背景 */
-  TOOLTIP: "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp",
   /** 对话框背景 */
   DIALOG: "UI\\Widgets\\Glues\\GlueScreen-DialogBackground.blp",
   /** 任务背景 */
   QUEST: "UI\\Widgets\\Quests\\QuestMainBackdrop.blp",
-  /** 人族边框 */
-  HUMAN_BORDER: "UI\\Widgets\\print\\Human\\CommandButton\\human-multipleselection-border.blp",
-  /** 人族背景 */
-  HUMAN_BACKGROUND: "UI\\Widgets\\print\\Human\\human-transport-slot.blp",
-  /** 兽族背景 */
-  ORC_BACKGROUND: "UI\\Widgets\\print\\Orc\\orc-transport-slot.blp",
-  /** 暗夜精灵背景 */
-  NIGHTELF_BACKGROUND: "UI\\Widgets\\print\\NightElf\\nightelf-transport-slot.blp",
-  /** 不死族背景 */
-  UNDEAD_BACKGROUND: "UI\\Widgets\\print\\Undead\\undead-transport-slot.blp",
   /** ESC菜单背景 */
   ESC_MENU: "UI\\Widgets\\EscMenu\\Human\\human-options-menu-background.blp",
 
