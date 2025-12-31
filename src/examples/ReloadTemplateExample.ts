@@ -11,6 +11,8 @@ import { DamageTextManager } from "src/system/ui/DamageTexttag";
 import { MessageList } from "src/system/ui/component/MessageList";
 import { Button } from "src/system/ui/component/Button";
 import { Console } from "src/system/console";
+import { Tips, TipsAnimation, TipsPosition } from "src/system/ui/component/Tips";
+import { runTipsExamples } from "./TipsExample";
 
 /**
  * 热更新模板
@@ -112,20 +114,66 @@ class ReloadTemplateExample {
     // actor?.createBloodBar();
     // typeof DamageTextExample;
 
+    // const button = Button.createAtPresetPosition("测试按钮", "CENTER");
+    // button.setOnClick(() => {
+    //   Console.log("测试按钮被点击!111", 5, Players[0]);
+    // });
+    // button.create();
+    // this.ui.register(button);
 
 
+    // const btn = Button.createAtPresetPosition("测试按钮", "CENTER");
+    // btn.setOnHover(() => {
+    //   Console.log("鼠标进入测试按钮");
+    //   Tips.getInstance().showFromComponentInfo({
+    //     text: "火焰之球\n\n向目标发射一颗火球\n造成 150 点火焰伤害\n\n冷却时间: 10 秒\n魔法消耗: 100",
+    //     textColor: "FFD700", // 金色
+    //     icon: "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp",
+    //     width: 320,
+    //     maxHeight: 200,
+    //     position: TipsPosition.AUTO,
+    //     animation: TipsAnimation.NONE,
+    //     delayShow: 0
+    //   }, btn.getComponentInfo());
+    // })
 
-    const button = Button.createAtPresetPosition("测试按钮", "CENTER");
-    button.setOnClick(() => {
-      Console.log("测试按钮被点击!111", 5, Players[0]);
+    // btn.setOnLeave(() => {
+    //   Console.log("鼠标离开测试按钮");
+    //   Tips.getInstance().hide();
+    // })
+
+    //this.ui.register(btn);
+
+    // 获取 Tips 单例
+    const tips = Tips.getInstance();
+
+    // 示例 1: 使用 getComponentInfo()（推荐方式）
+    const skillButton = new Button("技能按钮", 200, 200, 100, 40);
+    skillButton.create();
+    skillButton.setText("火焰之球");
+
+    skillButton.setOnHover(() => {
+      print("显示技能提示 - 使用 getComponentInfo");
+      const info = skillButton.getComponentInfo();
+      tips.showFromComponentInfo({
+        text: "火焰之球\n\n向目标发射一颗火球\n造成 150 点火焰伤害\n\n冷却时间: 10 秒\n魔法消耗: 100",
+        textColor: "FFD700", // 金色
+        icon: "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp",
+        width: 320,
+        maxHeight: 200,
+        position: TipsPosition.AUTO,
+        animation: TipsAnimation.NONE,
+        delayShow: 0
+      }, info);
     });
-    button.create();
-    this.ui.register(button);
 
-
-    Timer.create().start(1, true, () => {
-      Console.log("测试按钮被点击!");
+    skillButton.setOnLeave(() => {
+      print("隐藏技能提示");
+      tips.hide();
     });
+
+    this.ui.register(skillButton);
+
     print(`Registered ${this.ui.getComponentCount()} components`);
 
   }

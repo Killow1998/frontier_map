@@ -1,5 +1,5 @@
 
-import { Frame, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*";
+import { Frame, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -27,10 +27,6 @@ async function main(): Promise<void> {
   PanCameraToTimed(0, 0, 0);
   Timer.create().start(1, false, () => {
     print("Loading UI modules:", typeof ReloadTemplateExample);
-
-    for (let i = 0; i < 1000; i++) {
-      Actor.create(Players[0], FourCC('hfoo'), 0, 0, 270);
-    }
   });
 
   // Timer.create().start(5, false, () => {
