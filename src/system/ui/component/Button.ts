@@ -263,7 +263,7 @@ export class Button {
       // 使用 FDF 模板创建
       // Frame.createType(name, owner, createContext, typeName, inherits)
       this.backdropFrame = Frame.createType(
-        "ButtonBackdrop_" + Math.random(),  // name - 唯一名称
+        "ButtonBackdrop_" + os.time(),  // name - 唯一名称
         parentFrame,                         // owner - 父框架
         0,                                   // createContext
         "BACKDROP",                          // typeName - 框架类型
@@ -273,7 +273,7 @@ export class Button {
     } else {
       // 使用普通方式创建
       this.backdropFrame = Frame.createType(
-        "ButtonBackdrop_" + Math.random(),
+        "ButtonBackdrop_" + os.time(),
         parentFrame,
         0,
         "BACKDROP",
@@ -314,7 +314,7 @@ export class Button {
 
     // 创建按钮框架用于事件检测
     this.buttonFrame = Frame.createType(
-      "ButtonFrame_" + Math.random(),
+      "ButtonFrame_" + os.time(),
       this.backdropFrame,
       0,
       "BUTTON",
@@ -324,7 +324,7 @@ export class Button {
       print("Error: Failed to create button frame");
       return;
     }
-
+    
     this.buttonFrame.setAllPoints(this.backdropFrame);
 
     this.setVisible(this.isVisible);
