@@ -143,7 +143,11 @@ class ReloadTemplateExample {
     // })
 
     //this.ui.register(btn);
-    runTipsExamples();
+    //runTipsExamples();
+
+
+    const hero = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
+    hero?.createBloodBar();
 
     print(`Registered ${this.ui.getComponentCount()} components`);
 
