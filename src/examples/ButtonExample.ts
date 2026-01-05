@@ -1,4 +1,5 @@
-import { Button, ButtonTextures } from "src/system/ui/component/Button";
+import { Button } from "src/system/ui/component/Button";
+import { UIBackgrounds } from "src/constants/ui/preset";
 
 
 /**
@@ -14,11 +15,11 @@ export class ButtonExample {
 
     // 方法1: 使用像素坐标创建按钮
     this.testButton = new Button("测试按钮", 400, 300, 100, 36);
-    
+
     // 配置按钮
     this.testButton
       .setTextColor("FFCC00") // 金色文字
-      .setTexturePreset("HUMAN_BACKGROUND") // 使用预设背景
+      .setTexturePreset("BLACK_TRANSPARENT") // 使用预设背景
       .setOnClick(() => {
         print("测试按钮被点击了!");
       })
@@ -37,7 +38,7 @@ export class ButtonExample {
     this.centerButton = Button.createCentered("屏幕中心按钮", "LARGE");
     this.centerButton
       .setTextColor("00FF00") // 绿色文字
-      .setBackground(ButtonTextures.DIALOG_BACKGROUND) // 设置对话框背景
+      .setBackground(UIBackgrounds.DIALOG) // 设置对话框背景
       .setOnClick(() => {
         print("中心按钮被点击!");
       });
