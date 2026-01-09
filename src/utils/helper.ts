@@ -97,8 +97,8 @@ export function worldToScreen(
   const xPrime = scaleFactor * (-cosAttackCosRot * dx - cosAttackSinRot * dy - sinAttack * dz);
 
   // 获取屏幕宽高比并计算校正因子
-  const clientWidth = DzGetClientWidth();
-  const clientHeight = DzGetClientHeight();
+  const clientWidth = DzGetWindowWidth();
+  const clientHeight = DzGetWindowHeight();
 
   print(`clientWidth: ${clientWidth}, clientHeight: ${clientHeight}`);
   let aspectRatio = 4.0 / 3.0; // 默认 4:3
@@ -396,4 +396,139 @@ export function worldToScreen3(
   const finalScreenY = screenY + (options.offsetScreenY || 0);
 
   return { screenX: finalScreenX, screenY: finalScreenY, onScreen };
+}
+
+/**
+ * 世界坐标转屏幕坐标（标准透视投影，使用魔兽争霸3原生API，不使用经验公式）
+ * 
+ * 基于标准的3D图形学透视投影原理：
+ * 1. 构建视图矩阵（从相机参数）
+ * 2. 构建投影矩阵（从FOV和宽高比）
+ * 3. 执行透视投影变换
+ * 4. 透视除法并映射到屏幕坐标
+ * 
+ * @param worldX 世界坐标 X
+ * @param worldY 世界坐标 Y
+ * @param worldZ 世界坐标 Z（垂直高度）
+ * @param options 可选的偏移配置
+ * @returns 屏幕坐标 { screenX, screenY, onScreen }
+ */
+export function worldToScreen4(
+  worldX: number,
+  worldY: number,
+  worldZ: number = 0,
+  options: WorldToScreenOptions = {}
+): { screenX: number, screenY: number, onScreen: boolean } {
+  // ============================================
+  // 1. 获取相机参数（使用魔兽争霸3原生API）
+  // ============================================
+  const eyeX = GetCameraEyePositionX();
+  const eyeY = GetCameraEyePositionY();
+  const eyeZ = GetCameraEyePositionZ();
+  const angleOfAttack = GetCameraField(ConvertCameraField(2)); // CAMERA_FIELD_ANGLE_OF_ATTACK
+  const rotation = GetCameraField(ConvertCameraField(5));      // CAMERA_FIELD_ROTATION
+  const fieldOfView = GetCameraField(ConvertCameraField(3));   // CAMERA_FIELD_FIELD_OF_VIEW
+
+  // ============================================
+  // 2. 预计算三角函数
+  // ============================================
+  const cosAttack = Math.cos(angleOfAttack);
+  const sinAttack = Math.sin(angleOfAttack);
+  const cosRot = Math.cos(rotation);
+  const sinRot = Math.sin(rotation);
+
+  // 矩阵元素预计算（与 worldToScreen3 保持一致）
+  const cosAttackCosRot = cosAttack * cosRot;
+  const cosAttackSinRot = cosAttack * sinRot;
+  const sinAttackCosRot = sinAttack * cosRot;
+  const sinAttackSinRot = sinAttack * sinRot;
+
+  // ============================================
+  // 4. 将世界坐标转换为视图坐标
+  // ============================================
+  // 计算世界点到相机的向量
+  const dx = worldX - eyeX;
+  const dy = worldY - eyeY;
+  const dz = worldZ - eyeZ;
+
+  // 投影到相机坐标系（与 worldToScreen3 保持一致）
+  // viewX: 右向量方向的投影（屏幕X方向）
+  // 使用与 worldToScreen3 相同的计算方式：cosRot * dy - sinRot * dx
+  const viewX = cosRot * dy - sinRot * dx;
+  // viewY: 上向量方向的投影（屏幕Y方向）
+  const viewY = sinAttackCosRot * dx + sinAttackSinRot * dy - cosAttack * dz;
+  // viewZ: 前向量方向的投影（深度，负值表示在相机前方）
+  // 使用与 worldToScreen3 的 xPrime 相同的公式（但保持负号）
+  const viewZ = -cosAttackCosRot * dx - cosAttackSinRot * dy - sinAttack * dz;
+
+  // ============================================
+  // 5. 检查点是否在相机前方
+  // ============================================
+  if (viewZ >= 0) {
+    // 点在相机后方或与相机同平面，不可见
+    return { 
+      screenX: 0, 
+      screenY: 0, 
+      onScreen: false 
+    };
+  }
+
+  // ============================================
+  // 6. 构建投影矩阵并执行透视投影
+  // ============================================
+  // 获取屏幕宽高比
+  const clientWidth = DzGetClientWidth();
+  const clientHeight = DzGetClientHeight();
+  let aspectRatio = 4.0 / 3.0; // 默认 4:3
+  if (clientHeight > 0) {
+    aspectRatio = clientWidth / clientHeight;
+  }
+
+  // 标准的透视投影：使用 FOV 计算投影参数
+  // fov 在魔兽争霸3中是垂直视场角（以弧度为单位）
+  // 计算近裁剪平面的高度（在视图空间中）
+  const fovRad = fieldOfView;
+  const nearPlaneHeight = 2.0 * Math.tan(fovRad / 2.0);
+  const nearPlaneWidth = nearPlaneHeight * aspectRatio;
+
+  // 透视投影：将视图坐标投影到裁剪空间
+  // 使用标准的透视投影公式：x' = x / z, y' = y / z
+  // 注意：viewZ 是负数（点在相机前方），所以除以 viewZ 相当于除以负数
+  // 这与 worldToScreen3 中除以 xPrime（也是负数）的行为一致
+  const projectedX = viewX / viewZ;
+  const projectedY = viewY / viewZ;
+
+  // 归一化到 [-1, 1] 范围（NDC坐标）
+  const ndcX = projectedX / (nearPlaneWidth / 2.0);
+  const ndcY = projectedY / (nearPlaneHeight / 2.0);
+
+  // ============================================
+  // 7. 映射到魔兽争霸3屏幕坐标系（0-1范围）
+  // ============================================
+  // WC3屏幕坐标系：
+  // - X: 0.0 (左) 到 0.8 (右)
+  // - Y: 0.0 (下) 到 0.6 (上)
+  // 中心点大约在 (0.4, 0.3)
+  
+  // 将NDC坐标映射到WC3屏幕坐标
+  // NDC [-1, 1] -> WC3 [0, 0.8] for X, [0, 0.6] for Y
+  const screenX = 0.4 + (ndcX * 0.4); // 中心在0.4，范围±0.4
+  const screenY = 0.3 - (ndcY * 0.3); // 中心在0.3，范围±0.3（注意Y轴反转）
+
+  // ============================================
+  // 8. 判断点是否在屏幕上
+  // ============================================
+  const onScreen = screenX >= 0 && screenX <= 0.8 && screenY >= 0 && screenY <= 0.6;
+
+  // ============================================
+  // 9. 应用偏移量
+  // ============================================
+  const finalScreenX = screenX + (options.offsetScreenX || 0);
+  const finalScreenY = screenY + (options.offsetScreenY || 0);
+
+  return { 
+    screenX: finalScreenX, 
+    screenY: finalScreenY, 
+    onScreen 
+  };
 }
