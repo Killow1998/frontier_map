@@ -99,8 +99,6 @@ export function worldToScreen(
   // 获取屏幕宽高比并计算校正因子
   const clientWidth = DzGetWindowWidth();
   const clientHeight = DzGetWindowHeight();
-
-  print(`clientWidth: ${clientWidth}, clientHeight: ${clientHeight}`);
   let aspectRatio = 4.0 / 3.0; // 默认 4:3
   if (clientHeight > 0) {
     aspectRatio = clientWidth / clientHeight;
