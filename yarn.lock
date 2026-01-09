@@ -14,10 +14,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eiriksgata/wc3ts@npm:3.2.8":
-  version: 3.2.8
-  resolution: "@eiriksgata/wc3ts@npm:3.2.8"
-  checksum: 10/79e8d275ef470486bff01c0407a47088d31dce1d1b7fa44a73ab2d58b762268c03a53ca542c3c9769f1b6e7ee9f84e92296fd6f90cf13b8f49258fb4cb2cca5f
+"@eiriksgata/wc3ts@npm:3.2.9":
+  version: 3.2.9
+  resolution: "@eiriksgata/wc3ts@npm:3.2.9"
+  checksum: 10/187cbe772b288f485fe0716ca42ad2b018716f4b739aa5a86e47679e2dd2b3cacdc1f04b04dbbda16c7538e14596ec97d2c8444cb66bbd935fcfedce60ed8651
   languageName: node
   linkType: hard
 
@@ -389,7 +389,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wc3-map-ts-template@workspace:."
   dependencies:
-    "@eiriksgata/wc3ts": "npm:3.2.8"
+    "@eiriksgata/wc3ts": "npm:3.2.9"
     "@types/node": "npm:^24.5.2"
     "@typescript-to-lua/language-extensions": "npm:^1.19.0"
     fs-extra: "npm:^11.3.2"

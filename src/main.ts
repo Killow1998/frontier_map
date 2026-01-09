@@ -1,5 +1,5 @@
 
-import { Frame, Players, Timer } from "@eiriksgata/wc3ts/*";
+import { Frame, KKUnitCanPlaceAroundLocItem, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -88,8 +88,7 @@ export function initialize(): void {
   // 启动应用程序
   main();
 
-  DzFrameUnlockMouseRectLimit(true)
-
+  DzFrameUnlockMouseRectLimit(true);
   //隐藏魔兽UI
   //DzFrameHideInterface();
 
