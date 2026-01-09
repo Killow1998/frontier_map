@@ -88,11 +88,13 @@ export function initialize(): void {
   // 启动应用程序
   main();
 
+  //DzFrameUnlockMouseRectLimit(true)
+
   //隐藏魔兽UI
-  //DzFrameHideInterface();
+  DzFrameHideInterface();
 
   //调整魔兽渲染黑边
-  //DzFrameEditBlackBorders(0, 0);
+  DzFrameEditBlackBorders(0, 0);
 
 
 
