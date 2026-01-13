@@ -11,27 +11,6 @@ export function FourCC(id: string) {
   return c2i(id)
 }
 
-/**
- * 将世界坐标转换为屏幕坐标 原生方法（不推荐使用，效率低下）
- * @param x 世界坐标 X
- * @param y 世界坐标 Y
- * @param z 世界坐标 Z
- * @param callback 转换完成后的回调函数
- */
-export function worldToScreenNative(
-  x: number,
-  y: number,
-  z: number,
-  callback: (result: { screenX: number, screenY: number, screenZ: number }) => void
-): void {
-  DzConvertWorldPosition(x, y, z, () => {
-    const screenX = DzGetConvertWorldPositionX();
-    const screenY = DzGetConvertWorldPositionY();
-    const screenZ = 0;
-    callback({ screenX, screenY, screenZ });
-  });
-}
-
 
 /**
  * 世界坐标转屏幕坐标的配置选项

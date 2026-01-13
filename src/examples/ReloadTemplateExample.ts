@@ -4,7 +4,7 @@ import { HotReloadHelper } from "src/system/ui/UIComponent";
 import { Dialog } from "src/system/ui/component/Dialog";
 import { DamageTextExample } from "./DamageTextExample";
 import { Actor } from "src/system/actor";
-import { EVENT_PLAYER_UNIT_TRAIN_CANCEL, Players, Timer, Trigger, Unit } from "@eiriksgata/wc3ts/*";
+import { EVENT_PLAYER_UNIT_TRAIN_CANCEL, Frame, FRAMEPOINT_CENTER, Players, Timer, Trigger, Unit } from "@eiriksgata/wc3ts/*";
 import { FourCC } from "src/utils/helper";
 import { GameEventManager, PlayerUnitEventId } from "src/system/event/GameEvent";
 import { DamageTextManager } from "src/system/ui/DamageTexttag";
@@ -13,6 +13,8 @@ import { Button } from "src/system/ui/component/Button";
 import { Console } from "src/system/console";
 import { Tips, TipsAnimation, TipsPosition } from "src/system/ui/component/Tips";
 import { runTipsExamples } from "./TipsExample";
+import { ScreenCoordinates } from "src/system/ui/ScreenCoordinates";
+import { UILayout } from "src/system/ui/UILayout";
 
 /**
  * 热更新模板
@@ -34,123 +36,31 @@ class ReloadTemplateExample {
    * 创建测试按钮
    */
   public TestButton() {
-    // // 方式1: 使用 helper.create() 创建并自动注册
-    // this.ui.create(() => {
-    //   const button = Button.createCentered("ReloadTemplate Button");
-    //   button.setDraggable(true);
-    //   button.setOnClick(() => {
-    //     print("ReloadTemplate Button clicked!");
-    //   });
-    //   return button;
-    // });
+    const gameUI = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
 
-    // // 方式2: 先创建再注册
-    // const text = Text.createAtPresetPosition("ReloadTemplate Example v2", 'TOP_LEFT');
-    // text.setSize(500, 100);
-    // text.setBackground("UI\\Widgets\\BattleNet\\bnet-userlist-back.blp");
-    // text.setPaddingTop(30);
-    // text.setPaddingLeft(30);
-    // text.enableDrag();
+    const gameUIConsole = Frame.createType("gameUIConsole", gameUI, 0, "BACKDROP", "")!;
 
-    // this.ui.register(text);  // 注册到热重载管理
-    //text.setBackdropPadding(100);
+    gameUIConsole.setTexture("map\\resource\\Console\\console.blp", 0, true);
 
+    // ========================================
+    // 使用 UILayout 预设方法 - 简单快捷！
+    // ========================================
+    const imageWidth = 910;   // 图片像素宽度
+    const imageHeight = 245;  // 图片像素高度
 
-    //创建面板
-    //const panel = Panel.createCentered("SMALL");
-    //panel.setDraggable(true);
-    //panel.setPosition(600, 300);
-    //panel.setBackground("UI\\Widgets\\ChatFrame\\ChatFrame-Background.blp");
-    //this.ui.register(panel); // 注册面板
+    // 方式1：一行代码居中并设置尺寸
+    UILayout.setFrame(gameUIConsole, 'CENTER', imageWidth, imageHeight);
 
+    // 方式2：分别设置（如果需要）
+    // UILayout.setFramePosition(gameUIConsole, 'CENTER');
+    // UILayout.setFrameSize(gameUIConsole, imageWidth, imageHeight);
 
-    // // 直接显示一个简单的对话框进行测试
-    // const testDialog = new Dialog("测试对话框", 500, 600);
-    // testDialog.create();
-    // testDialog.setDraggable(true);
+    // 方式3：设置完整矩形区域
+    // UILayout.setFrameRect(gameUIConsole, { x: 100, y: 100, width: imageWidth, height: imageHeight });
 
-    // testDialog.addButton({
-    //   text: "选项 12",
-    //   onClick: () => {
-    //     print("点击了选项 1");
-    //   },
-    //   color: TextColors.GREEN
-    // });
+    print(`图片尺寸: ${imageWidth}x${imageHeight} 像素，已居中显示`);
 
-    // testDialog.addButton({
-    //   text: "选项 2",
-    //   onClick: () => {
-    //     print("点击了选项 2");
-    //   },
-    //   color: TextColors.YELLOW
-    // });
-
-    // testDialog.addButton({
-    //   text: "关闭",
-    //   onClick: () => {
-    //     print("关闭对话框");
-    //     testDialog.hide();
-    //   },
-    //   color: TextColors.RED
-    // });
-
-    // // 显示对话框
-    // testDialog.show();
-
-    // // 注册对话框到热重载管理器
-    // this.ui.register(testDialog);
-
-    //创建圣骑士单位
-    // const actor = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
-
-
-    // // 单位受到伤害
-    // GameEventManager.getInstance().onUnitAttacked((data) => {
-    //   if (data.Actor == undefined) return;
-    //   const damage = GetRandomInt(1, 100000000);
-    //   DamageTextManager.showDamage(damage, data.Actor.x, data.Actor.y, data.Actor.hpBarUIHeight);
-    // });
-
-    // actor?.createBloodBar();
-    // typeof DamageTextExample;
-
-    // const button = Button.createAtPresetPosition("测试按钮", "CENTER");
-    // button.setOnClick(() => {
-    //   Console.log("测试按钮被点击!111", 5, Players[0]);
-    // });
-    // button.create();
-    // this.ui.register(button);
-
-
-    // const btn = Button.createAtPresetPosition("测试按钮", "CENTER");
-    // btn.setOnHover(() => {
-    //   Console.log("鼠标进入测试按钮");
-    //   Tips.getInstance().showFromComponentInfo({
-    //     text: "火焰之球\n\n向目标发射一颗火球\n造成 150 点火焰伤害\n\n冷却时间: 10 秒\n魔法消耗: 100",
-    //     textColor: "FFD700", // 金色
-    //     icon: "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp",
-    //     width: 320,
-    //     maxHeight: 200,
-    //     position: TipsPosition.AUTO,
-    //     animation: TipsAnimation.NONE,
-    //     delayShow: 0
-    //   }, btn.getComponentInfo());
-    // })
-
-    // btn.setOnLeave(() => {
-    //   Console.log("鼠标离开测试按钮");
-    //   Tips.getInstance().hide();
-    // })
-
-    //this.ui.register(btn);
-    runTipsExamples();
-
-
-    const hero = Actor.create(Players[0], FourCC('Hpal'), 0, 0, 270);
-    hero?.createBloodBar();
-
-    print(`Registered ${this.ui.getComponentCount()} components`);
-
+    this.ui.register(gameUIConsole);
   }
 
   /**

@@ -9,8 +9,6 @@ import { MapGeneral } from "./config/Map";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { EventBus, mouseEvents } from "./system/event";
 import { Console } from "./system/console";
-import { Actor } from "./system/actor";
-import { FourCC } from "./utils/helper";
 
 /**
  * 应用程序主入口
@@ -51,7 +49,7 @@ export function initialize(): void {
   ydlua.getInstance().initialize();
 
   //log 初始化
-  Console.init();
+  //Console.init();
 
   //载入TOC fdf样式模板Frame
   try {
@@ -90,10 +88,10 @@ export function initialize(): void {
 
   DzFrameUnlockMouseRectLimit(true);
   //隐藏魔兽UI
-  //DzFrameHideInterface();
+  DzFrameHideInterface();
 
   //调整魔兽渲染黑边
-  //DzFrameEditBlackBorders(0, 0);
+  DzFrameEditBlackBorders(0, 0);
 
 
 

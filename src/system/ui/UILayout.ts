@@ -4,6 +4,7 @@
  */
 
 import { ScreenCoordinates } from "./ScreenCoordinates";
+import { Frame } from "@eiriksgata/wc3ts/*";
 
 export interface UIRect {
   x: number;
@@ -18,6 +19,28 @@ export interface WC3Rect {
   width: number;
   height: number;
 }
+
+/**
+ * 预设位置类型定义
+ */
+export type PresetPosition = 
+  // 角落位置
+  | 'TOP_LEFT' 
+  | 'TOP_RIGHT' 
+  | 'BOTTOM_LEFT' 
+  | 'BOTTOM_RIGHT'
+  // 边缘中心
+  | 'TOP_CENTER' 
+  | 'BOTTOM_CENTER' 
+  | 'LEFT_CENTER' 
+  | 'RIGHT_CENTER'
+  // 屏幕中心
+  | 'CENTER'
+  // 常用UI位置
+  | 'UI_TOP_LEFT' 
+  | 'UI_TOP_RIGHT' 
+  | 'UI_BOTTOM_LEFT' 
+  | 'UI_BOTTOM_RIGHT';
 
 export class UILayout {
   // 常用按钮尺寸（像素）
@@ -46,256 +69,112 @@ export class UILayout {
   };
 
   /**
-   * 创建按钮位置和尺寸
-   * @param x 像素X坐标
-   * @param y 像素Y坐标
-   * @param sizePreset 尺寸预设
-   * @param origin 坐标原点
-   * @returns WC3坐标格式的矩形
+   * 将 Frame 设置到预设位置
+   * @param frame 要设置的 Frame
+   * @param preset 预设位置名称（如 'CENTER', 'TOP_LEFT' 等）
+   * @param anchorPoint Frame 的锚点，默认为 FRAMEPOINT_CENTER
+   * @example
+   * UILayout.setFramePosition(myFrame, 'CENTER');
+   * UILayout.setFramePosition(myFrame, 'TOP_LEFT', FRAMEPOINT_TOPLEFT);
    */
-  public static createButton(
-    x: number,
-    y: number,
-    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
-    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT
-  ): WC3Rect {
-    const size = UILayout.BUTTON_SIZES[sizePreset];
-    const wc3Pos = ScreenCoordinates.pixelToWC3(x, y, origin);
-    const wc3Size = {
-      width: (size.width / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH,
-      height: (size.height / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT
-    };
-
-    return {
-      x: wc3Pos.x,
-      y: wc3Pos.y,
-      width: wc3Size.width,
-      height: wc3Size.height
-    };
+  public static setFramePosition(
+    frame: Frame,
+    preset: PresetPosition,
+    anchorPoint: number = 4  // FRAMEPOINT_CENTER = 4
+  ): void {
+    const pixelPos = ScreenCoordinates.getPresetPosition(preset);
+    const wc3Pos = ScreenCoordinates.pixelToWC3(
+      pixelPos.x,
+      pixelPos.y,
+      ScreenCoordinates.ORIGIN_TOP_LEFT
+    );
+    frame.setAbsPoint(anchorPoint, wc3Pos.x, wc3Pos.y);
   }
 
   /**
-   * 创建面板位置和尺寸
-   * @param x 像素X坐标
-   * @param y 像素Y坐标
-   * @param sizePreset 尺寸预设
-   * @param origin 坐标原点
-   * @returns WC3坐标格式的矩形
+   * 设置 Frame 到指定预设位置，并可选设置尺寸
+   * @param frame 要设置的 Frame
+   * @param preset 预设位置名称（'CENTER', 'TOP_LEFT', 'BOTTOM_RIGHT', 'UI_TOP_LEFT' 等）
+   * @param pixelWidth 可选的像素宽度
+   * @param pixelHeight 可选的像素高度
+   * @param anchorPoint Frame 的锚点，默认为 FRAMEPOINT_CENTER
+   * @example
+   * // 居中显示，设置尺寸
+   * UILayout.setFrame(myFrame, 'CENTER', 910, 245);
+   * 
+   * // 左上角显示
+   * UILayout.setFrame(myFrame, 'TOP_LEFT', 300, 200, FRAMEPOINT_TOPLEFT);
+   * 
+   * // 右下角显示（仅位置，不设置尺寸）
+   * UILayout.setFrame(myFrame, 'BOTTOM_RIGHT');
    */
-  public static createPanel(
-    x: number,
-    y: number,
-    sizePreset: keyof typeof UILayout.PANEL_SIZES = 'MEDIUM',
-    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT
-  ): WC3Rect {
-    const size = UILayout.PANEL_SIZES[sizePreset];
-    const wc3Pos = ScreenCoordinates.pixelToWC3(x, y, origin);
-    const wc3Size = {
-      width: (size.width / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH,
-      height: (size.height / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT
-    };
-
-    return {
-      x: wc3Pos.x,
-      y: wc3Pos.y,
-      width: wc3Size.width,
-      height: wc3Size.height
-    };
-  }
-
-  /**
-   * 创建水平布局的按钮组
-   * @param startX 起始X坐标（像素）
-   * @param y Y坐标（像素）
-   * @param buttonCount 按钮数量
-   * @param sizePreset 按钮尺寸预设
-   * @param spacing 间距（像素）
-   * @param origin 坐标原点
-   * @returns 按钮位置数组
-   */
-  public static createHorizontalButtonGroup(
-    startX: number,
-    y: number,
-    buttonCount: number,
-    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
-    spacing: number = UILayout.SPACING.MEDIUM,
-    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT
-  ): WC3Rect[] {
-    const buttons: WC3Rect[] = [];
-    const buttonSize = UILayout.BUTTON_SIZES[sizePreset];
-
-    for (let i = 0; i < buttonCount; i++) {
-      const x = startX + i * (buttonSize.width + spacing);
-      buttons.push(UILayout.createButton(x, y, sizePreset, origin));
+  public static setFrame(
+    frame: Frame,
+    preset: PresetPosition,
+    pixelWidth?: number,
+    pixelHeight?: number,
+    anchorPoint: number = 4  // FRAMEPOINT_CENTER = 4
+  ): void {
+    this.setFramePosition(frame, preset, anchorPoint);
+    
+    if (pixelWidth !== undefined && pixelHeight !== undefined) {
+      this.setFrameSize(frame, pixelWidth, pixelHeight);
     }
-
-    return buttons;
   }
 
   /**
-   * 创建垂直布局的按钮组
-   * @param x X坐标（像素）
-   * @param startY 起始Y坐标（像素）
-   * @param buttonCount 按钮数量
-   * @param sizePreset 按钮尺寸预设
-   * @param spacing 间距（像素）
-   * @param origin 坐标原点
-   * @returns 按钮位置数组
+   * 居中显示 Frame，并可选设置尺寸（setFrame 的便捷方法）
+   * @param frame 要居中的 Frame
+   * @param pixelWidth 可选的像素宽度
+   * @param pixelHeight 可选的像素高度
+   * @example
+   * UILayout.centerFrame(myFrame, 910, 245);
    */
-  public static createVerticalButtonGroup(
-    x: number,
-    startY: number,
-    buttonCount: number,
-    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
-    spacing: number = UILayout.SPACING.MEDIUM,
-    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT
-  ): WC3Rect[] {
-    const buttons: WC3Rect[] = [];
-    const buttonSize = UILayout.BUTTON_SIZES[sizePreset];
-
-    for (let i = 0; i < buttonCount; i++) {
-      const y = startY + i * (buttonSize.height + spacing);
-      buttons.push(UILayout.createButton(x, y, sizePreset, origin));
-    }
-
-    return buttons;
+  public static centerFrame(
+    frame: Frame,
+    pixelWidth?: number,
+    pixelHeight?: number
+  ): void {
+    this.setFrame(frame, 'CENTER', pixelWidth, pixelHeight, 4);
   }
 
   /**
-   * 创建网格布局
-   * @param startX 起始X坐标（像素）
-   * @param startY 起始Y坐标（像素）
-   * @param rows 行数
-   * @param cols 列数
-   * @param sizePreset 按钮尺寸预设
-   * @param spacing 间距（像素）
-   * @param origin 坐标原点
-   * @returns 按钮位置数组（按行列顺序）
+   * 设置 Frame 的尺寸（从像素转换）
+   * @param frame 要设置的 Frame
+   * @param pixelWidth 像素宽度
+   * @param pixelHeight 像素高度
+   * @example
+   * UILayout.setFrameSize(myFrame, 910, 245);
    */
-  public static createGridLayout(
-    startX: number,
-    startY: number,
-    rows: number,
-    cols: number,
-    sizePreset: keyof typeof UILayout.BUTTON_SIZES = 'MEDIUM',
-    spacing: number = UILayout.SPACING.MEDIUM,
-    origin: string = ScreenCoordinates.ORIGIN_TOP_LEFT
-  ): WC3Rect[][] {
-    const grid: WC3Rect[][] = [];
-    const buttonSize = UILayout.BUTTON_SIZES[sizePreset];
-
-    for (let row = 0; row < rows; row++) {
-      const rowButtons: WC3Rect[] = [];
-      for (let col = 0; col < cols; col++) {
-        const x = startX + col * (buttonSize.width + spacing);
-        const y = startY + row * (buttonSize.height + spacing);
-        rowButtons.push(UILayout.createButton(x, y, sizePreset, origin));
-      }
-      grid.push(rowButtons);
-    }
-
-    return grid;
+  public static setFrameSize(
+    frame: Frame,
+    pixelWidth: number,
+    pixelHeight: number
+  ): void {
+    const size = ScreenCoordinates.pixelSizeToWC3(pixelWidth, pixelHeight);
+    frame.setSize(size.width, size.height);
   }
 
   /**
-   * 居中对齐元素
-   * @param elementWidth 元素宽度（像素）
-   * @param elementHeight 元素高度（像素）
-   * @param containerWidth 容器宽度（像素），默认为屏幕宽度
-   * @param containerHeight 容器高度（像素），默认为屏幕高度
-   * @returns 居中位置（像素坐标）
+   * 设置 Frame 的矩形区域（位置 + 尺寸）
+   * @param frame 要设置的 Frame
+   * @param pixelRect 像素矩形 {x, y, width, height}
+   * @param anchorPoint Frame 的锚点，默认为 FRAMEPOINT_TOPLEFT
+   * @example
+   * UILayout.setFrameRect(myFrame, { x: 100, y: 100, width: 300, height: 200 });
    */
-  public static centerAlign(
-    elementWidth: number,
-    elementHeight: number,
-    containerWidth: number = ScreenCoordinates.STANDARD_WIDTH,
-    containerHeight: number = ScreenCoordinates.STANDARD_HEIGHT
-  ): { x: number; y: number } {
-    return {
-      x: (containerWidth - elementWidth) / 2,
-      y: (containerHeight - elementHeight) / 2
-    };
+  public static setFrameRect(
+    frame: Frame,
+    pixelRect: UIRect,
+    anchorPoint: number = 0  // FRAMEPOINT_TOPLEFT = 0
+  ): void {
+    const wc3Pos = ScreenCoordinates.pixelToWC3(
+      pixelRect.x,
+      pixelRect.y,
+      ScreenCoordinates.ORIGIN_TOP_LEFT
+    );
+    frame.setAbsPoint(anchorPoint, wc3Pos.x, wc3Pos.y);
+    this.setFrameSize(frame, pixelRect.width, pixelRect.height);
   }
-
-  /**
-   * 获取安全区域（避免UI被遮挡）
-   * @param margin 边距（像素）
-   * @returns 安全区域矩形
-   */
-  public static getSafeArea(margin: number = 50): UIRect {
-    return {
-      x: margin,
-      y: margin,
-      width: ScreenCoordinates.STANDARD_WIDTH - 2 * margin,
-      height: ScreenCoordinates.STANDARD_HEIGHT - 2 * margin
-    };
-  }
-
-  /**
-   * 在指定区域内排列元素
-   * @param area 区域
-   * @param elementCount 元素数量
-   * @param elementSize 元素尺寸
-   * @param spacing 间距
-   * @param direction 排列方向
-   * @returns 元素位置数组
-   */
-  public static arrangeInArea(
-    area: UIRect,
-    elementCount: number,
-    elementSize: { width: number; height: number },
-    spacing: number = UILayout.SPACING.MEDIUM,
-    direction: 'horizontal' | 'vertical' | 'grid' = 'horizontal'
-  ): { x: number; y: number }[] {
-    const positions: { x: number; y: number }[] = [];
-
-    switch (direction) {
-      case 'horizontal':
-        const totalWidth = elementCount * elementSize.width + (elementCount - 1) * spacing;
-        const startX = area.x + (area.width - totalWidth) / 2;
-        const centerY = area.y + (area.height - elementSize.height) / 2;
-
-        for (let i = 0; i < elementCount; i++) {
-          positions.push({
-            x: startX + i * (elementSize.width + spacing),
-            y: centerY
-          });
-        }
-        break;
-
-      case 'vertical':
-        const totalHeight = elementCount * elementSize.height + (elementCount - 1) * spacing;
-        const centerX = area.x + (area.width - elementSize.width) / 2;
-        const startY = area.y + (area.height - totalHeight) / 2;
-
-        for (let i = 0; i < elementCount; i++) {
-          positions.push({
-            x: centerX,
-            y: startY + i * (elementSize.height + spacing)
-          });
-        }
-        break;
-
-      case 'grid':
-        const cols = Math.floor((area.width + spacing) / (elementSize.width + spacing));
-        const rows = Math.ceil(elementCount / cols);
-        
-        const gridWidth = cols * elementSize.width + (cols - 1) * spacing;
-        const gridHeight = rows * elementSize.height + (rows - 1) * spacing;
-        const gridStartX = area.x + (area.width - gridWidth) / 2;
-        const gridStartY = area.y + (area.height - gridHeight) / 2;
-
-        for (let i = 0; i < elementCount; i++) {
-          const row = Math.floor(i / cols);
-          const col = i % cols;
-          positions.push({
-            x: gridStartX + col * (elementSize.width + spacing),
-            y: gridStartY + row * (elementSize.height + spacing)
-          });
-        }
-        break;
-    }
-
-    return positions;
-  }
+  
 }

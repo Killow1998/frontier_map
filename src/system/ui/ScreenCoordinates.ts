@@ -160,4 +160,30 @@ export class ScreenCoordinates {
            pointY >= rectY && 
            pointY <= rectY + rectHeight;
   }
+
+  /**
+   * 将像素尺寸转换为 WC3 尺寸
+   * @param pixelWidth 像素宽度
+   * @param pixelHeight 像素高度
+   * @returns WC3 尺寸 {width, height}
+   */
+  public static pixelSizeToWC3(pixelWidth: number, pixelHeight: number): { width: number; height: number } {
+    return {
+      width: (pixelWidth / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH,
+      height: (pixelHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT
+    };
+  }
+
+  /**
+   * 将 WC3 尺寸转换为像素尺寸
+   * @param wc3Width WC3 宽度
+   * @param wc3Height WC3 高度
+   * @returns 像素尺寸 {width, height}
+   */
+  public static wc3SizeToPixel(wc3Width: number, wc3Height: number): { width: number; height: number } {
+    return {
+      width: Math.round((wc3Width / ScreenCoordinates.WC3_SCREEN_WIDTH) * ScreenCoordinates.STANDARD_WIDTH),
+      height: Math.round((wc3Height / ScreenCoordinates.WC3_SCREEN_HEIGHT) * ScreenCoordinates.STANDARD_HEIGHT)
+    };
+  }
 }
