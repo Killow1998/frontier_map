@@ -72,7 +72,7 @@ export class UILayout {
    * 将 Frame 设置到预设位置
    * @param frame 要设置的 Frame
    * @param preset 预设位置名称（如 'CENTER', 'TOP_LEFT' 等）
-   * @param anchorPoint Frame 的锚点，默认为 FRAMEPOINT_CENTER
+   * @param anchorPoint Frame 的锚点；不传时会根据 preset 自动选择（避免底边贴图被高度顶出屏幕）
    * @example
    * UILayout.setFramePosition(myFrame, 'CENTER');
    * UILayout.setFramePosition(myFrame, 'TOP_LEFT', FRAMEPOINT_TOPLEFT);
@@ -80,7 +80,7 @@ export class UILayout {
   public static setFramePosition(
     frame: Frame,
     preset: PresetPosition,
-    anchorPoint: number = 4  // FRAMEPOINT_CENTER = 4
+    anchorPoint?: number
   ): void {
     const pixelPos = ScreenCoordinates.getPresetPosition(preset);
     const wc3Pos = ScreenCoordinates.pixelToWC3(
@@ -88,7 +88,8 @@ export class UILayout {
       pixelPos.y,
       ScreenCoordinates.ORIGIN_TOP_LEFT
     );
-    frame.setAbsPoint(anchorPoint, wc3Pos.x, wc3Pos.y);
+    const resolvedAnchor = UILayout.resolveAnchor(preset, anchorPoint);
+    frame.setAbsPoint(resolvedAnchor, wc3Pos.x, wc3Pos.y);
   }
 
   /**
@@ -113,13 +114,55 @@ export class UILayout {
     preset: PresetPosition,
     pixelWidth?: number,
     pixelHeight?: number,
-    anchorPoint: number = 4  // FRAMEPOINT_CENTER = 4
+    anchorPoint?: number
   ): void {
     this.setFramePosition(frame, preset, anchorPoint);
     
     if (pixelWidth !== undefined && pixelHeight !== undefined) {
       this.setFrameSize(frame, pixelWidth, pixelHeight);
     }
+  }
+
+  /**
+   * 将 Frame 放置在预设位置并自动保证贴图不越出屏幕（需要提供尺寸）
+   * @param frame 要设置的 Frame
+   * @param preset 预设位置
+   * @param pixelWidth 像素宽度（必填，用于计算边界）
+   * @param pixelHeight 像素高度（必填，用于计算边界）
+   * @param anchorPoint 可选锚点，缺省时按 preset 自动选择
+   * @example
+   * UILayout.setFrameWithinScreen(myFrame, 'BOTTOM_RIGHT', 910, 245);
+   */
+  public static setFrameWithinScreen(
+    frame: Frame,
+    preset: PresetPosition,
+    pixelWidth: number,
+    pixelHeight: number,
+    anchorPoint?: number
+  ): void {
+    const pixelPos = ScreenCoordinates.getPresetPosition(preset);
+    const wc3Pos = ScreenCoordinates.pixelToWC3(
+      pixelPos.x,
+      pixelPos.y,
+      ScreenCoordinates.ORIGIN_TOP_LEFT
+    );
+
+    const resolvedAnchor = UILayout.resolveAnchor(preset, anchorPoint);
+    const anchorFactors = UILayout.resolveAnchorFactors(resolvedAnchor);
+    const size = ScreenCoordinates.pixelSizeToWC3(pixelWidth, pixelHeight);
+
+    const clampedX = Math.min(
+      Math.max(wc3Pos.x, anchorFactors.x * size.width),
+      ScreenCoordinates.WC3_SCREEN_WIDTH - (1 - anchorFactors.x) * size.width
+    );
+
+    const clampedY = Math.min(
+      Math.max(wc3Pos.y, anchorFactors.y * size.height),
+      ScreenCoordinates.WC3_SCREEN_HEIGHT - (1 - anchorFactors.y) * size.height
+    );
+
+    frame.setAbsPoint(resolvedAnchor, clampedX, clampedY);
+    frame.setSize(size.width, size.height);
   }
 
   /**
@@ -175,6 +218,62 @@ export class UILayout {
     );
     frame.setAbsPoint(anchorPoint, wc3Pos.x, wc3Pos.y);
     this.setFrameSize(frame, pixelRect.width, pixelRect.height);
+  }
+
+  /**
+   * 根据预设位置推断合适的锚点，避免底部/顶部因尺寸被裁切
+   * @param preset 预设位置
+   * @param anchorPoint 用户传入的锚点，若提供则直接使用
+   */
+  private static resolveAnchor(preset: PresetPosition, anchorPoint?: number): number {
+    if (anchorPoint !== undefined) {
+      return anchorPoint;
+    }
+
+    switch (preset) {
+      case 'TOP_LEFT':
+      case 'UI_TOP_LEFT':
+        return 0; // FRAMEPOINT_TOPLEFT
+      case 'TOP_CENTER':
+        return 1; // FRAMEPOINT_TOP
+      case 'TOP_RIGHT':
+      case 'UI_TOP_RIGHT':
+        return 2; // FRAMEPOINT_TOPRIGHT
+      case 'LEFT_CENTER':
+        return 3; // FRAMEPOINT_LEFT
+      case 'CENTER':
+        return 4; // FRAMEPOINT_CENTER
+      case 'RIGHT_CENTER':
+        return 5; // FRAMEPOINT_RIGHT
+      case 'BOTTOM_LEFT':
+      case 'UI_BOTTOM_LEFT':
+        return 6; // FRAMEPOINT_BOTTOMLEFT
+      case 'BOTTOM_CENTER':
+        return 7; // FRAMEPOINT_BOTTOM
+      case 'BOTTOM_RIGHT':
+      case 'UI_BOTTOM_RIGHT':
+        return 8; // FRAMEPOINT_BOTTOMRIGHT
+      default:
+        return 4; // 安全兜底 CENTER
+    }
+  }
+
+  /**
+   * 将锚点编号转换为相对位置系数（0=左/下, 1=右/上）
+   */
+  private static resolveAnchorFactors(anchorPoint: number): { x: number; y: number } {
+    switch (anchorPoint) {
+      case 0: return { x: 0,   y: 1 };   // TOPLEFT
+      case 1: return { x: 0.5, y: 1 };   // TOP
+      case 2: return { x: 1,   y: 1 };   // TOPRIGHT
+      case 3: return { x: 0,   y: 0.5 }; // LEFT
+      case 4: return { x: 0.5, y: 0.5 }; // CENTER
+      case 5: return { x: 1,   y: 0.5 }; // RIGHT
+      case 6: return { x: 0,   y: 0 };   // BOTTOMLEFT
+      case 7: return { x: 0.5, y: 0 };   // BOTTOM
+      case 8: return { x: 1,   y: 0 };   // BOTTOMRIGHT
+      default: return { x: 0.5, y: 0.5 };
+    }
   }
   
 }

@@ -49,7 +49,7 @@ class ReloadTemplateExample {
     const imageHeight = 245;  // 图片像素高度
 
     // 方式1：一行代码居中并设置尺寸
-    UILayout.setFrame(gameUIConsole, 'CENTER', imageWidth, imageHeight);
+    UILayout.setFrame(gameUIConsole, 'BOTTOM_CENTER', imageWidth, imageHeight);
 
     // 方式2：分别设置（如果需要）
     // UILayout.setFramePosition(gameUIConsole, 'CENTER');
