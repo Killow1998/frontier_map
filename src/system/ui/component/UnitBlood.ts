@@ -62,7 +62,7 @@ export class UnitBlood {
     this.nameFrame.setText(actor.getLabel());
     this.nameFrame.setTextAlignment(18, 0);
     this.nameFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf", 0.01, 0);
-    // this.nameFrame.setSize(0, 0.006)
+    this.nameFrame.setScale(0.6);
 
     this.nameFrame.alpha = 255;
     this.nameFrame.setPoint(FRAME_ALIGN_BOTTOM, this.frame, FRAME_ALIGN_TOP, 0.003, 10 / 1800);
@@ -219,7 +219,7 @@ export class UnitBlood {
     const unitHeightOffset = this.actor.hpBarUIHeight * this.actor.size; // 单位高度偏移
     
     // 转换为屏幕坐标（传入计算好的偏移量）
-    const screenPos = worldToScreen(unitX, unitY + unitHeightOffset, 0);
+    const screenPos = worldToScreen(unitX - 30, unitY + unitHeightOffset, 0);
 
     //判断是否在控制台的位置
     if (screenPos.screenY >= 1000 / 1800 ||

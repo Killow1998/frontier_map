@@ -1,20 +1,9 @@
-import { Text, TextColors } from "src/system/ui/component/Text";
 import { ModuleManager } from "../system/ModuleManager";
 import { HotReloadHelper } from "src/system/ui/UIComponent";
-import { Dialog } from "src/system/ui/component/Dialog";
-import { DamageTextExample } from "./DamageTextExample";
-import { Actor } from "src/system/actor";
 import { EVENT_PLAYER_UNIT_TRAIN_CANCEL, Frame, FRAMEPOINT_CENTER, Players, Timer, Trigger, Unit } from "@eiriksgata/wc3ts/*";
-import { FourCC } from "src/utils/helper";
-import { GameEventManager, PlayerUnitEventId } from "src/system/event/GameEvent";
-import { DamageTextManager } from "src/system/ui/DamageTexttag";
-import { MessageList } from "src/system/ui/component/MessageList";
-import { Button } from "src/system/ui/component/Button";
-import { Console } from "src/system/console";
-import { Tips, TipsAnimation, TipsPosition } from "src/system/ui/component/Tips";
-import { runTipsExamples } from "./TipsExample";
-import { ScreenCoordinates } from "src/system/ui/ScreenCoordinates";
 import { UILayout } from "src/system/ui/UILayout";
+import { Actor } from "src/system/actor";
+import { FourCC } from "src/utils/helper";
 
 /**
  * 热更新模板
@@ -32,10 +21,7 @@ class ReloadTemplateExample {
   private ui = new HotReloadHelper("ReloadTemplate");
 
 
-  /**
-   * 创建测试按钮
-   */
-  public TestButton() {
+  public createConsoleUI() {
     const gameUI = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
 
     const gameUIConsole = Frame.createType("gameUIConsole", gameUI, 0, "BACKDROP", "")!;
@@ -45,22 +31,24 @@ class ReloadTemplateExample {
     // ========================================
     // 使用 UILayout 预设方法 - 简单快捷！
     // ========================================
-    const imageWidth = 910;   // 图片像素宽度
-    const imageHeight = 245;  // 图片像素高度
+    const imageWidth = 910 * 1;   // 图片像素宽度
+    const imageHeight = 245 * 1;  // 图片像素高度
 
-    // 方式1：一行代码居中并设置尺寸
     UILayout.setFrame(gameUIConsole, 'BOTTOM_CENTER', imageWidth, imageHeight);
-
-    // 方式2：分别设置（如果需要）
-    // UILayout.setFramePosition(gameUIConsole, 'CENTER');
-    // UILayout.setFrameSize(gameUIConsole, imageWidth, imageHeight);
-
-    // 方式3：设置完整矩形区域
-    // UILayout.setFrameRect(gameUIConsole, { x: 100, y: 100, width: imageWidth, height: imageHeight });
 
     print(`图片尺寸: ${imageWidth}x${imageHeight} 像素，已居中显示`);
 
     this.ui.register(gameUIConsole);
+  }
+
+  /**
+   * 创建测试按钮
+   */
+  public TestButton() {
+    const unit = Actor.create(Players[0], FourCC('hfoo'), 0, 0);
+    if (unit == null) return;
+    unit.createBloodBar();
+    unit.setLabel("测试单位");
   }
 
   /**
