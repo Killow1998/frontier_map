@@ -1,4 +1,5 @@
 import { Timer } from "@eiriksgata/wc3ts/*";
+import { UnitBlood } from "src/system/ui/component/UnitBlood";
 
 
 /**
@@ -24,13 +25,15 @@ export class CameraControl {
   //记录游戏初始化镜头角度
   private static gameStartXAngle: number = GetCameraField(ConvertCameraField(2));
 
+  private static unitBloodScale: number = 1.0;
+  
   /**
    * 初始化鼠标控制
    * 设置迷雾和镜头截断距离，注册鼠标滚轮事件
    */
   public static initMouseControl(): void {
     // 设置镜头远景截断距离
-    SetCameraField(ConvertCameraField(1), 20000.00, 0);
+    SetCameraField(ConvertCameraField(1), 9999999.00, 0);
 
     // 注册鼠标滚轮事件
     const mouseTrigger = CreateTrigger();
@@ -70,6 +73,7 @@ export class CameraControl {
       }
     }
 
+
     // 记录滚动前的镜头角度
     //this.xAngle = this.rad2Deg(GetCameraField(ConvertCameraField(1))); // CAMERA_FIELD_ANGLE_OF_ATTACK = 1
 
@@ -88,7 +92,12 @@ export class CameraControl {
       SetCameraField(ConvertCameraField(0), this.viewLevel * 200, this.wheelSpeed); // CAMERA_FIELD_TARGET_DISTANCE = 0
       this.resetCam = false;
     }
+
+    
+
   }
+
+
 
   /**
    * 设置宽屏

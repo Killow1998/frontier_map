@@ -62,7 +62,6 @@ export class UnitBlood {
     this.nameFrame.setText(actor.getLabel());
     this.nameFrame.setTextAlignment(18, 0);
     this.nameFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf", 0.01, 0);
-    this.nameFrame.setScale(0.6);
 
     this.nameFrame.alpha = 255;
     this.nameFrame.setPoint(FRAME_ALIGN_BOTTOM, this.frame, FRAME_ALIGN_TOP, 0.003, 10 / 1800);
@@ -146,6 +145,7 @@ export class UnitBlood {
       CameraControl.update();
       // 这里可以添加其他需要每帧更新的血条逻辑
       UnitBlood.updateAllUnitBloods();
+
     });
 
     print("UnitBlood: 绘制事件注册成功");
@@ -169,6 +169,8 @@ export class UnitBlood {
         unitBlood.updateUI();
       }
     }
+
+
   }
 
   /**
@@ -190,6 +192,12 @@ export class UnitBlood {
     this.updatePosition();
 
     this.levelFrame.setText(`${this.actor.level}`);
+    //更新缩放比例
+    //设置血条缩放比例
+    const scale = 1 - (CameraControl.getViewLevel() - 8) * 0.1;
+    this.setScale(scale);
+
+
   }
 
   /**
@@ -217,7 +225,7 @@ export class UnitBlood {
     const unitY = this.actor.y;
 
     const unitHeightOffset = this.actor.hpBarUIHeight * this.actor.size; // 单位高度偏移
-    
+
     // 转换为屏幕坐标（传入计算好的偏移量）
     const screenPos = worldToScreen(unitX - 30, unitY + unitHeightOffset, 0);
 
@@ -245,5 +253,18 @@ export class UnitBlood {
 
   }
 
+  /**
+   * 设置所有Frame的大小
+   * @param scale 缩放因子
+   */
+  public setScale(scale: number): void {
+    this.frame.setSize((130 / 2400) * scale, (28 / 1800) * scale);
+    this.lifeFrame.setSize((100 / 2400) * scale, (12 / 1800) * scale);
+    this.manaFrame.setSize((100 / 2400) * scale, (8 / 1800) * scale);
+    this.levelFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf",  scale, 0);
+    this.nameFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf",  scale, 0);
+    print(`UnitBlood: 设置血条UI缩放比例为 ${scale}`);
+
+  }
 
 }
