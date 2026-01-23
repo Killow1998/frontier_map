@@ -45,10 +45,12 @@ class ReloadTemplateExample {
    * 创建测试按钮
    */
   public TestButton() {
-    const unit = Actor.create(Players[0], FourCC('hfoo'), 0, 0);
-    if (unit == null) return;
-    unit.createBloodBar();
-    unit.setLabel("测试单位");
+    for (let i = 0; i < 10; i++) {
+      const unit = Actor.create(Players[0], FourCC('Hpal'), 0, 0);
+      if (unit == null) return;
+      unit.createBloodBar();
+      unit.setLabel("测试单位");
+    }
   }
 
   /**

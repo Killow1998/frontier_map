@@ -48,7 +48,7 @@ export class UnitBlood {
     this.levelFrame = Frame.createType("LevelFrame", this.frame, 0, "TEXT", "")!;
     this.levelFrame.setTextAlignment(50, 0);
     this.levelFrame.setText(`${actor.level}`);
-    this.levelFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf", 0.01, 0);
+    this.levelFrame.setFont("resource\\Texture\\ui\\hpbar\\ZiTi.TTf", 1, 0);
 
     this.levelFrame.setPoint(FRAME_ALIGN_CENTER, this.frame, FRAME_ALIGN_LEFT_TOP, 14 / 2400, -14 / 1800);
 
@@ -61,7 +61,7 @@ export class UnitBlood {
     this.nameFrame = Frame.createType("NameFrame", this.nameBoxFrame, 0, "TEXT", "")!;
     this.nameFrame.setText(actor.getLabel());
     this.nameFrame.setTextAlignment(18, 0);
-    this.nameFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf", 0.01, 0);
+    this.nameFrame.setFont("resource\\Texture\\ui\\hpbar\\ZiTi.TTf", 1, 0);
 
     this.nameFrame.alpha = 255;
     this.nameFrame.setPoint(FRAME_ALIGN_BOTTOM, this.frame, FRAME_ALIGN_TOP, 0.003, 10 / 1800);
@@ -258,12 +258,15 @@ export class UnitBlood {
    * @param scale 缩放因子
    */
   public setScale(scale: number): void {
-    this.frame.setSize((130 / 2400) * scale, (28 / 1800) * scale);
-    this.lifeFrame.setSize((100 / 2400) * scale, (12 / 1800) * scale);
-    this.manaFrame.setSize((100 / 2400) * scale, (8 / 1800) * scale);
-    this.levelFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf",  scale, 0);
-    this.nameFrame.setFont("resource\\ui\\hpbar\\ZiTi.ttf",  scale, 0);
-    print(`UnitBlood: 设置血条UI缩放比例为 ${scale}`);
+    // this.frame.setSize((130 / 2400) * scale, (28 / 1800) * scale);
+    // this.lifeFrame.setSize((100 / 2400) * scale, (12 / 1800) * scale);
+    // this.manaFrame.setSize((100 / 2400) * scale, (8 / 1800) * scale);
+    this.frame.setScale(scale);
+    this.lifeFrame.setScale(scale);
+    this.manaFrame.setScale(scale);
+    this.nameBoxFrame.setScale(scale);
+    this.levelFrame.setFont("resource\\Texture\\ui\\hpbar\\ZiTi.TTf", 0.01 * scale, 0);
+    this.nameFrame.setFont("resource\\Texture\\ui\\hpbar\\ZiTi.TTf", 0.01 * scale, 0);
 
   }
 
