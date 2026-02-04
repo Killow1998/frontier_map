@@ -1,5 +1,5 @@
 
-import { Frame, KKUnitCanPlaceAroundLocItem, Players, Timer } from "@eiriksgata/wc3ts/*";
+import { Frame, KKUnitCanPlaceAroundLocItem, Players, Timer, Unit } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -9,6 +9,7 @@ import { MapGeneral } from "./config/Map";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { EventBus, mouseEvents } from "./system/event";
 import { Console } from "./system/console";
+import { FourCC } from "./utils/helper";
 
 /**
  * 应用程序主入口
@@ -23,15 +24,18 @@ async function main(): Promise<void> {
 
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
-  Timer.create().start(1, false, () => {
-    print("Loading UI modules:", typeof ReloadTemplateExample);
-  });
+  // Timer.create().start(1, false, () => {
+  //   print("Loading UI modules:", typeof ReloadTemplateExample);
+  // });
 
   // Timer.create().start(5, false, () => {
   //   DamageTextManager.showDamage(1234, 0, 0, 100);
   // })
 
-
+  //创建1000个单位
+  for (let i = 0; i < 1000; i++) {
+    const unit = Unit.create(Players[0], FourCC('Hpal'), 0, 0);
+  }
 
 
 
