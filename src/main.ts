@@ -1,7 +1,7 @@
-
 import { Frame, KKUnitCanPlaceAroundLocItem, Players, Timer, Unit } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
+import { KKWEHeroBloodBar } from "./system/ui/component/KKWEHeroBloodBar";
 import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
@@ -17,32 +17,13 @@ import { FourCC } from "./utils/helper";
  * 测试自动重新编译功能
  */
 async function main(): Promise<void> {
-
-
-  // 确保所有UI模块被加载（这样它们的注册代码会被执行）
-  // 只是引用一下类，确保模块被加载
-
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
-  // Timer.create().start(1, false, () => {
-  //   print("Loading UI modules:", typeof ReloadTemplateExample);
-  // });
+  const unit = Unit.create(Players[0], FourCC('Hpal'), 0, 0);
+  KKWEHeroBloodBar.create(unit!.handle!);
 
-  // Timer.create().start(5, false, () => {
-  //   DamageTextManager.showDamage(1234, 0, 0, 100);
-  // })
-
-  //创建1000个单位
-  for (let i = 0; i < 1000; i++) {
-    const unit = Unit.create(Players[0], FourCC('Hpal'), 0, 0);
-  }
-
-
-
-
-
-
-
+  const unit2 = Unit.create(Players[1], FourCC('Hpal'), 0, 0);
+  KKWEHeroBloodBar.create(unit2!.handle!);
 }
 
 /**
