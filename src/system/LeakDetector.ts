@@ -25,6 +25,8 @@ export class LeakDetector {
   private static installed = false;
   private static enabled = true;
   private static records = new Map<unknown, LeakRecord>();
+  /** 上一次 dump 时各类型数量快照，用于计算 (+/-) 变化 */
+  private static lastKindCounts: Record<string, number> | null = null;
 
   /**
    * 安装钩子，只需在游戏初始化时调用一次
@@ -52,6 +54,7 @@ export class LeakDetector {
   public static dump(minLifetimeSec = 0): void {
     const now = this.now();
     let count = 0;
+    const kindCounts: Record<string, number> = {};
 
     print("|cff00ff00========== LeakDetector Report ==========" + "|r");
 
@@ -60,6 +63,9 @@ export class LeakDetector {
       if (life < minLifetimeSec) {
         continue;
       }
+
+      // 统计每种类型数量
+      kindCounts[info.kind] = (kindCounts[info.kind] ?? 0) + 1;
 
       count++;
       print(
@@ -75,6 +81,30 @@ export class LeakDetector {
       if (info.stack) {
         print(info.stack);
       }
+    }
+
+    // 汇总统计（类似：特效:330(-1)，玩家组:19，触发器:472 ...）
+    if (Object.keys(kindCounts).length > 0) {
+      const parts: string[] = [];
+      for (const kind of Object.keys(kindCounts)) {
+        const current = kindCounts[kind];
+        const prev = this.lastKindCounts?.[kind] ?? 0;
+        const diff = current - prev;
+        const label = this.kindLabel(kind);
+
+        let part = `${label}:${current}`;
+        if (diff !== 0) {
+          // %+d 会带符号，例如 +14 / -2
+          part += string.format("(%+d)", diff);
+        }
+        parts.push(part);
+      }
+
+      // 固定顺序：按 label 排序，方便对比
+      parts.sort();
+      print(parts.join("，"));
+
+      this.lastKindCounts = kindCounts;
     }
 
     if (count === 0) {
@@ -95,6 +125,58 @@ export class LeakDetector {
     }
 
     print("|cff00ff00=========================================" + "|r");
+  }
+
+  /** 将内部 kind 映射为更易读的中文标签 */
+  private static kindLabel(kind: string): string {
+    switch (kind) {
+      case "timer":
+        return "计时器";
+      case "trigger":
+        return "触发器";
+      case "triggerDialog":
+        return "触发器对话框";
+      case "timerDialog":
+        return "计时器对话框";
+      case "group":
+        return "单位组";
+      case "force":
+        return "玩家组";
+      case "location":
+        return "点";
+      case "region":
+        return "范围";
+      case "unit":
+        return "单位";
+      case "unitAtLoc":
+        return "单位(点)";
+      case "corpse":
+        return "尸体";
+      case "item":
+        return "物品";
+      case "destructable":
+      case "destructableZ":
+        return "可破坏物";
+      case "fogRect":
+        return "矩形区域雾效";
+      case "fogRadius":
+        return "范围雾效";
+      case "texttag":
+        return "文本";
+      case "effect":
+      case "effectTarget":
+        return "特效";
+      case "hashtable":
+        return "哈希表";
+      case "sound":
+        return "声音";
+      case "condition":
+        return "触发器条件";
+      case "filter":
+        return "过滤器";
+      default:
+        return kind;
+    }
   }
 
   /**
@@ -144,25 +226,54 @@ export class LeakDetector {
 
   /**
    * 安装核心的一批句柄 Hook
-   * （常见泄露源：timer / trigger / group / location / region / force 等）
+   * 常见泄露源：timer / trigger / group / force / point(location) / unit / destructable / item / region / fogModifier / effect / texttag / timerDialog / triggerDialog
    */
   private static hookTimer(): void {
     this.hookHandlePair("CreateTimer", "DestroyTimer", "timer");
   }
 
   private static hookTrigger(): void {
+    // 触发器 / 计时器对话框 / 触发器对话框
     this.hookHandlePair("CreateTrigger", "DestroyTrigger", "trigger");
-    this.hookHandlePair("CreateGroup", "DestroyGroup", "group");
-    this.hookHandlePair("CreateForce", "DestroyForce", "force");
-    this.hookHandlePair("Location", "RemoveLocation", "location");
-    this.hookHandlePair("CreateRegion", "RemoveRegion", "region");
-    this.hookHandlePair("CreateFogModifierRect", "DestroyFogModifier", "fogRect");
-    this.hookHandlePair("CreateFogModifierRadius", "DestroyFogModifier", "fogRadius");
     this.hookHandlePair("CreateTriggerDialog", "DestroyTriggerDialog", "triggerDialog");
     this.hookHandlePair("CreateTimerDialog", "DestroyTimerDialog", "timerDialog");
+
+    // 单位组 / 力量组
+    this.hookHandlePair("CreateGroup", "DestroyGroup", "group");
+    this.hookHandlePair("CreateForce", "DestroyForce", "force");
+
+    // 点（Location）/ 区域
+    this.hookHandlePair("Location", "RemoveLocation", "location");
+    this.hookHandlePair("CreateRegion", "RemoveRegion", "region");
+
+    // 单位（多种创建方式，对应统一的 RemoveUnit）
+    this.hookHandlePair("CreateUnit", "RemoveUnit", "unit");
+    this.hookHandlePair("CreateUnitAtLoc", "RemoveUnit", "unitAtLoc");
+    this.hookHandlePair("CreateCorpse", "RemoveUnit", "corpse");
+
+    // 物品 / 可破坏物
+    this.hookHandlePair("CreateItem", "RemoveItem", "item");
+    this.hookHandlePair("CreateDestructable", "RemoveDestructable", "destructable");
+    this.hookHandlePair("CreateDestructableZ", "RemoveDestructable", "destructableZ");
+
+    // 雾效
+    this.hookHandlePair("CreateFogModifierRect", "DestroyFogModifier", "fogRect");
+    this.hookHandlePair("CreateFogModifierRadius", "DestroyFogModifier", "fogRadius");
+
+    // 文本 / 特效
     this.hookHandlePair("CreateTextTag", "DestroyTextTag", "texttag");
     this.hookHandlePair("AddSpecialEffect", "DestroyEffect", "effect");
     this.hookHandlePair("AddSpecialEffectTarget", "DestroyEffect", "effectTarget");
+
+    // 哈希表
+    this.hookHandlePair("InitHashtable", "DestroyHashtable", "hashtable");
+
+    // 声音
+    this.hookHandlePair("CreateSound", "DestroySound", "sound");
+
+    // 触发器条件 / 过滤器（布尔表达式）
+    this.hookHandlePair("Condition", "DestroyCondition", "condition");
+    this.hookHandlePair("Filter", "DestroyFilter", "filter");
   }
 
   private static registerHandle(
