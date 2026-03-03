@@ -27,6 +27,8 @@ export class LeakDetector {
   private static records = new Map<unknown, LeakRecord>();
   /** 上一次 dump 时各类型数量快照，用于计算 (+/-) 变化 */
   private static lastKindCounts: Record<string, number> | null = null;
+  /** 是否打印每一个泄露对象的详细信息（默认不开启，只看汇总） */
+  private static showDetails = false;
 
   /**
    * 安装钩子，只需在游戏初始化时调用一次
@@ -45,6 +47,14 @@ export class LeakDetector {
 
   public static setEnabled(enabled: boolean): void {
     this.enabled = enabled;
+  }
+
+  /**
+   * 配置是否在 dump 时打印每一个泄露对象的详细信息
+   * 默认 false（只打印类型汇总），需要时可在调试代码里打开：LeakDetector.setShowDetails(true)
+   */
+  public static setShowDetails(show: boolean): void {
+    this.showDetails = show;
   }
 
   /**
@@ -68,18 +78,22 @@ export class LeakDetector {
       kindCounts[info.kind] = (kindCounts[info.kind] ?? 0) + 1;
 
       count++;
-      print(
-        string.format(
-          "#%d [%s] 存活时间: %.2fs 对象: %s",
-          count,
-          info.kind,
-          life,
-          tostring(obj as never),
-        ),
-      );
 
-      if (info.stack) {
-        print(info.stack);
+      // 是否输出详细的单个对象信息由配置控制
+      if (this.showDetails) {
+        print(
+          string.format(
+            "#%d [%s] 存活时间: %.2fs 对象: %s",
+            count,
+            info.kind,
+            life,
+            tostring(obj as never),
+          ),
+        );
+
+        if (info.stack) {
+          print(info.stack);
+        }
       }
     }
 
