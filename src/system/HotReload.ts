@@ -1,50 +1,36 @@
 import { Timer } from "@eiriksgata/wc3ts/*";
 import { ModuleManager } from "./ModuleManager";
-import { gameEvents, PlayerChatEventData } from "./event";
 
 // 程序运行目录路径（仅在 dev 模式下由 bootstrap.lua 注入）
 declare const PROJECT_PATH: string | undefined;
-// Lua 标准库，部分运行环境可能被禁用
-declare const os: { time: () => number } | undefined;
-declare const io:
-  | { open: (path: string, mode: string) => LuaFile | null }
-  | undefined;
-
-interface LuaFile {
-  read: (this: LuaFile, format: string) => string | null;
-  close: (this: LuaFile) => void;
-}
 
 /**
  * 检查是否为开发模式
  */
 function isDevMode(): boolean {
-  return typeof PROJECT_PATH !== "undefined" && PROJECT_PATH !== null;
+  return typeof PROJECT_PATH !== 'undefined' && PROJECT_PATH !== null;
 }
 
 /**
- * 热更新管理器（读文件 + 聊天命令双驱动）
- *
- * - 游戏内仅读取 hot-reload.json，不写任何文件（文件由构建脚本/IDE 写入）
- * - 定时轮询 PROJECT_PATH/hot-reload.json，根据时间戳去重，只处理新通知
- * - 同时支持聊天命令 -hr list / all / ModuleA 作为手动触发
+ * 热更新管理器
+ * 负责检测外部热更新通知并重新加载指定模块
+ * 注意：仅在开发模式下有效，生产环境会自动禁用
  */
 export class HotReload {
   private static instance: HotReload;
-
-  private enabled = true;
-  private initialized = false;
-
-  /** 定时轮询读文件用的定时器 */
   private timer: Timer | null = null;
-  private checkInterval = 1;
-  /** 上次已处理的通知时间戳（秒），仅内存，不写文件 */
-  private lastProcessedTimestamp = 0;
-  /** 游戏启动时间戳（秒），用于忽略启动前的旧通知 */
-  private gameStartTimestamp = 0;
+  private checkInterval: number = 1; // 检查间隔（秒）
+  private lastProcessedTimestamp: number = 0;
+  private gameStartTimestamp: number = 0; // 游戏启动时间戳（秒，10位）
+  private enabled: boolean = true;
 
-  private constructor() {}
+  private constructor() {
+    // 私有构造函数，确保单例
+  }
 
+  /**
+   * 获取单例实例
+   */
   public static getInstance(): HotReload {
     if (!HotReload.instance) {
       HotReload.instance = new HotReload();
@@ -53,11 +39,10 @@ export class HotReload {
   }
 
   /**
-   * 启动热重载系统
-   * 若环境支持：开启定时器轮询读 hot-reload.json（只读不写）
-   * 并注册 -hr 聊天命令
+   * 启动热更新监听
    */
   public start(): void {
+    // 检查是否为开发模式
     if (!isDevMode()) {
       print(">>> HotReload: Production mode detected, hot reload disabled");
       this.enabled = false;
@@ -69,276 +54,383 @@ export class HotReload {
       return;
     }
 
-    if (this.initialized) {
-      print(">>> HotReload: Already initialized");
+    if (this.timer) {
+      print(">>> HotReload: Hot reload is already running");
       return;
     }
 
-    // 仅内存记录启动时间，用于过滤旧通知（若 os 不可用则用 0）
-    if (typeof os !== "undefined" && os !== null && typeof os.time === "function") {
-      this.gameStartTimestamp = os.time();
-    } else {
-      this.gameStartTimestamp = 0;
-    }
+    // 记录游戏启动时间戳（os.time() 返回 10 位秒级时间戳）
+    this.gameStartTimestamp = os.time();
+    print(">>> HotReload: Starting hot reload system...");
+    print(`>>> HotReload: Game start timestamp: ${this.gameStartTimestamp} (seconds, 10 digits)`);
+    print(`>>> HotReload: Check interval: ${this.checkInterval} seconds`);
+    print(`>>> HotReload: PROJECT_PATH: ${PROJECT_PATH}`);
 
-    this.registerChatCommands();
+    this.timer = Timer.create();
+    this.timer.start(this.checkInterval, true, () => {
+      this.checkForUpdates();
+    });
 
-    // 若 io 可用则启动定时读文件（只读）
-    if (typeof io !== "undefined" && io !== null && typeof io.open === "function") {
-      this.timer = Timer.create();
-      this.timer.start(this.checkInterval, true, () => {
-        this.checkForUpdates();
-      });
-      print(">>> HotReload: File polling started (read-only, no write)");
-    } else {
-      print(">>> HotReload: io.open not available, file polling disabled; use -hr commands");
-    }
-
-    this.initialized = true;
-    print(">>> HotReload: Commands: -hr list | -hr all | -hr ModuleA ...");
-  }
-
-  public setEnabled(enabled: boolean): void {
-    this.enabled = enabled;
-    if (!enabled) this.stop();
-    print(`Hot reload ${enabled ? "enabled" : "disabled"}`);
+    print(">>> HotReload: Hot reload system started successfully");
   }
 
   /**
-   * 停止定时器（不写文件）
+   * 停止热更新监听
    */
   public stop(): void {
     if (this.timer) {
       this.timer.destroy();
       this.timer = null;
-      print(">>> HotReload: File polling stopped");
+      print("Hot reload system stopped");
     }
   }
 
   /**
-   * 轮询读取 hot-reload.json，仅读不写；用 lastProcessedTimestamp 去重（仅内存）
+   * 启用/禁用热更新
+   */
+  public setEnabled(enabled: boolean): void {
+    this.enabled = enabled;
+    if (!enabled) {
+      this.stop();
+    }
+    print(`Hot reload ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  /**
+   * 检查热更新通知
    */
   private checkForUpdates(): void {
     try {
-      const content = this.readHotReloadFile();
-      if (!content) return;
+      // 尝试读取热更新通知文件
+      const notificationContent = this.readHotReloadFile();
+      if (!notificationContent) {
+        return;
+      }
 
-      const notification = this.parseNotification(content);
-      if (!notification) return;
+      const notification = this.parseNotification(notificationContent);
+      if (!notification) {
+        print(">>> HotReload: Failed to parse notification");
+        return;
+      }
 
-      let ts = notification.timestamp;
-      if (ts > 10000000000) ts = Math.floor(ts / 1000);
+      // 将通知时间戳转换为秒级（如果文件中的是毫秒级，则除以1000）
+      // os.time() 返回 10 位秒级时间戳，文件中的可能是 13 位毫秒级
+      let notificationTimestampSeconds = notification.timestamp;
+      if (notificationTimestampSeconds > 10000000000) {
+        // 如果大于 10 位，说明是毫秒级，转换为秒级
+        notificationTimestampSeconds = Math.floor(notificationTimestampSeconds / 1000);
+      }
 
-      if (ts < this.gameStartTimestamp) return;
-      if (ts <= this.lastProcessedTimestamp) return;
+      // 检查时间戳是否在游戏启动之前
+      if (notificationTimestampSeconds < this.gameStartTimestamp) {
+        print(`>>> HotReload: Notification timestamp (${notificationTimestampSeconds}) is before game start (${this.gameStartTimestamp}), ignoring`);
+        return;
+      }
 
-      print(`>>> HotReload: New notification (ts=${ts}), reloading ${notification.modules.length} module(s)`);
+      // 检查是否是新的通知（仅检查时间戳，忽略文件中的 processed 字段）
+      if (notificationTimestampSeconds <= this.lastProcessedTimestamp) {
+        return;
+      }
+
+      print(`>>> HotReload: New notification detected!`);
+      print(`>>> HotReload: Notification timestamp: ${notificationTimestampSeconds} (original: ${notification.timestamp})`);
+      print(`>>> HotReload: Game start timestamp: ${this.gameStartTimestamp}`);
+      print(`>>> HotReload: Last processed: ${this.lastProcessedTimestamp}`);
+      print(`>>> HotReload: Action: ${notification.action}`);
+      print(`>>> HotReload: Modules: ${notification.modules.map(m => m.name).join(", ")}`);
+
+      // 处理热更新
       this.processHotReload(notification);
-      this.lastProcessedTimestamp = ts;
-    } catch (e) {
-      print(`>>> HotReload: checkForUpdates error: ${e}`);
+
+      // 标记为已处理（仅在内存中，使用秒级时间戳）
+      this.markAsProcessed(notificationTimestampSeconds);
+
+    } catch (error) {
+      print(`>>> HotReload: Error in checkForUpdates: ${error}`);
     }
   }
 
   /**
-   * 仅读取文件内容，不写任何东西
+   * 读取热更新通知文件
    */
   private readHotReloadFile(): string | null {
     try {
-      if (typeof PROJECT_PATH !== "string" || !PROJECT_PATH) return null;
-      if (typeof io === "undefined" || !io || typeof io.open !== "function") return null;
-
-      const path = `${PROJECT_PATH}/hot-reload.json`;
-      const file = io.open(path, "r");
-      if (!file) return null;
-
-      const read = file.read;
-      let content = "";
-      if (read && typeof read === "function") {
-        let line: string | null;
-        while (true) {
-          line = read.call(file, "*l");
-          if (line == null) break;
-          content += line + "\n";
-        }
+      const filePath = `${PROJECT_PATH}/hot-reload.json`;
+      
+      // 使用原生 Lua 代码读取文件
+      const file = io.open(filePath, "r");
+      if (!file) {
+        return null;
       }
-      file.close();
+
+      // 使用 *l 逐行读取整个文件
+      let content = "";
+      let line: string | null;
+      while (true) {
+        line = file[0]?.read("l") || null;
+        if (!line) {
+          break;
+        }
+        content += line + "\n";
+      }
+      file[0]?.close();
       return content;
-    } catch (e) {
+    } catch (error) {
+      print(`>>> HotReload: Error reading hot reload file: ${error}`);
       return null;
     }
   }
 
+  /**
+   * 解析通知内容
+   */
   private parseNotification(content: string): HotReloadNotification | null {
     try {
+      // 简单的手动 JSON 解析
       return this.parseJsonManually(content);
-    } catch {
+    } catch (error) {
       return null;
     }
   }
 
+  /**
+   * 手动解析简单的 JSON
+   */
   private parseJsonManually(jsonStr: string): HotReloadNotification | null {
     try {
-      const str = jsonStr.replace(/\s/g, "");
+      // 简单的字符串解析
+      const str = this.removeWhitespace(jsonStr);
 
+      // 提取时间戳
       const timestamp = this.extractNumber(str, '"timestamp":');
+
+      // 提取 action
       const action = this.extractString(str, '"action":"');
+
+      // 提取 modules 数组
       const modules = this.extractModules(str);
+
+      // 提取 processed
       const processed = this.extractBoolean(str, '"processed":');
 
       return {
-        timestamp: timestamp ?? 0,
-        action: action ?? "",
-        modules: modules ?? [],
-        processed: processed ?? false,
+        timestamp: timestamp || 0,
+        action: action || "",
+        modules: modules || [],
+        processed: processed || false
       };
-    } catch {
+    } catch (error) {
       return null;
     }
   }
 
+  private removeWhitespace(str: string): string {
+    let result = "";
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charAt(i);
+      if (char !== ' ' && char !== '\n' && char !== '\r' && char !== '\t') {
+        result += char;
+      }
+    }
+    return result;
+  }
+
   private extractNumber(str: string, key: string): number | null {
-    const i = str.indexOf(key);
-    if (i === -1) return null;
-    let end = i + key.length;
-    while (end < str.length && str.charAt(end) >= "0" && str.charAt(end) <= "9") end++;
-    const num = str.substring(i + key.length, end);
-    return num ? parseInt(num, 10) : null;
+    const startIndex = str.indexOf(key);
+    if (startIndex === -1) return null;
+
+    const valueStart = startIndex + key.length;
+    let valueEnd = valueStart;
+
+    while (valueEnd < str.length) {
+      const char = str.charAt(valueEnd);
+      if (char >= '0' && char <= '9') {
+        valueEnd++;
+      } else {
+        break;
+      }
+    }
+
+    const numberStr = str.substring(valueStart, valueEnd);
+    return numberStr ? parseInt(numberStr) : null;
   }
 
   private extractString(str: string, key: string): string | null {
-    const i = str.indexOf(key);
-    if (i === -1) return null;
-    const start = i + key.length;
-    const end = str.indexOf('"', start);
-    return end === -1 ? null : str.substring(start, end);
+    const startIndex = str.indexOf(key);
+    if (startIndex === -1) return null;
+
+    const valueStart = startIndex + key.length;
+    const valueEnd = str.indexOf('"', valueStart);
+
+    if (valueEnd === -1) return null;
+
+    return str.substring(valueStart, valueEnd);
   }
 
   private extractModules(str: string): ModuleInfo[] {
-    const out: ModuleInfo[] = [];
-    const key = '"modules":[';
-    const i = str.indexOf(key);
-    if (i === -1) return out;
-    let start = i + key.length;
+    const modules: ModuleInfo[] = [];
+    const startKey = '"modules":[';
+    const startIndex = str.indexOf(startKey);
+
+    if (startIndex === -1) return modules;
+
+    const arrayStart = startIndex + startKey.length;
+    // 找到数组结束位置（需要处理嵌套的对象）
     let depth = 1;
-    let end = start;
-    for (let j = start; j < str.length && depth > 0; j++) {
-      const c = str.charAt(j);
-      if (c === "[" || c === "{") depth++;
-      else if (c === "]" || c === "}") depth--;
-      if (depth === 0) end = j;
+    let arrayEnd = arrayStart;
+    for (let i = arrayStart; i < str.length && depth > 0; i++) {
+      const char = str.charAt(i);
+      if (char === '[' || char === '{') depth++;
+      else if (char === ']' || char === '}') depth--;
+      if (depth === 0) arrayEnd = i;
     }
-    const arr = str.substring(start, end);
-    let k = 0;
-    while (k < arr.length) {
-      const ob = arr.indexOf("{", k);
-      if (ob === -1) break;
-      const cb = arr.indexOf("}", ob);
-      if (cb === -1) break;
-      const name = this.extractStringFromObject(arr.substring(ob, cb + 1), '"name":"');
-      const path = this.extractStringFromObject(arr.substring(ob, cb + 1), '"path":"');
-      if (name && path) out.push({ name, path });
-      k = cb + 1;
+
+    if (arrayEnd === arrayStart) return modules;
+
+    const arrayContent = str.substring(arrayStart, arrayEnd);
+
+    // 解析数组中的对象 {"name":"...","path":"..."}
+    let i = 0;
+    while (i < arrayContent.length) {
+      // 找到对象开始
+      const objStart = arrayContent.indexOf('{', i);
+      if (objStart === -1) break;
+      
+      // 找到对象结束
+      const objEnd = arrayContent.indexOf('}', objStart);
+      if (objEnd === -1) break;
+      
+      const objContent = arrayContent.substring(objStart, objEnd + 1);
+      
+      // 提取 name 和 path
+      const name = this.extractStringFromObject(objContent, '"name":"');
+      const path = this.extractStringFromObject(objContent, '"path":"');
+      
+      if (name && path) {
+        modules.push({ name, path });
+      }
+      
+      i = objEnd + 1;
     }
-    return out;
+
+    return modules;
   }
 
-  private extractStringFromObject(obj: string, key: string): string | null {
-    const i = obj.indexOf(key);
-    if (i === -1) return null;
-    const start = i + key.length;
-    const end = obj.indexOf('"', start);
-    return end === -1 ? null : obj.substring(start, end);
+  /**
+   * 从对象字符串中提取字段值
+   */
+  private extractStringFromObject(objStr: string, key: string): string | null {
+    const startIndex = objStr.indexOf(key);
+    if (startIndex === -1) return null;
+
+    const valueStart = startIndex + key.length;
+    const valueEnd = objStr.indexOf('"', valueStart);
+
+    if (valueEnd === -1) return null;
+
+    return objStr.substring(valueStart, valueEnd);
   }
 
   private extractBoolean(str: string, key: string): boolean | null {
-    const i = str.indexOf(key);
-    if (i === -1) return null;
-    const v = str.substring(i + key.length, i + key.length + 5);
-    if (v.startsWith("true")) return true;
-    if (v.startsWith("false")) return false;
+    const startIndex = str.indexOf(key);
+    if (startIndex === -1) return null;
+
+    const valueStart = startIndex + key.length;
+
+    if (str.substring(valueStart, valueStart + 4) === 'true') {
+      return true;
+    } else if (str.substring(valueStart, valueStart + 5) === 'false') {
+      return false;
+    }
+
     return null;
   }
 
+  /**
+   * 处理热更新
+   * notification.modules 包含 {name, path} 对象
+   */
   private processHotReload(notification: HotReloadNotification): void {
-    const mm = ModuleManager.getInstance();
-    const matched: ModuleInfo[] = [];
-    for (const m of notification.modules) {
-      if (mm.isModuleRegistered(m.name)) matched.push(m);
+    print(`>>> HotReload: Processing hot reload for ${notification.modules.length} modules...`);
+
+    const moduleManager = ModuleManager.getInstance();
+    const registeredModules = moduleManager.getRegisteredModules();
+    print(`>>> HotReload: All registered modules: ${registeredModules.join(", ")}`);
+
+    // 匹配已注册的模块，并传递路径信息
+    const matchedModules: ModuleInfo[] = [];
+
+    for (const moduleInfo of notification.modules) {
+      print(`>>> HotReload: Checking module: ${moduleInfo.name} (${moduleInfo.path})`);
+
+      if (moduleManager.isModuleRegistered(moduleInfo.name)) {
+        print(`>>> HotReload: ✓ Matched: ${moduleInfo.name}`);
+        matchedModules.push(moduleInfo);
+      } else {
+        print(`>>> HotReload: ✗ Not registered: ${moduleInfo.name}`);
+      }
     }
-    if (matched.length === 0) {
-      print(">>> HotReload: No registered modules to reload");
+
+    const matchedNames = matchedModules.map(m => m.name).join(", ");
+    print(`>>> HotReload: Matched registered modules: ${matchedNames}`);
+
+    if (matchedModules.length === 0) {
+      print(">>> HotReload: No registered modules to hot reload");
       return;
     }
-    mm.hotReloadModulesWithPath(matched);
+
+    // 使用 ModuleManager 进行热重载，传递完整的模块信息
+    print(`>>> HotReload: Calling ModuleManager.hotReloadModules...`);
+    moduleManager.hotReloadModulesWithPath(matchedModules);
   }
 
-  // ----- 聊天命令（保留为手动触发） -----
+  /**
+   * 重新加载单个模块
+   */
+  private reloadModule(moduleName: string): void {
+    // 清除模块缓存（使用 any 绕过类型检查）
+    (globalThis as any).package.loaded[moduleName] = undefined;
 
-  private registerChatCommands(): void {
-    gameEvents.onPlayerChat((data: PlayerChatEventData) => {
-      const msg = (data.message || "").trim();
-      if (!msg.startsWith("-hr") || !this.enabled || !isDevMode()) return;
-      this.handleCommand(msg);
-    });
-  }
+    // 重新加载模块
+    const newModule = require(moduleName);
 
-  private handleCommand(msg: string): void {
-    const parts = msg.split(/\s+/);
-    if (parts.length === 1 || parts[1] === "help" || parts[1] === "?") {
-      this.printHelp();
-      return;
+    // 如果模块有初始化函数，调用它
+    if (newModule && typeof newModule.initialize === 'function') {
+      newModule.initialize();
     }
-    const sub = parts[1];
-    if (sub === "list") {
-      this.printRegisteredModules();
-      return;
+
+    // 如果模块有热重载处理函数，调用它
+    if (newModule && typeof newModule.onHotReload === 'function') {
+      newModule.onHotReload();
     }
-    if (sub === "all") {
-      this.reloadAllModules();
-      return;
-    }
-    this.reloadSelectedModules(parts.slice(1));
   }
 
-  private printHelp(): void {
-    print(">>> HotReload: -hr list | -hr all | -hr NameA NameB ...");
-  }
-
-  private printRegisteredModules(): void {
-    const list = ModuleManager.getInstance().getRegisteredModules();
-    print(`>>> HotReload: Registered (${list.length}): ${list.join(", ")}`);
-  }
-
-  private reloadAllModules(): void {
-    const list = ModuleManager.getInstance().getRegisteredModules();
-    if (list.length === 0) {
-      print(">>> HotReload: No modules to reload");
-      return;
-    }
-    ModuleManager.getInstance().hotReloadModules(list);
-  }
-
-  private reloadSelectedModules(names: string[]): void {
-    const mm = ModuleManager.getInstance();
-    const valid: string[] = [];
-    for (const n of names) {
-      if (mm.isModuleRegistered(n)) valid.push(n);
-      else print(`>>> HotReload: Not registered: ${n}`);
-    }
-    if (valid.length === 0) return;
-    mm.hotReloadModules(valid);
+  /**
+   * 标记通知为已处理（仅在内存中标记）
+   * @param timestampSeconds 时间戳（秒级，10位）
+   */
+  private markAsProcessed(timestampSeconds: number): void {
+    // 由于 Lua 引擎不支持文件写入模式，我们只在内存中标记已处理的时间戳
+    // 通过更新 lastProcessedTimestamp 来避免重复处理相同的通知
+    this.lastProcessedTimestamp = timestampSeconds;
+    print(`>>> HotReload: Marked notification with timestamp ${timestampSeconds} as processed in memory`);
   }
 }
 
+/**
+ * 模块信息接口
+ */
 interface ModuleInfo {
-  name: string;
-  path: string;
+  name: string;  // 注册的模块名，如 "ReloadTemplate"
+  path: string;  // require 路径，如 "src.examples.ReloadTemplateExample"
 }
 
+/**
+ * 热更新通知接口
+ */
 interface HotReloadNotification {
   timestamp: number;
   action: string;
-  modules: ModuleInfo[];
+  modules: ModuleInfo[];  // 改为 ModuleInfo 数组
   processed: boolean;
 }

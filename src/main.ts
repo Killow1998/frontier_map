@@ -17,11 +17,13 @@ import { FourCC } from "./utils/helper";
 async function main(): Promise<void> {
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
-  const unit = Unit.create(Players[0], FourCC('Hpal'), 0, 0);
-  KKWEHeroBloodBar.create(unit!.handle!);
+  // const unit = Unit.create(Players[0], FourCC('Hpal'), 0, 0);
+  // KKWEHeroBloodBar.create(unit!.handle!);
 
-  const unit2 = Unit.create(Players[1], FourCC('Hpal'), 0, 0);
-  KKWEHeroBloodBar.create(unit2!.handle!);
+  // const unit2 = Unit.create(Players[1], FourCC('Hpal'), 0, 0);
+  // KKWEHeroBloodBar.create(unit2!.handle!);
+
+  Unit.create(Players[0], FourCC('u00K'), 0, 0);
 }
 
 /**
@@ -43,16 +45,16 @@ export function initialize(): void {
   }
 
   // 初始化模块管理器中的所有模块
-  print(">>> Main: Initializing all modules...");
-  ModuleManager.getInstance().initializeAllModules();
-  print(`>>> Main: All registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
+  // print(">>> Main: Initializing all modules...");
+  // ModuleManager.getInstance().initializeAllModules();
+  // print(`>>> Main: All registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
 
-  // 延迟启动热更新系统，确保所有模块都已注册
-  Timer.create().start(0.1, false, () => {
-    print(`>>> Main: Starting hot reload system...`);
-    print(`>>> Main: Registered modules at start: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
-    HotReload.getInstance().start();
-  });
+  // // 延迟启动热更新系统，确保所有模块都已注册
+  // Timer.create().start(0.1, false, () => {
+  //   print(`>>> Main: Starting hot reload system...`);
+  //   print(`>>> Main: Registered modules at start: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
+  //   HotReload.getInstance().start();
+  // });
 
   PlayersConfig.CameraControl();
   UnitBlood.registerLocalDrawEvent();
