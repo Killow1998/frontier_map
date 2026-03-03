@@ -21,26 +21,6 @@ class ReloadTemplateExample {
   private ui = new HotReloadHelper("ReloadTemplate");
 
 
-  public createConsoleUI() {
-    const gameUI = Frame.fromOrigin(ORIGIN_FRAME_GAME_UI, 0)!;
-
-    const gameUIConsole = Frame.createType("gameUIConsole", gameUI, 0, "BACKDROP", "")!;
-
-    gameUIConsole.setTexture("map\\resource\\Console\\console.blp", 0, true);
-
-    // ========================================
-    // 使用 UILayout 预设方法 - 简单快捷！
-    // ========================================
-    const imageWidth = 910 * 1;   // 图片像素宽度
-    const imageHeight = 245 * 1;  // 图片像素高度
-
-    UILayout.setFrame(gameUIConsole, 'BOTTOM_CENTER', imageWidth, imageHeight);
-
-    print(`图片尺寸: ${imageWidth}x${imageHeight} 像素，已居中显示`);
-
-    this.ui.register(gameUIConsole);
-  }
-
   /**
    * 创建测试按钮
    */
