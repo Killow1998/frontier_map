@@ -178,8 +178,13 @@ export class UnitBlood {
    */
   private updateUI(): void {
     // 检查单位是否还存在
-    if (this.actor.life <= 0 || !this.actor.handle || this.actor.id == 0) {
+    if(this.actor.handle == undefined || this.actor.id ) {
       this.destroy();
+      return;
+    }
+    if (this.actor.life <= 0) {
+      //隐藏血条
+      this.frame.setVisible(false);
       return;
     }
 
