@@ -15,7 +15,7 @@ import {
 } from "src/constants/game/units";
 
 /** 血条宽度（比例） */
-const BAR_WIDTH = 0.0001;
+const BAR_WIDTH = 0.04;
 /** 血条高度 */
 const LIFE_HEIGHT = 0.005;
 /** 蓝条高度 */

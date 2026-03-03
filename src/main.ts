@@ -6,9 +6,7 @@ import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
-import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { EventBus, mouseEvents } from "./system/event";
-import { Console } from "./system/console";
 import { FourCC } from "./utils/helper";
 
 /**
