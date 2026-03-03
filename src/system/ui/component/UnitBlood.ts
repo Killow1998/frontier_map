@@ -178,7 +178,7 @@ export class UnitBlood {
    */
   private updateUI(): void {
     // 检查单位是否还存在
-    if(this.actor.handle == undefined || this.actor.id ) {
+    if (!this.actor || this.actor.handle == undefined || this.actor.id === 0) {
       this.destroy();
       return;
     }

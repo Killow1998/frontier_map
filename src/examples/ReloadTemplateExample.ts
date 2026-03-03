@@ -1,9 +1,11 @@
 import { ModuleManager } from "../system/ModuleManager";
 import { HotReloadHelper } from "src/system/ui/UIComponent";
-import { EVENT_PLAYER_UNIT_TRAIN_CANCEL, Frame, FRAMEPOINT_CENTER, Players, Timer, Trigger, Unit } from "@eiriksgata/wc3ts/*";
+import { EVENT_PLAYER_UNIT_DEATH, EVENT_PLAYER_UNIT_TRAIN_CANCEL, EVENT_UNIT_DEATH, Frame, FRAMEPOINT_CENTER, Players, Timer, Trigger, Unit } from "@eiriksgata/wc3ts/*";
 import { UILayout } from "src/system/ui/UILayout";
 import { Actor } from "src/system/actor";
 import { FourCC } from "src/utils/helper";
+import { EventBus } from "src/system/event";
+import { Console } from "src/system/console";
 
 /**
  * 热更新模板
@@ -25,12 +27,33 @@ class ReloadTemplateExample {
    * 创建测试按钮
    */
   public TestButton() {
-    for (let i = 0; i < 10; i++) {
-      const unit = Actor.create(Players[0], FourCC('Hpal'), 0, 0);
-      if (unit == null) return;
-      unit.createBloodBar();
-      unit.setLabel("测试单位");
+    //泄露
+    
+    const deadTrigger = CreateTrigger();
+    TriggerAddAction(deadTrigger, () => {
+      const unit = GetTriggerUnit();
+      Console.log("单位死亡: " + GetUnitName(unit));
+      const time = Timer.create().start(1, false, () => {
+        //复活
+        ReviveHero(unit, 0, 0, true);
+        time.destroy();
+      })
+    });
+
+    for (let j = 0; j < 2; j++) {
+      for (let i = 0; i < 10; i++) {
+        const unit = Actor.create(Players[j], FourCC('Hpal'), 0, 0);
+        if (unit == null) return;
+        print("创建单位: " + unit?.id);
+        unit.createBloodBar();
+        unit.setLabel("测试单位");
+        unit.setBaseDamageJAPI(200);
+        //攻击速度
+        unit.setUnitAttackCooldownJAPI(0.5);
+        TriggerRegisterUnitEvent(deadTrigger, unit.handle!, EVENT_UNIT_DEATH());
+      }
     }
+
   }
 
   /**

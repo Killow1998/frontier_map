@@ -10,6 +10,7 @@ import { EventBus, mouseEvents } from "./system/event";
 import { FourCC } from "./utils/helper";
 import { Console } from "./system/console";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
+import { LeakDetector } from "./system/LeakDetector";
 
 /**
  * 应用程序主入口
@@ -24,8 +25,10 @@ async function main(): Promise<void> {
 
   // const unit2 = Unit.create(Players[1], FourCC('Hpal'), 0, 0);
   // KKWEHeroBloodBar.create(unit2!.handle!);
-  
-  typeof ReloadTemplateExample;
+  Timer.create().start(1, false, () => {
+    typeof ReloadTemplateExample;
+  })
+
 
 }
 
@@ -36,6 +39,12 @@ export function initialize(): void {
   // register ydlua
   ydlua.getInstance().initialize();
 
+  // 安装泄露检测（Timer / Trigger 句柄跟踪）
+  LeakDetector.install();
+
+  Timer.create().start(3, true, () => {
+    LeakDetector.dump(3);
+  })
   //log 初始化
   //Console.init();
 

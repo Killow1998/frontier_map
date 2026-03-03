@@ -123,7 +123,7 @@ export class HotReload {
 
       // 检查时间戳是否在游戏启动之前
       if (notificationTimestampSeconds < this.gameStartTimestamp) {
-        print(`>>> HotReload: Notification timestamp (${notificationTimestampSeconds}) is before game start (${this.gameStartTimestamp}), ignoring`);
+        //print(`>>> HotReload: Notification timestamp (${notificationTimestampSeconds}) is before game start (${this.gameStartTimestamp}), ignoring`);
         return;
       }
 
