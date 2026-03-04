@@ -50,6 +50,10 @@ export class GachaPanel implements UIComponent {
   private cardSpacing: number = 24;
   private contentPaddingTop: number = 40;
   private contentPaddingBottom: number = 40;
+  // 卡片内部内容 padding（左右 / 上 / 下），避免图标和文字贴边
+  private cardPaddingX: number = 24;
+  private cardPaddingTop: number = 20;
+  private cardPaddingBottom: number = 20;
 
   private isCreated: boolean = false;
 
@@ -137,7 +141,7 @@ export class GachaPanel implements UIComponent {
       config.title,
       0,
       0,
-      this.cardWidth - 32,
+      this.cardWidth - this.cardPaddingX * 2,
       26
     );
     titleText.create(backdrop || undefined);
@@ -150,8 +154,8 @@ export class GachaPanel implements UIComponent {
       config.description,
       0,
       0,
-      this.cardWidth - 32,
-      this.cardHeight - 120
+      this.cardWidth - this.cardPaddingX * 2,
+      this.cardHeight - (this.cardPaddingTop + this.cardPaddingBottom + 80)
     );
     descText.create(backdrop || undefined);
     descText
@@ -267,9 +271,10 @@ export class GachaPanel implements UIComponent {
       cardView.button.setPosition(x, y);
 
       // 计算卡片内部布局：顶部图标 -> 标题 -> 描述
-      const iconSize = Math.min(this.cardWidth - 40, 64);
+      const innerWidth = this.cardWidth - this.cardPaddingX * 2;
+      const iconSize = Math.min(innerWidth, 64);
       const iconX = x + (this.cardWidth - iconSize) / 2;
-      const iconY = y + 12;
+      const iconY = y + this.cardPaddingTop;
 
       if (cardView.iconFrame) {
         const wc3Pos = ScreenCoordinates.pixelToWC3(iconX, iconY, ScreenCoordinates.ORIGIN_TOP_LEFT);
@@ -282,19 +287,19 @@ export class GachaPanel implements UIComponent {
           .setAbsPoint(FRAME_ALIGN_RIGHT_BOTTOM, rightX, bottomY);
       }
 
-      const titleX = x + 16;
+      const titleX = x + this.cardPaddingX;
       const titleY = iconY + iconSize + 8;
-      const titleWidth = this.cardWidth - 32;
+      const titleWidth = innerWidth;
       const titleHeight = 26;
 
       cardView.titleText
         .setPosition(titleX, titleY)
         .setSize(titleWidth, titleHeight);
 
-      const descX = x + 16;
+      const descX = x + this.cardPaddingX;
       const descY = titleY + titleHeight + 4;
-      const descWidth = this.cardWidth - 32;
-      const descHeight = this.cardHeight - (descY - y) - 16;
+      const descWidth = innerWidth;
+      const descHeight = this.cardHeight - (descY - y) - this.cardPaddingBottom;
 
       cardView.descText
         .setPosition(descX, descY)
@@ -329,6 +334,17 @@ export class GachaPanel implements UIComponent {
   public setContentPadding(top: number, bottom: number): this {
     this.contentPaddingTop = top;
     this.contentPaddingBottom = bottom;
+    this.repositionCards();
+    return this;
+  }
+
+  /**
+   * 设置卡片内部 padding（类似 CSS：左右、上、下）
+   */
+  public setCardInnerPadding(horizontal: number, top: number, bottom: number): this {
+    this.cardPaddingX = horizontal;
+    this.cardPaddingTop = top;
+    this.cardPaddingBottom = bottom;
     this.repositionCards();
     return this;
   }
