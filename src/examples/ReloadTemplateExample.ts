@@ -57,7 +57,7 @@ class ReloadTemplateExample {
 
 
 
-    const gacha = GachaPanel.createCentered("抽卡天赋", 1200, 500).setCardSize(300, 350)
+    const gacha = GachaPanel.createCentered("抽卡天赋", 1100, 500).setCardSize(300, 350)
       .setDraggable(true);  // 可选：面板可拖拽
 
     gacha.addCard({
