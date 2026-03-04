@@ -4,7 +4,7 @@ import { EVENT_PLAYER_UNIT_DEATH, EVENT_PLAYER_UNIT_TRAIN_CANCEL, EVENT_UNIT_DEA
 import { UILayout } from "src/system/ui/UILayout";
 import { Actor } from "src/system/actor";
 import { FourCC } from "src/utils/helper";
-import { EventBus } from "src/system/event";
+import { EventBus, gameEvents, UnitDeathEventData } from "src/system/event";
 import { Console } from "src/system/console";
 import { GachaPanel } from "src/system/ui/component/GachaPanel";
 
@@ -28,18 +28,14 @@ class ReloadTemplateExample {
    * 创建测试按钮
    */
   public TestButton() {
-    //泄露
 
-    const deadTrigger = CreateTrigger();
-    TriggerAddAction(deadTrigger, () => {
-      const unit = GetTriggerUnit();
-      Console.log("单位死亡: " + GetUnitName(unit));
+    gameEvents.onUnitDeath((data: UnitDeathEventData) => {
       const time = Timer.create().start(1, false, () => {
         //复活
-        ReviveHero(unit, 0, 0, true);
+        data.Actor?.revive(0, 0, true);
         time.destroy();
       })
-    });
+    })
 
     for (let j = 0; j < 2; j++) {
       for (let i = 0; i < 10; i++) {
@@ -51,10 +47,9 @@ class ReloadTemplateExample {
         unit.setBaseDamageJAPI(200);
         //攻击速度
         unit.setUnitAttackCooldownJAPI(0.5);
-        TriggerRegisterUnitEvent(deadTrigger, unit.handle!, EVENT_UNIT_DEATH());
       }
     }
-    
+
     const gacha = GachaPanel.createCentered("抽卡天赋", 1100, 500)
       .setCardSize(300, 350)
       .setDraggable(true);  // 可选：面板可拖拽
