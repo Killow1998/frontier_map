@@ -8,6 +8,10 @@ export class Actor extends Unit {
   private _hpBarUIHeight: number = 100; // 默认血条UI高度
   private _size: number = 1.0; // 默认大小倍数
 
+  // 护盾数值
+  private _shield: number = 0;
+  private _maxShield: number = 0;
+
   private label = "";
 
   private bloodBarUI: UnitBlood | null = null;
@@ -158,6 +162,36 @@ export class Actor extends Unit {
 
   public get size(): number {
     return this._size;
+  }
+
+  public set shield(value: number) {
+    // 护盾始终夹在 0 和 maxShield 之间
+    this._shield = Math.max(0, Math.min(value, this._maxShield));
+  }
+
+  public get shield(): number {
+    return this._shield;
+  }
+
+  public set maxShield(value: number) {
+    this._maxShield = Math.max(0, value);
+    if (this._shield > this._maxShield) {
+      this._shield = this._maxShield;
+    }
+  }
+
+  public get maxShield(): number {
+    return this._maxShield;
+  }
+
+  /**
+   * 护盾百分比 0~1
+   */
+  public get shieldPercent(): number {
+    if (this._maxShield <= 0) {
+      return 0;
+    }
+    return this._shield / this._maxShield;
   }
 
   public setLabel(value: string) {

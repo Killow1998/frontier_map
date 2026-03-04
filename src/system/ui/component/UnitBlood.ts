@@ -15,6 +15,7 @@ export class UnitBlood {
   frame: Frame;
   lifeFrame: Frame;
   manaFrame: Frame;
+  shieldFrame: Frame;
   levelFrame: Frame;
   nameBoxFrame: Frame;
   nameFrame: Frame;
@@ -38,11 +39,20 @@ export class UnitBlood {
     this.lifeFrame.setTexture("Texture\\ui\\hpbar\\02.tga", 0, false);
     this.lifeFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -4 / 1800);
 
+    //护盾值框架（位于血条和魔法条之间，较细）
+    this.shieldFrame = Frame.createType("ShieldFrame", this.frame, 0, "BACKDROP", "")!;
+    this.shieldFrame.setSize(100 / 2400, 4 / 1800);
+    // 护盾贴图，需在资源里准备；暂时可先复用蓝条贴图调试
+    this.shieldFrame.setTexture("Texture\\ui\\hpbar\\06.tga", 0, false);
+    this.shieldFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -10 / 1800);
+    this.shieldFrame.setVisible(false);
+
     //血条魔法值框架
     this.manaFrame = Frame.createType("ManaFrame", this.frame, 0, "BACKDROP", "")!;
     this.manaFrame.setSize(100 / 2400, 8 / 1800);
     this.manaFrame.setTexture("Texture\\ui\\hpbar\\03.tga", 0, false);
-    this.manaFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -16 / 1800);
+    // 向下微调，为护盾条留出空间
+    this.manaFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -18 / 1800);
 
     //血条等级框架
     this.levelFrame = Frame.createType("LevelFrame", this.frame, 0, "TEXT", "")!;
@@ -192,6 +202,7 @@ export class UnitBlood {
     // 这里可以添加具体的更新逻辑
     this.updateLifeBar();
     this.updateManaBar();
+    this.updateShieldBar();
 
     //this.updatePositionByNative();
     this.updatePosition();
@@ -219,6 +230,27 @@ export class UnitBlood {
   private updateManaBar(): void {
     const manaPercent = this.actor.mana / this.actor.maxMana;
     this.manaFrame.setSize((100 / 2400) * manaPercent, 8 / 1800);
+  }
+
+  /**
+   * 更新护盾值条
+   */
+  private updateShieldBar(): void {
+    const shieldPercent = this.actor.shieldPercent;
+
+    if (shieldPercent <= 0) {
+      if (DzFrameIsVisible(this.shieldFrame.handle)) {
+        this.shieldFrame.setVisible(false);
+      }
+      return;
+    }
+
+    if (!DzFrameIsVisible(this.shieldFrame.handle)) {
+      this.shieldFrame.setVisible(true);
+    }
+
+    const clamped = Math.max(0, Math.min(shieldPercent, 1));
+    this.shieldFrame.setSize((100 / 2400) * clamped, 4 / 1800);
   }
 
   /**
@@ -269,6 +301,7 @@ export class UnitBlood {
     this.frame.setScale(scale);
     this.lifeFrame.setScale(scale);
     this.manaFrame.setScale(scale);
+    this.shieldFrame.setScale(scale);
     this.nameBoxFrame.setScale(scale);
     this.levelFrame.setFont("resource\\Texture\\ui\\hpbar\\ZiTi.TTf", 0.01 * scale, 0);
     this.nameFrame.setFont("resource\\Texture\\ui\\hpbar\\ZiTi.TTf", 0.01 * scale, 0);
