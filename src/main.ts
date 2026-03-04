@@ -1,14 +1,11 @@
-import { Frame, KKUnitCanPlaceAroundLocItem, Players, Timer, Unit } from "@eiriksgata/wc3ts/*";
+import { Frame, Timer } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
-import { KKWEHeroBloodBar } from "./system/ui/component/KKWEHeroBloodBar";
 import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
 import { EventBus, mouseEvents } from "./system/event";
-import { FourCC } from "./utils/helper";
-import { Console } from "./system/console";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { LeakDetector } from "./system/LeakDetector";
 
