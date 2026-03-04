@@ -6,6 +6,7 @@ import { Actor } from "src/system/actor";
 import { FourCC } from "src/utils/helper";
 import { EventBus } from "src/system/event";
 import { Console } from "src/system/console";
+import { GachaPanel } from "src/system/ui/component/GachaPanel";
 
 /**
  * 热更新模板
@@ -28,7 +29,7 @@ class ReloadTemplateExample {
    */
   public TestButton() {
     //泄露
-    
+
     const deadTrigger = CreateTrigger();
     TriggerAddAction(deadTrigger, () => {
       const unit = GetTriggerUnit();
@@ -54,6 +55,40 @@ class ReloadTemplateExample {
       }
     }
 
+
+
+    const gacha = GachaPanel.createCentered("抽卡天赋", 1200, 500).setCardSize(300, 350)
+      .setDraggable(true);  // 可选：面板可拖拽
+
+    gacha.addCard({
+      icon: "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp",
+      title: "圣光信仰",
+      description: "提高你的治疗效果 20%，\n并在释放技能时有几率恢复生命。",
+      onClick: () => {
+        print("选择了天赋：圣光信仰");
+      },
+    });
+
+    gacha.addCard({
+      icon: "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
+      title: "雷霆一击",
+      description: "获得一个可以对敌方单位造成伤害并眩晕的主动技能。",
+      onClick: () => {
+        print("选择了天赋：雷霆一击");
+      },
+    });
+
+    gacha.addCard({
+      icon: "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
+      title: "雷霆一击",
+      description: "获得一个可以对敌方单位造成伤害并眩晕的主动技能。",
+      onClick: () => {
+        print("选择了天赋：雷霆一击");
+      },
+    });
+
+    // 显示抽卡 UI
+    gacha.show();
   }
 
   /**
