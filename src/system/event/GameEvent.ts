@@ -64,6 +64,7 @@ export const enum GameEventType {
   UNIT_DEATH = "game:Actor:death",
   UNIT_DAMAGED = "game:Actor:damaged",
   UNIT_ATTACKED = "game:Actor:attacked",
+  UNIT_SUMMONED = "game:Actor:summoned",
   UNIT_SELECTED = "game:Actor:selected",
   UNIT_DESELECTED = "game:Actor:deselected",
   UNIT_SPELL_CAST = "game:Actor:spellCast",
@@ -114,6 +115,16 @@ export interface UnitDamageEventData extends UnitEventData {
   attackType?: number;
   /** 伤害类型 */
   damageType?: number;
+}
+
+/**
+ * 单位召唤事件数据
+ */
+export interface UnitSummonedEventData extends UnitEventData {
+  /** 召唤者单位 */
+  SummoningUnit?: Actor;
+  /** 被召唤的单位 */
+  SummonedUnit?: Actor;
 }
 
 /**
@@ -224,7 +235,7 @@ export class GameEventManager extends EventEmitter {
    */
   public registerUnitAttackedEvent(): void {
     if (this.registeredEvents.has(GameEventType.UNIT_ATTACKED)) return;
-    
+
     const trig = CreateTrigger();
     this.nativeTriggers.push(trig);
     
@@ -245,6 +256,34 @@ export class GameEventManager extends EventEmitter {
     });
     
     this.registeredEvents.add(GameEventType.UNIT_ATTACKED);
+  }
+
+  /**
+   * 注册单位召唤事件
+   */
+  public registerUnitSummonedEvent(): void {
+    if (this.registeredEvents.has(GameEventType.UNIT_SUMMONED)) return;
+
+    const trig = CreateTrigger();
+    this.nativeTriggers.push(trig);
+
+    registerAnyUnitEvent(trig, PlayerUnitEventId.SUMMON);
+    TriggerAddAction(trig, () => {
+      const summonedUnit = GetTriggerUnit();
+      const summoningUnit = GetSummoningUnit();
+
+      const data: UnitSummonedEventData = {
+        Actor: Actor.fromHandle(summonedUnit),
+        unitTypeId: GetUnitTypeId(summonedUnit),
+        owner: GetOwningPlayer(summonedUnit),
+        SummoningUnit: Actor.fromHandle(summoningUnit),
+        SummonedUnit: Actor.fromHandle(summonedUnit),
+      };
+
+      this.emit(GameEventType.UNIT_SUMMONED, data);
+    });
+
+    this.registeredEvents.add(GameEventType.UNIT_SUMMONED);
   }
   
   /**
@@ -333,6 +372,17 @@ export class GameEventManager extends EventEmitter {
   ): number {
     this.registerUnitAttackedEvent();
     return this.on(GameEventType.UNIT_ATTACKED, handler, options);
+  }
+
+  /**
+   * 订阅单位召唤事件
+   */
+  public onUnitSummoned(
+    handler: GameEventHandler<UnitSummonedEventData>,
+    options?: SubscribeOptions
+  ): number {
+    this.registerUnitSummonedEvent();
+    return this.on(GameEventType.UNIT_SUMMONED, handler, options);
   }
   
   /**

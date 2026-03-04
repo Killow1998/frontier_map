@@ -8,6 +8,7 @@ import { MapGeneral } from "./config/Map";
 import { EventBus, mouseEvents } from "./system/event";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { LeakDetector } from "./system/LeakDetector";
+import SummoningSystem from "./system/SummoningSystem";
 
 /**
  * 应用程序主入口
@@ -88,6 +89,8 @@ export function initialize(): void {
   //DzFrameEditBlackBorders(0, 0);
 
 
+  //启动召唤系统
+  SummoningSystem.getInstance().init();
 
 }
 

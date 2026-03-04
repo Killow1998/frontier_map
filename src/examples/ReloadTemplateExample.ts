@@ -1,12 +1,11 @@
 import { ModuleManager } from "../system/ModuleManager";
 import { HotReloadHelper } from "src/system/ui/UIComponent";
-import { EVENT_PLAYER_UNIT_DEATH, EVENT_PLAYER_UNIT_TRAIN_CANCEL, EVENT_UNIT_DEATH, Frame, FRAMEPOINT_CENTER, Players, Timer, Trigger, Unit } from "@eiriksgata/wc3ts/*";
-import { UILayout } from "src/system/ui/UILayout";
+
 import { Actor } from "src/system/actor";
 import { FourCC } from "src/utils/helper";
 import { EventBus, gameEvents, UnitDeathEventData } from "src/system/event";
-import { Console } from "src/system/console";
 import { GachaPanel } from "src/system/ui/component/GachaPanel";
+import { Players, Timer } from "@eiriksgata/wc3ts/*";
 
 /**
  * 热更新模板
@@ -37,7 +36,7 @@ class ReloadTemplateExample {
       })
     })
 
-    for (let j = 0; j < 2; j++) {
+    for (let j = 0; j < 1; j++) {
       for (let i = 0; i < 10; i++) {
         const unit = Actor.create(Players[j], FourCC('Hpal'), 0, 0);
         if (unit == null) return;
@@ -45,8 +44,12 @@ class ReloadTemplateExample {
         unit.createBloodBar();
         unit.setLabel("测试单位");
         unit.setBaseDamageJAPI(200);
+      
         //攻击速度
         unit.setUnitAttackCooldownJAPI(0.5);
+
+        //添加召唤水元素技能
+        unit.addAbility(FourCC('AHwe'));
       }
     }
 
