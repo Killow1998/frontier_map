@@ -39,12 +39,11 @@ export class UnitBlood {
     this.lifeFrame.setTexture("Texture\\ui\\hpbar\\02.tga", 0, false);
     this.lifeFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -4 / 1800);
 
-    //护盾值框架（位于血条和魔法条之间，较细）
+    // 护盾值框架：与血条同位置同大小，覆盖在血条上方，只显示护盾百分比宽度，更直观
     this.shieldFrame = Frame.createType("ShieldFrame", this.frame, 0, "BACKDROP", "")!;
-    this.shieldFrame.setSize(100 / 2400, 4 / 1800);
-    // 护盾贴图，需在资源里准备；暂时可先复用蓝条贴图调试
+    this.shieldFrame.setSize(100 / 2400, 12 / 1800);
     this.shieldFrame.setTexture("Texture\\ui\\hpbar\\huduntiao.tga", 0, false);
-    this.shieldFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -10 / 1800);
+    this.shieldFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -4 / 1800);
     this.shieldFrame.setVisible(false);
 
     //血条魔法值框架
@@ -250,7 +249,7 @@ export class UnitBlood {
     }
 
     const clamped = Math.max(0, Math.min(shieldPercent, 1));
-    this.shieldFrame.setSize((100 / 2400) * clamped, 4 / 1800);
+    this.shieldFrame.setSize((100 / 2400) * clamped, 12 / 1800);
   }
 
   /**
