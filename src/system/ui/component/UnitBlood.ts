@@ -43,7 +43,7 @@ export class UnitBlood {
     this.shieldFrame = Frame.createType("ShieldFrame", this.frame, 0, "BACKDROP", "")!;
     this.shieldFrame.setSize(100 / 2400, 4 / 1800);
     // 护盾贴图，需在资源里准备；暂时可先复用蓝条贴图调试
-    this.shieldFrame.setTexture("Texture\\ui\\hpbar\\06.tga", 0, false);
+    this.shieldFrame.setTexture("Texture\\ui\\hpbar\\huduntiao.tga", 0, false);
     this.shieldFrame.setPoint(FRAME_ALIGN_LEFT_TOP, this.frame, FRAME_ALIGN_LEFT_TOP, 26 / 2400, -10 / 1800);
     this.shieldFrame.setVisible(false);
 

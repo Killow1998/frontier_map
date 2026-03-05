@@ -50,6 +50,9 @@ class ReloadTemplateExample {
 
         //添加召唤水元素技能
         unit.addAbility(FourCC('AHwe'));
+
+        //添加护盾
+        unit.addShield(1000);
       }
     }
 
