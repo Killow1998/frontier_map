@@ -9,6 +9,9 @@ import { EventBus, mouseEvents } from "./system/event";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { LeakDetector } from "./system/LeakDetector";
 import SummoningSystem from "./system/SummoningSystem";
+import DamageSystem from "./system/damage";
+import ShieldSystem from "./system/ShieldSystem";
+import { BuffSystem } from "./system/buff";
 
 /**
  * 应用程序主入口
@@ -92,6 +95,14 @@ export function initialize(): void {
   //启动召唤系统
   SummoningSystem.getInstance().init();
 
+  // 启动伤害系统
+  DamageSystem.getInstance().initialize();
+
+  // Buff 系统（驱动力：持续时间 tick、护盾等 buff 的过期与移除）
+  BuffSystem.getInstance().init();
+
+  // 护盾系统（护盾为 Buff 一种，高优先级处理伤害吸收后 setEventDamage 写回）
+  ShieldSystem.getInstance().init();
 }
 
 /**

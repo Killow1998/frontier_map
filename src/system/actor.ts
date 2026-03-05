@@ -1,5 +1,7 @@
 import { Unit, MapPlayer } from "@eiriksgata/wc3ts/*";
 import { UnitBlood } from "./ui/component/UnitBlood";
+import { BuffManager } from "./buff/BuffManager";
+import { BUFF_DURATION_PERMANENT } from "./buff/types";
 
 export class Actor extends Unit {
   public static allActors: Record<number, Actor> = {};
@@ -8,9 +10,7 @@ export class Actor extends Unit {
   private _hpBarUIHeight: number = 100; // 默认血条UI高度
   private _size: number = 1.0; // 默认大小倍数
 
-  // 护盾数值
-  private _shield: number = 0;
-  private _maxShield: number = 0;
+  private _buffManager: BuffManager | null = null;
 
   private label = "";
 
@@ -164,34 +164,50 @@ export class Actor extends Unit {
     return this._size;
   }
 
-  public set shield(value: number) {
-    // 护盾始终夹在 0 和 maxShield 之间
-    this._shield = Math.max(0, Math.min(value, this._maxShield));
-  }
-
-  public get shield(): number {
-    return this._shield;
-  }
-
-  public set maxShield(value: number) {
-    this._maxShield = Math.max(0, value);
-    if (this._shield > this._maxShield) {
-      this._shield = this._maxShield;
+  /** Buff 管理器（护盾等均通过 buff 挂载） */
+  public get buffManager(): BuffManager {
+    if (!this._buffManager) {
+      this._buffManager = new BuffManager(this);
     }
+    return this._buffManager;
   }
 
+  /** 当前护盾总量（所有护盾 buff 的 current 之和） */
+  public get shield(): number {
+    return this.buffManager.getTotalShieldCurrent();
+  }
+
+  /** 护盾上限总量（所有护盾 buff 的 max 之和） */
   public get maxShield(): number {
-    return this._maxShield;
+    return this.buffManager.getTotalShieldMax();
   }
 
   /**
    * 护盾百分比 0~1
    */
   public get shieldPercent(): number {
-    if (this._maxShield <= 0) {
-      return 0;
+    const max = this.buffManager.getTotalShieldMax();
+    if (max <= 0) return 0;
+    return this.buffManager.getTotalShieldCurrent() / max;
+  }
+
+  /**
+   * 是否有护盾（当前护盾值 > 0）
+   */
+  public hasShield(): boolean {
+    return this.buffManager.getTotalShieldCurrent() > 0;
+  }
+
+  /**
+   * 增减护盾：正数添加一个护盾 buff，负数扣减护盾值（不扣血）
+   * @param delta 变化量；正数时可选 duration，默认永久直到被打破
+   */
+  public addShield(delta: number, duration: number = BUFF_DURATION_PERMANENT): void {
+    if (delta > 0) {
+      this.buffManager.addShieldBuff(delta, duration);
+    } else if (delta < 0) {
+      this.buffManager.reduceShield(-delta);
     }
-    return this._shield / this._maxShield;
   }
 
   public setLabel(value: string) {

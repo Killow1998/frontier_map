@@ -2,7 +2,12 @@
  * 游戏事件管理器
  * 基于 EventEmitter 实现的游戏事件订阅系统
  * 用于封装 Warcraft III 原生游戏事件（单位死亡、伤害、技能等）
+ *
+ * 订阅优先级：on/onUnitDamaged 等支持 options.priority，数值越大越先执行；
+ * 事件派发时按优先级从高到低依次调用，高优先级逻辑（如护盾）应先订阅并设置较高 priority。
  */
+
+declare function EXSetEventDamage(amount: number): boolean;
 
 import { bj_MAX_PLAYER_SLOTS } from "@eiriksgata/wc3ts/src/globals/define";
 import { EventEmitter, EventHandler, SubscribeOptions } from "./EventEmitter";
@@ -104,17 +109,53 @@ export interface UnitDeathEventData extends UnitEventData {
 }
 
 /**
- * 单位伤害事件数据
+ * 单位伤害事件数据（类，便于持有源伤害/当前伤害并对外提供设置方法）
  */
-export interface UnitDamageEventData extends UnitEventData {
+export class UnitDamageEventData implements UnitEventData {
+  /** 触发事件的单位 */
+  Actor: Actor | undefined;
+  /** 单位类型 ID */
+  unitTypeId: number;
+  /** 所属玩家 */
+  owner: player;
   /** 伤害来源 */
   source: Actor | undefined;
-  /** 伤害值 */
+  /** 源伤害值（事件创建时的原始伤害，只读、不随 setEventDamage 改变） */
+  readonly originalDamage: number;
+  /** 当前伤害值（可被 setEventDamage 修改，用于后续逻辑与最终结算） */
   damage: number;
   /** 攻击类型 */
   attackType?: number;
   /** 伤害类型 */
   damageType?: number;
+
+  constructor(
+    Actor: Actor | undefined,
+    unitTypeId: number,
+    owner: player,
+    source: Actor | undefined,
+    damageAmount: number,
+    attackType?: number,
+    damageType?: number
+  ) {
+    this.Actor = Actor;
+    this.unitTypeId = unitTypeId;
+    this.owner = owner;
+    this.source = source;
+    this.originalDamage = damageAmount;
+    this.damage = damageAmount;
+    this.attackType = attackType;
+    this.damageType = damageType;
+  }
+
+  /**
+   * 设置此次伤害的结算值（1.27a 下内部调用 EXSetEventDamage）。
+   * 会同时更新 data.damage，后续订阅者与飘字等将看到该值。
+   */
+  public setEventDamage(amount: number): void {
+    EXSetEventDamage(amount);
+    this.damage = amount;
+  }
 }
 
 /**
@@ -231,34 +272,6 @@ export class GameEventManager extends EventEmitter {
   }
   
   /**
-   * 注册单位被攻击事件
-   */
-  public registerUnitAttackedEvent(): void {
-    if (this.registeredEvents.has(GameEventType.UNIT_ATTACKED)) return;
-
-    const trig = CreateTrigger();
-    this.nativeTriggers.push(trig);
-    
-    registerAnyUnitEvent(trig, PlayerUnitEventId.ATTACKED);
-    TriggerAddAction(trig, () => {
-      const attackedUnit = GetTriggerUnit();
-      const attacker = GetAttacker();
-      
-      const data: UnitDamageEventData = {
-        Actor: Actor.fromHandle(attackedUnit),
-        unitTypeId: GetUnitTypeId(attackedUnit),
-        owner: GetOwningPlayer(attackedUnit),
-        source: Actor.fromHandle(attacker),
-        damage: 0, // 攻击事件没有具体伤害值
-      };
-      
-      this.emit(GameEventType.UNIT_ATTACKED, data);
-    });
-    
-    this.registeredEvents.add(GameEventType.UNIT_ATTACKED);
-  }
-
-  /**
    * 注册单位召唤事件
    */
   public registerUnitSummonedEvent(): void {
@@ -370,8 +383,19 @@ export class GameEventManager extends EventEmitter {
     handler: GameEventHandler<UnitDamageEventData>,
     options?: SubscribeOptions
   ): number {
-    this.registerUnitAttackedEvent();
     return this.on(GameEventType.UNIT_ATTACKED, handler, options);
+  }
+
+  /**
+   * 订阅单位受伤害事件。
+   * 支持 options.priority，优先级高的先执行；数据为 UnitDamageEventData，含 originalDamage（源伤害）、damage（当前伤害），
+   * 可通过 data.setEventDamage(amount) 修改此次结算伤害（内部调用 EXSetEventDamage）。
+   */
+  public onUnitDamaged(
+    handler: GameEventHandler<UnitDamageEventData>,
+    options?: SubscribeOptions
+  ): number {
+    return this.on(GameEventType.UNIT_DAMAGED, handler, options);
   }
 
   /**
