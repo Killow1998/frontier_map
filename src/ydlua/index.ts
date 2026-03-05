@@ -70,7 +70,7 @@ export class ydlua {
    */
   public initialize(): void {
     this.initializeConsole();
-    this.initializeRuntime();
+    //this.initializeRuntime();
     this.registerGlobals();
   }
 

@@ -7,11 +7,13 @@
  * 事件派发时按优先级从高到低依次调用，高优先级逻辑（如护盾）应先订阅并设置较高 priority。
  */
 
+
 import {
   bj_MAX_PLAYER_SLOTS,
   EVENT_PLAYER_UNIT_DEATH,
   EVENT_PLAYER_UNIT_SPELL_EFFECT,
   EVENT_PLAYER_UNIT_SUMMON,
+  EVENT_UNIT_SPELL_EFFECT,
 } from "@eiriksgata/wc3ts/src/globals/define";
 import { EventEmitter, EventHandler, SubscribeOptions } from "./EventEmitter";
 import { Actor } from "../actor";
@@ -139,6 +141,15 @@ export interface SpellEventData extends UnitEventData {
   targetX?: number;
   /** 目标点 Y */
   targetY?: number;
+}
+
+/**
+ * 技能目标类型
+ */
+export const enum SpellTargetType {
+  NONE = 0,  // 无目标（如瞬发、自身、部分通用技能）
+  POINT = 1, // 点目标
+  UNIT = 2,  // 单位目标
 }
 
 /**

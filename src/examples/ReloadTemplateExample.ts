@@ -28,67 +28,7 @@ class ReloadTemplateExample {
    */
   public TestButton() {
 
-    gameEvents.onUnitDeath((data: UnitDeathEventData) => {
-      const time = Timer.create().start(1, false, () => {
-        //复活
-        data.Actor?.revive(0, 0, true);
-        time.destroy();
-      })
-    })
-
-    for (let j = 0; j < 1; j++) {
-      for (let i = 0; i < 10; i++) {
-        const unit = Actor.create(Players[j], FourCC('Hpal'), 0, 0);
-        if (unit == null) return;
-        print("创建单位: " + unit?.id);
-        unit.createBloodBar();
-        unit.setLabel("测试单位");
-        unit.setBaseDamageJAPI(200);
-      
-        //攻击速度
-        unit.setUnitAttackCooldownJAPI(0.5);
-
-        //添加召唤水元素技能
-        unit.addAbility(FourCC('AHwe'));
-
-        //添加护盾
-        unit.addShield(1000);
-      }
-    }
-
-    const gacha = GachaPanel.createCentered("抽卡天赋", 1100, 500)
-      .setCardSize(300, 350)
-      .setDraggable(true);  // 可选：面板可拖拽
-
-    gacha.addCard({
-      icon: "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp",
-      title: "圣光信仰",
-      description: "提高你的治疗效果 20%，\n并在释放技能时有几率恢复生命。",
-      onClick: () => {
-        print("选择了天赋：圣光信仰");
-      },
-    });
-
-    gacha.addCard({
-      icon: "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
-      title: "雷霆一击",
-      description: "获得一个可以对敌方单位造成伤害并眩晕的主动技能。",
-      onClick: () => {
-        print("选择了天赋：雷霆一击");
-      },
-    });
-
-    gacha.addCard({
-      icon: "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
-      title: "雷霆一击",
-      description: "获得一个可以对敌方单位造成伤害并眩晕的主动技能。",
-      onClick: () => {
-        print("选择了天赋：雷霆一击");
-      },
-    });
-
-    // 显示抽卡 UI
-    gacha.show();
+   
   }
 
   /**

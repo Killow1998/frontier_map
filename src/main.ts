@@ -1,17 +1,20 @@
-import { Frame, Timer } from "@eiriksgata/wc3ts/*";
+import { EVENT_PLAYER_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_EFFECT, Frame, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
-import { EventBus, gameEvents, mouseEvents } from "./system/event";
+import { EventBus, gameEvents, mouseEvents, SpellEventData, UnitDeathEventData } from "./system/event";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { LeakDetector } from "./system/LeakDetector";
 import SummoningSystem from "./system/SummoningSystem";
 import DamageSystem from "./system/damage";
 import ShieldSystem from "./system/ShieldSystem";
 import { BuffSystem } from "./system/buff";
+import { FourCC } from "./utils/helper";
+import { Actor } from "./system/actor";
+import { GachaPanel } from "./system/ui/component/GachaPanel";
 
 /**
  * 应用程序主入口
@@ -21,20 +24,77 @@ import { BuffSystem } from "./system/buff";
 async function main(): Promise<void> {
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
-  // const unit = Unit.create(Players[0], FourCC('Hpal'), 0, 0);
-  // KKWEHeroBloodBar.create(unit!.handle!);
 
-  // const unit2 = Unit.create(Players[1], FourCC('Hpal'), 0, 0);
-  // KKWEHeroBloodBar.create(unit2!.handle!);
   Timer.create().start(1, false, () => {
-    typeof ReloadTemplateExample;
+    gameEvents.onUnitDeath((data: UnitDeathEventData) => {
+      const time = Timer.create().start(1, false, () => {
+        //复活
+        data.Actor?.revive(0, 0, true);
+        time.destroy();
+      })
+    })
+
+    for (let j = 0; j < 1; j++) {
+      for (let i = 0; i < 10; i++) {
+        const unit = Actor.create(Players[j], FourCC('Hpal'), 0, 0);
+        if (unit == null) return;
+        print("创建单位: " + unit?.id);
+        unit.createBloodBar();
+        unit.setLabel("测试单位");
+        unit.setBaseDamageJAPI(200);
+
+        //攻击速度
+        unit.setUnitAttackCooldownJAPI(0.5);
+
+        //添加召唤水元素技能
+        unit.addAbility(FourCC('AHwe'));
+
+        //添加护盾
+        unit.addShield(1000);
+      }
+    }
+
+    // const gacha = GachaPanel.createCentered("抽卡天赋", 1100, 500)
+    //   .setCardSize(300, 350)
+    //   .setDraggable(true);  // 可选：面板可拖拽
+
+    // gacha.addCard({
+    //   icon: "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp",
+    //   title: "圣光信仰",
+    //   description: "提高你的治疗效果 20%，\n并在释放技能时有几率恢复生命。",
+    //   onClick: () => {
+    //     print("选择了天赋：圣光信仰");
+    //   },
+    // });
+
+    // gacha.addCard({
+    //   icon: "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
+    //   title: "雷霆一击",
+    //   description: "获得一个可以对敌方单位造成伤害并眩晕的主动技能。",
+    //   onClick: () => {
+    //     print("选择了天赋：雷霆一击");
+    //   },
+    // });
+
+    // gacha.addCard({
+    //   icon: "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
+    //   title: "雷霆一击",
+    //   description: "获得一个可以对敌方单位造成伤害并眩晕的主动技能。",
+    //   onClick: () => {
+    //     print("选择了天赋：雷霆一击");
+    //   },
+    // });
+
+    // // 显示抽卡 UI
+    // gacha.show();
+
+    gameEvents.onSpellEffect((data:SpellEventData)=>{
+      print(`${data.Actor?.name} 释放了 ${data.abilityId} 效果`);
+    })
   })
 
 
-  gameEvents.onSpellEffect((data) => {
-    print(`${data.Actor?.name} 释放了 ${data.abilityId} 效果`);
 
-  });
 
 
 }
@@ -46,7 +106,7 @@ export function initialize(): void {
   // register ydlua
   ydlua.getInstance().initialize();
 
-  // 安装泄露检测（Timer / Trigger 句柄跟踪）
+  //安装泄露检测（Timer / Trigger 句柄跟踪）
   LeakDetector.install();
 
   Timer.create().start(3, true, () => {
@@ -56,33 +116,35 @@ export function initialize(): void {
   //Console.init();
 
   //载入TOC fdf样式模板Frame
-  try {
-    Frame.loadTOC("resource\\fdf\\path.toc");
-    print("FDF TOC loaded successfully");
-  } catch (e) {
-    print(`Error loading FDF TOC: ${e}`);
-  }
+  // try {
+  //   Frame.loadTOC("resource\\fdf\\path.toc");
+  //   print("FDF TOC loaded successfully");
+  // } catch (e) {
+  //   print(`Error loading FDF TOC: ${e}`);
+  // }
 
-  // 初始化模块管理器中的所有模块
+  // 热重载模块极其容易发生闪退，不推荐使用
+
+  // 初始化模块管理器中的所有模块 
   print(">>> Main: Initializing all modules...");
   ModuleManager.getInstance().initializeAllModules();
   print(`>>> Main: All registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
 
-  // // 延迟启动热更新系统，确保所有模块都已注册
+  // 延迟启动热更新系统，确保所有模块都已注册
   Timer.create().start(0.1, false, () => {
     print(`>>> Main: Starting hot reload system...`);
     print(`>>> Main: Registered modules at start: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
     HotReload.getInstance().start();
   });
 
-  PlayersConfig.CameraControl();
-  UnitBlood.registerLocalDrawEvent();
+  //PlayersConfig.CameraControl();
+  //UnitBlood.registerLocalDrawEvent();
 
-  MapGeneral.sceneVisionInit();
+  //MapGeneral.sceneVisionInit();
 
-  DzEnableWideScreen(true)
+  //DzEnableWideScreen(true)
 
-  mouseEvents.initialize();
+  //mouseEvents.initialize();
 
   print(">>> Main: Main module initialized");
 
@@ -99,16 +161,16 @@ export function initialize(): void {
 
 
   //启动召唤系统
-  SummoningSystem.getInstance().init();
+  //SummoningSystem.getInstance().init();
 
   // 启动伤害系统
-  DamageSystem.getInstance().initialize();
+  //DamageSystem.getInstance().initialize();
 
   // Buff 系统（驱动力：持续时间 tick、护盾等 buff 的过期与移除）
-  BuffSystem.getInstance().init();
+  //BuffSystem.getInstance().init();
 
   // 护盾系统（护盾为 Buff 一种，高优先级处理伤害吸收后 setEventDamage 写回）
-  ShieldSystem.getInstance().init();
+  //ShieldSystem.getInstance().init();
 }
 
 /**
