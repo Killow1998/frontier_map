@@ -7,59 +7,18 @@
  * 事件派发时按优先级从高到低依次调用，高优先级逻辑（如护盾）应先订阅并设置较高 priority。
  */
 
-declare function EXSetEventDamage(amount: number): boolean;
-
-import { bj_MAX_PLAYER_SLOTS } from "@eiriksgata/wc3ts/src/globals/define";
+import {
+  bj_MAX_PLAYER_SLOTS,
+  EVENT_PLAYER_UNIT_DEATH,
+  EVENT_PLAYER_UNIT_SPELL_EFFECT,
+  EVENT_PLAYER_UNIT_SUMMON,
+} from "@eiriksgata/wc3ts/src/globals/define";
 import { EventEmitter, EventHandler, SubscribeOptions } from "./EventEmitter";
 import { Actor } from "../actor";
 
-/**
- * 玩家单位事件 ID（用于 ConvertPlayerUnitEvent）
- * @see https://jass.fandom.com/wiki/PlayerUnitEvent
- */
-export const PlayerUnitEventId = {
-  ATTACKED: 18,        // EVENT_PLAYER_UNIT_ATTACKED
-  RESCUED: 19,         // EVENT_PLAYER_UNIT_RESCUED
-  DEATH: 20,           // EVENT_PLAYER_UNIT_DEATH
-  DECAY: 21,           // EVENT_PLAYER_UNIT_DECAY
-  DETECTED: 22,        // EVENT_PLAYER_UNIT_DETECTED
-  HIDDEN: 23,          // EVENT_PLAYER_UNIT_HIDDEN
-  SELECTED: 24,        // EVENT_PLAYER_UNIT_SELECTED
-  DESELECTED: 25,      // EVENT_PLAYER_UNIT_DESELECTED
-  CONSTRUCT_START: 26, // EVENT_PLAYER_UNIT_CONSTRUCT_START
-  CONSTRUCT_CANCEL: 27,// EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL
-  CONSTRUCT_FINISH: 28,// EVENT_PLAYER_UNIT_CONSTRUCT_FINISH
-  UPGRADE_START: 29,   // EVENT_PLAYER_UNIT_UPGRADE_START
-  UPGRADE_CANCEL: 30,  // EVENT_PLAYER_UNIT_UPGRADE_CANCEL
-  UPGRADE_FINISH: 31,  // EVENT_PLAYER_UNIT_UPGRADE_FINISH
-  TRAIN_START: 32,     // EVENT_PLAYER_UNIT_TRAIN_START
-  TRAIN_CANCEL: 33,    // EVENT_PLAYER_UNIT_TRAIN_CANCEL
-  TRAIN_FINISH: 34,    // EVENT_PLAYER_UNIT_TRAIN_FINISH
-  RESEARCH_START: 35,  // EVENT_PLAYER_UNIT_RESEARCH_START
-  RESEARCH_CANCEL: 36, // EVENT_PLAYER_UNIT_RESEARCH_CANCEL
-  RESEARCH_FINISH: 37, // EVENT_PLAYER_UNIT_RESEARCH_FINISH
-  ISSUED_ORDER: 38,    // EVENT_PLAYER_UNIT_ISSUED_ORDER
-  ISSUED_POINT_ORDER: 39, // EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER
-  ISSUED_TARGET_ORDER: 40,// EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER
-  HERO_LEVEL: 41,      // EVENT_PLAYER_HERO_LEVEL
-  HERO_SKILL: 42,      // EVENT_PLAYER_HERO_SKILL
-  HERO_REVIVABLE: 43,  // EVENT_PLAYER_HERO_REVIVABLE
-  HERO_REVIVE_START: 44, // EVENT_PLAYER_HERO_REVIVE_START
-  HERO_REVIVE_CANCEL: 45,// EVENT_PLAYER_HERO_REVIVE_CANCEL
-  HERO_REVIVE_FINISH: 46,// EVENT_PLAYER_HERO_REVIVE_FINISH
-  SUMMON: 47,          // EVENT_PLAYER_UNIT_SUMMON
-  DROP_ITEM: 48,       // EVENT_PLAYER_UNIT_DROP_ITEM
-  PICKUP_ITEM: 49,     // EVENT_PLAYER_UNIT_PICKUP_ITEM
-  USE_ITEM: 50,        // EVENT_PLAYER_UNIT_USE_ITEM
-  LOADED: 51,          // EVENT_PLAYER_UNIT_LOADED
-  DAMAGED: 52,         // EVENT_PLAYER_UNIT_DAMAGED (1.29+)
-  DAMAGING: 53,        // EVENT_PLAYER_UNIT_DAMAGING (1.31+)
-  SPELL_CHANNEL: 274,  // EVENT_PLAYER_UNIT_SPELL_CHANNEL
-  SPELL_CAST: 275,     // EVENT_PLAYER_UNIT_SPELL_CAST
-  SPELL_EFFECT: 276,   // EVENT_PLAYER_UNIT_SPELL_EFFECT
-  SPELL_FINISH: 277,   // EVENT_PLAYER_UNIT_SPELL_FINISH
-  SPELL_ENDCAST: 278,  // EVENT_PLAYER_UNIT_SPELL_ENDCAST
-} as const;
+// 注意：1.27a 中玩家-单位事件与单位事件是区分开的，这里只用玩家单位事件常量（EVENT_PLAYER_UNIT_XXX）
+// 注册单位事件时使用 TriggerRegisterPlayerUnitEvent + EVENT_PLAYER_UNIT_XXX；
+// 技能效果事件则使用单位事件 EVENT_UNIT_SPELL_EFFECT 与 TriggerRegisterAnyUnitEvent。
 
 /**
  * 游戏事件类型
@@ -203,8 +162,7 @@ export type GameEventHandler<T = any> = EventHandler<T>;
  * 辅助函数：为所有玩家注册单位事件
  * 模拟 TriggerRegisterAnyUnitEventBJ
  */
-function registerAnyUnitEvent(trig: trigger, eventId: number): void {
-  const event = ConvertPlayerUnitEvent(eventId);
+function registerAnyUnitEvent(trig: trigger, event: playerunitevent): void {
   for (let i = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
     TriggerRegisterPlayerUnitEvent(trig, Player(i), event, null);
   }
@@ -253,7 +211,8 @@ export class GameEventManager extends EventEmitter {
     const trig = CreateTrigger();
     this.nativeTriggers.push(trig);
     
-    registerAnyUnitEvent(trig, PlayerUnitEventId.DEATH);
+    // 玩家单位事件：任意玩家的单位死亡
+    registerAnyUnitEvent(trig, EVENT_PLAYER_UNIT_DEATH());
     TriggerAddAction(trig, () => {
       const dyingUnit = GetTriggerUnit();
       const killingUnit = GetKillingUnit();
@@ -280,7 +239,8 @@ export class GameEventManager extends EventEmitter {
     const trig = CreateTrigger();
     this.nativeTriggers.push(trig);
 
-    registerAnyUnitEvent(trig, PlayerUnitEventId.SUMMON);
+    // 玩家单位事件：任意玩家的单位被召唤
+    registerAnyUnitEvent(trig, EVENT_PLAYER_UNIT_SUMMON());
     TriggerAddAction(trig, () => {
       const summonedUnit = GetTriggerUnit();
       const summoningUnit = GetSummoningUnit();
@@ -308,7 +268,9 @@ export class GameEventManager extends EventEmitter {
     const trig = CreateTrigger();
     this.nativeTriggers.push(trig);
     
-    registerAnyUnitEvent(trig, PlayerUnitEventId.SPELL_EFFECT);
+    // 单位事件：任意单位发动技能效果（1.27a 下只存在单位事件版本）
+    registerAnyUnitEvent(trig, EVENT_PLAYER_UNIT_SPELL_EFFECT());
+
     TriggerAddAction(trig, () => {
       const caster = GetTriggerUnit();
       const targetUnit = GetSpellTargetUnit();

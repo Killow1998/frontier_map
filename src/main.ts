@@ -5,7 +5,7 @@ import { HotReload } from "./system/HotReload";
 import { ModuleManager } from "./system/ModuleManager";
 import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
-import { EventBus, mouseEvents } from "./system/event";
+import { EventBus, gameEvents, mouseEvents } from "./system/event";
 import { ReloadTemplateExample } from "./examples/ReloadTemplateExample";
 import { LeakDetector } from "./system/LeakDetector";
 import SummoningSystem from "./system/SummoningSystem";
@@ -29,6 +29,12 @@ async function main(): Promise<void> {
   Timer.create().start(1, false, () => {
     typeof ReloadTemplateExample;
   })
+
+
+  gameEvents.onSpellEffect((data) => {
+    print(`${data.Actor?.name} 释放了 ${data.abilityId} 效果`);
+
+  });
 
 
 }
