@@ -1,12 +1,12 @@
 import { Frame, FRAME_ALIGN_BOTTOM, FRAME_ALIGN_CENTER, FRAME_ALIGN_LEFT_TOP, FRAME_ALIGN_RIGHT_BOTTOM, FRAME_ALIGN_TOP, MapPlayer, Timer, Unit, UNIT_TYPE_DEAD } from "@eiriksgata/wc3ts/*";
 import { CameraControl } from "src/utils/CameraControl";
-import { worldToScreen, worldToScreen2, worldToScreen3, worldToScreen4 } from "src/utils/helper";
+import { worldToScreen } from "src/utils/helper";
 import { Actor } from "../../actor";
 
 
 export class UnitBlood {
 
-  public static allUnitBlood: Record<number, UnitBlood> = {};
+  public static allUnitBlood: Map<number, UnitBlood> = new Map();
 
   // 标记是否已经注册过绘制事件
   private static isDrawEventRegistered: boolean = false;
@@ -88,7 +88,7 @@ export class UnitBlood {
       }
     }
 
-    UnitBlood.allUnitBlood[actor.id] = this;
+    UnitBlood.allUnitBlood.set(actor.id, this);
   }
 
   /**
@@ -97,8 +97,9 @@ export class UnitBlood {
    */
   public static create(actor: Actor): UnitBlood {
     // 如果已经存在，直接返回现有实例
-    if (UnitBlood.allUnitBlood[actor.id] !== undefined) {
-      return UnitBlood.allUnitBlood[actor.id];
+    const existing = UnitBlood.allUnitBlood.get(actor.id);
+    if (existing !== undefined) {
+      return existing;
     }
 
     // 不存在则创建新实例
@@ -109,17 +110,17 @@ export class UnitBlood {
    * 获取指定单位的血条UI
    */
   public static get(unit: Unit): UnitBlood | undefined {
-    return UnitBlood.allUnitBlood[unit.id];
+    return UnitBlood.allUnitBlood.get(unit.id);
   }
 
   /**
    * 移除指定单位的血条UI
    */
   public static remove(unit: Unit): void {
-    const unitBlood = UnitBlood.allUnitBlood[unit.id];
+    const unitBlood = UnitBlood.allUnitBlood.get(unit.id);
     if (unitBlood !== undefined) {
       unitBlood.destroy();
-      delete UnitBlood.allUnitBlood[unit.id];
+      UnitBlood.allUnitBlood.delete(unit.id);
     }
   }
 
@@ -129,7 +130,7 @@ export class UnitBlood {
   public destroy(): void {
     this.frame.destroy();
     this.actor.setPreselectUIVisible(true);
-    delete UnitBlood.allUnitBlood[this.actor.id];
+    UnitBlood.allUnitBlood.delete(this.actor.id);
     // print(`UnitBlood for unit ${this.unit.id} destroyed.`);
     // 其他清理工作...
   }
@@ -150,12 +151,18 @@ export class UnitBlood {
     UnitBlood.isDrawEventRegistered = true;
 
     // 执行注册逻辑
-    DzFrameSetUpdateCallbackByCode(() => {
-      CameraControl.update();
-      // 这里可以添加其他需要每帧更新的血条逻辑
-      UnitBlood.updateAllUnitBloods();
+    // DzFrameSetUpdateCallbackByCode(() => {
+    //   CameraControl.update();
+    //   // 这里可以添加其他需要每帧更新的血条逻辑
+    //   UnitBlood.updateAllUnitBloods();
 
-    });
+    // });
+
+    //使用计时器更新
+    // Timer.create().start(0.03, true, () => {
+    //   CameraControl.update();
+    //   UnitBlood.updateAllUnitBloods();
+    // });
 
     print("UnitBlood: 绘制事件注册成功");
     return true;
@@ -172,11 +179,8 @@ export class UnitBlood {
    * 更新所有血条UI（每帧调用）
    */
   private static updateAllUnitBloods(): void {
-    for (const unitId in UnitBlood.allUnitBlood) {
-      const unitBlood = UnitBlood.allUnitBlood[unitId];
-      if (unitBlood !== undefined) {
-        unitBlood.updateUI();
-      }
+    for (const unitBlood of UnitBlood.allUnitBlood.values()) {
+      unitBlood.updateUI();
     }
 
 
