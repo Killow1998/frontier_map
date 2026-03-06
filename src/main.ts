@@ -1,4 +1,4 @@
-import { EVENT_PLAYER_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_EFFECT, Frame, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*";
+import { EVENT_PLAYER_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_ENDCAST, Frame, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -25,34 +25,49 @@ async function main(): Promise<void> {
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
 
+  const unitSpellEffectTrigger = Trigger.create();
+
   Timer.create().start(1, false, () => {
     gameEvents.onUnitDeath((data: UnitDeathEventData) => {
       const time = Timer.create().start(1, false, () => {
         //复活
         data.Actor?.revive(0, 0, true);
+        data.Actor!.mana = 3000;
         time.destroy();
       })
     })
 
-    for (let j = 0; j < 1; j++) {
+    for (let j = 0; j < 5; j++) {
       for (let i = 0; i < 10; i++) {
         const unit = Actor.create(Players[j], FourCC('Hpal'), 0, 0);
         if (unit == null) return;
         print("创建单位: " + unit?.id);
         unit.createBloodBar();
         unit.setLabel("测试单位");
-        unit.setBaseDamageJAPI(200);
 
         //攻击速度
-        unit.setUnitAttackCooldownJAPI(0.5);
+        //unit.setUnitAttackCooldownJAPI(0.5);
 
-        //添加召唤水元素技能
+        //添加霜冻新星技能
+        unit.addAbility(FourCC('AUfn'));
+
+        //添加水元素技能
         unit.addAbility(FourCC('AHwe'));
 
+        unit.maxMana = 3000;
+        unit.mana = 3000;
+
         //添加护盾
-        unit.addShield(1000);
+        //unit.addShield(1000);
+        unitSpellEffectTrigger.registerUnitEvent(unit, EVENT_UNIT_SPELL_EFFECT());
+        
+        
       }
     }
+
+    unitSpellEffectTrigger.addAction(()=>{
+      print("单位释放了技能");
+    })
 
     // const gacha = GachaPanel.createCentered("抽卡天赋", 1100, 500)
     //   .setCardSize(300, 350)
@@ -87,10 +102,11 @@ async function main(): Promise<void> {
 
     // // 显示抽卡 UI
     // gacha.show();
+    // gameEvents.onSpellEffect((data: SpellEventData) => {
+    //   //print(`${data.Actor?.name} 释放了 ${data.abilityId} 效果`);
+    //   DisplayTextToPlayer(Player(0), 0, 0, `${data.Actor?.name} 释放了 ${data.abilityId} 效果`);
+    // })
 
-    gameEvents.onSpellEffect((data:SpellEventData)=>{
-      print(`${data.Actor?.name} 释放了 ${data.abilityId} 效果`);
-    })
   })
 
 
@@ -116,61 +132,64 @@ export function initialize(): void {
   //Console.init();
 
   //载入TOC fdf样式模板Frame
-  // try {
-  //   Frame.loadTOC("resource\\fdf\\path.toc");
-  //   print("FDF TOC loaded successfully");
-  // } catch (e) {
-  //   print(`Error loading FDF TOC: ${e}`);
-  // }
+  try {
+    Frame.loadTOC("resource\\fdf\\path.toc");
+    print("FDF TOC loaded successfully");
+  } catch (e) {
+    print(`Error loading FDF TOC: ${e}`);
+  }
 
   // 热重载模块极其容易发生闪退，不推荐使用
 
   // 初始化模块管理器中的所有模块 
-  print(">>> Main: Initializing all modules...");
-  ModuleManager.getInstance().initializeAllModules();
-  print(`>>> Main: All registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
+  // print(">>> Main: Initializing all modules...");
+  // ModuleManager.getInstance().initializeAllModules();
+  // print(`>>> Main: All registered modules: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
 
   // 延迟启动热更新系统，确保所有模块都已注册
-  Timer.create().start(0.1, false, () => {
-    print(`>>> Main: Starting hot reload system...`);
-    print(`>>> Main: Registered modules at start: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
-    HotReload.getInstance().start();
-  });
+  // Timer.create().start(0.1, false, () => {
+  //   print(`>>> Main: Starting hot reload system...`);
+  //   print(`>>> Main: Registered modules at start: ${ModuleManager.getInstance().getRegisteredModules().join(", ")}`);
+  //   HotReload.getInstance().start();
+  // });
 
   //PlayersConfig.CameraControl();
-  //UnitBlood.registerLocalDrawEvent();
+  UnitBlood.registerLocalDrawEvent();
 
-  //MapGeneral.sceneVisionInit();
+  MapGeneral.sceneVisionInit();
 
   //DzEnableWideScreen(true)
 
-  //mouseEvents.initialize();
+  mouseEvents.initialize();
 
-  print(">>> Main: Main module initialized");
+  // print(">>> Main: Main module initialized");
+
+
+
+
+  // DzFrameUnlockMouseRectLimit(true);
+  // //隐藏魔兽UI
+  // //DzFrameHideInterface();
+
+  // //调整魔兽渲染黑边
+  // //DzFrameEditBlackBorders(0, 0);
+
+
+  // //启动召唤系统
+  // SummoningSystem.getInstance().init();
+
+  // // 启动伤害系统
+  // DamageSystem.getInstance().initialize();
+
+  // // Buff 系统（驱动力：持续时间 tick、护盾等 buff 的过期与移除）
+  // BuffSystem.getInstance().init();
+
+  // // 护盾系统（护盾为 Buff 一种，高优先级处理伤害吸收后 setEventDamage 写回）
+  // ShieldSystem.getInstance().init();
 
 
   // 启动应用程序
   main();
-
-  DzFrameUnlockMouseRectLimit(true);
-  //隐藏魔兽UI
-  //DzFrameHideInterface();
-
-  //调整魔兽渲染黑边
-  //DzFrameEditBlackBorders(0, 0);
-
-
-  //启动召唤系统
-  //SummoningSystem.getInstance().init();
-
-  // 启动伤害系统
-  //DamageSystem.getInstance().initialize();
-
-  // Buff 系统（驱动力：持续时间 tick、护盾等 buff 的过期与移除）
-  //BuffSystem.getInstance().init();
-
-  // 护盾系统（护盾为 Buff 一种，高优先级处理伤害吸收后 setEventDamage 写回）
-  //ShieldSystem.getInstance().init();
 }
 
 /**

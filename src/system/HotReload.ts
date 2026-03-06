@@ -60,7 +60,14 @@ export class HotReload {
     }
 
     // 记录游戏启动时间戳（os.time() 返回 10 位秒级时间戳）
-    this.gameStartTimestamp = os.time();
+    // 在某些 Warcraft III Lua 运行环境中，os 或 os.time 可能不可用，这里做防御性处理避免闪退
+    try {
+      // @ts-ignore - os 由运行时提供
+      this.gameStartTimestamp = os.time();
+    } catch (error) {
+      this.gameStartTimestamp = 0;
+      print(`>>> HotReload: os.time() not available, fallback to 0, error: ${error}`);
+    }
     print(">>> HotReload: Starting hot reload system...");
     print(`>>> HotReload: Game start timestamp: ${this.gameStartTimestamp} (seconds, 10 digits)`);
     print(`>>> HotReload: Check interval: ${this.checkInterval} seconds`);
