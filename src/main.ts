@@ -13,10 +13,8 @@ import { mouseEvents } from "./system/event";
 async function main(): Promise<void> {
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
-
-
-  Timer.create().start(1, false, () => {
-
+  Timer.create().start(0.01, false, () => {
+    
    
 
   })
@@ -71,8 +69,6 @@ export function initialize(): void {
   mouseEvents.initialize();
 
   // print(">>> Main: Main module initialized");
-
-
 
 
   // DzFrameUnlockMouseRectLimit(true);
