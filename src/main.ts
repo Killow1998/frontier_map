@@ -1,4 +1,4 @@
-import { EVENT_PLAYER_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_ENDCAST, Frame, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*";
+import { EVENT_PLAYER_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_ENDCAST, Frame, PLAYER_NEUTRAL_AGGRESSIVE, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { HotReload } from "./system/HotReload";
@@ -25,9 +25,13 @@ async function main(): Promise<void> {
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
 
-  const unitSpellEffectTrigger = Trigger.create();
+  DzDisableUnitPreselectUi();
 
   Timer.create().start(1, false, () => {
+
+    gameEvents.onSpellEffect((data: SpellEventData) => {
+      print("单位释放了技能: " + data.abilityId);
+    })
     gameEvents.onUnitDeath((data: UnitDeathEventData) => {
       const time = Timer.create().start(1, false, () => {
         //复活
@@ -59,15 +63,12 @@ async function main(): Promise<void> {
 
         //添加护盾
         //unit.addShield(1000);
-        unitSpellEffectTrigger.registerUnitEvent(unit, EVENT_UNIT_SPELL_EFFECT());
-        
-        
+
+
+
       }
     }
 
-    unitSpellEffectTrigger.addAction(()=>{
-      print("单位释放了技能");
-    })
 
     // const gacha = GachaPanel.createCentered("抽卡天赋", 1100, 500)
     //   .setCardSize(300, 350)
@@ -123,11 +124,11 @@ export function initialize(): void {
   ydlua.getInstance().initialize();
 
   //安装泄露检测（Timer / Trigger 句柄跟踪）
-  LeakDetector.install();
+  // LeakDetector.install();
 
-  Timer.create().start(3, true, () => {
-    LeakDetector.dump(3);
-  })
+  // Timer.create().start(3, true, () => {
+  //   LeakDetector.dump(3);
+  // })
   //log 初始化
   //Console.init();
 

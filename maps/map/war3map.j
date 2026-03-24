@@ -114,6 +114,8 @@ function main takes nothing returns nothing
 
     call InitGlobals()
     call InitCustomTriggers()
+    call StartCampaignAI(Player(PLAYER_NEUTRAL_AGGRESSIVE), "callback")
+    
     call Cheat("exec-lua:bootstrap")
 endfunction
 //***************************************************************************

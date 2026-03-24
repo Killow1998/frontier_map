@@ -25,7 +25,7 @@ export class UnitBlood {
    */
   private constructor(actor: Actor) {
     this.actor = actor;
-    actor.setPreselectUIVisible(false);
+    //actor.setPreselectUIVisible(false);
 
     //血条UI基底框架
     this.frame = Frame.createType("UnitBloodFrame", Frame.fromHandle(DzGetGameUI())!, 0, "BACKDROP", "")!;
@@ -129,7 +129,7 @@ export class UnitBlood {
    */
   public destroy(): void {
     this.frame.destroy();
-    this.actor.setPreselectUIVisible(true);
+    //this.actor.setPreselectUIVisible(true);
     UnitBlood.allUnitBlood.delete(this.actor.id);
     // print(`UnitBlood for unit ${this.unit.id} destroyed.`);
     // 其他清理工作...
@@ -151,12 +151,12 @@ export class UnitBlood {
     UnitBlood.isDrawEventRegistered = true;
 
     // 执行注册逻辑
-    // DzFrameSetUpdateCallbackByCode(() => {
-    //   CameraControl.update();
-    //   // 这里可以添加其他需要每帧更新的血条逻辑
-    //   UnitBlood.updateAllUnitBloods();
+    DzFrameSetUpdateCallbackByCode(() => {
+      CameraControl.update();
+      // 这里可以添加其他需要每帧更新的血条逻辑
+      UnitBlood.updateAllUnitBloods();
 
-    // });
+    });
 
     //使用计时器更新
     // Timer.create().start(0.03, true, () => {
