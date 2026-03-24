@@ -327,9 +327,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript-to-lua@npm:^1.32.0":
-  version: 1.32.0
-  resolution: "typescript-to-lua@npm:1.32.0"
+"typescript-to-lua@npm:^1.34.0":
+  version: 1.34.0
+  resolution: "typescript-to-lua@npm:1.34.0"
   dependencies:
     "@typescript-to-lua/language-extensions": "npm:1.19.0"
     enhanced-resolve: "npm:5.8.2"
@@ -337,10 +337,10 @@ __metadata:
     resolve: "npm:^1.15.1"
     source-map: "npm:^0.7.3"
   peerDependencies:
-    typescript: 5.8.2
+    typescript: 5.9.3
   bin:
     tstl: dist/tstl.js
-  checksum: 10/5cff20bd4ab08eee825ffaa79a22df706fab5fe8a5a7fdbc054cee0d2b55da73ecc8fc58ac82dc0c7dec861f122dfb6ebd5a9d60328da0938150ee227bdaae42
+  checksum: 10/b250c934690284027c650b1e33fd0f2aa8d07fc960adad8dd3cd8a8724e6d99bed5316a705b1b5cf04c29018ad7258ff6e7766dc011bee0289b0cb87f5bcb652
   languageName: node
   linkType: hard
 
@@ -397,7 +397,7 @@ __metadata:
     luamin: "npm:^1.0.4"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.8.2"
-    typescript-to-lua: "npm:^1.32.0"
+    typescript-to-lua: "npm:^1.34.0"
   languageName: unknown
   linkType: soft
 

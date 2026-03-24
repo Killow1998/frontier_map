@@ -25,7 +25,7 @@ async function main(): Promise<void> {
   //移动镜头到0,0位置
   PanCameraToTimed(0, 0, 0);
 
-  DzDisableUnitPreselectUi();
+  //DzDisableUnitPreselectUi();
 
   Timer.create().start(1, false, () => {
 
@@ -155,7 +155,7 @@ export function initialize(): void {
   // });
 
   PlayersConfig.CameraControl();
-  UnitBlood.registerLocalDrawEvent();
+  //UnitBlood.registerLocalDrawEvent();
 
   MapGeneral.sceneVisionInit();
 
