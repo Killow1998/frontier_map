@@ -6,38 +6,44 @@ import { BUFF_DURATION_PERMANENT } from "./buff/types";
 export class Actor extends Unit {
   public static allActors: Record<number, Actor> = {};
 
-  // 私有字段存储实际值，并设置默认值
-  private _hpBarUIHeight: number = 100; // 默认血条UI高度
-  private _size: number = 1.0; // 默认大小倍数
-
+  private _hpBarUIHeight: number = 100;
+  private _size: number = 1.0;
   private _buffManager: BuffManager | null = null;
-
   private label = "";
-
   private bloodBarUI: UnitBlood | null = null;
 
   /**
-   * @deprecated 请使用 Actor.create 或 Actor.fromUnit 或 Actor.fromHandle 静态方法
-   * @param owner 单位所有者
-   * @param unitId 单位ID
-   * @param x X坐标
-   * @param y Y坐标 
-   * @param face 朝向角度
+   * @deprecated 请使用 Actor.create / Actor.fromUnit / Actor.fromHandle 静态方法。
+   * 直接 new 时 Unit 构造函数内部会调用 CreateUnit，绕过了 Actor.create 的统一管理。
    */
   constructor(owner: MapPlayer, unitId: number, x: number, y: number, face?: number) {
     super(owner, unitId, x, y, face);
-    // 将当前实例添加到全局管理器中
     Actor.allActors[this.id] = this;
   }
 
   /**
-   * 创建新的Actor单位
-   * @param owner 单位所有者
-   * @param unitId 单位ID (FourCC)
-   * @param x X坐标
-   * @param y Y坐标
-   * @param facing 朝向角度（可选）
-   * @returns Actor实例，如果创建失败返回undefined
+   * 当 Handle.getObject 从 WeakMap 中找到一个已有的父类 Unit 实例并返回时，
+   * Actor 构造函数不会被执行，Actor 特有字段（_hpBarUIHeight、_size 等）
+   * 将为 nil，对其做任何算术运算都会在 Lua 层崩溃。
+   * 此方法负责在这种"类型升级"场景下补全默认值。
+   *
+   * TSTL 背景：Handle、Unit、Actor 共享同一个模块级 WeakMap（见 handle.ts），
+   * 一个 handle 只缓存第一次创建它的类实例。子类调用 getObject 拿到的可能是
+   * 父类对象，因此必须显式补全子类字段。
+   */
+  private static ensureActorFields(obj: Actor): void {
+    const f = obj as unknown as Record<string, unknown>;
+    if (f["_hpBarUIHeight"] === undefined) f["_hpBarUIHeight"] = 100;
+    if (f["_size"] === undefined) f["_size"] = 1.0;
+    if (f["_buffManager"] === undefined) f["_buffManager"] = null;
+    if (f["label"] === undefined) f["label"] = "";
+    if (f["bloodBarUI"] === undefined) f["bloodBarUI"] = null;
+  }
+
+  /**
+   * 创建新的 Actor 单位。
+   * 注意：调用方需在单位死亡事件中调用 actor.destroy() 以防 WC3 handle ID
+   * 被复用后 allActors 返回指向已死亡单位的过期 Actor。
    */
   public static create(
     owner: MapPlayer,
@@ -46,83 +52,50 @@ export class Actor extends Unit {
     y: number,
     facing: number = 0
   ): Actor | undefined {
-    // 检查是否已经存在该位置的单位
-    if (owner == undefined || owner == null) {
-      owner = MapPlayer.fromHandle(Player(owner))!;
-    }
+    if (!owner) return undefined;
+
     const handle = CreateUnit(owner.handle, unitId, x, y, facing);
-    if (handle === undefined) {
-      return undefined;
-    }
+    if (!handle) return undefined;
 
-    // 检查是否已经是Actor
-    const unitId_handle = GetHandleId(handle);
-    const existingActor = Actor.allActors[unitId_handle];
-    if (existingActor !== undefined) {
-      return existingActor;
-    }
-
-    // 创建Actor实例 - 使用wc3ts的getObject方法
     const actor = Actor.getObject(handle) as Actor;
-    if (actor !== undefined) {
-      const values: Record<string, unknown> = {};
-      values.handle = handle;
-      Object.assign(actor, values);
+    if (!actor) return undefined;
 
-      // 添加到管理器
-      Actor.allActors[actor.id] = actor;
-      return actor;
-    }
-
-    return undefined;
+    Actor.ensureActorFields(actor);
+    Object.assign(actor, { handle });
+    Actor.allActors[actor.id] = actor;
+    return actor;
   }
 
   /**
-   * 从现有Unit创建Actor
-   * @param unit 现有的Unit实例
-   * @returns Actor实例
+   * 从现有 Unit 实例升级为 Actor。
+   * 若该 handle 已被 Unit.fromEvent 等方法注册为 Unit 实例，
+   * ensureActorFields 会补全 Actor 特有字段默认值。
    */
-  public static fromUnit(unit: Unit): Actor {
-    // 检查是否已经是Actor
-    const existingActor = Actor.allActors[unit.id];
-    if (existingActor !== undefined) {
-      return existingActor;
-    }
-
-    // 从Unit的handle创建Actor
-    return Actor.fromHandle(unit.handle)!;
+  public static fromUnit(unit: Unit): Actor | undefined {
+    if (!unit) return undefined;
+    const existing = Actor.allActors[unit.id];
+    if (existing !== undefined) return existing;
+    return Actor.fromHandle(unit.handle);
   }
 
   /**
-   * 从handle创建Actor
-   * @param handle 单位handle
-   * @returns Actor实例，如果handle无效返回undefined
+   * 从 WC3 unit handle 获取或创建 Actor。
+   * 若该 handle 已被父类方法注册为普通 Unit，则补全 Actor 字段后升级返回。
    */
   public static fromHandle(handle: unit): Actor | undefined {
-    if (handle === undefined) {
-      return undefined;
-    }
+    if (!handle) return undefined;
 
-    // 检查是否已经存在
-    const unitId = GetHandleId(handle);
-    const existingActor = Actor.allActors[unitId];
-    if (existingActor !== undefined) {
-      return existingActor;
-    }
+    const hid = GetHandleId(handle);
+    const existing = Actor.allActors[hid];
+    if (existing !== undefined) return existing;
 
-    // 使用wc3ts的getObject方法创建实例
     const actor = Actor.getObject(handle) as Actor;
-    if (actor !== undefined) {
-      const values: Record<string, unknown> = {};
-      values.handle = handle;
-      Object.assign(actor, values);
+    if (!actor) return undefined;
 
-      // 添加到管理器
-      Actor.allActors[actor.id] = actor;
-      return actor;
-    }
-
-    return undefined;
+    Actor.ensureActorFields(actor);
+    Object.assign(actor, { handle });
+    Actor.allActors[actor.id] = actor;
+    return actor;
   }
 
   /**
