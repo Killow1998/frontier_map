@@ -1,6 +1,7 @@
 import { Timer, Players } from "@eiriksgata/wc3ts/*";
 import { Actor } from "src/system/actor";
 import { gameEvents, SpellEventData, UnitDeathEventData } from "src/system/event";
+import { KKWEHeroBloodBar } from "src/system/ui/component/KKWEHeroBloodBar";
 import { FourCC } from "src/utils/helper";
 
 export function rgeisterUnitSpellEffectEvent():void{
@@ -36,6 +37,8 @@ export function rgeisterUnitSpellEffectEvent():void{
 
       unit.maxMana = 3000;
       unit.mana = 3000;
+
+      KKWEHeroBloodBar.create(unit.handle);
 
       //添加护盾
       //unit.addShield(1000);

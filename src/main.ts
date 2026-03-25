@@ -6,6 +6,7 @@ import { mouseEvents } from "./system/event";
 import { FourCC } from "./utils/helper";
 import { castRushBarrageSkill } from "./examples/HeroUnitSkill";
 import { castRushBarrageSkillTest } from "./test/HeroUnitSkillTestExample";
+import { rgeisterUnitSpellEffectEvent } from "./examples/UnitEventExample";
 
 
 /**
@@ -17,7 +18,9 @@ async function main(): Promise<void> {
   // 镜头对准两单位中间，便于观察「施法者 → 敌方脚下」的暴风雪
   PanCameraToTimed(200, 0, 0);
   Timer.create().start(0.01, false, () => {
-    castRushBarrageSkillTest();
+    rgeisterUnitSpellEffectEvent();
+
+    
   });
 }
 
