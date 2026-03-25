@@ -1,8 +1,10 @@
-import { EVENT_PLAYER_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_ENDCAST, Frame, PLAYER_NEUTRAL_AGGRESSIVE, Players, Timer, Trigger } from "@eiriksgata/wc3ts/*";
+import { EVENT_PLAYER_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_EFFECT, EVENT_UNIT_SPELL_ENDCAST, Frame, PLAYER_NEUTRAL_AGGRESSIVE, Players, Timer, Trigger, Unit } from "@eiriksgata/wc3ts/*";
 import { ydlua } from "./ydlua";
 import { PlayersConfig } from "./config/Players";
 import { MapGeneral } from "./config/Map";
 import { mouseEvents } from "./system/event";
+import { FourCC } from "./utils/helper";
+import { castBlizzardSkill, castRushBarrageSkill } from "./examples/HeroUnitSkill";
 
 
 /**
@@ -11,14 +13,27 @@ import { mouseEvents } from "./system/event";
  * 测试自动重新编译功能
  */
 async function main(): Promise<void> {
-  //移动镜头到0,0位置
-  PanCameraToTimed(0, 0, 0);
+  // 镜头对准两单位中间，便于观察「施法者 → 敌方脚下」的暴风雪
+  PanCameraToTimed(200, 0, 0);
   Timer.create().start(0.01, false, () => {
-    
-   
+    const caster = Unit.create(Players[0], FourCC("Hpal"), 0, 0);
+    const target = Unit.create(Players[1], FourCC("Hpal"), 400, 0);
+    if (!caster || !target) {
+      return;
+    }
 
-  })
-
+    // 暴风雪约 3s 结束后测试冲刺猛攻（可删去暴风雪 Timer 单独测本技能）
+    Timer.create().start(1, false, () => {
+      castRushBarrageSkill(caster.handle, target.handle, {
+        hitCount: 10,
+        hitInterval: 0.14,
+        damagePerHit: 45,
+        knockbackDist: 40,
+        selfLungeDist: 26,
+        standDist: 88,
+      });
+    });
+  });
 }
 
 /**
