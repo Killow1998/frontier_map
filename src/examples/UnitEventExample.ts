@@ -41,7 +41,7 @@ export function rgeisterUnitSpellEffectEvent():void{
       KKWEHeroBloodBar.create(unit.handle);
 
       //添加护盾
-      //unit.addShield(1000);
+      unit.addShield(1000);
 
 
 
