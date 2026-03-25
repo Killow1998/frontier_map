@@ -108,13 +108,15 @@ export class KKWEHeroBloodBar {
     DzFrameSetText(heroIconText, "1");
     DzFrameSetTextAlignment(heroIconText, 4);
     DzFrameSetIgnoreTrackEvents(heroIconText as any, true);
-
+    DzFrameSetFont(heroIconText ,"resource\\Texture\\ui\\hpbar\\ZiTi.TTf", 0.009, 0);
+    
     const heroName = DzCreateFrameByTagName("TEXT", nameText, backdrop, "", 0);
     DzFrameSetPoint(heroName, 7, backdrop, 1, 0, 0.002);
     DzFrameSetSize(heroName, 0.0, 0.01);
     DzFrameSetText(heroName, GetUnitName(u));
     DzFrameSetTextAlignment(heroName, 4);
     DzFrameSetIgnoreTrackEvents(heroName as any, true);
+    DzFrameSetFont(heroName ,"resource\\Texture\\ui\\hpbar\\ZiTi.TTf", 0.009, 0);
 
     this.backdrop = backdrop as any;
     this.lifeBar = lifeBar as any;
