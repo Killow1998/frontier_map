@@ -1,6 +1,7 @@
 import { Unit, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { FourCC } from "src/utils/helper";
 import { castBlizzardSkill, castRushBarrageSkill } from "src/examples/HeroUnitSkill";
+import { Actor } from "src/system/actor";
 
 export function castBlizzardSkillTest(): void {
 
@@ -40,4 +41,17 @@ export function castRushBarrageSkillTest() {
       standDist: 88,
     });
   });
+}
+
+
+//测试增加护盾
+export function testAddShield():void{
+  const caster = Actor.create(Players[0], FourCC("Hpal"), 0, 0);
+  const target = Actor.create(Players[1], FourCC("Hpal"), 400, 0);
+  if (!caster) {
+    return;
+  }
+
+  caster.addShield(300);
+  target!.addShield(30);
 }

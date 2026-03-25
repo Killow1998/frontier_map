@@ -5,8 +5,12 @@ import { MapGeneral } from "./config/Map";
 import { mouseEvents } from "./system/event";
 import { FourCC } from "./utils/helper";
 import { castRushBarrageSkill } from "./examples/HeroUnitSkill";
-import { castRushBarrageSkillTest } from "./test/HeroUnitSkillTestExample";
+import { castRushBarrageSkillTest, testAddShield } from "./test/HeroUnitSkillTestExample";
 import { rgeisterUnitSpellEffectEvent } from "./examples/UnitEventExample";
+import DamageSystem from "./system/damage";
+import { BuffSystem } from "./system/buff";
+import ShieldSystem from "./system/ShieldSystem";
+import SummoningSystem from "./system/SummoningSystem";
 
 
 /**
@@ -18,9 +22,9 @@ async function main(): Promise<void> {
   // 镜头对准两单位中间，便于观察「施法者 → 敌方脚下」的暴风雪
   PanCameraToTimed(200, 0, 0);
   Timer.create().start(0.01, false, () => {
-    rgeisterUnitSpellEffectEvent();
+    testAddShield();
 
-    
+
   });
 }
 
@@ -67,7 +71,7 @@ export function initialize(): void {
 
   MapGeneral.sceneVisionInit();
 
-  //DzEnableWideScreen(true)
+  DzEnableWideScreen(true)
 
   mouseEvents.initialize();
 
@@ -83,16 +87,16 @@ export function initialize(): void {
 
 
   // //启动召唤系统
-  // SummoningSystem.getInstance().init();
+  SummoningSystem.getInstance().init();
 
   // // 启动伤害系统
-  // DamageSystem.getInstance().initialize();
+  DamageSystem.getInstance().initialize();
 
   // // Buff 系统（驱动力：持续时间 tick、护盾等 buff 的过期与移除）
-  // BuffSystem.getInstance().init();
+  BuffSystem.getInstance().init();
 
   // // 护盾系统（护盾为 Buff 一种，高优先级处理伤害吸收后 setEventDamage 写回）
-  // ShieldSystem.getInstance().init();
+  ShieldSystem.getInstance().init();
 
 
   // 启动应用程序
