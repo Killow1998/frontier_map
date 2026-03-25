@@ -2,6 +2,7 @@ import { EVENT_UNIT_DAMAGED, EVENT_UNIT_DEATH, Group, Rectangle, Region, Timer, 
 import { gameEvents, GameEventType, UnitDeathEventData, UnitDamageEventData } from "./event";
 import { FourCC } from "src/utils/helper";
 import { Actor } from "./actor";
+import { eventBus } from "./event/EventBus";
 
 export default class DamageSystem {
 
@@ -10,6 +11,8 @@ export default class DamageSystem {
   private static dmgTrigger: Trigger;
 
   private static triggerEventCount = 0;
+
+  // 使用 Actor 创建事件动态补注册，避免 Timer 循环遍历。
   private constructor() {
   }
   public static getInstance(): DamageSystem {
@@ -78,6 +81,17 @@ export default class DamageSystem {
         this.releaseUnitEvent();
         DamageSystem.triggerEventCount = 0;
       }
+    });
+
+    // 动态补注册：Actor 创建/升级时通知 DamageSystem。
+    // 这样新创建单位也能触发 UNIT_DAMAGED，从而护盾系统生效。
+    eventBus.on("game:Actor:created", ({ actor }: { actor: Actor }) => {
+      if (!DamageSystem.unitGroup || !DamageSystem.dmgTrigger) return;
+      if (DamageSystem.unitGroup.hasUnit(actor)) return;
+
+      DamageSystem.dmgTrigger.registerUnitEvent(actor, EVENT_UNIT_DAMAGED());
+      DamageSystem.unitGroup.addUnit(actor);
+      DamageSystem.triggerEventCount++;
     });
 
   }

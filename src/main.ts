@@ -11,6 +11,7 @@ import DamageSystem from "./system/damage";
 import { BuffSystem } from "./system/buff";
 import ShieldSystem from "./system/ShieldSystem";
 import SummoningSystem from "./system/SummoningSystem";
+import { UnitBlood } from "./system/ui/component/UnitBlood";
 
 
 /**
@@ -22,8 +23,8 @@ async function main(): Promise<void> {
   // 镜头对准两单位中间，便于观察「施法者 → 敌方脚下」的暴风雪
   PanCameraToTimed(200, 0, 0);
   Timer.create().start(0.01, false, () => {
-    testAddShield();
-
+    //testAddShield();
+    rgeisterUnitSpellEffectEvent();
 
   });
 }

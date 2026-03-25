@@ -2,6 +2,7 @@ import { Unit, MapPlayer } from "@eiriksgata/wc3ts/*";
 import { UnitBlood } from "./ui/component/UnitBlood";
 import { BuffManager } from "./buff/BuffManager";
 import { BUFF_DURATION_PERMANENT } from "./buff/types";
+import { eventBus } from "./event/EventBus";
 
 export class Actor extends Unit {
   public static allActors: Record<number, Actor> = {};
@@ -63,6 +64,9 @@ export class Actor extends Unit {
     Actor.ensureActorFields(actor);
     Object.assign(actor, { handle });
     Actor.allActors[actor.id] = actor;
+
+    // 通知 DamageSystem：该 Actor 已成功加入管理器，后续受击事件需要注册。
+    eventBus.emit("game:Actor:created", { actor });
     return actor;
   }
 
@@ -95,6 +99,9 @@ export class Actor extends Unit {
     Actor.ensureActorFields(actor);
     Object.assign(actor, { handle });
     Actor.allActors[actor.id] = actor;
+
+     // 通知 DamageSystem：该 Actor 已成功加入管理器，后续受击事件需要注册。
+    eventBus.emit("game:Actor:created", { actor });
     return actor;
   }
 

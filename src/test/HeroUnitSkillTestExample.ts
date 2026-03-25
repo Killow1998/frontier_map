@@ -2,6 +2,7 @@ import { Unit, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { FourCC } from "src/utils/helper";
 import { castBlizzardSkill, castRushBarrageSkill } from "src/examples/HeroUnitSkill";
 import { Actor } from "src/system/actor";
+import { UnitBlood } from "src/system/ui/component/UnitBlood";
 
 export function castBlizzardSkillTest(): void {
 
@@ -48,10 +49,18 @@ export function castRushBarrageSkillTest() {
 export function testAddShield():void{
   const caster = Actor.create(Players[0], FourCC("Hpal"), 0, 0);
   const target = Actor.create(Players[1], FourCC("Hpal"), 400, 0);
-  if (!caster) {
+  if (!caster || !target) {
     return;
   }
 
-  caster.addShield(300);
-  target!.addShield(30);
+  // 护盾 UI 依赖本地绘制回调刷新；测试里先开启并创建血条。
+  // UnitBlood.registerLocalDrawEvent();
+  // caster.createBloodBar();
+  // target.createBloodBar();
+
+  caster.addShield(3000);
+  target!.addShield(300);
+
+  // 用于快速确认 buff 是否真的加上了（shield 从 0 变大说明逻辑生效）。
+  print(`testAddShield: casterShield=${caster.shield}, targetShield=${target.shield}`);
 }
