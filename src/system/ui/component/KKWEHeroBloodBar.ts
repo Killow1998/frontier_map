@@ -4,7 +4,6 @@
  * 使用方式：给英雄创建血条只需传入单位，例如 HeroBloodBarYD.create(unit)
  */
 
-import { bj_MAX_PLAYER_SLOTS } from "@eiriksgata/wc3ts/src/globals/define";
 import {
   UNIT_TYPE_HERO,
   UNIT_TYPE_DEAD,
@@ -23,6 +22,12 @@ const MANA_HEIGHT = 0.003;
 
 /** 定时器间隔（与 JASS 0.03 一致） */
 const TIMER_INTERVAL = 0.03;
+
+/** 与 {@link UnitBlood} 相同血条/蓝条填充贴图（仅换皮，不改布局） */
+const TEX_LIFE_SELF = "Texture\\ui\\hpbar\\02.tga";
+const TEX_LIFE_ENEMY = "Texture\\ui\\hpbar\\05.tga";
+const TEX_LIFE_ALLY = "Texture\\ui\\hpbar\\06.tga";
+const TEX_MANA = "Texture\\ui\\hpbar\\03.tga";
 
 /**
  * 获取英雄单位头像贴图路径（可改为从配置/物编读取）
@@ -75,16 +80,20 @@ export class KKWEHeroBloodBar {
 
     const lifeBar = DzCreateFrameByTagName("BACKDROP", nameLife, backdrop, "", 0);
     DzFrameSetPoint(lifeBar, 0, backdrop, 0, 0, 0);
-    if (IsUnitEnemy(u, GetLocalPlayer())) {
-      DzFrameSetTexture(lifeBar, "ReplaceableTextures\\TeamColor\\TeamColor00.blp", 0);
+    const lp = GetLocalPlayer();
+    const owner = GetOwningPlayer(u);
+    if (owner === lp) {
+      DzFrameSetTexture(lifeBar, TEX_LIFE_SELF, 0);
+    } else if (IsPlayerAlly(owner, lp)) {
+      DzFrameSetTexture(lifeBar, TEX_LIFE_ALLY, 0);
     } else {
-      DzFrameSetTexture(lifeBar, "ReplaceableTextures\\TeamColor\\TeamColor06.blp", 0);
+      DzFrameSetTexture(lifeBar, TEX_LIFE_ENEMY, 0);
     }
     DzFrameSetSize(lifeBar, this.barWidth, this.lifeHeight);
 
     const manaBar = DzCreateFrameByTagName("BACKDROP", nameMana, backdrop, "", 0);
     DzFrameSetPoint(manaBar, 6, backdrop, 6, 0, 0);
-    DzFrameSetTexture(manaBar, "ReplaceableTextures\\TeamColor\\TeamColor01.blp", 0);
+    DzFrameSetTexture(manaBar, TEX_MANA, 0);
     DzFrameSetSize(manaBar, this.barWidth, this.manaHeight);
 
     const heroIcon = DzCreateFrameByTagName("BACKDROP", nameIcon, backdrop, "", 0);
