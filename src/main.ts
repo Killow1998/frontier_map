@@ -13,9 +13,11 @@ import ShieldSystem from "./system/ShieldSystem";
 import SummoningSystem from "./system/SummoningSystem";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { registerDefaultRelicsAndPools } from "./system/relic";
+import { BuffBarUI } from "./system/ui/component/BuffBarUI";
 import { RelicBarUI } from "./system/ui/component/RelicBarUI";
 import { relicSystemTestExample } from "./test/RelicSystemTestExample";
 import { runTipsExamples } from "./examples/TipsExample";
+import { buffBarTestExample } from "./test/BuffBarTestExample";
 
 
 /**
@@ -30,7 +32,8 @@ async function main(): Promise<void> {
     //testAddShield();
     //rgeisterUnitSpellEffectEvent();
     // 遗物：两名英雄各一个，仅其一有遗物；绑定后选中单位切换左上角遗物栏
-    relicSystemTestExample();
+    //relicSystemTestExample();
+    buffBarTestExample();
   });
 }
 
@@ -60,6 +63,7 @@ export function initialize(): void {
 
   registerDefaultRelicsAndPools();
   RelicBarUI.getInstance().create();
+  BuffBarUI.getInstance().create();
 
   // 热重载模块极其容易发生闪退，不推荐使用
 

@@ -3,6 +3,8 @@
  */
 
 import { Actor } from "../actor";
+import { eventBus } from "../event/EventBus";
+import { BUFF_EVENT_BUFFS_CHANGED } from "./buffEvents";
 import { Buff } from "./Buff";
 import { ShieldBuff } from "./ShieldBuff";
 import { BUFF_DURATION_PERMANENT } from "./types";
@@ -15,6 +17,10 @@ export class BuffManager {
     this.owner = owner;
   }
 
+  private emitChanged(): void {
+    eventBus.emit(BUFF_EVENT_BUFFS_CHANGED, { actor: this.owner });
+  }
+
   getOwner(): Actor {
     return this.owner;
   }
@@ -23,6 +29,7 @@ export class BuffManager {
     buff.holderId = this.owner.id;
     this.buffs.push(buff);
     buff.onApply();
+    this.emitChanged();
   }
 
   removeBuff(buff: Buff): boolean {
@@ -30,6 +37,7 @@ export class BuffManager {
     if (idx < 0) return false;
     this.buffs.splice(idx, 1);
     buff.onRemove();
+    this.emitChanged();
     return true;
   }
 
@@ -58,6 +66,7 @@ export class BuffManager {
       if (buff.isExpired()) {
         this.buffs.splice(i, 1);
         buff.onRemove();
+        this.emitChanged();
       }
     }
     // 移除已耗尽的护盾
@@ -66,6 +75,7 @@ export class BuffManager {
       if (b instanceof ShieldBuff && b.isDepleted()) {
         this.buffs.splice(i, 1);
         b.onRemove();
+        this.emitChanged();
       }
     }
   }
