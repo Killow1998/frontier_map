@@ -4,7 +4,7 @@
 
 import { Actor } from "../actor";
 import { eventBus } from "../event/EventBus";
-import { BUFF_EVENT_BUFFS_CHANGED } from "./buffEvents";
+import { BUFF_EVENT_BUFFS_CHANGED } from "./types";
 import { Buff } from "./Buff";
 import { ShieldBuff } from "./ShieldBuff";
 import { BUFF_DURATION_PERMANENT } from "./types";

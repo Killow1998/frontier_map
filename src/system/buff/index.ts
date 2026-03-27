@@ -6,6 +6,7 @@ export {
   BuffTypeId,
   BuffPolarity,
   BUFF_DURATION_PERMANENT,
+  BUFF_EVENT_BUFFS_CHANGED,
 } from "./types";
 export {
   registerBuffDisplay,
@@ -17,4 +18,3 @@ export {
   buildBuffTooltipText,
 } from "./BuffDisplayRegistry";
 export type { BuffDisplayDefinition } from "./BuffDisplayRegistry";
-export { BUFF_EVENT_BUFFS_CHANGED } from "./buffEvents";

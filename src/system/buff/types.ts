@@ -25,3 +25,8 @@ export const enum BuffPolarity {
  * 持续时间语义：负数表示永久（如光环或直到被打破的护盾）
  */
 export const BUFF_DURATION_PERMANENT = -1;
+
+/**
+ * Buff 列表变化（增删、过期、护盾耗尽移除），载荷 `{ actor: Actor }`
+ */
+export const BUFF_EVENT_BUFFS_CHANGED = "buff:buffsChanged";
