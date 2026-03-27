@@ -14,6 +14,7 @@ import { RelicBarUI } from "./system/ui/component/RelicBarUI";
 import { relicSystemTestExample } from "./test/RelicSystemTestExample";
 import { runTipsExamples } from "./examples/TipsExample";
 import { buffBarTestExample } from "./test/BuffBarTestExample";
+import { shockwaveEffectCircleTest } from "./test/EffectExTestExample";
 
 
 /**
@@ -25,11 +26,13 @@ async function main(): Promise<void> {
   // 镜头对准两单位中间，便于观察「施法者 → 敌方脚下」的暴风雪
   PanCameraToTimed(200, 0, 0);
   Timer.create().start(0.01, false, () => {
-    //testAddShield();
-    //rgeisterUnitSpellEffectEvent();
+    // testAddShield();
+    // rgeisterUnitSpellEffectEvent();
     // 遗物：两名英雄各一个，仅其一有遗物；绑定后选中单位切换左上角遗物栏
-    //relicSystemTestExample();
-    buffBarTestExample();
+    // relicSystemTestExample();
+    // buffBarTestExample();
+
+    shockwaveEffectCircleTest();
   });
 }
 
