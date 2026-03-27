@@ -182,9 +182,13 @@ export class Actor extends Unit {
    * 增减护盾：正数添加一个护盾 buff，负数扣减护盾值（不扣血）
    * @param delta 变化量；正数时可选 duration，默认永久直到被打破
    */
-  public addShield(delta: number, duration: number = BUFF_DURATION_PERMANENT): void {
+  public addShield(
+    delta: number,
+    duration: number = BUFF_DURATION_PERMANENT,
+    displayKey?: string
+  ): void {
     if (delta > 0) {
-      this.buffManager.addShieldBuff(delta, duration);
+      this.buffManager.addShieldBuff(delta, duration, displayKey);
     } else if (delta < 0) {
       this.buffManager.reduceShield(-delta);
     }

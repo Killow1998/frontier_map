@@ -1,5 +1,6 @@
 /**
- * Buff 展示用元数据（名称、图标、描述），按 typeId 注册；未知类型有占位。
+ * Buff 展示用元数据（名称、图标、描述），按 key 注册；
+ * key 可为 typeId，也可为自定义 displayKey。未知类型有占位。
  */
 
 import { Buff } from "./Buff";
@@ -24,10 +25,10 @@ const DEFAULT_UNKNOWN: BuffDisplayDefinition = {
 };
 
 export function registerBuffDisplay(
-  typeId: string,
+  key: string,
   def: BuffDisplayDefinition
 ): void {
-  registry.set(typeId, def);
+  registry.set(key, def);
 }
 
 /** 注册内置类型（护盾等）；可多次调用，后写覆盖 */
@@ -39,15 +40,16 @@ export function registerDefaultBuffDisplays(): void {
   });
 }
 
-export function getBuffDisplay(typeId: string): BuffDisplayDefinition {
-  return registry.get(typeId) ?? DEFAULT_UNKNOWN;
+export function getBuffDisplay(key: string): BuffDisplayDefinition {
+  return registry.get(key) ?? DEFAULT_UNKNOWN;
 }
 
-/** 未知类型时用 typeId 作为标题 */
+/** 查找顺序：displayKey > typeId；未知时用 displayKey/typeId 作为标题 */
 export function resolveBuffDisplay(buff: Buff): BuffDisplayDefinition {
-  const base = registry.get(buff.typeId);
+  const key = buff.displayKey ?? buff.typeId;
+  const base = registry.get(key) ?? registry.get(buff.typeId);
   if (base) return base;
-  return { ...DEFAULT_UNKNOWN, name: buff.typeId };
+  return { ...DEFAULT_UNKNOWN, name: key };
 }
 
 /** 剩余秒数；永久 Buff 为 null */

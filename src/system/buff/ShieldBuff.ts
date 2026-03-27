@@ -12,10 +12,15 @@ export class ShieldBuff extends Buff {
   /** 护盾上限（本 buff 的） */
   readonly max: number;
 
-  constructor(amount: number, duration: number = BUFF_DURATION_PERMANENT) {
+  constructor(
+    amount: number,
+    duration: number = BUFF_DURATION_PERMANENT,
+    displayKey?: string
+  ) {
     super(duration, BuffPolarity.BENEFICIAL);
     this.current = amount;
     this.max = amount;
+    this.displayKey = displayKey;
   }
 
   /**

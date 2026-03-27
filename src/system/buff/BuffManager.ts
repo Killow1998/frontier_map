@@ -93,8 +93,12 @@ export class BuffManager {
   /**
    * 添加护盾 Buff（可选持续时间，默认永久直到被打破）
    */
-  addShieldBuff(amount: number, duration: number = BUFF_DURATION_PERMANENT): ShieldBuff {
-    const buff = new ShieldBuff(amount, duration);
+  addShieldBuff(
+    amount: number,
+    duration: number = BUFF_DURATION_PERMANENT,
+    displayKey?: string
+  ): ShieldBuff {
+    const buff = new ShieldBuff(amount, duration, displayKey);
     this.addBuff(buff);
     return buff;
   }

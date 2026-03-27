@@ -12,6 +12,11 @@ export abstract class Buff {
   readonly id: number;
   /** 类型标识，用于叠加/驱散等（如 BuffTypeId.SHIELD） */
   abstract readonly typeId: string;
+  /**
+   * 展示键（可选）：用于 UI 图标/文案区分。
+   * 例如多个技能都产出 shield 类型时，可分别设置为 shield_fire / shield_ice。
+   */
+  displayKey?: string;
   /** 挂载单位 id（由 BuffManager 设置） */
   holderId: number = 0;
   /** 剩余持续时间（秒），BUFF_DURATION_PERMANENT 表示永久 */
