@@ -53,8 +53,17 @@ export interface TipsConfig {
   icon?: string;
   /** 宽度（像素） */
   width?: number;
-  /** 最大高度（像素） */
+  /** 最大高度（像素）；自适应开启时作为内容上限制 */
   maxHeight?: number;
+  /**
+   * 为 true（默认）时按正文宽度估算高度，整体不超过 maxHeight；
+   * 为 false 时面板高度固定为 maxHeight（与旧行为一致）。
+   */
+  autoHeight?: boolean;
+  /** 估算行高（像素），用于 autoHeight，默认 18 */
+  lineHeightPx?: number;
+  /** 估算每字符占位宽度（像素），用于自动换行，默认 9（中英混排近似） */
+  charWidthPx?: number;
   /** 显示位置偏好 */
   position?: TipsPosition;
   /** 动画类型 */
@@ -101,6 +110,10 @@ export class Tips {
   private componentWidth: number = 100;  // 目标组件宽度（像素）
   private componentHeight: number = 40;  // 目标组件高度（像素）
 
+  /** 最近一次布局后的 Tips 像素尺寸（用于贴边与边界检测） */
+  private lastTipsWidthPx: number = 300;
+  private lastTipsHeightPx: number = 400;
+
   // 定时器
   private showTimer: timer | null = null;
   private hideTimer: timer | null = null;
@@ -123,6 +136,9 @@ export class Tips {
   private static readonly DEFAULT_DELAY_SHOW = 0.3; // 秒
   private static readonly DEFAULT_DELAY_HIDE = 0.1; // 秒
   private static readonly DEFAULT_OFFSET = 10; // 像素
+  private static readonly DEFAULT_LINE_HEIGHT_PX = 18;
+  private static readonly DEFAULT_CHAR_WIDTH_PX = 9;
+  private static readonly MIN_TIPS_HEIGHT_PX = 32;
   private static readonly ANIMATION_DURATION = 0.15; // 动画持续时间（秒）
   private static readonly ANIMATION_FPS = 30; // 动画帧率
 
@@ -139,6 +155,76 @@ export class Tips {
       return raw;
     }
     return `|cff${hex}${raw}|r`;
+  }
+
+  private static isHexDigit(ch: string): boolean {
+    const c = ch.charAt(0);
+    return (
+      (c >= "0" && c <= "9") ||
+      (c >= "a" && c <= "f") ||
+      (c >= "A" && c <= "F")
+    );
+  }
+
+  /** 去掉魔兽颜色码与 |n，便于按「可见字符」估算换行（与引擎换行近似） */
+  private static stripWarcraftColorCodes(s: string): string {
+    if (!s) return "";
+    let r = "";
+    let i = 0;
+    while (i < s.length) {
+      if (s.charAt(i) === "|" && i + 3 < s.length && s.substring(i, i + 4) === "|cff") {
+        let j = i + 4;
+        let hexDigits = 0;
+        while (j < s.length && hexDigits < 8 && Tips.isHexDigit(s.charAt(j))) {
+          hexDigits++;
+          j++;
+        }
+        if (hexDigits === 6 || hexDigits === 8) {
+          i = j;
+          continue;
+        }
+      }
+      if (s.charAt(i) === "|" && i + 1 < s.length && s.substring(i, i + 2) === "|r") {
+        i += 2;
+        continue;
+      }
+      if (s.charAt(i) === "|" && i + 1 < s.length && s.substring(i, i + 2) === "|n") {
+        r += "\n";
+        i += 2;
+        continue;
+      }
+      r += s.charAt(i);
+      i++;
+    }
+    return r;
+  }
+
+  /**
+   * 在给定内容宽度下估算正文像素高度（多行、自动换行近似）。
+   */
+  private static estimateTextHeightPx(
+    displayText: string,
+    textWidthPx: number,
+    lineHeightPx: number,
+    charWidthPx: number
+  ): number {
+    if (textWidthPx <= 0) {
+      return Tips.MIN_TIPS_HEIGHT_PX;
+    }
+    const plain = Tips.stripWarcraftColorCodes(displayText);
+    const charsPerLine = Math.max(1, Math.floor(textWidthPx / charWidthPx));
+    const parts = plain.split("\n");
+    let lineCount = 0;
+    for (const part of parts) {
+      const len = part.length;
+      if (len === 0) {
+        lineCount += 1;
+      } else {
+        lineCount += Math.max(1, Math.ceil(len / charsPerLine));
+      }
+    }
+    const h = lineCount * lineHeightPx;
+    return Math.max(Tips.MIN_TIPS_HEIGHT_PX, h);
   }
 
   private constructor() {
@@ -363,68 +449,165 @@ export class Tips {
   private updateContent(config: TipsConfig): void {
     if (!this.backdropFrame || !this.textFrame) return;
 
-    // 计算尺寸
-    const width = config.width ?? Tips.DEFAULT_WIDTH;
-    const maxHeight = config.maxHeight ?? Tips.DEFAULT_MAX_HEIGHT;
-    const wc3Width = (width / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
-    const wc3MaxHeight = (maxHeight / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+    const widthPx = config.width ?? Tips.DEFAULT_WIDTH;
+    const maxHeightPx = config.maxHeight ?? Tips.DEFAULT_MAX_HEIGHT;
+    const autoHeight = config.autoHeight !== false;
+    const lineHeightPx =
+      config.lineHeightPx ?? Tips.DEFAULT_LINE_HEIGHT_PX;
+    const charWidthPx =
+      config.charWidthPx ?? Tips.DEFAULT_CHAR_WIDTH_PX;
 
-    // 设置背景
-    this.backdropFrame
-      .setSize(wc3Width, wc3MaxHeight)
-      .setTexture(config.background ?? Tips.DEFAULT_BACKGROUND, 0, true);
+    const wc3Width =
+      (widthPx / ScreenCoordinates.STANDARD_WIDTH) *
+      ScreenCoordinates.WC3_SCREEN_WIDTH;
 
-    // 设置图标（如果有）
+    const textColor = config.textColor ?? Tips.DEFAULT_TEXT_COLOR;
+    const displayText = Tips.formatDisplayText(config.text, textColor);
+
+    const iconSizePx = 32;
+    const iconPaddingPx = 8;
+    const leftPaddingPx = 8;
+    const topPaddingPx = 8;
+    const rightPaddingPx = 8;
+    const bottomPaddingPx = 8;
+
+    const wc3IconSize =
+      (iconSizePx / ScreenCoordinates.STANDARD_WIDTH) *
+      ScreenCoordinates.WC3_SCREEN_WIDTH;
+    const wc3IconPadding =
+      (iconPaddingPx / ScreenCoordinates.STANDARD_WIDTH) *
+      ScreenCoordinates.WC3_SCREEN_WIDTH;
+    const wc3LeftPadding =
+      (leftPaddingPx / ScreenCoordinates.STANDARD_WIDTH) *
+      ScreenCoordinates.WC3_SCREEN_WIDTH;
+    const wc3TopPadding =
+      (topPaddingPx / ScreenCoordinates.STANDARD_HEIGHT) *
+      ScreenCoordinates.WC3_SCREEN_HEIGHT;
+    const wc3RightPadding =
+      (rightPaddingPx / ScreenCoordinates.STANDARD_WIDTH) *
+      ScreenCoordinates.WC3_SCREEN_WIDTH;
+    const wc3BottomPadding =
+      (bottomPaddingPx / ScreenCoordinates.STANDARD_HEIGHT) *
+      ScreenCoordinates.WC3_SCREEN_HEIGHT;
+
+    let textWidthPx: number;
+    let backdropHeightPx: number;
+
     if (config.icon) {
-      const iconSize = 32; // 像素
-      const iconPadding = 8; // 图标与文字之间的间距（像素）
-      const leftPadding = 8; // 左侧内边距（像素）
-      const topPadding = 8; // 顶部内边距（像素）
-
-      const wc3IconSize = (iconSize / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
-      const wc3IconPadding = (iconPadding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
-      const wc3LeftPadding = (leftPadding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
-      const wc3TopPadding = (topPadding / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+      textWidthPx =
+        widthPx -
+        leftPaddingPx -
+        iconSizePx -
+        iconPaddingPx -
+        rightPaddingPx;
+      if (autoHeight) {
+        const textBlockH = Tips.estimateTextHeightPx(
+          displayText,
+          textWidthPx,
+          lineHeightPx,
+          charWidthPx
+        );
+        const innerH = Math.max(iconSizePx, textBlockH);
+        backdropHeightPx = topPaddingPx + innerH + bottomPaddingPx;
+        backdropHeightPx = Math.min(backdropHeightPx, maxHeightPx);
+        backdropHeightPx = Math.max(backdropHeightPx, Tips.MIN_TIPS_HEIGHT_PX);
+      } else {
+        backdropHeightPx = maxHeightPx;
+      }
 
       if (this.iconFrame) {
         this.iconFrame.setVisible(true);
-        // 图标定位：左上角，带内边距
-        this.iconFrame!
+        this.iconFrame
           .setSize(wc3IconSize, wc3IconSize)
           .setTexture(config.icon, 0, true)
           .clearPoints()
-          .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, wc3LeftPadding, -wc3TopPadding)
-          .setAlpha(0); // 初始透明，动画中会设置
-
+          .setPoint(
+            FRAMEPOINT_TOPLEFT,
+            this.backdropFrame,
+            FRAMEPOINT_TOPLEFT,
+            wc3LeftPadding,
+            -wc3TopPadding
+          )
+          .setAlpha(0);
       }
 
-      // 文本需要为图标留出空间：图标宽度 + 左边距 + 图标间距
       const textLeftOffset = wc3LeftPadding + wc3IconSize + wc3IconPadding;
-      const wc3RightPadding = (8 / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
+      const textHeightPx = Math.max(
+        1,
+        backdropHeightPx - topPaddingPx - bottomPaddingPx
+      );
+      const wc3TextHeight =
+        (textHeightPx / ScreenCoordinates.STANDARD_HEIGHT) *
+        ScreenCoordinates.WC3_SCREEN_HEIGHT;
+      const textWidthWc3 =
+        (textWidthPx / ScreenCoordinates.STANDARD_WIDTH) *
+        ScreenCoordinates.WC3_SCREEN_WIDTH;
 
-      this.textFrame
-        .clearPoints()
-        .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, textLeftOffset, -wc3TopPadding)
-        .setPoint(FRAMEPOINT_BOTTOMRIGHT, this.backdropFrame, FRAMEPOINT_BOTTOMRIGHT, -wc3RightPadding, wc3TopPadding);
+      this.textFrame.clearPoints();
+      this.textFrame.setPoint(
+        FRAMEPOINT_TOPLEFT,
+        this.backdropFrame,
+        FRAMEPOINT_TOPLEFT,
+        textLeftOffset,
+        -wc3TopPadding
+      );
+      this.textFrame.setSize(textWidthWc3, wc3TextHeight);
     } else {
-      // 没有图标，文本占满整个区域（带内边距）
+      textWidthPx = widthPx - leftPaddingPx - rightPaddingPx;
+      if (autoHeight) {
+        const textBlockH = Tips.estimateTextHeightPx(
+          displayText,
+          textWidthPx,
+          lineHeightPx,
+          charWidthPx
+        );
+        backdropHeightPx = topPaddingPx + textBlockH + bottomPaddingPx;
+        backdropHeightPx = Math.min(backdropHeightPx, maxHeightPx);
+        backdropHeightPx = Math.max(backdropHeightPx, Tips.MIN_TIPS_HEIGHT_PX);
+      } else {
+        backdropHeightPx = maxHeightPx;
+      }
+
       if (this.iconFrame) {
         this.iconFrame.setVisible(false);
-        //this.iconFrame.setAlpha(0);
       }
 
-      const padding = 8; // 像素
-      const wc3Padding = (padding / ScreenCoordinates.STANDARD_WIDTH) * ScreenCoordinates.WC3_SCREEN_WIDTH;
-      const wc3PaddingY = (padding / ScreenCoordinates.STANDARD_HEIGHT) * ScreenCoordinates.WC3_SCREEN_HEIGHT;
+      const textHeightPx = Math.max(
+        1,
+        backdropHeightPx - topPaddingPx - bottomPaddingPx
+      );
+      const wc3TextHeight =
+        (textHeightPx / ScreenCoordinates.STANDARD_HEIGHT) *
+        ScreenCoordinates.WC3_SCREEN_HEIGHT;
+      const textWidthWc3 =
+        (textWidthPx / ScreenCoordinates.STANDARD_WIDTH) *
+        ScreenCoordinates.WC3_SCREEN_WIDTH;
 
-      this.textFrame
-        .clearPoints()
-        .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, wc3Padding, -wc3PaddingY)
-        .setPoint(FRAMEPOINT_BOTTOMRIGHT, this.backdropFrame, FRAMEPOINT_BOTTOMRIGHT, -wc3Padding, wc3PaddingY);
+      this.textFrame.clearPoints();
+      this.textFrame.setPoint(
+        FRAMEPOINT_TOPLEFT,
+        this.backdropFrame,
+        FRAMEPOINT_TOPLEFT,
+        wc3LeftPadding,
+        -wc3TopPadding
+      );
+      this.textFrame.setSize(textWidthWc3, wc3TextHeight);
     }
 
-    const textColor = config.textColor ?? Tips.DEFAULT_TEXT_COLOR;
-    this.textFrame.setText(Tips.formatDisplayText(config.text, textColor));
+    const wc3BackdropHeight =
+      (backdropHeightPx / ScreenCoordinates.STANDARD_HEIGHT) *
+      ScreenCoordinates.WC3_SCREEN_HEIGHT;
+
+    this.backdropFrame
+      .setSize(wc3Width, wc3BackdropHeight)
+      .setTexture(config.background ?? Tips.DEFAULT_BACKGROUND, 0, true);
+
+    this.textFrame
+      .setText(displayText)
+      .setTextAlignment(0, 0);
+
+    this.lastTipsWidthPx = widthPx;
+    this.lastTipsHeightPx = backdropHeightPx;
   }
 
   /**
@@ -448,9 +631,9 @@ export class Tips {
       pixelY = ScreenCoordinates.STANDARD_HEIGHT / 2;
     }
 
-    // Tips 尺寸
-    const tipsWidth = config.width ?? Tips.DEFAULT_WIDTH;
-    const tipsHeight = config.maxHeight ?? Tips.DEFAULT_MAX_HEIGHT;
+    // Tips 尺寸（与 updateContent 中 lastTips* 一致，已含自适应高度）
+    const tipsWidth = this.lastTipsWidthPx;
+    const tipsHeight = this.lastTipsHeightPx;
     const offset = config.offset ?? Tips.DEFAULT_OFFSET;
 
     // 确定显示位置
