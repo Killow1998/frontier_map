@@ -12,6 +12,10 @@ import { BuffSystem } from "./system/buff";
 import ShieldSystem from "./system/ShieldSystem";
 import SummoningSystem from "./system/SummoningSystem";
 import { UnitBlood } from "./system/ui/component/UnitBlood";
+import { registerDefaultRelicsAndPools } from "./system/relic";
+import { RelicBarUI } from "./system/ui/component/RelicBarUI";
+import { relicSystemTestExample } from "./test/RelicSystemTestExample";
+import { runTipsExamples } from "./examples/TipsExample";
 
 
 /**
@@ -24,8 +28,9 @@ async function main(): Promise<void> {
   PanCameraToTimed(200, 0, 0);
   Timer.create().start(0.01, false, () => {
     //testAddShield();
-    rgeisterUnitSpellEffectEvent();
-
+    //rgeisterUnitSpellEffectEvent();
+    // 遗物：两名英雄各一个，仅其一有遗物；绑定后选中单位切换左上角遗物栏
+    relicSystemTestExample();
   });
 }
 
@@ -52,6 +57,9 @@ export function initialize(): void {
   } catch (e) {
     print(`Error loading FDF TOC: ${e}`);
   }
+
+  registerDefaultRelicsAndPools();
+  RelicBarUI.getInstance().create();
 
   // 热重载模块极其容易发生闪退，不推荐使用
 

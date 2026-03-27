@@ -40,7 +40,10 @@ export enum TipsPosition {
  * Tips 配置
  */
 export interface TipsConfig {
-  /** 提示文本 */
+  /**
+   * 提示正文。建议为**纯文本**，由 `textColor` 统一着色。
+   * 若已自行写入魔兽颜色码（含 `|` 的 `|cff…|r` 等），将**不再**外包一层颜色，避免嵌套导致渲染异常或崩溃。
+   */
   text: string;
   /** 文本颜色（十六进制，不含#） */
   textColor?: string;
@@ -70,21 +73,16 @@ export interface TipsConfig {
  * 
  * @example
  * ```typescript
- * // 获取 Tips 单例
  * const tips = Tips.getInstance();
- * 
- * // 显示提示（使用组件的 getComponentInfo 方法）
- * const button = new Button("技能", 200, 200, 100, 100);
  * const info = button.getComponentInfo();
- * tips.show({
- *   text: "这是一个强力技能\n冷却时间: 10秒\n魔法消耗: 100",
+ * tips.showFromComponentInfo({
+ *   text: "技能说明…",
  *   textColor: "FFD700",
  *   icon: "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp",
  *   position: TipsPosition.AUTO,
- *   animation: TipsAnimation.FADE
- * }, info.x, info.y, info.width, info.height);
- * 
- * // 隐藏提示
+ *   animation: TipsAnimation.NONE,
+ *   delayShow: 0,
+ * }, info);
  * tips.hide();
  * ```
  */
@@ -128,6 +126,21 @@ export class Tips {
   private static readonly ANIMATION_DURATION = 0.15; // 动画持续时间（秒）
   private static readonly ANIMATION_FPS = 30; // 动画帧率
 
+  /**
+   * 将正文设为可显示字符串：纯文本时外包一层 |cff{color}|r；已含 `|` 控制符时不再包裹，避免嵌套崩溃。
+   */
+  private static formatDisplayText(raw: string, hexColor: string): string {
+    if (raw === undefined || raw === null) {
+      return "";
+    }
+    const hex =
+      hexColor && hexColor.length >= 6 ? hexColor : Tips.DEFAULT_TEXT_COLOR;
+    if (raw.indexOf("|") >= 0) {
+      return raw;
+    }
+    return `|cff${hex}${raw}|r`;
+  }
+
   private constructor() {
     // 私有构造函数，防止外部实例化
   }
@@ -152,27 +165,19 @@ export class Tips {
   private create(): void {
     if (this.isCreated) return;
 
-    print("[Tips] Starting Tips creation...");
-
     const gameUI = Frame.fromHandle(DzGetGameUI());
     if (!gameUI) {
       print("[Tips] Error: Cannot get game UI frame");
       return;
     }
-    print("[Tips] ✓ Got game UI frame");
 
-    // 使用时间戳确保 Frame 名称唯一
     const timestamp = math.floor(os.clock() * 1000);
-    print(`[Tips] Using timestamp: ${timestamp}`);
-
-    // 创建背景框架
-    print("[Tips] Creating backdrop frame...");
-    this.backdropFrame = Frame.createType(`TipsBackdrop_${timestamp}`, gameUI, 1000, "BACKDROP", "") || null;
+    // Frame.createType 第三参为 createContext，必须传 0；层级请用 DzFrameSetPriority，禁止误传 1000 等
+    this.backdropFrame = Frame.createType(`TipsBackdrop_${timestamp}`, gameUI, 0, "BACKDROP", "") || null;
     if (!this.backdropFrame) {
       print("[Tips] Error: Failed to create backdrop frame");
       return;
     }
-    print("[Tips] ✓ Backdrop frame created");
 
     this.backdropFrame
       .setSize(0.2, 0.15)
@@ -181,6 +186,8 @@ export class Tips {
       .setAlpha(0); // 初始透明
 
     DzFrameSetPriority(this.backdropFrame.handle, 1000);
+    // 不拦截鼠标：否则 Tips 盖住触发控件时会误触 mouse leave → hide → 再 enter，振荡甚至崩溃
+    DzFrameSetIgnoreTrackEvents(this.backdropFrame.handle as any, true);
 
     // 创建图标框架（可选，初始隐藏）
     this.iconFrame = Frame.createType(`TipsIcon_${timestamp}`, this.backdropFrame, 0, "BACKDROP", "") || null;
@@ -189,6 +196,7 @@ export class Tips {
         .setSize(0.03, 0.03)
         .setPoint(FRAMEPOINT_TOPLEFT, this.backdropFrame, FRAMEPOINT_TOPLEFT, 0.005, -0.005)
         .setAlpha(0);
+      DzFrameSetIgnoreTrackEvents(this.iconFrame.handle as any, true);
     }
 
     // 创建文本框架
@@ -204,11 +212,10 @@ export class Tips {
       .setText("")
       .setTextAlignment(0, 50) // 左对齐，垂直居中
       .setAlpha(0);
+    DzFrameSetIgnoreTrackEvents(this.textFrame.handle as any, true);
 
     this.isCreated = true;
     this.isVisible = false;
-
-    print("[Tips] Tips component created successfully");
   }
 
   /**
@@ -238,12 +245,9 @@ export class Tips {
     componentWidth: number = 100,
     componentHeight: number = 40
   ): void {
-    // 确保已创建
     if (!this.isCreated) {
-      print("[Tips] Tips not created, attempting to create...");
       this.create();
       if (!this.isCreated) {
-        print("[Tips] Error: Failed to create Tips");
         return;
       }
     }
@@ -419,9 +423,8 @@ export class Tips {
         .setPoint(FRAMEPOINT_BOTTOMRIGHT, this.backdropFrame, FRAMEPOINT_BOTTOMRIGHT, -wc3Padding, wc3PaddingY);
     }
 
-    // 设置文本
     const textColor = config.textColor ?? Tips.DEFAULT_TEXT_COLOR;
-    this.textFrame.setText(`|cff${textColor}${config.text}|r`);
+    this.textFrame.setText(Tips.formatDisplayText(config.text, textColor));
   }
 
   /**
@@ -793,8 +796,6 @@ export class Tips {
     this.isCreated = false;
     this.isVisible = false;
     Tips.instance = null;
-
-    print("[Tips] Tips component destroyed");
   }
 
   /**
