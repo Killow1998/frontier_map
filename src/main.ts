@@ -15,6 +15,7 @@ import { relicSystemTestExample } from "./test/RelicSystemTestExample";
 import { runTipsExamples } from "./examples/TipsExample";
 import { buffBarTestExample } from "./test/BuffBarTestExample";
 import { shockwaveEffectCircleTest } from "./test/EffectExTestExample";
+import { testUnitJumpToSkill } from "./test/UnitMovementSkillsTestExample";
 
 
 /**
@@ -32,7 +33,9 @@ async function main(): Promise<void> {
     // relicSystemTestExample();
     // buffBarTestExample();
 
-    shockwaveEffectCircleTest();
+    // testUnitJumpToSkill();
+
+    // shockwaveEffectCircleTest();
   });
 }
 

@@ -41,6 +41,7 @@ export function copyDir(src: string, dest: string): void {
  */
 export function buildW3x(): void {
   try {
+    const projectRoot = path.resolve(__dirname, "../");
     // 读取config.json
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
     const w2lPath = config.w2l.path;
@@ -50,8 +51,13 @@ export function buildW3x(): void {
       return;
     }
 
-    ensureDirectoryExists("dist");
-    execSync(`"${w2lPath}/w2l.exe" obj ./maps ./dist/map.w3x`);
+    const mapsDir = path.join(projectRoot, "maps");
+    const distDir = path.join(projectRoot, "dist");
+    const mapW3xPath = path.join(distDir, "map.w3x");
+
+    ensureDirectoryExists(distDir);
+    // 使用绝对路径，避免调用时工作目录不一致导致 w2l 找不到 ./maps 或输出路径异常
+    execSync(`"${w2lPath}/w2l.exe" obj "${mapsDir}" "${mapW3xPath}"`);
     console.log(">>> w2l build obj completed");
   } catch (error) {
     console.error(">>> Error during w2l build obj:", error);
