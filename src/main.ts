@@ -15,9 +15,10 @@ import { relicSystemTestExample } from "./test/RelicSystemTestExample";
 import { runTipsExamples } from "./examples/TipsExample";
 import { buffBarTestExample } from "./test/BuffBarTestExample";
 import { shockwaveEffectCircleTest } from "./test/EffectExTestExample";
-import { testUnitJumpToSkill } from "./test/UnitMovementSkillsTestExample";
+import { testCasterJumpAndKnockEnemiesSkill, testUnitChargeToPointSkill, testUnitChargeToUnitSkill, testUnitJumpToSkill, testUnitKnockUpSkill } from "./test/UnitMovementSkillsTestExample";
 
-
+import { FourCC } from "./utils/helper";
+import { Actor } from "./system/actor";
 /**
  * 应用程序主入口
  * 负责引导整个应用程序的启动
@@ -34,6 +35,12 @@ async function main(): Promise<void> {
     // buffBarTestExample();
 
     // testUnitJumpToSkill();
+    // testUnitChargeToPointSkill();
+    // testUnitChargeToUnitSkill();
+    // testUnitKnockUpSkill();
+    // testCasterJumpAndKnockEnemiesSkill();
+
+    testUnitJumpToSkill();
 
     // shockwaveEffectCircleTest();
   });

@@ -1,7 +1,14 @@
 import { Timer, bj_RADTODEG } from "@eiriksgata/wc3ts/*";
 import { UNIT_TYPE_DEAD, UNIT_TYPE_STRUCTURE } from "src/constants/game/units";
 import { easeInOutQuad, lerp, parabolaArc, unitVector2, clamp01 } from "./physics";
-import { ensureStormCrowFlyHeight, setFlyHeight } from "./flyheight";
+import { ensureStormCrowFlyHeight, reapplyStormCrowHeightUnlock, setFlyHeightInt } from "./flyheight";
+
+/** 设为 true 可打印 unitJumpTo 每 tick 的 wantH / GetUnitFlyHeight（排错时用） */
+const DEBUG_UNIT_JUMP_TO = false;
+
+function dbgUnitJumpTo(msg: string): void {
+  if (DEBUG_UNIT_JUMP_TO) print(`[unitJumpTo] ${msg}`);
+}
 
 function unitAlive(u: unit): boolean {
   return !IsUnitType(u, UNIT_TYPE_DEAD) && GetWidgetLife(u) > 0.405;
@@ -21,6 +28,37 @@ function unlockUnit(u: unit, savedSpeed: number): void {
   SetUnitMoveSpeed(u, savedSpeed);
 }
 
+/**
+ * 带垂直位移时不要 PauseUnit；且不要把移速设为 0：
+ * 物编/运行时移速为 0 时，常见现象是 GetUnitFlyHeight 有读数但模型不离地（Hive 等讨论过）。
+ * 仅用关碰撞防止乱跑，移速保持原值，由寻路关闭限制位移。
+ */
+function lockUnitForVerticalMotion(u: unit): number {
+  const savedSpeed = GetUnitMoveSpeed(u);
+  SetUnitPathing(u, false);
+  return savedSpeed;
+}
+
+function unlockUnitForVerticalMotion(u: unit, savedSpeed: number): void {
+  SetUnitPathing(u, true);
+  SetUnitMoveSpeed(u, savedSpeed);
+}
+
+/** unitJumpTo 每帧高度采样（SetUnitFlyHeight 之后读取引擎高度） */
+export interface UnitJumpHeightTickInfo {
+  tickIndex: number;
+  /** 归一化时间 0~1 */
+  t: number;
+  /** 本帧目标高度（base + 抛物线 * maxHeight） */
+  wantHeight: number;
+  /** GetUnitFlyHeight 读数 */
+  actualHeight: number;
+}
+
+/**
+ * 水平位移 + SetUnitFlyHeight 抛物线。引擎里高度会按日志与 wantH 一致；
+ * 若「看起来」像贴地平移，多为俯视角、阴影仍在地面或模型姿态不明显，可加大 jumpMaxHeight 或配合特效/镜头。
+ */
 export function unitJumpTo(
   target: unit,
   x: number,
@@ -30,6 +68,8 @@ export function unitJumpTo(
     duration?: number;
     tickInterval?: number;
     flyRate?: number;
+    /** 每 tick 回调，便于测试或 UI 显示高度变化 */
+    onHeightTick?: (info: UnitJumpHeightTickInfo) => void;
   }
 ): void {
   if (!unitAlive(target)) return;
@@ -37,9 +77,11 @@ export function unitJumpTo(
   const duration = opts?.duration ?? 0.35;
   const tickInterval = opts?.tickInterval ?? 0.03;
   const maxHeight = opts?.jumpMaxHeight ?? 250;
-  const flyRate = opts?.flyRate ?? tickInterval;
+  /** 由 Timer 逐帧驱动时用 0 瞬时到位；若需引擎平滑爬升可传正数 rate */
+  const flyRate = opts?.flyRate ?? 0;
+  const onHeightTick = opts?.onHeightTick;
 
-  const savedSpeed = lockUnit(target);
+  const savedSpeed = lockUnitForVerticalMotion(target);
   const startX = GetUnitX(target);
   const startY = GetUnitY(target);
 
@@ -49,6 +91,11 @@ export function unitJumpTo(
   }
 
   ensureStormCrowFlyHeight(target, (baseFlyHeight, dispose) => {
+    dbgUnitJumpTo(
+      `init: baseFlyHeight=${baseFlyHeight} maxHeight=${maxHeight} duration=${duration} tick=${tickInterval} flyRate=${flyRate} ` +
+        `start=(${startX},${startY}) end=(${x},${y}) dist=${dir.dist}`
+    );
+
     let ended = false;
 
     const endSkill = (timer: Timer) => {
@@ -56,13 +103,15 @@ export function unitJumpTo(
       ended = true;
       timer.destroy();
       if (unitAlive(target)) {
-        unlockUnit(target, savedSpeed);
+        unlockUnitForVerticalMotion(target, savedSpeed);
         SetUnitPosition(target, x, y);
+        dbgUnitJumpTo(`end: SetUnitPosition done, GetUnitFlyHeight(after unlock)=${GetUnitFlyHeight(target)}`);
       }
       dispose();
     };
 
     let elapsed = 0;
+    let tickIndex = 0;
     const timer = Timer.create();
     timer.start(tickInterval, true, () => {
       if (!unitAlive(target)) {
@@ -73,9 +122,21 @@ export function unitJumpTo(
       elapsed += tickInterval;
       const t = clamp01(elapsed / duration);
       const e = easeInOutQuad(t);
+      const arc = parabolaArc(t);
+      const wantH = baseFlyHeight + arc * maxHeight;
+      const wantHInt = Math.round(wantH);
 
       SetUnitPosition(target, lerp(startX, x, e), lerp(startY, y, e));
-      setFlyHeight(target, baseFlyHeight + parabolaArc(t) * maxHeight, flyRate);
+      reapplyStormCrowHeightUnlock(target);
+      setFlyHeightInt(target, wantHInt, flyRate);
+      tickIndex++;
+      const actualH = GetUnitFlyHeight(target);
+      if (onHeightTick) {
+        onHeightTick({ tickIndex, t, wantHeight: wantHInt, actualHeight: actualH });
+      }
+      dbgUnitJumpTo(
+        `#${tickIndex} t=${t} easeXY=${e} arc=${arc} wantH=${wantHInt} GetUnitFlyHeight=${actualH} savedSpeed=${savedSpeed}`
+      );
 
       if (t >= 1) {
         endSkill(timer);
@@ -269,10 +330,10 @@ export function unitKnockUp(
   const maxHeight = opts?.maxHeight ?? 180;
   const duration = opts?.duration ?? 0.45;
   const tickInterval = opts?.tickInterval ?? 0.03;
-  const flyRate = opts?.flyRate ?? tickInterval;
+  const flyRate = opts?.flyRate ?? 0;
   const pushDist = opts?.pushDist ?? 0;
 
-  const savedSpeed = lockUnit(target);
+  const savedSpeed = lockUnitForVerticalMotion(target);
   const startX = GetUnitX(target);
   const startY = GetUnitY(target);
 
@@ -295,7 +356,7 @@ export function unitKnockUp(
       ended = true;
       timer.destroy();
       if (unitAlive(target)) {
-        unlockUnit(target, savedSpeed);
+        unlockUnitForVerticalMotion(target, savedSpeed);
       }
       dispose();
     };
@@ -315,8 +376,8 @@ export function unitKnockUp(
       const cx = lerp(startX, startX + dir.nx * pushDist, e);
       const cy = lerp(startY, startY + dir.ny * pushDist, e);
       SetUnitPosition(target, cx, cy);
-
-      setFlyHeight(target, baseFlyHeight + parabolaArc(t) * maxHeight, flyRate);
+      reapplyStormCrowHeightUnlock(target);
+      setFlyHeightInt(target, baseFlyHeight + parabolaArc(t) * maxHeight, flyRate);
 
       if (t >= 1) {
         // 结束时把单位放到最终位置，避免浮点误差
@@ -348,15 +409,15 @@ export function casterJumpToAndKnockEnemies(
   const tickInterval = opts?.tickInterval ?? 0.03;
   const jumpDuration = opts?.jumpDuration ?? 0.35;
   const jumpMaxHeight = opts?.jumpMaxHeight ?? 220;
-  const flyRate = opts?.flyRate ?? tickInterval;
+  const flyRate = opts?.flyRate ?? 0;
 
   const knockRadius = opts?.knockRadius ?? 350;
   const knockMaxHeight = opts?.knockMaxHeight ?? 220;
   const knockDuration = opts?.knockDuration ?? 0.55;
   const knockPushDist = opts?.knockPushDist ?? 180;
-  const knockFlyRate = opts?.knockFlyRate ?? tickInterval;
+  const knockFlyRate = opts?.knockFlyRate ?? 0;
 
-  const savedSpeed = lockUnit(caster);
+  const savedSpeed = lockUnitForVerticalMotion(caster);
   const startX = GetUnitX(caster);
   const startY = GetUnitY(caster);
   const dir = unitVector2(x - startX, y - startY);
@@ -371,7 +432,7 @@ export function casterJumpToAndKnockEnemies(
       ended = true;
       timer.destroy();
       if (unitAlive(caster)) {
-        unlockUnit(caster, savedSpeed);
+        unlockUnitForVerticalMotion(caster, savedSpeed);
         SetUnitPosition(caster, x, y);
       }
       disposeCaster();
@@ -424,7 +485,8 @@ export function casterJumpToAndKnockEnemies(
       const e = easeInOutQuad(t);
 
       SetUnitPosition(caster, lerp(startX, x, e), lerp(startY, y, e));
-      setFlyHeight(caster, baseFlyHeight + parabolaArc(t) * jumpMaxHeight, flyRate);
+      reapplyStormCrowHeightUnlock(caster);
+      setFlyHeightInt(caster, baseFlyHeight + parabolaArc(t) * jumpMaxHeight, flyRate);
 
       if (t >= 1) {
         endCasterJump(timer);

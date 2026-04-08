@@ -4,6 +4,9 @@ import { BuffManager } from "./buff/BuffManager";
 import { BUFF_DURATION_PERMANENT } from "./buff/types";
 import { eventBus } from "./event/EventBus";
 
+// TSTL/Lua 全局：用于把缓存的 Unit 实例“升级”为 Actor（修复方法为 nil 的问题）
+declare const setmetatable: (t: unknown, mt: unknown) => unknown;
+
 export class Actor extends Unit {
   public static allActors: Record<number, Actor> = {};
 
@@ -42,6 +45,15 @@ export class Actor extends Unit {
   }
 
   /**
+   * 把 getObject(handle) 返回的“父类 Unit 实例”升级为 Actor 实例：
+   * - 仅补字段不够：否则 Actor.prototype 上的方法（如 hasShield）在 Lua 层会是 nil
+   * - 通过 setmetatable(obj, Actor.prototype) 让方法查找走到 Actor 原型链
+   */
+  private static ensureActorPrototype(obj: Actor): void {
+    setmetatable(obj as unknown as object, Actor.prototype as unknown as object);
+  }
+
+  /**
    * 创建新的 Actor 单位。
    * 注意：调用方需在单位死亡事件中调用 actor.destroy() 以防 WC3 handle ID
    * 被复用后 allActors 返回指向已死亡单位的过期 Actor。
@@ -61,6 +73,7 @@ export class Actor extends Unit {
     const actor = Actor.getObject(handle) as Actor;
     if (!actor) return undefined;
 
+    Actor.ensureActorPrototype(actor);
     Actor.ensureActorFields(actor);
     Object.assign(actor, { handle });
     Actor.allActors[actor.id] = actor;
@@ -96,6 +109,7 @@ export class Actor extends Unit {
     const actor = Actor.getObject(handle) as Actor;
     if (!actor) return undefined;
 
+    Actor.ensureActorPrototype(actor);
     Actor.ensureActorFields(actor);
     Object.assign(actor, { handle });
     Actor.allActors[actor.id] = actor;
