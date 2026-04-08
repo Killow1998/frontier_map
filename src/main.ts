@@ -35,12 +35,12 @@ async function main(): Promise<void> {
     // buffBarTestExample();
 
     // testUnitJumpToSkill();
-    // testUnitChargeToPointSkill();
-    // testUnitChargeToUnitSkill();
-    // testUnitKnockUpSkill();
-    // testCasterJumpAndKnockEnemiesSkill();
+    testUnitChargeToPointSkill();
+    testUnitChargeToUnitSkill();
+    testUnitKnockUpSkill();
+    testCasterJumpAndKnockEnemiesSkill();
 
-    testUnitJumpToSkill();
+    // testUnitJumpToSkill();
 
     // shockwaveEffectCircleTest();
   });

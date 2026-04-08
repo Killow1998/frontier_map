@@ -1,3 +1,7 @@
+/**
+ * 单位移动/跳跃/冲刺/击飞相关 API 的本地测试入口。
+ * 在 `main.ts` 中按需调用单个 `test*` 函数即可；多个测试若同帧启动会在约 1 秒后同时执行，宜错开或单独测。
+ */
 import { Players, Timer, Unit } from "@eiriksgata/wc3ts/*";
 import { FourCC } from "src/utils/helper";
 import {
@@ -8,12 +12,17 @@ import {
   unitKnockUp,
 } from "src/unit/skills";
 
+/** 在指定点创建单位，供本文件各测试复用。 */
 function safeCreate(owner: number, unitTypeId: number, x: number, y: number): Unit | undefined {
   const p = Players[owner];
   if (!p) return undefined;
   return Unit.create(p, unitTypeId, x, y);
 }
 
+/**
+ * 测试「跳跃位移」`unitJumpTo`：水平插值 + 飞行高度抛物线（需风暴乌鸦解锁链，见 `flyheight.ts`）。
+ * 延迟 1 秒后执行；1 号玩家圣骑士从 (0,0) 跳到 (500,500)，带 `jumpMaxHeight` / `duration`。
+ */
 export function testUnitJumpToSkill(): void {
   print("[testUnitJumpToSkill] 开始：创建单位…");
   const caster = safeCreate(0, FourCC("Hpal"), 0, 0);
@@ -31,6 +40,10 @@ export function testUnitJumpToSkill(): void {
   });
 }
 
+/**
+ * 测试「冲向固定点」`unitChargeToPoint`：纯地面位移，不改 `SetUnitFlyHeight`。
+ * 延迟 1 秒后执行；1 号玩家单位从 (0,0) 沿直线冲向 (500,0)。
+ */
 export function testUnitChargeToPointSkill(): void {
   const caster = safeCreate(0, FourCC("Hpal"), 0, 0);
   if (!caster) return;
@@ -42,6 +55,10 @@ export function testUnitChargeToPointSkill(): void {
   });
 }
 
+/**
+ * 测试「追向目标单位」`unitChargeToUnit`：追踪移动至与目标相距 `stopDist`，纯地面、无高度变化。
+ * 延迟 1 秒后执行；0 号玩家追击 1 号玩家英雄，停在约 90 距离处。
+ */
 export function testUnitChargeToUnitSkill(): void {
   const charger = safeCreate(0, FourCC("Hpal"), 0, 0);
   const target = safeCreate(1, FourCC("Hpal"), 450, 0);
@@ -55,6 +72,10 @@ export function testUnitChargeToUnitSkill(): void {
   });
 }
 
+/**
+ * 测试「击飞」`unitKnockUp`：抛物线高度 + 可选水平推开，与跳跃共用飞行高度管线。
+ * 延迟 1 秒后执行；以 `from` 决定推开方向，击飞 1 号玩家目标单位。
+ */
 export function testUnitKnockUpSkill(): void {
   const caster = safeCreate(0, FourCC("Hpal"), 0, 0);
   const target = safeCreate(1, FourCC("Hpal"), 350, 0);
@@ -71,6 +92,11 @@ export function testUnitKnockUpSkill(): void {
   });
 }
 
+/**
+ * 测试「施法者起跳落地 + 范围击飞」`casterJumpToAndKnockEnemies`：
+ * 先完成施法者带高度的跳跃，落地后以落点为圆心击飞敌方非建筑单位（内部再调 `unitKnockUp`）。
+ * 延迟 1 秒后执行；含两名敌方英雄与一座建筑用于验证过滤。
+ */
 export function testCasterJumpAndKnockEnemiesSkill(): void {
   const caster = safeCreate(0, FourCC("Hpal"), 0, 0);
   const enemy1 = safeCreate(1, FourCC("Hpal"), 380, 0);
