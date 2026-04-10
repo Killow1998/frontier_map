@@ -31,8 +31,8 @@ Use only scripts that exist in package.json.
 
 - yarn dev: development mode with initial build + tstl watch + hot-reload notification generation.
 - yarn build: production build (compile, inject Lua call, bootstrap copy, minify, package map).
-- yarn build:dev: build.ts dev mode entry.
-- yarn build:prod: build.ts build mode entry.
+- yarn build:dev: one-off development build for agent validation and local debug packaging.
+- yarn build:prod: explicit production alias for build.ts prod mode.
 - yarn test: compile and then launch map through scripts/test.ts.
 - yarn watch: raw tstl watch.
 - yarn build:map: package maps to dist/map.w3x through w3x2lni.
@@ -46,7 +46,7 @@ If a command fails because tools are missing, verify config.json paths and local
 - Keep noImplicitSelf enabled unless there is a proven compatibility reason.
 - Keep noResolvePaths entries for jass modules consistent between tsconfig.json and tsconfig.prod.json.
 - Dev mode emits modular Lua to dist/src; production mode bundles to maps/map/main.lua.
-- After changing tsconfig or scripts, rerun yarn build and validate map launch.
+- For routine agent compile validation, prefer yarn build:dev; rerun yarn build only when validating the production bundle path.
 
 ## Runtime And Hot Reload Rules
 
@@ -90,6 +90,8 @@ Production flow should remain conceptually:
 5. Package maps into dist/map.w3x.
 
 Any change to this flow must be validated with yarn build and a real map launch test.
+
+For routine AI-agent verification, default to yarn build:dev first, then use yarn build when changes may affect bundled production output.
 
 ## Common Failure Checks
 

@@ -91,7 +91,9 @@ if (handle === undefined) {
 ## Development Workflow
 
 ### Build Commands
-- `yarn build` - Compile TypeScript to Lua and package into `dist/map.w3x`
+- `yarn build:dev` - Preferred one-off compile command for routine AI validation and local debug packaging
+- `yarn build` - Compile TypeScript to Lua in production bundle mode and package into `dist/map.w3x`
+- `yarn build:prod` - Explicit alias of the production build
 - `yarn dev` - Development build (preserves debug symbols)
 - `yarn test` - Build and launch map in Warcraft III via KKWE
 - `yarn watch` - Watch mode compilation

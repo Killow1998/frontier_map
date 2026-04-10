@@ -65,7 +65,7 @@ yarn dev            # 开发模式（watch）
     "dev": "ts-node scripts/dev.ts",      // 开发模式（推荐）
     "build": "ts-node scripts/build.ts",  // 生产构建
     "build:dev": "ts-node scripts/build.ts dev",   // 开发构建
-    "build:prod": "ts-node scripts/build.ts build", // 生产构建
+    "build:prod": "ts-node scripts/build.ts prod", // 生产构建
     "test": "yarn build && ts-node scripts/test.ts", // 构建并测试
     "build:map": "w2l.exe obj maps dist/map.w3x",    // 仅打包地图
     "test:map": "YDWEConfig.exe -loadfile dist/map.w3x" // 仅测试地图
@@ -116,6 +116,14 @@ yarn dev            # 开发模式（watch）
 3. 处理 bootstrap.lua（生产模式）
 4. [可选] Lua 代码压缩
 5. 打包 w3x 文件
+```
+
+### 单次开发构建 (`yarn build:dev`)
+```
+1. 编译 TypeScript → Lua（开发模式，多文件输出）
+2. 注入 Lua 执行调用
+3. 处理 bootstrap.lua（开发模式，注入 PROJECT_PATH）
+4. 打包 w3x 文件
 ```
 
 ## 📋 迁移说明

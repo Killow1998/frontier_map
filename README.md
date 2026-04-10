@@ -39,6 +39,9 @@ yarn test:map
 ### 发布
 
 ```bash
+# 日常单次开发构建
+yarn build:dev
+
 # 生产构建
 yarn build
 ```
@@ -48,7 +51,9 @@ yarn build
 | 命令 | 说明 |
 |------|------|
 | `yarn dev` | 开发模式，支持热重载和文件监听 |
+| `yarn build:dev` | 单次开发构建，适合调试和 AI 编译验证 |
 | `yarn build` | 生产构建，打包成单文件并压缩 |
+| `yarn build:prod` | 显式生产构建，效果与 `yarn build` 一致 |
 | `yarn test` | 编译并自动运行地图 |
 | `yarn watch` | 仅监听 TypeScript 文件变化 |
 | `yarn build:map` | 仅打包地图（不编译） |
@@ -96,7 +101,7 @@ yarn build
 
 1. 用 KKWE 打开 `maps/` 目录下的 `.w3x` 文件
 2. 编辑地形后保存
-3. 运行 `yarn build` 或 `yarn dev`
+3. 日常验证运行 `yarn build:dev` 或 `yarn dev`，发布前再运行 `yarn build`
 
 ## 📦 主要依赖
 

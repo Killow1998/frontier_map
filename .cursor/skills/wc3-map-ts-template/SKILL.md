@@ -37,6 +37,7 @@ description: >-
 | 命令 | 作用 |
 |------|------|
 | `yarn dev` | 开发：TSTL 编译、`injectLuaExecutionCall`、`handleBootstrapLua(true)`、`buildW3x`，并启动 `tstl --watch` 等开发流 |
+| `yarn build:dev` | 单次开发构建：开发模式编译、`injectLuaExecutionCall`、`handleBootstrapLua(true)`、`buildW3x`；优先用于日常 agent 编译验证 |
 | `yarn build` / `build:prod` | 生产：TSTL 单文件、`injectLuaExecutionCall`、`handleBootstrapLua(false)`、可选 luamin、`buildW3x` |
 | `yarn build:map` | 仅 `w2l.exe obj ./maps ./dist/map.w3x`（不跑 TS 编译） |
 | `yarn test:map` | 用 KKWE 启动 WC3 加载 `./dist/map.w3x` |

@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { buildW3x, compileTypeScriptToLuaProd, injectLuaExecutionCall, handleBootstrapLua } from './common';
+import { buildW3x, compileTypeScriptToLua, compileTypeScriptToLuaProd, injectLuaExecutionCall, handleBootstrapLua } from './common';
 
 const luamin = require('luamin');
 
@@ -11,6 +11,23 @@ interface TsConfig {
 
 interface Luamin {
   minify(code: string): string;
+}
+
+type BuildMode = 'dev' | 'prod';
+
+function resolveBuildMode(): BuildMode {
+  const modeArg = process.argv[2]?.toLowerCase();
+
+  if (modeArg === 'dev') {
+    return 'dev';
+  }
+
+  if (modeArg === 'build' || modeArg === 'prod' || modeArg === undefined) {
+    return 'prod';
+  }
+
+  console.warn(`>>> Unknown build mode "${modeArg}", falling back to production mode`);
+  return 'prod';
 }
 
 /**
@@ -45,29 +62,42 @@ function minifyLua(): void {
   }
 }
 
+function runDevBuild(): void {
+  console.log('>>> Starting build process (development mode)');
+
+  compileTypeScriptToLua();
+  injectLuaExecutionCall();
+  handleBootstrapLua(true);
+  buildW3x();
+
+  console.log('>>> Build process completed (development mode)');
+}
+
+function runProdBuild(): void {
+  console.log('>>> Starting build process (production mode - bundled)');
+
+  compileTypeScriptToLuaProd();
+  injectLuaExecutionCall();
+  handleBootstrapLua(false);
+  minifyLua();
+  buildW3x();
+
+  console.log('>>> Build process completed (production mode)');
+}
+
 /**
- * 构建项目 (生产模式 - 单文件打包)
+ * 构建项目
  */
 function main(): void {
-  console.log(`>>> Starting build process (production mode - bundled)`);
+  const mode = resolveBuildMode();
 
   try {
-    // 编译 TypeScript 到 Lua (单文件打包)
-    compileTypeScriptToLuaProd();
+    if (mode === 'dev') {
+      runDevBuild();
+      return;
+    }
 
-    // 注入 Lua 执行调用
-    injectLuaExecutionCall();
-
-    // 处理 bootstrap.lua (生产模式，不注入 PROJECT_PATH)
-    handleBootstrapLua(false);
-
-    // 压缩 Lua 代码（仅生产模式）
-    minifyLua(); // 可选启用
-
-    // 打包 w3x 文件
-    buildW3x();
-
-    console.log(">>> Build process completed");
+    runProdBuild();
   } catch (error) {
     console.error(">>> Error during build process:", error);
     process.exit(1);
