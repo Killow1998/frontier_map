@@ -2,6 +2,9 @@ export enum SpellCardId {
   RING_BURST = 1,
   DUAL_SPIRAL = 2,
   FAN_PULSE = 3,
+  ROSE_BLOOM = 4,
+  ECHO_FAN = 5,
+  LATTICE_SPIN = 6,
 }
 
 export interface StartSpellCardOptions {

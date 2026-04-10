@@ -327,6 +327,119 @@ export class SpellCardBulletSystem {
           math.sin(angle) * speed
         );
       }
+      return;
+    }
+
+    if (emitter.cardId === SpellCardId.ROSE_BLOOM) {
+      const petalCount = 6;
+      const step = (2 * math.pi) / petalCount;
+      emitter.phase += 0.18;
+
+      for (let i = 0; i < petalCount; i++) {
+        const angle = emitter.phase + step * i;
+        const speed = emitter.baseSpeed * (0.82 + 0.18 * math.sin(emitter.phase * 2));
+        this.spawnBullet(
+          emitter,
+          cx,
+          cy,
+          math.cos(angle) * speed,
+          math.sin(angle) * speed
+        );
+      }
+
+      for (let i = 0; i < petalCount; i++) {
+        const angle = emitter.phase + math.pi / petalCount + step * i;
+        const speed = emitter.baseSpeed * 0.56;
+        this.spawnBullet(
+          emitter,
+          cx,
+          cy,
+          math.cos(angle) * speed,
+          math.sin(angle) * speed
+        );
+      }
+      return;
+    }
+
+    if (emitter.cardId === SpellCardId.ECHO_FAN) {
+      const fanCount = 8;
+      const reverseCount = 5;
+      const fanAngle = 1.18;
+      const reverseAngle = 0.76;
+      const waveSwing = emitter.wave % 4 >= 2 ? math.pi / 10 : 0;
+      emitter.phase += 0.2;
+      const forward = emitter.phase + waveSwing;
+      const backward = forward + math.pi;
+
+      for (let i = 0; i < fanCount; i++) {
+        const t = fanCount <= 1 ? 0 : i / (fanCount - 1);
+        const angle = forward - fanAngle / 2 + fanAngle * t;
+        const speed = emitter.baseSpeed * (0.78 + t * 0.28);
+        this.spawnBullet(
+          emitter,
+          cx,
+          cy,
+          math.cos(angle) * speed,
+          math.sin(angle) * speed
+        );
+      }
+
+      for (let i = 0; i < reverseCount; i++) {
+        const t = reverseCount <= 1 ? 0 : i / (reverseCount - 1);
+        const angle = backward - reverseAngle / 2 + reverseAngle * t;
+        const speed = emitter.baseSpeed * (0.54 + t * 0.12);
+        this.spawnBullet(
+          emitter,
+          cx,
+          cy,
+          math.cos(angle) * speed,
+          math.sin(angle) * speed
+        );
+      }
+      return;
+    }
+
+    if (emitter.cardId === SpellCardId.LATTICE_SPIN) {
+      emitter.phase += 0.24;
+
+      for (let i = 0; i < 4; i++) {
+        const angle = emitter.phase + (math.pi / 2) * i;
+        const speed = emitter.baseSpeed * 0.88;
+        this.spawnBullet(
+          emitter,
+          cx,
+          cy,
+          math.cos(angle) * speed,
+          math.sin(angle) * speed
+        );
+      }
+
+      for (let i = 0; i < 4; i++) {
+        const angle = emitter.phase * 1.45 + math.pi / 4 + (math.pi / 2) * i;
+        const speed = emitter.baseSpeed * 0.66;
+        this.spawnBullet(
+          emitter,
+          cx,
+          cy,
+          math.cos(angle) * speed,
+          math.sin(angle) * speed
+        );
+      }
+      return;
+    }
+
+    const count = 12;
+    const step = (2 * math.pi) / count;
+    emitter.phase += 0.17;
+    for (let i = 0; i < count; i++) {
+      const angle = emitter.phase + step * i;
+      this.spawnBullet(
+        emitter,
+        cx,
+        cy,
+        math.cos(angle) * emitter.baseSpeed,
+        math.sin(angle) * emitter.baseSpeed
+      );
     }
   }
 
@@ -504,8 +617,32 @@ export class SpellCardBulletSystem {
         return;
       }
 
-      impact.life = 0.2;
-      fx.setUniformScale(1.2).setSpeed(0.8).setXYZ(x, y, z + 35);
+      if (cardId === SpellCardId.FAN_PULSE) {
+        impact.life = 0.2;
+        fx.setUniformScale(1.2).setSpeed(0.8).setXYZ(x, y, z + 35);
+        return;
+      }
+
+      if (cardId === SpellCardId.ROSE_BLOOM) {
+        impact.life = 0.14;
+        fx.setUniformScale(0.95).setSpeed(1.15).setXYZ(x, y, z + 18);
+        return;
+      }
+
+      if (cardId === SpellCardId.ECHO_FAN) {
+        impact.life = 0.18;
+        fx.setUniformScale(1.1).setSpeed(1.05).setXYZ(x, y, z + 28);
+        return;
+      }
+
+      if (cardId === SpellCardId.LATTICE_SPIN) {
+        impact.life = 0.22;
+        fx.setUniformScale(0.78).setSpeed(1.5).setXYZ(x, y, z + 22);
+        return;
+      }
+
+      impact.life = 0.16;
+      fx.setUniformScale(1).setSpeed(1).setXYZ(x, y, z + 20);
       return;
     }
   }

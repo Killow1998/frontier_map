@@ -3,10 +3,83 @@ import { Actor } from "src/system/actor";
 import { SpellCardBulletSystem, SpellCardId } from "src/system/bullethell";
 import { FourCC } from "src/utils/helper";
 
+function getDefaultSpellCardOptions(cardId: SpellCardId): {
+  duration: number;
+  emissionInterval: number;
+  baseSpeed: number;
+  bulletLife: number;
+  bulletRadius: number;
+  bulletDamage: number;
+} {
+  if (cardId === SpellCardId.DUAL_SPIRAL) {
+    return {
+      duration: 7,
+      emissionInterval: 0.05,
+      baseSpeed: 640,
+      bulletLife: 3.5,
+      bulletRadius: 85,
+      bulletDamage: 10,
+    };
+  }
+
+  if (cardId === SpellCardId.FAN_PULSE) {
+    return {
+      duration: 7,
+      emissionInterval: 0.09,
+      baseSpeed: 700,
+      bulletLife: 2.8,
+      bulletRadius: 95,
+      bulletDamage: 14,
+    };
+  }
+
+  if (cardId === SpellCardId.ROSE_BLOOM) {
+    return {
+      duration: 7,
+      emissionInterval: 0.09,
+      baseSpeed: 610,
+      bulletLife: 3.4,
+      bulletRadius: 88,
+      bulletDamage: 11,
+    };
+  }
+
+  if (cardId === SpellCardId.ECHO_FAN) {
+    return {
+      duration: 7,
+      emissionInterval: 0.08,
+      baseSpeed: 680,
+      bulletLife: 3,
+      bulletRadius: 92,
+      bulletDamage: 13,
+    };
+  }
+
+  if (cardId === SpellCardId.LATTICE_SPIN) {
+    return {
+      duration: 7,
+      emissionInterval: 0.06,
+      baseSpeed: 650,
+      bulletLife: 3.1,
+      bulletRadius: 82,
+      bulletDamage: 12,
+    };
+  }
+
+  return {
+    duration: 7,
+    emissionInterval: 0.08,
+    baseSpeed: 600,
+    bulletLife: 3.3,
+    bulletRadius: 90,
+    bulletDamage: 12,
+  };
+}
+
 /**
  * 弹幕压测入口：
  * 1. 创建巫妖单位
- * 2. 依次释放 3 张符卡（每张 8 秒）
+ * 2. 依次释放 6 张符卡（每张 7 秒）
  * 3. 每 2 秒打印一次统计，便于观察 200~300 并发下的稳定性
  */
 export function runSpellCardBulletHellTest(): void {
@@ -23,36 +96,29 @@ export function runSpellCardBulletHellTest(): void {
     collisionTickStride: 2,
   });
 
-  system.startCardFromCaster(caster.handle, SpellCardId.RING_BURST, {
-    duration: 8,
-    emissionInterval: 0.08,
-    baseSpeed: 600,
-    bulletLife: 3.3,
-    bulletRadius: 90,
-    bulletDamage: 12,
-  });
+  const cards: SpellCardId[] = [
+    SpellCardId.RING_BURST,
+    SpellCardId.DUAL_SPIRAL,
+    SpellCardId.FAN_PULSE,
+    SpellCardId.ROSE_BLOOM,
+    SpellCardId.ECHO_FAN,
+    SpellCardId.LATTICE_SPIN,
+  ];
 
-  Timer.create().start(8.2, false, () => {
-    system.startCardFromCaster(caster.handle, SpellCardId.DUAL_SPIRAL, {
-      duration: 8,
-      emissionInterval: 0.05,
-      baseSpeed: 640,
-      bulletLife: 3.5,
-      bulletRadius: 85,
-      bulletDamage: 10,
-    });
-  });
+  const startDelay = 7.2;
+  for (let i = 0; i < cards.length; i++) {
+    const cardId = cards[i];
+    const options = getDefaultSpellCardOptions(cardId);
 
-  Timer.create().start(16.4, false, () => {
-    system.startCardFromCaster(caster.handle, SpellCardId.FAN_PULSE, {
-      duration: 8,
-      emissionInterval: 0.09,
-      baseSpeed: 700,
-      bulletLife: 2.8,
-      bulletRadius: 95,
-      bulletDamage: 14,
+    if (i === 0) {
+      system.startCardFromCaster(caster.handle, cardId, options);
+      continue;
+    }
+
+    Timer.create().start(startDelay * i, false, () => {
+      system.startCardFromCaster(caster.handle, cardId, options);
     });
-  });
+  }
 
   const statTimer = Timer.create();
   statTimer.start(2, true, () => {
@@ -75,12 +141,5 @@ export function castSpellCardFromUnit(caster: unit, cardId: SpellCardId): number
   const system = SpellCardBulletSystem.getInstance();
   system.initialize();
 
-  return system.startCardFromCaster(caster, cardId, {
-    duration: 8,
-    emissionInterval: cardId === SpellCardId.DUAL_SPIRAL ? 0.05 : 0.08,
-    baseSpeed: 620,
-    bulletLife: 3.2,
-    bulletRadius: 90,
-    bulletDamage: 12,
-  });
+  return system.startCardFromCaster(caster, cardId, getDefaultSpellCardOptions(cardId));
 }
