@@ -16,6 +16,7 @@ import { runTipsExamples } from "./examples/TipsExample";
 import { buffBarTestExample } from "./test/BuffBarTestExample";
 import { shockwaveEffectCircleTest } from "./test/EffectExTestExample";
 import { testCasterJumpAndKnockEnemiesSkill, testUnitChargeToPointSkill, testUnitChargeToUnitSkill, testUnitJumpToSkill, testUnitKnockUpSkill } from "./test/UnitMovementSkillsTestExample";
+import { runSpellCardBulletHellTest } from "./test/BulletHellTestExample";
 
 import { FourCC } from "./utils/helper";
 import { Actor } from "./system/actor";
@@ -34,7 +35,8 @@ async function main(): Promise<void> {
     // relicSystemTestExample();
     // buffBarTestExample();
 
-    
+    runSpellCardBulletHellTest();
+    // 或者你也可以在任意单位上直接调用 castSpellCardFromUnit(unitHandle, SpellCardId.RING_BURST)
     
   });
 }
@@ -82,7 +84,7 @@ export function initialize(): void {
   // });
 
   PlayersConfig.CameraControl();
-  //UnitBlood.registerLocalDrawEvent();
+  UnitBlood.registerLocalDrawEvent();
 
   MapGeneral.sceneVisionInit();
 
