@@ -84,6 +84,11 @@ function getDefaultSpellCardOptions(cardId: SpellCardId): {
  */
 export function runSpellCardBulletHellTest(): void {
   const caster = Actor.create(Players[0], FourCC("Ulic"), 0, 0, 0);
+
+  //创建两个敌人单位
+  Actor.create(Players[1], FourCC("Ulic"), 700, 0, 270);
+  Actor.create(Players[1], FourCC("Ulic"), -700, 700, 90);
+
   if (!caster) {
     print("[BulletHellTest] 创建巫妖失败");
     return;
