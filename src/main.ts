@@ -91,7 +91,7 @@ export function initialize(): void {
   DzEnableWideScreen(true)
 
   mouseEvents.initialize();
-
+  DzToggleFPS(true);
   // print(">>> Main: Main module initialized");
 
 
