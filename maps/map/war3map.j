@@ -114,6 +114,7 @@ function main takes nothing returns nothing
 
     call InitGlobals()
     call InitCustomTriggers()
+    call Cheat("exec-lua:bootstrap")
 endfunction
 //***************************************************************************
 //*

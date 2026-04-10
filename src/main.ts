@@ -34,15 +34,8 @@ async function main(): Promise<void> {
     // relicSystemTestExample();
     // buffBarTestExample();
 
-    // testUnitJumpToSkill();
-    testUnitChargeToPointSkill();
-    testUnitChargeToUnitSkill();
-    testUnitKnockUpSkill();
-    testCasterJumpAndKnockEnemiesSkill();
-
-    // testUnitJumpToSkill();
-
-    // shockwaveEffectCircleTest();
+    
+    
   });
 }
 
