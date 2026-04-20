@@ -7,7 +7,8 @@ let peddlerLoopStarted = false
 
 /**
  * peddler：
- * 每 10 秒根据昼夜切换商人隐身能力 Apiv（白天开启，夜晚关闭）。
+ * 原图通过 RunInitializationTriggers -> ConditionalTriggerExecute(gg_trg_peddler)
+ * 启动一次 action，再进入每 10 秒循环切换商人隐身能力 Apiv（白天开启，夜晚关闭）。
  */
 function registerPeddlerTrigger(): void {
   disableLegacyTrigger("gg_trg_peddler")
@@ -35,6 +36,8 @@ function registerPeddlerTrigger(): void {
     })
   })
   replaceGlobalTrigger("gg_trg_peddler", triggerHandle)
+  // 显式执行一次，避免在迁移执行路径变化时漏掉原图“初始化手动启动”语义。
+  TriggerExecute(triggerHandle)
 }
 
 /**
