@@ -93,8 +93,12 @@ function registerPoliManaTrigger(): void {
 /**
  * 原始魔能之药（I02Z）：
  * 原生能力先恢复 150 法力，脚本补足到 max(150, 最大法力值*10%)。
+ *
+ * @note 该触发器为新增逻辑。原始 war3map.j / war3map.wct 中不存在 primitive_mana_potion 对应的 legacy gg_trg，
+ * 因此这里不执行 disableLegacyTrigger / replaceGlobalTrigger。
  */
 function registerPrimitiveManaPotionTrigger(): void {
+  // 新增 trigger：无 legacy 全局句柄可接管。
   const triggerHandle = CreateTrigger()
   registerPlayerUnitEventAll(triggerHandle, EVENT_PLAYER_UNIT_USE_ITEM())
   TriggerAddCondition(
@@ -113,7 +117,7 @@ function registerPrimitiveManaPotionTrigger(): void {
 }
 
 /**
- * 入口：迁移 mana_get / bullet_fly / base_build / poli_mana / primitive_mana_potion。
+ * 入口：迁移 mana_get / bullet_fly / base_build / poli_mana，并新增 primitive_mana_potion。
  */
 export function migrateManaAndItemTriggers(): void {
   registerManaGetTrigger()
