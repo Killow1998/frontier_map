@@ -7,7 +7,6 @@ import DamageSystem from "./system/damage";
 import { BuffSystem } from "./system/buff";
 import ShieldSystem from "./system/ShieldSystem";
 import SummoningSystem from "./system/SummoningSystem";
-import { UnitBlood } from "./system/ui/component/UnitBlood";
 import { registerDefaultRelicsAndPools } from "./system/relic";
 import { BuffBarUI } from "./system/ui/component/BuffBarUI";
 import { RelicBarUI } from "./system/ui/component/RelicBarUI";
@@ -17,6 +16,8 @@ import { buffBarTestExample } from "./test/BuffBarTestExample";
 import { shockwaveEffectCircleTest } from "./test/EffectExTestExample";
 import { testCasterJumpAndKnockEnemiesSkill, testUnitChargeToPointSkill, testUnitChargeToUnitSkill, testUnitJumpToSkill, testUnitKnockUpSkill } from "./test/UnitMovementSkillsTestExample";
 import { runSpellCardBulletHellTest } from "./test/BulletHellTestExample";
+import { runTriggerMigrations } from "./migration";
+import { takeOverRemainingLegacyTriggers } from "./migration/core/takeover";
 
 import { FourCC } from "./utils/helper";
 import { Actor } from "./system/actor";
@@ -26,8 +27,6 @@ import { Actor } from "./system/actor";
  * 测试自动重新编译功能
  */
 async function main(): Promise<void> {
-  // 镜头对准两单位中间，便于观察「施法者 → 敌方脚下」的暴风雪
-  PanCameraToTimed(200, 0, 0);
   Timer.create().start(0.01, false, () => {
     // testAddShield();
     // rgeisterUnitSpellEffectEvent();
@@ -35,7 +34,7 @@ async function main(): Promise<void> {
     // relicSystemTestExample();
     // buffBarTestExample();
 
-    runSpellCardBulletHellTest();
+    // runSpellCardBulletHellTest();
     // 或者你也可以在任意单位上直接调用 castSpellCardFromUnit(unitHandle, SpellCardId.RING_BURST)
     
   });
@@ -47,6 +46,8 @@ async function main(): Promise<void> {
 export function initialize(): void {
   // register ydlua
   ydlua.getInstance().initialize();
+  runTriggerMigrations();
+  takeOverRemainingLegacyTriggers();
 
   //安装泄露检测（Timer / Trigger 句柄跟踪）
   // LeakDetector.install();
@@ -84,14 +85,13 @@ export function initialize(): void {
   // });
 
   PlayersConfig.CameraControl();
-  UnitBlood.registerLocalDrawEvent();
 
   MapGeneral.sceneVisionInit();
 
   DzEnableWideScreen(true)
 
   mouseEvents.initialize();
-  DzToggleFPS(true);
+  DzToggleFPS(false);
   // print(">>> Main: Main module initialized");
 
 
@@ -128,4 +128,6 @@ export function onHotReload(): void {
   print("Main module hot reloaded!");
   // 这里可以添加主模块热重载后的特殊处理逻辑
 }
+
+
 

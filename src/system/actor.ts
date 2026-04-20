@@ -1,5 +1,4 @@
 import { Unit, MapPlayer } from "@eiriksgata/wc3ts/*";
-import { UnitBlood } from "./ui/component/UnitBlood";
 import { BuffManager } from "./buff/BuffManager";
 import { BUFF_DURATION_PERMANENT } from "./buff/types";
 import { eventBus } from "./event/EventBus";
@@ -14,7 +13,6 @@ export class Actor extends Unit {
   private _size: number = 1.0;
   private _buffManager: BuffManager | null = null;
   private label = "";
-  private bloodBarUI: UnitBlood | null = null;
 
   /**
    * @deprecated 请使用 Actor.create / Actor.fromUnit / Actor.fromHandle 静态方法。
@@ -41,7 +39,6 @@ export class Actor extends Unit {
     if (f["_size"] === undefined) f["_size"] = 1.0;
     if (f["_buffManager"] === undefined) f["_buffManager"] = null;
     if (f["label"] === undefined) f["label"] = "";
-    if (f["bloodBarUI"] === undefined) f["bloodBarUI"] = null;
   }
 
   /**
@@ -135,9 +132,6 @@ export class Actor extends Unit {
     // 从全局管理器中移除
     delete Actor.allActors[this.id];
 
-    // 移除相关的UI
-    UnitBlood.remove(this);
-
     // 调用父类的销毁方法
     super.destroy();
   }
@@ -210,9 +204,6 @@ export class Actor extends Unit {
 
   public setLabel(value: string) {
     this.label = value;
-    if (this.bloodBarUI) {
-      this.bloodBarUI.nameFrame.setText(value);
-    }
   }
 
   public getLabel(): string {
@@ -223,7 +214,7 @@ export class Actor extends Unit {
    * 为当前Actor创建血条UI
    */
   public createBloodBar(): void {
-    this.bloodBarUI = UnitBlood.create(this);
+    // 迁移目标图不需要该模板血条 UI；保留空实现以兼容示例/测试代码编译。
   }
 
 }

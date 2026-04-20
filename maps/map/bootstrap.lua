@@ -1,5 +1,5 @@
-PROJECT_PATH = "D:/work/github/wc3-map-ts-template/dist"
-package.path = package.path .. ";D:/work/github/wc3-map-ts-template/dist/?.lua;"
+PROJECT_PATH = "Q:/Game/YDWE1.32.13/newmap/wc3-map-ts-template/dist"
+package.path = package.path .. ";Q:/Game/YDWE1.32.13/newmap/wc3-map-ts-template/dist/?.lua;"
 -- Bootstrap script for loading TSTL output
 -- Supports both dev (modular) and prod (bundled) modes
 

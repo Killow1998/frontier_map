@@ -2,10 +2,9 @@
 export class MapGeneral {
 
   public static sceneVisionInit() {
-
-    //禁用黑色阴影和迷雾
-    FogMaskEnable(false)
-    FogEnable(false)
+    // 正常启用黑色阴影与战争迷雾，避免开局全图可见。
+    FogMaskEnable(true)
+    FogEnable(true)
 
   }
   

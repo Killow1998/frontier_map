@@ -79,13 +79,16 @@ export class ydlua {
  */
   private initializeConsole(): void {
     const isConsoleEnabled = this.configManager.isConsoleEnabled();
-    ydconsole.enable = isConsoleEnabled;
+    const isDebugMode = this.configManager.isDebugMode();
+    const enableConsolePrint = isConsoleEnabled && isDebugMode;
+    ydconsole.enable = enableConsolePrint;
 
-    if (isConsoleEnabled) {
-      // 设置全局 print 函数
-      _G["print"] = (message: string) => ydconsole.write(message);
-      print('>>> print enabled');
-    }
+    // 始终覆盖全局 print：默认静默，只有显式开启 debug+console 才写入控制台。
+    _G["print"] = (message: string) => {
+      if (enableConsolePrint) {
+        ydconsole.write(message);
+      }
+    };
   }
 
 
@@ -108,7 +111,6 @@ export class ydlua {
     //   _G[key] = ydjapi[key];
     // });
 
-    print('>>> Global APIs registered');
   }
 
 };

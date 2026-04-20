@@ -5,8 +5,8 @@ import { AppConfig } from "../types";
  * 默认应用配置
  */
 const DEFAULT_CONFIG: AppConfig = {
-  debug: true,
-  console: true,
+  debug: false,
+  console: false,
   runtime: {
     debuggerPort: 4279,
     sleep: false,

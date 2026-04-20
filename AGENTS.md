@@ -63,6 +63,7 @@ If a command fails because tools are missing, verify config.json paths and local
 - Use FourCC helper conversion for raw ids instead of magic integers.
 - Prefer wc3ts wrapper classes (Unit, Effect, Frame, Timer, Trigger) over raw handle usage when practical.
 - When using raw handles, validate and guard against undefined returns.
+- Do not add fallback logic to hide mapping or state issues; implement the correct source-of-truth logic directly.
 
 ## Frame/UI Safety Rules
 

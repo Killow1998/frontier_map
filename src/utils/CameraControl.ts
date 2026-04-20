@@ -1,5 +1,4 @@
 import { Timer } from "@eiriksgata/wc3ts/*";
-import { UnitBlood } from "src/system/ui/component/UnitBlood";
 
 
 /**
@@ -25,8 +24,6 @@ export class CameraControl {
   //记录游戏初始化镜头角度
   private static gameStartXAngle: number = GetCameraField(ConvertCameraField(2));
 
-  private static unitBloodScale: number = 1.0;
-  
   /**
    * 初始化鼠标控制
    * 设置迷雾和镜头截断距离，注册鼠标滚轮事件

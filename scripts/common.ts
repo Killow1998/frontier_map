@@ -77,34 +77,55 @@ export function injectLuaExecutionCall(): void {
     }
 
     let war3mapJContent = fs.readFileSync(war3mapJPath, "utf-8");
+    const cheatCall = 'call Cheat("exec-lua:bootstrap")';
+    const lineBreak = "(?:\\r\\n|\\n|\\r)";
 
-    // 检查是否已经注入
-    if (war3mapJContent.includes('call Cheat("exec-lua:bootstrap")')) {
-      console.log(">>> Lua execution call already injected in war3map.j, skipping.");
-      return;
+    // Clean up previous injection locations first. Some maps contain mixed line endings.
+    war3mapJContent = war3mapJContent.replace(
+      new RegExp(`^[ \\t]*call Cheat\\("exec-lua:(?:main|bootstrap)"\\)[ \\t]*(?:\\r\\n|\\n|\\r)`, "gm"),
+      ""
+    );
+
+    let injectedWhere: "before_run" | "end_of_main" = "end_of_main";
+
+    const initRunPattern = new RegExp(
+      `(^[ \\t]*call InitCustomTriggers\\(\\)${lineBreak})(^[ \\t]*call RunInitializationTriggers\\(\\))`,
+      "m"
+    );
+
+    if (initRunPattern.test(war3mapJContent)) {
+      injectedWhere = "before_run";
+      war3mapJContent = war3mapJContent.replace(initRunPattern, (_match, initLine: string, runLine: string) => {
+        const indent = (runLine.match(/^[ \t]*/) ?? ["    "])[0];
+        const nl = (initLine.match(/(\r\n|\n|\r)$/) ?? ["\n"])[0];
+        return `${initLine}${indent}${cheatCall}${nl}${runLine}`;
+      });
+    } else {
+      const mainRegex = new RegExp(
+        `(function\\s+main\\s+takes\\s+nothing\\s+returns\\s+nothing\\s*${lineBreak})([\\s\\S]*?)(${lineBreak}endfunction)`,
+        "i"
+      );
+      const mainFunctionMatch = mainRegex.exec(war3mapJContent);
+
+      if (!mainFunctionMatch) {
+        console.error(`>>> Error: main function not found in ${war3mapJPath}, skipping injection.`);
+        return;
+      }
+
+      const nl = (mainFunctionMatch[3].match(/^(\r\n|\n|\r)/) ?? ["\n"])[0];
+      const newMainFunction = mainFunctionMatch[0].replace(
+        new RegExp(`${lineBreak}endfunction$`),
+        `${nl}    ${cheatCall}${nl}endfunction`
+      );
+      war3mapJContent = war3mapJContent.replace(mainFunctionMatch[0], newMainFunction);
     }
 
-    // 移除旧的 main 注入（如果存在）
-    if (war3mapJContent.includes('call Cheat("exec-lua:main")')) {
-      war3mapJContent = war3mapJContent.replace('call Cheat("exec-lua:main")', 'call Cheat("exec-lua:bootstrap")');
-      fs.writeFileSync(war3mapJPath, war3mapJContent);
-      console.log(">>> Updated Lua execution call to use bootstrap.lua");
-      return;
-    }
-
-    // 在 main 函数最后一行注入 call Cheat("exec-lua:bootstrap")
-    const regex = /(function\s+main\s+takes\s+nothing\s+returns\snothing\s*\n)([\s\S]*?)(\nendfunction)/;
-    const mainFunctionMatch = regex.exec(war3mapJContent);
-
-    if (!mainFunctionMatch) {
-      console.error(`>>> Error: main function not found in ${war3mapJPath}, skipping injection.`);
-      return;
-    }
-
-    const newContent = mainFunctionMatch[0].replace(/\nendfunction/, '\n    call Cheat("exec-lua:bootstrap")\nendfunction');
-    war3mapJContent = war3mapJContent.replace(mainFunctionMatch[0], newContent);
     fs.writeFileSync(war3mapJPath, war3mapJContent);
-    console.log(">>> Injected Lua execution call for bootstrap.lua into war3map.j");
+    if (injectedWhere === "before_run") {
+      console.log(">>> Injected Lua execution call for bootstrap.lua into war3map.j (before RunInitializationTriggers)");
+    } else {
+      console.log(">>> Injected Lua execution call for bootstrap.lua into war3map.j (fallback: end of main)");
+    }
   } catch (error) {
     console.error(">>> Error injecting Lua execution call:", error);
   }

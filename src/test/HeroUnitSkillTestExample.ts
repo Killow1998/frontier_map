@@ -2,7 +2,6 @@ import { Unit, Players, Timer } from "@eiriksgata/wc3ts/*";
 import { FourCC } from "src/utils/helper";
 import { castBlizzardSkill, castRushBarrageSkill } from "src/examples/HeroUnitSkill";
 import { Actor } from "src/system/actor";
-import { UnitBlood } from "src/system/ui/component/UnitBlood";
 
 export function castBlizzardSkillTest(): void {
 

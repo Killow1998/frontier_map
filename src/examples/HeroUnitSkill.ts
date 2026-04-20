@@ -1,8 +1,8 @@
 import {
-  ATTACK_TYPE_HERO,
+  ATTACK_TYPE_NORMAL,
   ATTACK_TYPE_MAGIC,
   bj_RADTODEG,
-  DAMAGE_TYPE_COLD,
+  DAMAGE_TYPE_MAGIC,
   DAMAGE_TYPE_NORMAL,
   Timer,
   UNIT_TYPE_DEAD,
@@ -79,7 +79,7 @@ export function castBlizzardSkill(
             true,
             false,
             ATTACK_TYPE_MAGIC(),
-            DAMAGE_TYPE_COLD(),
+            DAMAGE_TYPE_MAGIC(),
             WEAPON_TYPE_WHOKNOWS()
           );
         }
@@ -211,7 +211,7 @@ export function castRushBarrageSkill(
       damagePerHit,
       true,
       false,
-      ATTACK_TYPE_HERO(),
+      ATTACK_TYPE_NORMAL(),
       DAMAGE_TYPE_NORMAL(),
       WEAPON_TYPE_WHOKNOWS()
     );
