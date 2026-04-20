@@ -748,6 +748,14 @@
 
 署名：**codex**
 
+## 备注（2026-04-20：关于 takeOver 白名单与原罪触发器的归属）
+
+- `takeover.ts` 的 `EXCLUDED_TRIGGERS` 中包含的 `gg_trg_knife_get / gg_trg_sin_lvup_knife7 / gg_trg_knife_use_new / gg_trg_sin_equipment / gg_trg_sin_equipment_quit` 并不是“误写白名单”。
+- 这些触发器目前由 `src/migration/combat/shadowKnife.ts` 的 `migrateShadowKnifeTriggers()` 迁移并替换（该模块会 `disableLegacyTrigger` + `replaceGlobalTrigger`）。
+- `src/migration/items/sinSystems.ts` 只负责 `sin_init / sin_select / sin_lvup_new / sin_upgrade` 这一组“原罪英雄选择与专武升级入口”，两者属于同一系统但分散在不同迁移模块中。
+
+署名：**codex**
+
 ## 最新进展（2026-04-19：联机复活修复与防分车）
 
 - 已完成：`src/migration/systems/playerRespawn.ts` 复活流程改为“每个槽位复用同一个计时器”，避免同一玩家多次死亡时出现多个复活计时器并发导致复活逻辑不触发或乱序。
