@@ -57,6 +57,9 @@ function registerKillToGetTrigger(): void {
   TriggerAddCondition(triggerHandle, Condition(() => {
     const deadUnit = GetTriggerUnit()
     const killerUnit = GetKillingUnit()
+    if (!killerUnit) {
+      return false
+    }
     const deadOwner = GetOwningPlayer(deadUnit)
     return (
       (deadOwner === Player(PLAYER_NEUTRAL_AGGRESSIVE) ||
@@ -70,7 +73,11 @@ function registerKillToGetTrigger(): void {
   }))
   TriggerAddAction(triggerHandle, () => {
     const deadUnit = GetTriggerUnit()
-    const killerPlayerId = GetPlayerId(GetOwningPlayer(GetKillingUnit())) + 1
+    const killerUnit = GetKillingUnit()
+    if (!killerUnit) {
+      return
+    }
+    const killerPlayerId = GetPlayerId(GetOwningPlayer(killerUnit)) + 1
     const deadOwner = GetOwningPlayer(deadUnit)
     let gain = GetUnitLevel(deadUnit)
     if (
