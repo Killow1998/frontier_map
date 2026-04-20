@@ -22,6 +22,7 @@ const TOWER_BLUEPRINT_ITEM_ID = FourCC("I03X")
 const TOWER_ORDER_ITEM_ID = FourCC("I03Y")
 const TOWER_BUILDER_UNIT_ID = FourCC("h00S")
 const SIGNAL_TOWER_UNIT_ID = FourCC("h00Q")
+const TOWER_BUILDER_OWNER_ID = 4
 
 const VTU_REVENGE_ITEM_ID = FourCC("I03W")
 const VTU_SOUP_ITEM_ID = FourCC("I02Q")
@@ -397,6 +398,8 @@ function registerTowerToBuildPlaceholderTrigger(): void {
 interface TowerTaskContext {
   quest: quest | undefined
   builder?: unit
+  buildRect?: rect
+  buildOrderIssued: boolean
 }
 
 /**
@@ -410,6 +413,16 @@ function createTowerConstructFinishTrigger(context: TowerTaskContext): trigger {
     if (!builtUnit || !IsUnitType(builtUnit, UNIT_TYPE_STRUCTURE()) || GetUnitTypeId(builtUnit) !== SIGNAL_TOWER_UNIT_ID) {
       return
     }
+    if (!context.buildOrderIssued || !context.buildRect) {
+      return
+    }
+    if (GetOwningPlayer(builtUnit) !== Player(TOWER_BUILDER_OWNER_ID)) {
+      return
+    }
+    if (!isUnitInRect(context.buildRect, builtUnit)) {
+      return
+    }
+    context.buildOrderIssued = false
     SetUnitInvulnerable(builtUnit, true)
     UnitShareVision(builtUnit, Player(0), true)
     UnitShareVision(builtUnit, Player(1), true)
@@ -456,7 +469,8 @@ function registerTowerTaskTrigger(): void {
         "穿云之信",
         "派出的传信兵均无消息，敌军已经明察营地虚实，我们如何才能破局",
         "ReplaceableTextures\\CommandButtons\\BTNHumanWatchTower.blp"
-      )
+      ),
+      buildOrderIssued: false
     }
     setQuestEnabled(context.quest, true)
 
@@ -491,6 +505,7 @@ function registerTowerTaskTrigger(): void {
     if (!baseRect || !buildRect) {
       return
     }
+    context.buildRect = buildRect
 
     const blueprintReadTrigger = CreateTrigger()
     registerEnterRectEvent(blueprintReadTrigger, baseRect)
@@ -542,7 +557,8 @@ function registerTowerTaskTrigger(): void {
         const randomDegrees = GetRandomReal(0, 360)
         const builderX = GetUnitX(commander) + 50 * math.cos((randomDegrees * math.pi) / 180)
         const builderY = GetUnitY(commander) + 50 * math.sin((randomDegrees * math.pi) / 180)
-        context.builder = CreateUnit(Player(4), TOWER_BUILDER_UNIT_ID, builderX, builderY, bj_UNIT_FACING)
+        context.builder = CreateUnit(Player(TOWER_BUILDER_OWNER_ID), TOWER_BUILDER_UNIT_ID, builderX, builderY, bj_UNIT_FACING)
+        context.buildOrderIssued = true
         broadcastAllPlayers("玩家5【建造专家】已出发！请全员前往河对岸守护魔法信号塔建造进程！")
         alertTowerBuildPoint(buildRect)
         IssueBuildOrderById(context.builder, SIGNAL_TOWER_UNIT_ID, GetRectCenterX(buildRect), GetRectCenterY(buildRect))
@@ -556,6 +572,7 @@ function registerTowerTaskTrigger(): void {
           return
         }
         if (!context.builder || !isUnitAlive(context.builder)) {
+          context.buildOrderIssued = false
           destroyAllSignalTowers()
           pushQuestMessage("bj_QUESTMESSAGE_FAILED", "[穿云之信]——不！！！！我们没机会看到高塔建成的时刻了，现在只能背水一战，希望能撑到指挥官发现我们的窘境。可是我们不能把希望寄托于这种渺茫的可能，只有死战！")
           setQuestFailed(context.quest, true)
