@@ -37,11 +37,8 @@ function registerMissionFailTrigger(): void {
   }
   TriggerAddAction(triggerHandle, () => {
     showGameScoreSummary(false)
-    if (getGlobal<boolean>("udg_build_finish") === true) {
-      displayTextToMercenaryPlayers(MISSION_FAIL_TEXT_WITH_HELP)
-    } else {
-      displayTextToMercenaryPlayers(MISSION_FAIL_TEXT)
-    }
+    const defeatMessage = getGlobal<boolean>("udg_build_finish") === true ? MISSION_FAIL_TEXT_WITH_HELP : MISSION_FAIL_TEXT
+    displayTextToMercenaryPlayers(defeatMessage)
     const customDefeat = getGlobal<(whichPlayer: player, message: string) => void>("CustomDefeatBJ")
     if (!customDefeat) {
       return
@@ -49,7 +46,7 @@ function registerMissionFailTrigger(): void {
     const timerHandle = CreateTimer()
     TimerStart(timerHandle, 5.0, false, () => {
       for (let i = 0; i < 4; i++) {
-        customDefeat(Player(i), MISSION_FAIL_TEXT)
+        customDefeat(Player(i), defeatMessage)
       }
       DestroyTimer(timerHandle)
     })
