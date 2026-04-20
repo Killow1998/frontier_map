@@ -8,7 +8,16 @@ import {
   UNIT_TYPE_HERO
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
-import { disableLegacyTrigger, findItemInInventory, getGlobal, registerPlayerUnitEventAll, replaceGlobalTrigger, setAbilityDataRealValue, setAbilityDataStringValue } from "../core/helpers"
+import {
+  countItemInInventory,
+  disableLegacyTrigger,
+  findItemInInventory,
+  getGlobal,
+  registerPlayerUnitEventAll,
+  replaceGlobalTrigger,
+  setAbilityDataRealValue,
+  setAbilityDataStringValue
+} from "../core/helpers"
 
 const RING_INT_ITEM_ID = FourCC("I01J")
 const RING_STR_ITEM_ID = FourCC("I01H")
@@ -16,6 +25,7 @@ const RING_AGI_ITEM_ID = FourCC("I01K")
 const RING_ATTACK_ITEM_ID = FourCC("I01G")
 const RING_SPIRIT_ITEM_ID = FourCC("I01I")
 const RING_SPIRIT_ABILITY_ID = FourCC("A03G")
+const RING_SPIRIT_UNIQUE_HINT = "|cffFF0000狮心之戒只能携带一个，已自动卸下多余戒指。|r"
 
 const HELMET_VOLCANO_ITEM_ID = FourCC("I01B")
 const HELMET_VOLCANO_REWARD_ID = FourCC("I01C")
@@ -40,6 +50,35 @@ function destroyEffectLater(effectHandle: effect, delay: number): void {
     DestroyEffect(effectHandle)
     DestroyTimer(timerHandle)
   })
+}
+
+/**
+ * 强制狮心之戒仅保留一枚，多余戒指自动卸下。
+ */
+function enforceSingleRingSpirit(hero: unit): void {
+  if (countItemInInventory(hero, RING_SPIRIT_ITEM_ID) <= 1) {
+    return
+  }
+  const extras: item[] = []
+  let kept = false
+  for (let slot = 0; slot < 6; slot++) {
+    const slotItem = UnitItemInSlot(hero, slot)
+    if (!slotItem || GetItemTypeId(slotItem) !== RING_SPIRIT_ITEM_ID) {
+      continue
+    }
+    if (!kept) {
+      kept = true
+      continue
+    }
+    extras.push(slotItem)
+  }
+  if (extras.length <= 0) {
+    return
+  }
+  for (const extraRing of extras) {
+    UnitRemoveItem(hero, extraRing)
+  }
+  DisplayTextToPlayer(GetOwningPlayer(hero), 0, 0, RING_SPIRIT_UNIQUE_HINT)
 }
 
 /**
@@ -75,6 +114,8 @@ function registerRingLevelupTrigger(): void {
   TriggerAddCondition(triggerHandle, Condition(() => IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO())))
   TriggerAddAction(triggerHandle, () => {
     const hero = GetTriggerUnit()
+    enforceSingleRingSpirit(hero)
+
     if (findItemInInventory(hero, RING_INT_ITEM_ID)) {
       SetHeroInt(hero, GetHeroInt(hero, true) + 1, true)
     }
@@ -106,9 +147,14 @@ function registerRingGetTrigger(): void {
   TriggerAddCondition(triggerHandle, Condition(() => IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO())))
   TriggerAddAction(triggerHandle, () => {
     const hero = GetTriggerUnit()
-    if (GetItemTypeId(GetManipulatedItem()) === RING_SPIRIT_ITEM_ID && findItemInInventory(hero, RING_SPIRIT_ITEM_ID)) {
-      refreshRingSpiritAbility(hero)
+    if (GetItemTypeId(GetManipulatedItem()) !== RING_SPIRIT_ITEM_ID) {
+      return
     }
+    enforceSingleRingSpirit(hero)
+    if (!findItemInInventory(hero, RING_SPIRIT_ITEM_ID)) {
+      return
+    }
+    refreshRingSpiritAbility(hero)
   })
   replaceGlobalTrigger("gg_trg_ring_get", triggerHandle)
 }
@@ -123,9 +169,15 @@ function registerRingThrowTrigger(): void {
   registerPlayerUnitEventAll(triggerHandle, EVENT_PLAYER_UNIT_DROP_ITEM())
   TriggerAddCondition(triggerHandle, Condition(() => IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO())))
   TriggerAddAction(triggerHandle, () => {
-    if (GetItemTypeId(GetManipulatedItem()) === RING_SPIRIT_ITEM_ID) {
-      UnitRemoveAbility(GetTriggerUnit(), RING_SPIRIT_ABILITY_ID)
+    const hero = GetTriggerUnit()
+    if (GetItemTypeId(GetManipulatedItem()) !== RING_SPIRIT_ITEM_ID) {
+      return
     }
+    if (findItemInInventory(hero, RING_SPIRIT_ITEM_ID)) {
+      refreshRingSpiritAbility(hero)
+      return
+    }
+    UnitRemoveAbility(hero, RING_SPIRIT_ABILITY_ID)
   })
   replaceGlobalTrigger("gg_trg_ring_throw", triggerHandle)
 }

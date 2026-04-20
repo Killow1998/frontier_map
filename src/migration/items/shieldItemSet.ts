@@ -1,6 +1,6 @@
 import { EVENT_PLAYER_UNIT_DROP_ITEM, EVENT_PLAYER_UNIT_PICKUP_ITEM, EVENT_PLAYER_UNIT_USE_ITEM, UNIT_STATE_LIFE, UNIT_TYPE_HERO, bj_UNIT_FACING } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
-import { disableLegacyTrigger, getGlobal, registerPlayerUnitEventAll, replaceGlobalTrigger } from "../core/helpers"
+import { countItemInInventory, disableLegacyTrigger, getGlobal, registerPlayerUnitEventAll, replaceGlobalTrigger } from "../core/helpers"
 
 const SHIELD_ITEM_1 = FourCC("I00F")
 const SHIELD_ITEM_2 = FourCC("I00J")
@@ -15,6 +15,7 @@ const SHIELD_ABILITY_4 = FourCC("A00Z")
 const SHIELD_BUFF_ID = FourCC("B001")
 const SHIELD_USE_DUMMY_ABILITY = FourCC("A081")
 const SHIELD_USE_DUMMY_UNIT = FourCC("ewsp")
+const SHIELD_UNIQUE_HINT = "|cffFF0000同类盾牌只能携带一件，已自动卸下多余盾牌。|r"
 
 /**
  * 延迟移除临时马甲单位。
@@ -32,6 +33,18 @@ function removeUnitLater(unitHandle: unit, delay: number): void {
  */
 function getGroupFromGlobal(name: string): group | undefined {
   return getGlobal<group>(name)
+}
+
+/**
+ * 同类盾牌唯一约束：若拾取后超过 1 件，则自动卸下本次拾取的盾牌。
+ */
+function rejectDuplicateShieldPickup(hero: unit, itemTypeId: number): boolean {
+  if (countItemInInventory(hero, itemTypeId) <= 1) {
+    return false
+  }
+  UnitRemoveItem(hero, GetManipulatedItem())
+  DisplayTextToPlayer(GetOwningPlayer(hero), 0, 0, SHIELD_UNIQUE_HINT)
+  return true
 }
 
 /**
@@ -88,20 +101,27 @@ function registerShieldThrowTrigger(): void {
     const shieldGroup3 = getGroupFromGlobal("udg_shield3")
 
     if (shieldGroup1 && IsUnitInGroup(hero, shieldGroup1) && droppedTypeId === SHIELD_ITEM_1) {
-      GroupRemoveUnit(shieldGroup1, hero)
-      UnitRemoveAbility(hero, SHIELD_ABILITY_1)
+      if (countItemInInventory(hero, SHIELD_ITEM_1) <= 0) {
+        GroupRemoveUnit(shieldGroup1, hero)
+        UnitRemoveAbility(hero, SHIELD_ABILITY_1)
+      }
     }
     if (shieldGroup2 && IsUnitInGroup(hero, shieldGroup2) && droppedTypeId === SHIELD_ITEM_2) {
-      GroupRemoveUnit(shieldGroup2, hero)
-      UnitRemoveAbility(hero, SHIELD_ABILITY_2)
+      if (countItemInInventory(hero, SHIELD_ITEM_2) <= 0) {
+        GroupRemoveUnit(shieldGroup2, hero)
+        UnitRemoveAbility(hero, SHIELD_ABILITY_2)
+      }
     }
-    if (shieldGroup3 && IsUnitInGroup(hero, shieldGroup3) && droppedTypeId === SHIELD_ITEM_3) {
-      GroupRemoveUnit(shieldGroup3, hero)
-      UnitRemoveAbility(hero, SHIELD_ABILITY_3)
-    }
-    if (shieldGroup3 && IsUnitInGroup(hero, shieldGroup3) && droppedTypeId === SHIELD_ITEM_4) {
-      GroupRemoveUnit(shieldGroup3, hero)
-      UnitRemoveAbility(hero, SHIELD_ABILITY_4)
+    if (shieldGroup3 && IsUnitInGroup(hero, shieldGroup3)) {
+      if (droppedTypeId === SHIELD_ITEM_3 && countItemInInventory(hero, SHIELD_ITEM_3) <= 0) {
+        UnitRemoveAbility(hero, SHIELD_ABILITY_3)
+      }
+      if (droppedTypeId === SHIELD_ITEM_4 && countItemInInventory(hero, SHIELD_ITEM_4) <= 0) {
+        UnitRemoveAbility(hero, SHIELD_ABILITY_4)
+      }
+      if (countItemInInventory(hero, SHIELD_ITEM_3) <= 0 && countItemInInventory(hero, SHIELD_ITEM_4) <= 0) {
+        GroupRemoveUnit(shieldGroup3, hero)
+      }
     }
   })
   replaceGlobalTrigger("gg_trg_shield_throw", triggerHandle)
@@ -124,18 +144,30 @@ function registerShieldGetTrigger(): void {
     const shieldGroup3 = getGroupFromGlobal("udg_shield3")
 
     if (pickedTypeId === SHIELD_ITEM_1 && shieldGroup1) {
+      if (rejectDuplicateShieldPickup(hero, SHIELD_ITEM_1)) {
+        return
+      }
       GroupAddUnit(shieldGroup1, hero)
       UnitAddAbility(hero, SHIELD_ABILITY_1)
     }
     if (pickedTypeId === SHIELD_ITEM_2 && shieldGroup2) {
+      if (rejectDuplicateShieldPickup(hero, SHIELD_ITEM_2)) {
+        return
+      }
       GroupAddUnit(shieldGroup2, hero)
       UnitAddAbility(hero, SHIELD_ABILITY_2)
     }
     if (pickedTypeId === SHIELD_ITEM_3 && shieldGroup3) {
+      if (rejectDuplicateShieldPickup(hero, SHIELD_ITEM_3)) {
+        return
+      }
       GroupAddUnit(shieldGroup3, hero)
       UnitAddAbility(hero, SHIELD_ABILITY_3)
     }
     if (pickedTypeId === SHIELD_ITEM_4 && shieldGroup3) {
+      if (rejectDuplicateShieldPickup(hero, SHIELD_ITEM_4)) {
+        return
+      }
       GroupAddUnit(shieldGroup3, hero)
       UnitAddAbility(hero, SHIELD_ABILITY_4)
     }

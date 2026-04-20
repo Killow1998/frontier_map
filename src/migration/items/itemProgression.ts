@@ -127,9 +127,9 @@ function registerGetItemTrigger(): void {
     const playerIndex = GetPlayerId(owner) + 1
     const credits = getCreditsTable()
     const currentCredits = credits[playerIndex] ?? 0
-    const tokenTypeId = GetItemTypeId(GetManipulatedItem())
+    const tokenItem = GetManipulatedItem()
+    const tokenTypeId = GetItemTypeId(tokenItem)
     const rewardTypeId = resolveExchangeReward(tokenTypeId)
-    RemoveItem(GetManipulatedItem())
 
     if (!rewardTypeId) {
       return
@@ -144,6 +144,7 @@ function registerGetItemTrigger(): void {
       return
     }
 
+    RemoveItem(tokenItem)
     credits[playerIndex] = currentCredits - ITEM_EXCHANGE_COST
     const rewardItem = CreateItem(rewardTypeId, GetUnitX(unitHandle), GetUnitY(unitHandle))
     DisplayTextToPlayer(owner, 0, 0, "兑换" + GetItemName(rewardItem) + "成功")
