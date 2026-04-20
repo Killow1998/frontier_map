@@ -331,7 +331,7 @@ function registerShowDaTrigger(): void {
       }
     }
 
-    if (attackInfo.isAttack && !attackInfo.isRanged && IsUnitType(target, UNIT_TYPE_HERO()) && hasItem(target, FourCC("I03D")) && GetRandomInt(1, 100) >= 9) {
+    if (attackInfo.isAttack && !attackInfo.isRanged && IsUnitType(target, UNIT_TYPE_HERO()) && hasItem(target, FourCC("I03D")) && GetRandomInt(1, 100) <= 9) {
       const facing = Atan2(GetUnitY(source) - GetUnitY(target), GetUnitX(source) - GetUnitX(target)) / bj_DEGTORAD
       SetUnitFacing(target, facing)
       SetUnitTimeScale(target, 9.0)
