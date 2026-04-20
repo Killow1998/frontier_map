@@ -134,6 +134,7 @@ function registerGetItemTrigger(): void {
     if (!rewardTypeId) {
       return
     }
+    RemoveItem(tokenItem)
     if (currentCredits < ITEM_EXCHANGE_COST) {
       DisplayTextToPlayer(
         owner,
@@ -144,7 +145,6 @@ function registerGetItemTrigger(): void {
       return
     }
 
-    RemoveItem(tokenItem)
     credits[playerIndex] = currentCredits - ITEM_EXCHANGE_COST
     const rewardItem = CreateItem(rewardTypeId, GetUnitX(unitHandle), GetUnitY(unitHandle))
     DisplayTextToPlayer(owner, 0, 0, "兑换" + GetItemName(rewardItem) + "成功")
