@@ -25,6 +25,7 @@ const BOOK_STAGE_3 = FourCC("I00N")
 const BOOK_STAGE_4 = FourCC("I00O")
 const BOOK_STAGE_5 = FourCC("I00K")
 const BOOK_DRAFT_PAPER = FourCC("I00P")
+const DRAFT_PAPER_CRAFTED_KEY = 0x641FDAD7
 
 const BOOK_SUCCESS_FX = "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl"
 const BOOK_FAIL_FX = "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl"
@@ -35,8 +36,6 @@ const BOOK_FIRE_IMPACT_COUNT = 5
 const BOOK_FIRE_IMPACT_SPREAD = 280.0
 const BOOK_FIRE_DAMAGE_RADIUS = 280.0
 const BOOK_FIRE_BASE_DAMAGE = 166.0
-
-let draftPaperCrafted = false
 
 /**
  * 延迟销毁特效。
@@ -109,6 +108,30 @@ function dropItemToFeet(unitHandle: unit, itemTypeId: number): void {
     return
   }
   SetItemPosition(itemHandle, GetUnitX(unitHandle), GetUnitY(unitHandle))
+}
+
+/**
+ * 判断草稿纸是否已被任意玩家合成（对齐原图 YDHT 状态来源）。
+ */
+function isDraftPaperCrafted(): boolean {
+  const ydht = getGlobal<hashtable>("YDHT")
+  if (!ydht) {
+    print("Missing hashtable: YDHT")
+    return false
+  }
+  return LoadBoolean(ydht, BOOK_DRAFT_PAPER, DRAFT_PAPER_CRAFTED_KEY)
+}
+
+/**
+ * 标记草稿纸已合成（全局唯一）。
+ */
+function markDraftPaperCrafted(): void {
+  const ydht = getGlobal<hashtable>("YDHT")
+  if (!ydht) {
+    print("Missing hashtable: YDHT")
+    return
+  }
+  SaveBoolean(ydht, BOOK_DRAFT_PAPER, DRAFT_PAPER_CRAFTED_KEY, true)
 }
 
 /**
@@ -271,7 +294,7 @@ function registerMagicBookTrigger(): void {
     const hero = GetTriggerUnit()
 
     if (hasAllItems(hero, [BOOK_STAGE_1, BOOK_STAGE_2, BOOK_STAGE_3, BOOK_STAGE_4, BOOK_STAGE_5])) {
-      if (!draftPaperCrafted) {
+      if (!isDraftPaperCrafted()) {
         const effectHandle = AddSpecialEffectTarget("Units\\NightElf\\Wisp\\WispExplode.mdl", hero, "origin")
         destroyEffectLater(effectHandle, 0.5)
         removeItemFromInventory(hero, BOOK_STAGE_1)
@@ -280,7 +303,7 @@ function registerMagicBookTrigger(): void {
         removeItemFromInventory(hero, BOOK_STAGE_4)
         removeItemFromInventory(hero, BOOK_STAGE_5)
         UnitAddItem(hero, CreateItem(BOOK_DRAFT_PAPER, GetUnitX(hero), GetUnitY(hero)))
-        draftPaperCrafted = true
+        markDraftPaperCrafted()
         DisplayTextToPlayer(GetOwningPlayer(hero), 0, 0, "你获得了一张？草稿纸")
       } else {
         dropItemToFeet(hero, BOOK_STAGE_1)
