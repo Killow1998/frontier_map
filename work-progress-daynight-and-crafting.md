@@ -756,6 +756,22 @@
 
 署名：**codex**
 
+## 最新进展（2026-04-20：对齐 takeOver 白名单 + 人造太阳提示回归原图 + 原罪 use 状态统一 API）
+
+- 已完成：`src/migration/core/takeover.ts`
+  - 将已 TS 接管但此前未列入 `EXCLUDED_TRIGGERS` 的核心流程触发器补齐，避免后续开启 `ENABLE_LEGACY_TAKEOVER_GUARD` 时误禁用：
+    - `gg_trg_day_come`、`gg_trg_night_come`、`gg_trg_init`、`gg_trg_day_init`、`gg_trg_nobody_init`、`gg_trg_boss_init`、`gg_trg_first_enemy_start`、`gg_trg_sin_init`
+    - `intro_guide` 原图 trigger 名为 `gg_trg_______u`，同样补齐
+  - 说明：`gg_trg_knife_get / gg_trg_sin_lvup_knife7 / gg_trg_knife_use_new / gg_trg_sin_equipment / gg_trg_sin_equipment_quit` 仍保留在白名单中，因为它们已由 `shadowKnife.ts` 迁移并替换；若从白名单移除，会导致 guard 启用时把 TS 触发器也禁掉。
+- 已完成：`src/migration/items/artificialSun.ts`
+  - 人造太阳提示改回“仅提示使用者（owner-only）”，不再全员广播；并移除新增的全员倒计时面板（回归原图行为）。
+- 已完成：`src/migration/core/userData.ts`
+  - 抽出 YDHT “use” 布尔状态兼容层：通过 `StringHash(\"use\")`（不一致则回退 `0x8376128B`）确保与原图 JASS 存储口径一致。
+- 已完成：`src/migration/items/sinSystems.ts`、`src/migration/combat/shadowKnife.ts`
+  - `sin_init` 与 `knife_use_new` 不再散落手写 key，统一走 `ydhtLoad/SaveItemUseFlag`。
+
+署名：**codex**
+
 ## 最新进展（2026-04-19：联机复活修复与防分车）
 
 - 已完成：`src/migration/systems/playerRespawn.ts` 复活流程改为“每个槽位复用同一个计时器”，避免同一玩家多次死亡时出现多个复活计时器并发导致复活逻辑不触发或乱序。

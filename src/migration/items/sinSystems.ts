@@ -1,15 +1,20 @@
 import { bj_MAX_PLAYER_SLOTS, bj_UNIT_FACING, EVENT_PLAYER_UNIT_PICKUP_ITEM } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
 import { panCameraToBaseForPlayer } from "../core/camera"
-import { countItemInInventory, disableLegacyTrigger, findItemInInventory, getGlobal, registerPlayerUnitEventAll, replaceGlobalTrigger } from "../core/helpers"
+import {
+  countItemInInventory,
+  disableLegacyTrigger,
+  findItemInInventory,
+  getGlobal,
+  registerPlayerUnitEventAll,
+  replaceGlobalTrigger
+} from "../core/helpers"
+import { ydhtSaveItemUseFlag } from "../core/userData"
 
 const SIN_GEM_ID = FourCC("I00D")
 const SIN_BASE_ITEM_ID = FourCC("I01F")
 const SIN_FALLBACK_ITEM_ID = FourCC("I02T")
 const SIN_SELECT_HERO_ID = FourCC("H004")
-// 原图使用 `SaveBoolean(YDHT, 'I023', 0x8376128B, ...)` 维护专武“是否已使用”状态。
-// 该 key 是原图的既有存档结构，迁移阶段保持一致，避免 TS/JASS 混跑时状态分叉。
-const SIN_WEAPON_USE_BOOL_KEY = 0x8376128b
 
 /**
  * 在基地生成原罪英雄并同步公共状态。
@@ -188,13 +193,13 @@ function registerSinInitTrigger(): void {
     if (!ydht) {
       return
     }
-    SaveBoolean(ydht, FourCC("I023"), SIN_WEAPON_USE_BOOL_KEY, false)
-    SaveBoolean(ydht, FourCC("I024"), SIN_WEAPON_USE_BOOL_KEY, false)
-    SaveBoolean(ydht, FourCC("I025"), SIN_WEAPON_USE_BOOL_KEY, false)
-    SaveBoolean(ydht, FourCC("I026"), SIN_WEAPON_USE_BOOL_KEY, false)
-    SaveBoolean(ydht, FourCC("I027"), SIN_WEAPON_USE_BOOL_KEY, false)
-    SaveBoolean(ydht, FourCC("I028"), SIN_WEAPON_USE_BOOL_KEY, false)
-    SaveBoolean(ydht, FourCC("I022"), SIN_WEAPON_USE_BOOL_KEY, false)
+    ydhtSaveItemUseFlag(FourCC("I023"), false)
+    ydhtSaveItemUseFlag(FourCC("I024"), false)
+    ydhtSaveItemUseFlag(FourCC("I025"), false)
+    ydhtSaveItemUseFlag(FourCC("I026"), false)
+    ydhtSaveItemUseFlag(FourCC("I027"), false)
+    ydhtSaveItemUseFlag(FourCC("I028"), false)
+    ydhtSaveItemUseFlag(FourCC("I022"), false)
   })
   replaceGlobalTrigger("gg_trg_sin_init", triggerHandle)
 }

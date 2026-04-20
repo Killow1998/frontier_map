@@ -50,19 +50,7 @@ function registerPlayerUnitEventAll(triggerHandle: trigger, eventId: playerunite
   }
 }
 
-function broadcastText(message: string): void {
-  for (let i = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
-    DisplayTextToPlayer(Player(i), 0, 0, message)
-  }
-}
-
-function destroyTimerDialogSafe(dialog: timerdialog | undefined): void {
-  if (!dialog) {
-    return
-  }
-  TimerDialogDisplay(dialog, false)
-  DestroyTimerDialog(dialog)
-}
+// 迁移对齐原图：不创建倒计时 TimerDialog，只走提示 + 强制白昼表现逻辑。
 
 function registerArtificialSunTrigger(): void {
   disableLegacyTrigger("gg_trg_artificial_sun")
@@ -125,10 +113,9 @@ function registerArtificialSunTrigger(): void {
       UnitRemoveAbility(nightTotem, FourCC("A0AE"))
     }
     const unitName = GetUnitName(triggerUnit)
-    broadcastText("|cffFFD700雇佣兵【" + unitName + "】使用了【人造太阳】！|r")
+    DisplayTextToPlayer(owner, 0, 0, "|cffFFD700雇佣兵【" + unitName + "】使用了【人造太阳】！|r")
 
     const timerHandle = CreateTimer()
-    let timerDialog: timerdialog | undefined
     setGlobal(ARTIFICIAL_SUN_TIMER_GLOBAL, timerHandle)
     TimerStart(timerHandle, ARTIFICIAL_SUN_DURATION, false, () => {
       setGlobal("udg_force_day", false)
@@ -153,17 +140,13 @@ function registerArtificialSunTrigger(): void {
         ShowUnit(nightTotem, true)
         restoreNightTotemAuras(nightTotem, difficulty)
       }
-      destroyTimerDialogSafe(timerDialog)
       setGlobal(ARTIFICIAL_SUN_TIMER_GLOBAL, undefined)
       setGlobal(ARTIFICIAL_SUN_TIMER_DIALOG_GLOBAL, undefined)
-      broadcastText("|cffFFD700【人造太阳】的光芒消散了。|r")
+      DisplayTextToPlayer(owner, 0, 0, "|cffFFD700【人造太阳】的光芒消散了。|r")
       DestroyTimer(timerHandle)
     })
-
-    timerDialog = CreateTimerDialog(timerHandle)
-    TimerDialogSetTitle(timerDialog, "人造太阳光芒消散还有")
-    TimerDialogDisplay(timerDialog, true)
-    setGlobal(ARTIFICIAL_SUN_TIMER_DIALOG_GLOBAL, timerDialog)
+    // 原图行为：仅提示使用者，不创建全员倒计时面板。
+    // 保留 timer global 仅用于内部逻辑/调试一致性。
   })
   replaceGlobalTrigger("gg_trg_artificial_sun", triggerHandle)
 }

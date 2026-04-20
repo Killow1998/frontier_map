@@ -3,6 +3,19 @@
  * 这些触发器不会再走遗留桥接逻辑
  */
 const EXCLUDED_TRIGGERS: Record<string, boolean> = {
+  // Core flow migrated in TS (avoid being disabled when ENABLE_LEGACY_TAKEOVER_GUARD is enabled).
+  gg_trg_day_come: true,
+  gg_trg_night_come: true,
+  gg_trg_init: true,
+  gg_trg_day_init: true,
+  gg_trg_nobody_init: true,
+  gg_trg_boss_init: true,
+  gg_trg_first_enemy_start: true,
+  // “intro_guide” in the original map uses an obfuscated trigger name.
+  gg_trg_______u: true,
+  // Sin init migrated in TS (state init for sin weapon use flags).
+  gg_trg_sin_init: true,
+
   gg_trg_difficulty_selection: true,
   gg_trg_mission_success: true,
   gg_trg_mission_fail: true,

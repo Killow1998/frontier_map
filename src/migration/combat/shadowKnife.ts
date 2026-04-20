@@ -34,6 +34,7 @@ import {
   setAbilityDataRealValue,
   setAbilityDataStringValue
 } from "../core/helpers"
+import { ydhtLoadItemUseFlag, ydhtSaveItemUseFlag } from "../core/userData"
 
 const SHADOW_HERO_ID = FourCC("H004")
 const SHADOW_DARK_ITEM_ID = FourCC("I014")
@@ -64,7 +65,6 @@ const SIN_ALLOWED_ARTIFACT_IDS = [FourCC("I01L"), FourCC("I01M"), FourCC("I01N")
 const KNIFE_ITEM_IDS = [FourCC("I023"), FourCC("I024"), FourCC("I025"), FourCC("I026"), FourCC("I027"), FourCC("I028"), FourCC("I022")]
 const KNIFE_ABILITY_IDS = [FourCC("A04U"), FourCC("A04V"), FourCC("A04W"), FourCC("A04Y"), FourCC("A04Z")]
 const KNIFE_UPGRADE_SOURCE_ID = FourCC("A053")
-const KNIFE_USED_KEY = 0x8376128B
 
 const SIN_SLOTH_KEY = 0x193764E8
 const SIN_PRIDE_KEY = 0x5CFF73A0
@@ -675,12 +675,12 @@ function registerKnifeUseNewTrigger(): void {
       DisplayTextToPlayer(owner, 0, 0, "当前没有可激活的原罪武器阶级")
       return
     }
-    if (LoadBoolean(ydht, equippedKnife, KNIFE_USED_KEY)) {
+    if (ydhtLoadItemUseFlag(equippedKnife)) {
       IssueImmediateOrder(hero, "stop")
       DisplayTextToPlayer(owner, 0, 0, "该躯体已汲取过此阶级的原罪，无法重复获取！")
       return
     }
-    SaveBoolean(ydht, equippedKnife, KNIFE_USED_KEY, true)
+    ydhtSaveItemUseFlag(equippedKnife, true)
 
     const dialogHandle = DialogCreate()
     DialogSetMessage(dialogHandle, "投身原罪")
