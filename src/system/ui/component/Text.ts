@@ -101,7 +101,7 @@ export const TextFonts = {
   /** 默认字体（不设置） */
   DEFAULT: "",
   /** 自定义字体示例 */
-  CUSTOM: "UI\\hpbar\\ZiTi.ttf",
+  CUSTOM: "Fonts\\FZXH1JW.TTF",
   /** 主字体 */
   MASTER: "Fonts\\FZXH1JW.TTF",
 } as const;
