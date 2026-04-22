@@ -943,3 +943,21 @@
   - 保留并复用现有倒计时面板清理、镜头回拉与复活提示文本链路。
 
 - 已完成：本轮再次执行 `npm run build:dev --silent && npm test --silent`，构建与测试流程通过。
+
+## 最新进展（2026-04-21：RNG 随机数与异步事件引发的联机分车修复）
+
+- 已完成：**穿云之信（高塔任务）路径与事件加固**
+  - 在 `src/migration/objectives/taskQuestChains.ts` 中移除导致潜在异步的 1.0s 轮询（Polling）计时器。
+  - 召唤建造专家（h00S）后，直接为其注册纯同步的 `EVENT_UNIT_DEATH` 来判定失败，实现毫秒级精准对齐。
+  - 新增 `SetUnitPathing(builder, false)`，关闭碰撞体积，防止野怪挤压产生的微小坐标偏移，确保各端走线绝对一致。
+
+- 已完成：**Boss 战轮询 RNG 消耗导致的分车修复（致命级）**
+  - **核心原因**：原 TS 迁移中，所有 Boss 的死亡掉落（包含 `GetRandomInt` 随机数消耗）都被包裹在 5.0 秒的 `TimerStart` 轮询检查中（`GetWidgetLife <= 0.405`）。在联机下，如果 Boss 在某个玩家机器上于 T=4.9秒死亡，该玩家会在 T=5.0秒的轮询时消耗 RNG（掉落物品）；而在另一个玩家机器上因浮点误差于 T=5.1秒死亡，则该玩家会跳过本次轮询，直到 T=10.0秒时才消耗 RNG。此时场上如果有其他玩家暴击或野怪掉落，两端的 RNG 序列将彻底错位，导致“物品和怪物完全不一样”。
+  - **修复措施**：
+    - `src/migration/flow/bossBranches.ts`：将 Boss 的死亡判定、AI 关闭和物品掉落从 5.0 秒轮询中全部抽离，改为绑定原生 `EVENT_UNIT_DEATH`。
+    - `src/migration/combat/soulCollector.ts`：对 10 分钟左右出现的第一只首领（Soul Collector）执行相同的重构，移除 5 秒轮询中的死亡判断，直接通过 `EVENT_UNIT_DEATH` 消耗掉落 RNG。
+
+- 已完成：**中立怪刷新 RNG 消耗修复**
+  - **修复措施**：在 `src/migration/combat/neutralDeaths.ts` 中，原本用于计算复活坐标的 `GetRandomReal` 被写在了异步计时器的回调函数中。现已将其提前至死亡事件触发的瞬间（同步帧）进行结算，随后再通过闭包传给复活计时器，根除了并发定时器过期导致 RNG 序列混乱的问题。
+
+署名：**Gemini CLI**

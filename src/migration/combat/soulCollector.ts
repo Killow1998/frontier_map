@@ -150,6 +150,41 @@ function registerSoulCollectorTrigger(): void {
     const aiTrigger = registerSoulCollectorAiDispatcher(boss)
 
     setGlobal("udg_bosscnt", bossCount + 1)
+
+    // 【加固】将死亡判定从轮询计时器中抽离，改为纯同步的死亡事件驱动
+    const deathTrigger = CreateTrigger()
+    TriggerRegisterUnitEvent(deathTrigger, boss, EVENT_UNIT_DEATH())
+    TriggerAddAction(deathTrigger, () => {
+      DestroyTrigger(aiTrigger)
+      const bossX = GetUnitX(boss)
+      const bossY = GetUnitY(boss)
+      const deathFx = AddSpecialEffect(BOSS_EFFECT_MODEL, bossX, bossY)
+      destroyEffectLater(deathFx, 2.0)
+      CreateItem(FourCC("I00D"), bossX + 256.0, bossY)
+      CreateItem(FourCC("I00D"), bossX - 256.0, bossY)
+      if (GetRandomInt(1, 100) <= 33) {
+        CreateItem(FourCC("I02W"), bossX, bossY)
+      }
+
+      setGlobal("udg_base_wave_time", baseWaveTime - waveReduction)
+      displayTimedTextToMercenaryPlayers(60.0, "|cffff0000敌将的陨落彻底激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
+      setGlobal("udg_bosswave", false)
+      const currentWave = getGlobal<number>(ENEMY_WAVE_COUNT_GLOBAL) ?? 0
+      if (currentWave > 0) {
+        setGlobal(ENEMY_WAVE_COUNT_GLOBAL, currentWave + 1)
+      }
+
+      const enemyComing = getGlobal<trigger>("gg_trg_enemycoming")
+      if (enemyComing) {
+        const runTimer = CreateTimer()
+        TimerStart(runTimer, 2.0, false, () => {
+          TriggerExecute(enemyComing)
+          DestroyTimer(runTimer)
+        })
+      }
+      DestroyTrigger(deathTrigger)
+    })
+
     const periodicTimer = CreateTimer()
     TimerStart(periodicTimer, 5.0, true, () => {
       const attackPoint = Location(GetRectCenterX(baseRect), GetRectCenterY(baseRect))
@@ -179,32 +214,6 @@ function registerSoulCollectorTrigger(): void {
       }
 
       if (GetWidgetLife(boss) <= 0.405) {
-        DestroyTrigger(aiTrigger)
-        const deathFx = AddSpecialEffect(BOSS_EFFECT_MODEL, bossX, bossY)
-        destroyEffectLater(deathFx, 2.0)
-        CreateItem(FourCC("I00D"), bossX + 256.0, bossY)
-        CreateItem(FourCC("I00D"), bossX - 256.0, bossY)
-        if (GetRandomInt(1, 100) <= 33) {
-          CreateItem(FourCC("I02W"), bossX, bossY)
-        }
-
-        setGlobal("udg_base_wave_time", baseWaveTime - waveReduction)
-        displayTimedTextToMercenaryPlayers(60.0, "|cffff0000敌将的陨落彻底激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
-        setGlobal("udg_bosswave", false)
-        const currentWave = getGlobal<number>(ENEMY_WAVE_COUNT_GLOBAL) ?? 0
-        if (currentWave > 0) {
-          setGlobal(ENEMY_WAVE_COUNT_GLOBAL, currentWave + 1)
-        }
-
-        const enemyComing = getGlobal<trigger>("gg_trg_enemycoming")
-        if (enemyComing) {
-          const runTimer = CreateTimer()
-          TimerStart(runTimer, 2.0, false, () => {
-            TriggerExecute(enemyComing)
-            DestroyTimer(runTimer)
-          })
-        }
-
         DestroyTimer(periodicTimer)
         return
       }

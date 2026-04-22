@@ -335,20 +335,35 @@ function registerBossBranchTrigger(config: BossBranchConfig): void {
     }
     setGlobal(BOSS_COUNT_GLOBAL, state.stage + 1)
 
+    // 【加固】将死亡判定从 5.0 秒的轮询计时器中抽离，改为纯同步的死亡事件驱动
+    const deathTrigger = CreateTrigger()
+    TriggerRegisterUnitEvent(deathTrigger, state.boss, EVENT_UNIT_DEATH())
+    TriggerAddAction(deathTrigger, () => {
+      if (state.aiTrigger) {
+        DestroyTrigger(state.aiTrigger)
+        state.aiTrigger = undefined
+      }
+      handleBossDefeated(state.boss, config.specialDropItemId, config.defeatMessageDuration, config.defeatMessageText)
+      DestroyTimer(state.timer)
+      DestroyTrigger(deathTrigger)
+    })
+
     TimerStart(state.timer, 5.0, true, () => {
       issueAttackBaseOrder(state.boss)
       config.onTick?.(state)
 
-      const defeated = config.isDefeated ? config.isDefeated(state) : GetWidgetLife(state.boss) <= 0.405
-      if (defeated) {
+      // 如果有特殊的击败判定（如僵尸联动），才在轮询中处理自定义死亡逻辑（不杀本体但视为击败）
+      if (config.isDefeated && config.isDefeated(state)) {
         if (state.aiTrigger) {
           DestroyTrigger(state.aiTrigger)
           state.aiTrigger = undefined
         }
         handleBossDefeated(state.boss, config.specialDropItemId, config.defeatMessageDuration, config.defeatMessageText)
         DestroyTimer(state.timer)
+        DestroyTrigger(deathTrigger)
         return
       }
+
       growBossStatsByDifficulty(state.boss)
     })
   })

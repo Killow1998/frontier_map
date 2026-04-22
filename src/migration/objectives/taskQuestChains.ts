@@ -554,33 +554,40 @@ function registerTowerTaskTrigger(): void {
     TriggerAddCondition(useTowerOrderTrigger, Condition(() => GetItemTypeId(GetManipulatedItem()) === TOWER_ORDER_ITEM_ID))
     TriggerAddAction(useTowerOrderTrigger, () => {
       const commander = GetTriggerUnit()
-        const randomDegrees = GetRandomReal(0, 360)
-        const builderX = GetUnitX(commander) + 50 * math.cos((randomDegrees * math.pi) / 180)
-        const builderY = GetUnitY(commander) + 50 * math.sin((randomDegrees * math.pi) / 180)
-        context.builder = CreateUnit(Player(TOWER_BUILDER_OWNER_ID), TOWER_BUILDER_UNIT_ID, builderX, builderY, bj_UNIT_FACING)
-        context.buildOrderIssued = true
-        broadcastAllPlayers("玩家5【建造专家】已出发！请全员前往河对岸守护魔法信号塔建造进程！")
-        alertTowerBuildPoint(buildRect)
-        IssueBuildOrderById(context.builder, SIGNAL_TOWER_UNIT_ID, GetRectCenterX(buildRect), GetRectCenterY(buildRect))
+      const randomDegrees = GetRandomReal(0, 360)
+      const builderX = GetUnitX(commander) + 50 * math.cos((randomDegrees * math.pi) / 180)
+      const builderY = GetUnitY(commander) + 50 * math.sin((randomDegrees * math.pi) / 180)
+      const builder = CreateUnit(Player(TOWER_BUILDER_OWNER_ID), TOWER_BUILDER_UNIT_ID, builderX, builderY, bj_UNIT_FACING)
+      context.builder = builder
+      context.buildOrderIssued = true
+
+      // 【加固】禁用路径碰撞，确保联机轨迹绝对同步
+      SetUnitPathing(builder, false)
+
+      broadcastAllPlayers("玩家5【建造专家】已出发！请全员前往河对岸守护魔法信号塔建造进程！")
+      alertTowerBuildPoint(buildRect)
+      IssueBuildOrderById(builder, SIGNAL_TOWER_UNIT_ID, GetRectCenterX(buildRect), GetRectCenterY(buildRect))
 
       const constructFinishTrigger = createTowerConstructFinishTrigger(context)
-      const monitorTimer = CreateTimer()
-      TimerStart(monitorTimer, 1.0, true, () => {
+
+      // 【加固】由轮询改为事件驱动：专家死亡即判定失败
+      const failureTrigger = CreateTrigger()
+      TriggerRegisterUnitEvent(failureTrigger, builder, EVENT_UNIT_DEATH())
+      TriggerAddAction(failureTrigger, () => {
         const buildFinished = getGlobal<boolean>("udg_build_finish") === true
         if (buildFinished) {
-          DestroyTimer(monitorTimer)
+          DestroyTrigger(failureTrigger)
           return
         }
-        if (!context.builder || !isUnitAlive(context.builder)) {
-          context.buildOrderIssued = false
-          destroyAllSignalTowers()
-          pushQuestMessage("bj_QUESTMESSAGE_FAILED", "[穿云之信]——不！！！！我们没机会看到高塔建成的时刻了，现在只能背水一战，希望能撑到指挥官发现我们的窘境。可是我们不能把希望寄托于这种渺茫的可能，只有死战！")
-          setQuestFailed(context.quest, true)
-          awardHeroSelectGroup(1500, 10)
-          DestroyTrigger(constructFinishTrigger)
-          DestroyTimer(monitorTimer)
-        }
+        context.buildOrderIssued = false
+        destroyAllSignalTowers()
+        pushQuestMessage("bj_QUESTMESSAGE_FAILED", "[穿云之信]——不！！！！我们没机会看到高塔建成的时刻了，现在只能背水一战，希望能撑到指挥官发现我们的窘境。可是我们不能把希望寄托于这种渺茫的可能，只有死战！")
+        setQuestFailed(context.quest, true)
+        awardHeroSelectGroup(1500, 10)
+        DestroyTrigger(constructFinishTrigger)
+        DestroyTrigger(failureTrigger)
       })
+
       DestroyTrigger(useTowerOrderTrigger)
     })
   })
