@@ -110,7 +110,7 @@ function spawnNeutralInRect(rule: RespawnRule): void {
   const y = rule.useRectCenter ? GetRectCenterY(whereRect) : GetRandomReal(GetRectMinY(whereRect), GetRectMaxY(whereRect))
   const facing = rule.useRectCenter ? bj_UNIT_FACING : GetRandomReal(0.0, 360.0)
   
-  return CreateUnit(PLAYER_NEUTRAL, rule.spawnTypeId, x, y, facing)
+  CreateUnit(PLAYER_NEUTRAL, rule.spawnTypeId, x, y, facing)
 }
 
 /**
