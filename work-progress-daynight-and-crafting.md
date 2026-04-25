@@ -411,11 +411,13 @@
   - 同步补回召唤落点特效、42 秒时限与随机攻击奖励（`attr=3`）。
 - 已完成：本轮 `npm run build:dev --silent && npm test --silent` 通过。
 
-## 最新进展（充能瓶改为 9 次限制）
+## 最新进展（充能瓶改为 9 次限制及使用完毕销毁修复）
 
 - 已完成：`充能瓶`（`I03G`）由“无限使用”改为“共 9 次使用”：
   - 物编字段新增 `uses = 9`；
   - Description/Ubertip 同步改为“共9次使用，每次冷却<A09Z,Cool1>s”。
+- 已修复：充能瓶使用完毕 9 次后不消失且无法使用的问题。
+  - 在 `item.ini` 中为 `I03G` 补充 `perishable = 1` 属性，确保次数耗尽后引擎自动销毁。
 - 已完成：`兑换充能瓶`（`I03H`）Description/Ubertip 同步改为“兑换后获得1个充能瓶（共9次使用）”。
 - 已完成：本轮 `npm run build:dev --silent && npm test --silent` 通过。
 
