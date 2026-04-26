@@ -1,7 +1,6 @@
 import { migrateDayComeTrigger } from "./flow/dayCome"
 import { migrateNightComeTrigger } from "./flow/nightCome"
 import { initializeTimeOfDayFlow } from "./flow/timeOfDayFlow"
-import { migrateCameraChatTriggers } from "./systems/cameraChat"
 import { migrateDifficultySelectionTrigger } from "./flow/difficulty"
 import { migrateMissionTriggers } from "./objectives/mission"
 import { migrateShowResourceTrigger } from "./objectives/showResource"
@@ -44,7 +43,6 @@ export function migrateAllTriggers(): void {
   migrateNightComeTrigger()
   migrateShowDaTriggers()
   migrateShowResourceTrigger()
-  migrateCameraChatTriggers()
   initializeTimeOfDayFlow()
 
   // Combat systems
