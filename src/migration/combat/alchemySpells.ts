@@ -17,7 +17,7 @@ import {
   bj_UNIT_FACING
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
-import { applyUnitBonus, disableLegacyTrigger, getAbilityDataRealValue, registerAnyUnitDamagedEvent, registerPlayerUnitEventAll, replaceGlobalTrigger, setAbilityDataRealValue, setGlobal } from "../core/helpers"
+import { SYNC_GROUP, applyUnitBonus, disableLegacyTrigger, getAbilityDataRealValue, registerAnyUnitDamagedEvent, registerPlayerUnitEventAll, replaceGlobalTrigger, setAbilityDataRealValue, setGlobal, toSyncInt } from "../core/helpers"
 
 const POISONOUS_FOG_UNIT_ID = FourCC("N00Q")
 const POISONOUS_FOG_ABILITY_ID = FourCC("A06W")
@@ -169,31 +169,35 @@ function registerPoisonousFogTrigger(): void {
       elapsed += interval
       let i = 0
       while (i < 12) {
-        const pointLoc = polarProjection(targetLoc, GetRandomReal(30.0, radius), GetRandomReal(0.0, 360.0))
+        // 【加固】移除计时器回调内的 GetRandomReal。
+        // 改用基于索引 i 的确定性偏移（螺旋扩展步进），确保全服坐标绝对对齐。
+        const angle = i * 30.0 // 12个点均匀分布
+        const dist = 50.0 + (i % 3) * (radius / 3.0)
+        const pointLoc = polarProjection(targetLoc, dist, angle)
         const effectHandle = AddSpecialEffectLoc("Abilities\\Spells\\Undead\\DeathandDecay\\DeathandDecayTarget.mdl", pointLoc)
         destroyEffectLater(effectHandle, 0.35)
         RemoveLocation(pointLoc)
         i++
       }
 
-      const groupHandle = CreateGroup()
+      // 【加固】使用全服同步组
+      GroupClear(SYNC_GROUP)
       GroupEnumUnitsInRange(
-        groupHandle,
+        SYNC_GROUP,
         targetX,
         targetY,
         radius,
-        Filter(() => {
-          const enumUnit = GetFilterUnit()
-          return isUnitAlive(enumUnit) && IsUnitEnemy(enumUnit, owner) && !IsUnitType(enumUnit, UNIT_TYPE_STRUCTURE())
-        })
+        null
       )
-      ForGroup(groupHandle, () => {
+      ForGroup(SYNC_GROUP, () => {
         const target = GetEnumUnit()
-        UnitDamageTarget(caster, target, damage, false, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
-        const hitEffect = AddSpecialEffectTarget("Abilities\\Spells\\Undead\\DeathandDecay\\DeathandDecayDamage.mdl", target, "chest")
-        destroyEffectLater(hitEffect, 0.35)
+        if (isUnitAlive(target) && IsUnitEnemy(target, owner) && !IsUnitType(target, UNIT_TYPE_STRUCTURE())) {
+          UnitDamageTarget(caster, target, damage, false, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
+          const hitEffect = AddSpecialEffectTarget("Abilities\\Spells\\Undead\\DeathandDecay\\DeathandDecayDamage.mdl", target, "chest")
+          destroyEffectLater(hitEffect, 0.35)
+        }
       })
-      DestroyGroup(groupHandle)
+      GroupClear(SYNC_GROUP)
 
       if (elapsed >= duration) {
         RemoveLocation(targetLoc)
@@ -252,24 +256,25 @@ function registerUbstableTrigger(): void {
       if (elapsed >= duration) {
         const centerX = GetUnitX(caster)
         const centerY = GetUnitY(caster)
-        const groupHandle = CreateGroup()
+        
+        // 【加固】使用全服同步组
+        GroupClear(SYNC_GROUP)
         GroupEnumUnitsInRange(
-          groupHandle,
+          SYNC_GROUP,
           centerX,
           centerY,
           radius,
-          Filter(() => {
-            const enumUnit = GetFilterUnit()
-            return !IsUnitType(enumUnit, UNIT_TYPE_STRUCTURE()) && !IsUnitHidden(enumUnit) && isUnitAlive(enumUnit)
-          })
+          null
         )
-        ForGroup(groupHandle, () => {
+        ForGroup(SYNC_GROUP, () => {
           const target = GetEnumUnit()
-          UnitDamageTarget(caster, target, burstDamage, false, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
-          const effectHandle = AddSpecialEffectTarget("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdl", target, "chest")
-          destroyEffectLater(effectHandle, 0.3)
+          if (!IsUnitType(target, UNIT_TYPE_STRUCTURE()) && !IsUnitHidden(target) && isUnitAlive(target)) {
+            UnitDamageTarget(caster, target, burstDamage, false, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
+            const effectHandle = AddSpecialEffectTarget("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdl", target, "chest")
+            destroyEffectLater(effectHandle, 0.3)
+          }
         })
-        DestroyGroup(groupHandle)
+        GroupClear(SYNC_GROUP)
 
         SetUnitState(caster, attackState, GetUnitState(caster, attackState) - attackSpeedBonus)
         SetUnitMoveSpeed(caster, GetUnitDefaultMoveSpeed(caster))

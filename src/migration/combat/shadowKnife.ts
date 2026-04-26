@@ -22,6 +22,8 @@ import {
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
 import {
+  SYNC_GROUP,
+  SYNC_TEMP_GROUP,
   applyUnitBonus,
   disableLegacyTrigger,
   findItemInInventory,
@@ -32,7 +34,8 @@ import {
   registerPlayerUnitEventAll,
   replaceGlobalTrigger,
   setAbilityDataRealValue,
-  setAbilityDataStringValue
+  setAbilityDataStringValue,
+  toSyncInt
 } from "../core/helpers"
 import { ydhtLoadItemUseFlag, ydhtSaveItemUseFlag } from "../core/userData"
 
@@ -247,11 +250,12 @@ function runPrideRush(caster: unit, targetX: number, targetY: number, duration: 
 
   let elapsed = 0.0
   let visualElapsed = 0.0
-  const hitGroup = CreateGroup()
+  // 【加固】使用 JS 对象记录命中，不再动态申请魔兽 Group 句柄
+  const hitMap: Record<number, boolean> = {}
   const timerHandle = CreateTimer()
+  
   TimerStart(timerHandle, step, true, () => {
     if (!isUnitAlive(caster)) {
-      DestroyGroup(hitGroup)
       DestroyTimer(timerHandle)
       return
     }
@@ -269,21 +273,22 @@ function runPrideRush(caster: unit, targetX: number, targetY: number, duration: 
       destroyEffectLater(trail, 0.25)
     }
 
-    const enumGroup = CreateGroup()
-    GroupEnumUnitsInRange(enumGroup, moveX, moveY, 180.0, null)
-    ForGroup(enumGroup, () => {
+    // 【加固】使用全服同步组
+    GroupClear(SYNC_GROUP)
+    GroupEnumUnitsInRange(SYNC_GROUP, moveX, moveY, 180.0, null)
+    ForGroup(SYNC_GROUP, () => {
       const enumUnit = GetEnumUnit()
-      if (IsUnitEnemy(enumUnit, owner) && !IsUnitType(enumUnit, UNIT_TYPE_STRUCTURE()) && isUnitAlive(enumUnit) && !IsUnitInGroup(enumUnit, hitGroup)) {
-        GroupAddUnit(hitGroup, enumUnit)
+      const tid = GetHandleId(enumUnit)
+      if (!hitMap[tid] && IsUnitEnemy(enumUnit, owner) && !IsUnitType(enumUnit, UNIT_TYPE_STRUCTURE()) && isUnitAlive(enumUnit)) {
+        hitMap[tid] = true
         UnitDamageTarget(caster, enumUnit, hitDamage, false, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
       }
     })
-    DestroyGroup(enumGroup)
+    GroupClear(SYNC_GROUP)
 
     if (progress >= 1.0) {
       SetUnitX(caster, targetX)
       SetUnitY(caster, targetY)
-      DestroyGroup(hitGroup)
       DestroyTimer(timerHandle)
     }
   })
@@ -763,9 +768,10 @@ function registerSlothSkillTrigger(): void {
     const stomp = AddSpecialEffectTarget("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl", caster, "origin")
     destroyEffectLater(stomp, 0.50)
 
-    const groupHandle = CreateGroup()
-    GroupEnumUnitsInRange(groupHandle, GetUnitX(caster), GetUnitY(caster), 388.0, null)
-    ForGroup(groupHandle, () => {
+    // 【加固】使用全服同步组
+    GroupClear(SYNC_GROUP)
+    GroupEnumUnitsInRange(SYNC_GROUP, GetUnitX(caster), GetUnitY(caster), 388.0, null)
+    ForGroup(SYNC_GROUP, () => {
       const target = GetEnumUnit()
       if (!isUnitAlive(target) || !IsUnitEnemy(target, owner)) {
         return
@@ -785,7 +791,7 @@ function registerSlothSkillTrigger(): void {
 
       UnitDamageTarget(caster, target, damage, false, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
     })
-    DestroyGroup(groupHandle)
+    GroupClear(SYNC_GROUP)
   })
   replaceGlobalTrigger("gg_trg_sloth_skill", triggerHandle)
 }
@@ -991,27 +997,28 @@ function registerBloodShadowTrigger(): void {
     IssueTargetOrderById(dummy, 852274, hero)
     removeUnitLater(dummy, 2.0)
 
-    const groupHandle = CreateGroup()
-    const noPathingIllusions = CreateGroup()
-    GroupEnumUnitsInRange(groupHandle, GetUnitX(hero), GetUnitY(hero), 444.0, null)
-    ForGroup(groupHandle, () => {
+    // 【加固】同步组加固
+    GroupClear(SYNC_GROUP)
+    GroupClear(SYNC_TEMP_GROUP)
+    GroupEnumUnitsInRange(SYNC_GROUP, GetUnitX(hero), GetUnitY(hero), 444.0, null)
+    ForGroup(SYNC_GROUP, () => {
       const enumUnit = GetEnumUnit()
       if (IsUnitIllusion(enumUnit) && IsUnitOwnedByPlayer(enumUnit, GetOwningPlayer(hero))) {
         SetUnitPathing(enumUnit, false)
-        GroupAddUnit(noPathingIllusions, enumUnit)
+        GroupAddUnit(SYNC_TEMP_GROUP, enumUnit)
       }
     })
-    DestroyGroup(groupHandle)
+    GroupClear(SYNC_GROUP)
 
     const restorePathingTimer = CreateTimer()
     TimerStart(restorePathingTimer, 2.0, false, () => {
-      ForGroup(noPathingIllusions, () => {
+      ForGroup(SYNC_TEMP_GROUP, () => {
         const illusion = GetEnumUnit()
         if (GetWidgetLife(illusion) > 0.405) {
           SetUnitPathing(illusion, true)
         }
       })
-      DestroyGroup(noPathingIllusions)
+      GroupClear(SYNC_TEMP_GROUP)
       DestroyTimer(restorePathingTimer)
     })
 
@@ -1124,9 +1131,10 @@ function registerShadowShackleTrigger(): void {
     const casterY = GetUnitY(hero)
     const damage = 0.05 * GetUnitState(hero, UNIT_STATE_MAX_LIFE())
 
-    const group = CreateGroup()
-    GroupEnumUnitsInRange(group, casterX, casterY, radius, null)
-    ForGroup(group, () => {
+    // 【加固】同步组加固
+    GroupClear(SYNC_GROUP)
+    GroupEnumUnitsInRange(SYNC_GROUP, casterX, casterY, radius, null)
+    ForGroup(SYNC_GROUP, () => {
       const target = GetEnumUnit()
       if (IsUnitEnemy(target, GetOwningPlayer(hero)) && !IsUnitType(target, UNIT_TYPE_STRUCTURE())) {
         const enemyX = GetUnitX(target)
@@ -1146,7 +1154,7 @@ function registerShadowShackleTrigger(): void {
         removeUnitLater(dummy, 8.0)
       }
     })
-    DestroyGroup(group)
+    GroupClear(SYNC_GROUP)
 
     const timerHandle = CreateTimer()
     TimerStart(timerHandle, 0.15, false, () => {

@@ -34,6 +34,24 @@ const messageQueueRunningByPlayerId: Record<number, true> = {}
 const questMessageQueue: { whichPlayers: force; messageType: number; message: string }[] = []
 let questMessageQueueRunning = false
 
+/**
+ * 【加固】全服同步句柄池 (Handle Pools)
+ * 彻底解决由于本地动态创建 Group/Timer 导致的 Handle ID 抢占分叉。
+ */
+export const SYNC_GROUP = CreateGroup()
+export const SYNC_TEMP_GROUP = CreateGroup()
+export const SYNC_GROUP_3 = CreateGroup()
+export const SYNC_GROUP_4 = CreateGroup()
+export const SYNC_TIMER = CreateTimer()
+export const SYNC_TIMER_2 = CreateTimer()
+
+/**
+ * 将浮点数转换为确定性的同步整数，消除跨 CPU 精度分歧。
+ */
+export function toSyncInt(value: number): number {
+  return R2I(value + 0.0001)
+}
+
 for (let i = 0; i < ATTACK_BONUS_BIT_CHARS.length; i++) {
   const charCode = ATTACK_BONUS_BIT_CHARS.charAt(i)
   ATTACK_BONUS_BIT_ABILITY_IDS[i] = FourCC("YDb" + charCode)
