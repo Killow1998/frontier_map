@@ -1,8 +1,11 @@
 import {
   EVENT_PLAYER_UNIT_SPELL_CAST,
+  EVENT_PLAYER_UNIT_DEATH,
   EVENT_UNIT_DEATH,
   UNIT_STATE_LIFE,
-  bj_UNIT_FACING
+  UNIT_STATE_MAX_LIFE,
+  bj_UNIT_FACING,
+  bj_MAX_PLAYER_SLOTS
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
 import {
@@ -10,11 +13,21 @@ import {
   disableLegacyTrigger,
   displayTextToMercenaryPlayers,
   getGlobal,
+  registerPlayerUnitEventAll,
   replaceGlobalTrigger,
   toSyncInt
 } from "../core/helpers"
 
 const FINAL_ENEMY_UNIT_ID = FourCC("n012")
+
+/**
+ * 统计单位组数量（同步确定性版本）。
+ */
+function getGroupUnitCountSync(g: group): number {
+  let count = 0
+  ForGroup(g, () => { count++ })
+  return count
+}
 
 /**
  * 延迟执行（同步加固版）。
@@ -40,7 +53,18 @@ function registerBossRebirthTrigger(config: {
 }): void {
   disableLegacyTrigger(config.triggerGlobal)
   const triggerHandle = CreateTrigger()
-  TriggerRegisterAnyUnitEventBJ(triggerHandle, EVENT_UNIT_DEATH())
+  
+  // 【加固】直接绑定具体单位的死亡事件，避开类型不匹配的玩家通用事件
+  const boss = getGlobal<unit>(config.bossGlobal)
+  if (boss) {
+    TriggerRegisterUnitEvent(triggerHandle, boss, EVENT_UNIT_DEATH())
+  } else {
+    // 降级方案：监听全玩家英雄单位死亡
+    for (let i = 0; i < bj_MAX_PLAYER_SLOTS; i++) {
+        TriggerRegisterPlayerUnitEvent(triggerHandle, Player(i), EVENT_PLAYER_UNIT_DEATH(), null)
+    }
+  }
+  
   TriggerAddCondition(triggerHandle, Condition(() => GetTriggerUnit() === getGlobal<unit>(config.bossGlobal)))
   TriggerAddAction(triggerHandle, () => {
     const deadBoss = getGlobal<unit>(config.bossGlobal)
@@ -70,13 +94,12 @@ function registerBossRebirthTrigger(config: {
 function registerFinalRoundRemakeTrigger(): void {
   disableLegacyTrigger("gg_trg_final_round_remake")
   const triggerHandle = CreateTrigger()
-  // 该触发器通常由其他流程逻辑手动 TriggerExecute 或通过全局变量标记触发
+  
   TriggerAddAction(triggerHandle, () => {
     const bossBirthRect = getGlobal<rect>("gg_rct_boss_birth")
     const baseRect = getGlobal<rect>("gg_rct_base_area")
     if (!bossBirthRect || !baseRect) return
 
-    // 【加固】使用全服唯一同步组
     const enemyGroup = SYNC_GROUP
     GroupClear(enemyGroup)
     
@@ -89,8 +112,6 @@ function registerFinalRoundRemakeTrigger(): void {
     displayTextToMercenaryPlayers("最后一波敌人已进攻！")
 
     const patrolTimer = CreateTimer()
-    
-    // 【加固】300秒强制胜利保底逻辑，根除卡死风险
     const failSafeTimer = CreateTimer()
     let isGameWon = false
     
@@ -128,7 +149,7 @@ function registerFinalRoundRemakeTrigger(): void {
         }
       })
 
-      if (getGroupUnitCount(enemyGroup) === 0) {
+      if (getGroupUnitCountSync(enemyGroup) === 0) {
         triggerVictory()
       }
     })
@@ -142,7 +163,6 @@ function registerFinalRoundRemakeTrigger(): void {
 export function migrateFinalBattleAndRebirthTriggers(): void {
   registerFinalRoundRemakeTrigger()
   
-  // 注册主线 BOSS 重生点
   registerBossRebirthTrigger({
     triggerGlobal: "gg_trg_bug_rebirth",
     bossGlobal: "gg_unit_u000_0120",
