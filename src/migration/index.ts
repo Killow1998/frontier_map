@@ -6,7 +6,7 @@ import { migrateHpStealTrigger } from "./combat/hpSteal"
 import { migrateInitTrigger } from "./flow/mapInit"
 import { migrateDayInitTrigger } from "./flow/dayInit"
 import { migrateNobodyInitTrigger } from "./flow/nobodyInit"
-import { migrateShowDaTrigger } from "./combat/showDa"
+import { migrateShowDaTriggers } from "./combat/showDa"
 import { migrateBossInitTrigger } from "./flow/bossInit"
 import { migrateFirstEnemyStartTrigger } from "./flow/firstEnemyStart"
 import { migrateIntroGuideTrigger } from "./flow/introGuide"
@@ -84,7 +84,7 @@ export function runTriggerMigrations(): void {
   migrateInitTrigger()
   migrateDayInitTrigger()
   migrateNobodyInitTrigger()
-  migrateShowDaTrigger()
+  migrateShowDaTriggers()
   migrateBossInitTrigger()
   migrateFirstEnemyStartTrigger()
   migrateIntroGuideTrigger()

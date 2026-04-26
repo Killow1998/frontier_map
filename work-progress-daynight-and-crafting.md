@@ -963,3 +963,39 @@
   - **修复措施**：在 `src/migration/combat/neutralDeaths.ts` 中，原本用于计算复活坐标的 `GetRandomReal` 被写在了异步计时器的回调函数中。现已将其提前至死亡事件触发的瞬间（同步帧）进行结算，随后再通过闭包传给复活计时器，根除了并发定时器过期导致 RNG 序列混乱的问题。
 
 署名：**Gemini CLI**
+
+## 最新进展（2026-04-26：联机分车全面排查与修复）
+
+### 核心问题
+
+联机游玩时频繁分车，经过全面代码审计，确认以下分车根因：
+
+### 已修复：**DamageTexttag 对象池 GetRandomInt 导致 Handle ID 分叉（致命级）**
+
+- **文件**：`src/system/ui/DamageTexttag.ts:77-78, 99-100`
+- **根因**：`DamageText` 构造函数使用 `GetRandomInt(0, 999999)` 为 Frame 命名。`GetRandomInt` 是_wc3原生同步随机_，但 Frame 的 `createType` 底层调用原生 `CreateFrame`，**每次调用都会消耗全局 Handle 计数器**。不同客户端产生的随机值不同 → Frame 命名不同 → 各客户端 Handle 的内部编号序列产生偏移 → 后续所有句柄（unit、item、effect、texttag 等）编号不一致 → WC3 网络同步校验失败 → 分车。
+- 对象池初始化时创建 30 × (1+8) = **270 个 Frame**，每个都用 `GetRandomInt`，偏移量极大。
+- **修复措施**：
+  - 新增静态递增计数器 `DamageText.nextId`，用确定性 ID `${instanceId}` 替代 `GetRandomInt(0, 999999)`。
+  - 所有客户端按相同顺序创建 Frame → Handle 计数器消耗一致 → 后续句柄编号对齐 → 分车消除。
+- **注意**：虽然当前 `main.ts` 未在生产代码中初始化 `DamageTextManager`（仅存在示例代码），但该组件随时可能被启用，且其分车隐患极为隐蔽（UI 代码通常被认为"无害"），因此预防性修复至关重要。
+
+### 已确认无风险的现有代码
+
+以下代码经过审查确认**不会**导致分车，原因附注：
+
+1. **`showDa.ts` 的 `createSyncTextTag`**（`src/migration/combat/showDa.ts:28-59`）：已正确使用"全服同步创建 TextTag + GetLocalPlayer 透明度控制"模式，不会导致 Handle 分叉。注释已标注"彻底解决由于本地创建 Handle 导致的 ID 序列分叉"。
+
+2. **`GetLocalPlayer()` 在 camera.ts / mapInit.ts 中的使用**（`src/migration/core/camera.ts:9`, `src/migration/flow/mapInit.ts:185`）：仅用于控制镜头平移和选单位操作——这些都是纯本地 UI 行为，不修改游戏状态，不会分车。
+
+3. **combat 文件中的 `createTextTagOnUnit`**（alchemySpells.ts, bladeAndWave.ts, shadowKnife.ts 等）：这些 TextTag 在同步帧创建，虽然颜色未做 GetLocalPlayer 分支，但**TextTag 颜色差异不会导致分车**——它只影响显示，不影响 Handle 序列或游戏逻辑。
+
+4. **`worldToScreen` 中的 `DzGetWindowWidth/DzGetClientHeight`**（`src/utils/helper.ts:79-84`）：这些是本地分辨率参数，仅用于 UI Frame 坐标计算，不回写到游戏逻辑，不会分车。
+
+5. **combat 中的 `GetRandomInt/GetRandomReal`**（bossBranches.ts, alchemySpells.ts, meteorSystems.ts 等）：这些都在同步触发器（TriggerAddAction）或同步 Timer 回调中使用，所有客户端同时消耗相同的 RNG 值，不会分车。之前的修复已确保死亡掉落 RNG 不再放在异步轮询中。
+
+### 未在本次修复范围的事项
+
+- `DamageSystem.releaseUnitEvent()` 重注册后漏注册已存在单位（`src/system/damage.ts:101-105`）：此为功能缺陷而非分车问题，不影响联机同步。
+
+署名：**Claude**

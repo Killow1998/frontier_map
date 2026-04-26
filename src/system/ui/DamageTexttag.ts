@@ -72,10 +72,14 @@ class DamageText {
   private static readonly STANDARD_WIDTH = 1920;
   private static readonly STANDARD_HEIGHT = 1080;
 
+  /** 全局递增计数器，避免 GetRandomInt 导致各客户端 handle ID 分叉（分车） */
+  private static nextId: number = 0;
+
   constructor(maxDigits: number = 8) {
-    // 创建容器 Frame
+    const instanceId = DamageText.nextId++
+    // 创建容器 Frame — 使用确定性计数器代替 GetRandomInt，防止联机分车
     this.containerFrame = Frame.createType(
-      `DamageTextContainer_${GetRandomInt(0, 999999)}`,
+      `DamageTextContainer_${instanceId}`,
       Frame.fromHandle(DzGetGameUI())!,
       0,
       "BACKDROP",
@@ -97,7 +101,7 @@ class DamageText {
     // 预创建数字 Frame（最多 maxDigits 位）
     for (let i = 0; i < maxDigits; i++) {
       const digitFrame = Frame.createType(
-        `DamageDigit_${GetRandomInt(0, 999999)}_${i}`,
+        `DamageDigit_${instanceId}_${i}`,
         this.containerFrame,
         0,
         "BACKDROP",
