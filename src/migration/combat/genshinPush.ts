@@ -15,13 +15,11 @@ const PUSH_ABILITY_ID = FourCC("A01A")
 
 /**
  * 碰撞推送逻辑重构。
- * 加固：使用 SYNC_GROUP 预分配句柄池。
  */
 function registerGenshinPushTrigger(): void {
   disableLegacyTrigger("gg_trg_genshin_push")
   const triggerHandle = CreateTrigger()
   
-  // 该触发器通常由其他技能逻辑手动触发或监听特定伤害
   TriggerAddAction(triggerHandle, () => {
     const source = GetEventDamageSource()
     const target = GetTriggerUnit()
@@ -36,8 +34,8 @@ function registerGenshinPushTrigger(): void {
     ForGroup(SYNC_GROUP, () => {
       const u = GetEnumUnit()
       if (IsUnitEnemy(u, GetOwningPlayer(source)) && !IsUnitType(u, UNIT_TYPE_STRUCTURE()) && GetWidgetLife(u) > 0.405) {
-         // 执行推送位移逻辑（这里采用原子化位移）
-         const angle = math.atan2(GetUnitY(u) - ty, GetUnitX(u) - tx)
+         // 使用 Lua 5.3 标准的 math.atan
+         const angle = math.atan(GetUnitY(u) - ty, GetUnitX(u) - tx)
          SetUnitX(u, GetUnitX(u) + 50.0 * math.cos(angle))
          SetUnitY(u, GetUnitY(u) + 50.0 * math.sin(angle))
       }

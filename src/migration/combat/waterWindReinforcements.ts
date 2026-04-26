@@ -1,7 +1,8 @@
 import {
   ATTACK_TYPE_NORMAL,
   DAMAGE_TYPE_NORMAL,
-  EVENT_PLAYER_UNIT_SPELL_EFFECT
+  EVENT_PLAYER_UNIT_SPELL_EFFECT,
+  WEAPON_TYPE_WHOKNOWS
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
 import {
@@ -15,7 +16,6 @@ const WATER_SHIELD_BUFF_ID = FourCC("B004")
 
 /**
  * 水盾事件重构。
- * 加固：使用全局同步组进行范围溅射判定。
  */
 function registerWaterShieldTrigger(): void {
   disableLegacyTrigger("gg_trg_water_shield")
@@ -35,7 +35,7 @@ function registerWaterShieldTrigger(): void {
     ForGroup(SYNC_GROUP, () => {
       const u = GetEnumUnit()
       if (IsUnitEnemy(u, GetOwningPlayer(target)) && GetWidgetLife(u) > 0.405) {
-        UnitDamageTarget(target, u, damage * 0.40, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), null)
+        UnitDamageTarget(target, u, damage * 0.40, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
       }
     })
     GroupClear(SYNC_GROUP)

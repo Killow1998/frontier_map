@@ -1,7 +1,8 @@
 import {
   ATTACK_TYPE_NORMAL,
   DAMAGE_TYPE_NORMAL,
-  EVENT_PLAYER_UNIT_SPELL_EFFECT
+  EVENT_PLAYER_UNIT_SPELL_EFFECT,
+  WEAPON_TYPE_WHOKNOWS
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
 import {
@@ -15,7 +16,6 @@ const LIGHTING_ABILITY_ID = FourCC("A08U")
 
 /**
  * 雷击事件重构。
- * 加固：使用全局同步句柄池。
  */
 function registerLightingTrigger(): void {
   disableLegacyTrigger("gg_trg_lighting_armor_attack")
@@ -35,7 +35,7 @@ function registerLightingTrigger(): void {
     ForGroup(SYNC_GROUP, () => {
       const u = GetEnumUnit()
       if (IsUnitEnemy(u, GetOwningPlayer(target)) && GetWidgetLife(u) > 0.405) {
-        UnitDamageTarget(target, u, 100.0, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), null)
+        UnitDamageTarget(target, u, 100.0, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
         const fx = AddSpecialEffectTarget("Abilities\\Spells\\Orc\\LightningShield\\LightningShieldBuff.mdl", u, "origin")
         const t = CreateTimer()
         TimerStart(t, 0.5, false, () => {

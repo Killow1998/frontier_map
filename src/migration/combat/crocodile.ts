@@ -4,6 +4,7 @@ import {
   EVENT_UNIT_DEATH,
   EVENT_PLAYER_UNIT_SPELL_EFFECT,
   UNIT_STATE_MAX_LIFE,
+  WEAPON_TYPE_WHOKNOWS,
   bj_UNIT_FACING
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
@@ -11,12 +12,12 @@ import {
   SYNC_GROUP,
   disableLegacyTrigger,
   getGlobal,
+  registerPlayerUnitEventAll,
   replaceGlobalTrigger,
   toSyncInt
 } from "../core/helpers"
 
 const CROCODILE_UNIT_ID = FourCC("O005")
-const CROCODILE_DROP_ITEM_ID = FourCC("I034")
 
 function destroyEffectLater(fx: effect, duration: number): void {
   const t = CreateTimer()
@@ -27,13 +28,13 @@ function destroyEffectLater(fx: effect, duration: number): void {
 }
 
 /**
- * Crocodile_skill1：鳄鱼冲刺逻辑重构。
- * 加固：使用全服同步组进行碰撞检测。
+ * 冲刺逻辑重构。
  */
 function runCrocodileRush(caster: unit, targetX: number, targetY: number, damage: number): void {
   const startX = GetUnitX(caster)
   const startY = GetUnitY(caster)
-  const angle = math.atan2(targetY - startY, targetX - startX)
+  // 【同步加固】使用 Lua 5.3 标准的 math.atan
+  const angle = math.atan(targetY - startY, targetX - startX)
   const duration = 0.5
   let elapsed = 0.0
 
@@ -49,7 +50,6 @@ function runCrocodileRush(caster: unit, targetX: number, targetY: number, damage
     SetUnitX(caster, curX)
     SetUnitY(caster, curY)
 
-    // 【同步加固】
     GroupClear(SYNC_GROUP)
     GroupEnumUnitsInRange(SYNC_GROUP, curX, curY, 150.0, null)
     ForGroup(SYNC_GROUP, () => {
@@ -57,9 +57,7 @@ function runCrocodileRush(caster: unit, targetX: number, targetY: number, damage
       const uid = GetHandleId(u)
       if (!hitMap[uid] && IsUnitEnemy(u, GetOwningPlayer(caster)) && GetWidgetLife(u) > 0.405) {
         hitMap[uid] = true
-        UnitDamageTarget(caster, u, damage, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), null)
-        const hitFx = AddSpecialEffectTarget("Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdl", u, "origin")
-        destroyEffectLater(hitFx, 1.0)
+        UnitDamageTarget(caster, u, damage, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
       }
     })
     GroupClear(SYNC_GROUP)
@@ -73,7 +71,10 @@ function runCrocodileRush(caster: unit, targetX: number, targetY: number, damage
 function registerCrocodileSkillTrigger(): void {
   disableLegacyTrigger("gg_trg_Crocodile_skill1")
   const triggerHandle = CreateTrigger()
-  TriggerRegisterAnyUnitEventBJ(triggerHandle, EVENT_PLAYER_UNIT_SPELL_EFFECT())
+  
+  // 使用同步加固的玩家事件监听
+  registerPlayerUnitEventAll(triggerHandle, EVENT_PLAYER_UNIT_SPELL_EFFECT())
+  
   TriggerAddCondition(triggerHandle, Condition(() => GetSpellAbilityId() === FourCC("A09M")))
   TriggerAddAction(triggerHandle, () => {
     const caster = GetTriggerUnit()

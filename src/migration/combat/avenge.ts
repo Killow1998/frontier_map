@@ -23,14 +23,11 @@ const AVENGE_ABILITY_ID = FourCC("A002")
 
 /**
  * avenge：受击积累复仇能量并反伤。
- * 加固：移除动态 Group，使用 SYNC_GROUP 池。
  */
 function registerAvengeTrigger(): void {
   disableLegacyTrigger("gg_trg_Avenge")
   const triggerHandle = CreateTrigger()
-  const jassGlobals = require("jass.globals") as Record<string, any>
-  const anyUnitDamagedTrigger = jassGlobals["gg_trg_any_unit_damaged"]
-
+  
   TriggerAddAction(triggerHandle, () => {
     const target = GetTriggerUnit()
     const source = GetEventDamageSource()
@@ -39,13 +36,13 @@ function registerAvengeTrigger(): void {
     const damage = GetEventDamage()
     const owner = GetOwningPlayer(target)
 
-    // 【同步加固】使用全服唯一同步组进行范围判定
     GroupClear(SYNC_GROUP)
     GroupEnumUnitsInRange(SYNC_GROUP, GetUnitX(target), GetUnitY(target), 450.0, null)
     ForGroup(SYNC_GROUP, () => {
       const enumUnit = GetEnumUnit()
       if (IsUnitEnemy(enumUnit, owner) && GetWidgetLife(enumUnit) > 0.405) {
-        UnitDamageTarget(target, enumUnit, damage * 0.15, false, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), null)
+        // 【同步加固】修正 weapontype 传递
+        UnitDamageTarget(target, enumUnit, damage * 0.15, false, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
       }
     })
     GroupClear(SYNC_GROUP)
