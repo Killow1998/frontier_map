@@ -112,7 +112,6 @@ function registerFinalRoundRemakeTrigger(): void {
     displayTextToMercenaryPlayers("最后一波敌人已进攻！")
 
     const patrolTimer = CreateTimer()
-    const failSafeTimer = CreateTimer()
     let isGameWon = false
     
     const triggerVictory = () => {
@@ -128,13 +127,7 @@ function registerFinalRoundRemakeTrigger(): void {
       
       GroupClear(enemyGroup)
       DestroyTimer(patrolTimer)
-      DestroyTimer(failSafeTimer)
     }
-
-    TimerStart(failSafeTimer, 300.0, false, () => {
-      displayTextToMercenaryPlayers("|cff00ff00[保底机制] 战斗已持续过久，判定残留敌军溃退...|r")
-      triggerVictory()
-    })
 
     TimerStart(patrolTimer, 3.0, true, () => {
       const baseX = GetRectCenterX(baseRect)
