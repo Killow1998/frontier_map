@@ -9,15 +9,15 @@ import { migrateShowDaTriggers } from "./combat/showDa"
 import { migrateAvengeTriggers } from "./combat/avenge"
 import { migrateArcaneSpellTriggers } from "./combat/arcaneMagic"
 import { migrateAlchemySpellTriggers } from "./combat/alchemySpells"
-import { migrateAshArrowTriggers } from "./combat/ashArrow"
+import { migrateAshArrowTrigger } from "./combat/ashArrow"
 import { migrateBladeAndWaveTriggers } from "./combat/bladeAndWave"
 import { migrateCrocodileTriggers } from "./combat/crocodile"
 import { migrateGenshinTriggers } from "./combat/genshinPush"
-import { migrateGenshinHitTriggers } from "./combat/genshinHit"
+import { migrateGenshinHitTrigger } from "./combat/genshinHit"
 import { migrateLightingTriggers } from "./combat/lightingEvents"
 import { migrateSunAndOrbTriggers } from "./combat/sunAndOrb"
 import { migrateSupportSpellTriggers } from "./combat/supportSpells"
-import { migrateSwimmingTriggers } from "./combat/swimming"
+import { migrateSwimmingTrigger } from "./combat/swimming"
 import { migrateFireflyTriggers } from "./items/fireflyCloakEquip"
 import { migrateBookTriggers } from "./items/helmetDraftMagicBook"
 import { migrateReinforcementTriggers } from "./combat/waterWindReinforcements"
@@ -51,15 +51,15 @@ export function migrateAllTriggers(): void {
   migrateAvengeTriggers()
   migrateArcaneSpellTriggers()
   migrateAlchemySpellTriggers()
-  migrateAshArrowTriggers()
+  migrateAshArrowTrigger()
   migrateBladeAndWaveTriggers()
   migrateCrocodileTriggers()
   migrateGenshinTriggers()
-  migrateGenshinHitTriggers()
+  migrateGenshinHitTrigger()
   migrateLightingTriggers()
   migrateSunAndOrbTriggers()
   migrateSupportSpellTriggers()
-  migrateSwimmingTriggers()
+  migrateSwimmingTrigger()
   migrateReinforcementTriggers()
   migrateShadowKnifeTriggers()
   migrateSkillMorphTriggers()

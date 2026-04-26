@@ -16,7 +16,7 @@ import { buffBarTestExample } from "./test/BuffBarTestExample";
 import { shockwaveEffectCircleTest } from "./test/EffectExTestExample";
 import { testCasterJumpAndKnockEnemiesSkill, testUnitChargeToPointSkill, testUnitChargeToUnitSkill, testUnitJumpToSkill, testUnitKnockUpSkill } from "./test/UnitMovementSkillsTestExample";
 import { runSpellCardBulletHellTest } from "./test/BulletHellTestExample";
-import { runTriggerMigrations } from "./migration";
+import { migrateAllTriggers } from "./migration";
 import { takeOverRemainingLegacyTriggers } from "./migration/core/takeover";
 
 import { FourCC } from "./utils/helper";
@@ -46,7 +46,7 @@ async function main(): Promise<void> {
 export function initialize(): void {
   // register ydlua
   ydlua.getInstance().initialize();
-  runTriggerMigrations();
+  migrateAllTriggers();
   takeOverRemainingLegacyTriggers();
 
   //安装泄露检测（Timer / Trigger 句柄跟踪）
