@@ -129,9 +129,8 @@ function registerAreaSilenceTrigger(): void {
   TriggerAddCondition(triggerHandle, Condition(() => IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO()) && GetSpellAbilityId() === FourCC("A091")))
   TriggerAddAction(triggerHandle, () => {
     const caster = GetTriggerUnit()
-    const targetUnit = GetSpellTargetUnit()
-    const targetX = GetUnitX(targetUnit)
-    const targetY = GetUnitY(targetUnit)
+    const targetX = GetSpellTargetX()
+    const targetY = GetSpellTargetY()
 
     const setupTimer = CreateTimer()
     TimerStart(setupTimer, 0.2, false, () => {
