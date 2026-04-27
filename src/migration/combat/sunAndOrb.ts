@@ -3,22 +3,27 @@ import {
   DAMAGE_TYPE_NORMAL,
   EVENT_PLAYER_UNIT_SPELL_EFFECT,
   UNIT_STATE_MAX_LIFE,
+  WEAPON_TYPE_WHOKNOWS,
   bj_UNIT_FACING
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
 import {
-  SYNC_GROUP,
   disableLegacyTrigger,
   getGlobal,
   replaceGlobalTrigger,
   toSyncInt
 } from "../core/helpers"
 
+/**
+ * 【同步加固】局部静态池。
+ */
+const SYNC_GROUP = CreateGroup()
+
 const SUN_ORB_ABILITY_ID = FourCC("A08U")
 
 /**
  * Praise the Sun：太阳光照重构。
- * 加固：使用全局同步句柄池。
+ * 加固：使用局部静态同步句柄池。
  */
 function registerSunTrigger(): void {
   disableLegacyTrigger("gg_trg_Praise_the_Sun")
@@ -29,7 +34,6 @@ function registerSunTrigger(): void {
     const tx = GetUnitX(caster)
     const ty = GetUnitY(caster)
     
-    // 【同步加固】使用 SYNC_GROUP
     GroupClear(SYNC_GROUP)
     GroupEnumUnitsInRange(SYNC_GROUP, tx, ty, 600.0, null)
     ForGroup(SYNC_GROUP, () => {
