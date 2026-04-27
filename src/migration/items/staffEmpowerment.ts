@@ -19,7 +19,6 @@ import {
   getAbilityDataRealValue,
   getGlobal,
   isHumanMercenaryPlayer,
-  isUnitAlive,
   registerAnyUnitDamagedEvent,
   registerPlayerUnitEventAll,
   replaceGlobalTrigger,
@@ -65,6 +64,10 @@ function destroyEffectLater(effectHandle: effect, delay: number): void {
   })
 }
 
+function isUnitAliveLocal(unitHandle: unit): boolean {
+  return GetWidgetLife(unitHandle) > 0.405 && !IsUnitType(unitHandle, UNIT_TYPE_DEAD())
+}
+
 function isMercenaryHero(unitHandle: unit): boolean {
   if (!IsUnitType(unitHandle, UNIT_TYPE_HERO())) return false
   const ownerId = GetPlayerId(GetOwningPlayer(unitHandle))
@@ -108,7 +111,7 @@ function queueLightningExtraStun(target: unit, extraDuration: number): void {
     DestroyTimer(delayTimer)
     const bonusDuration = pendingLightningExtraStunByUnitId[unitId] ?? 0.0
     delete pendingLightningExtraStunByUnitId[unitId]
-    if (bonusDuration <= 0.0 || !isUnitAlive(target)) return
+    if (bonusDuration <= 0.0 || !isUnitAliveLocal(target)) return
     PauseUnit(target, true)
     const releaseTimer = CreateTimer()
     TimerStart(releaseTimer, bonusDuration, false, () => {
@@ -123,7 +126,7 @@ function registerStaffManaSiphonTrigger(): void {
   registerAnyUnitDamagedEvent(triggerHandle)
   TriggerAddAction(triggerHandle, () => {
     const source = GetEventDamageSource()
-    if (!source || !isUnitAlive(source) || !isMercenaryHero(source)) return
+    if (!source || !isUnitAliveLocal(source) || !isMercenaryHero(source)) return
     const siphonRate = getStaffManaSiphonRate(source)
     const restoreMana = GetEventDamage() * siphonRate
     if (restoreMana <= 0.0) return
@@ -153,10 +156,38 @@ function updateStaffIntScalingForHero(hero: unit): void {
   const unitId = GetHandleId(hero)
   const state = getOrCreateStaffScalingState(unitId)
   const intelligence = math.max(0.0, GetHeroInt(hero, true))
+  
+  // 蛇杖缩放
   const hasSnake = !!findItemInInventory(hero, STAFF_LV4_ITEM_ID)
-  const hasHell = !!findItemInInventory(hero, STAFF_LV5_ITEM_ID)
+  if (hasSnake) {
+    const targetSpeedBonus = intelligence * 0.01
+    const speedDiff = targetSpeedBonus - state.snakeSpeedBonus
+    if (math.abs(speedDiff) > 0.0001) {
+      SetUnitState(hero, UNIT_STATE_ATTACK_SPEED(), GetUnitState(hero, UNIT_STATE_ATTACK_SPEED()) + speedDiff)
+      state.snakeSpeedBonus = targetSpeedBonus
+    }
+  } else if (state.snakeSpeedBonus > 0) {
+    SetUnitState(hero, UNIT_STATE_ATTACK_SPEED(), GetUnitState(hero, UNIT_STATE_ATTACK_SPEED()) - state.snakeSpeedBonus)
+    state.snakeSpeedBonus = 0.0
+  }
 
-  // 缩放更新省略逻辑 (维持原样)...
+  // 地狱之杖缩放
+  const hasHell = !!findItemInInventory(hero, STAFF_LV5_ITEM_ID)
+  if (hasHell) {
+    const stackCount = math.floor(intelligence / HELL_STEP_INT)
+    const factor = getHellMultiplier(stackCount) - 1.0
+    const currentAttack = GetUnitState(hero, UNIT_STATE_ATTACK_WHITE())
+    const targetAttackBonus = (currentAttack - state.hellAttackBonus) * factor
+    const attackDiff = targetAttackBonus - state.hellAttackBonus
+    if (math.abs(attackDiff) > 0.0001) {
+      SetUnitState(hero, UNIT_STATE_ATTACK_WHITE(), currentAttack + attackDiff)
+      state.hellAttackBonus = targetAttackBonus
+    }
+  } else if (state.hellAttackBonus > 0) {
+    SetUnitState(hero, UNIT_STATE_ATTACK_WHITE(), GetUnitState(hero, UNIT_STATE_ATTACK_WHITE()) - state.hellAttackBonus)
+    state.hellAttackBonus = 0.0
+  }
+
   if (!hasSnake && !hasHell) delete staffScalingStateByUnitId[unitId]
 }
 
@@ -170,7 +201,7 @@ function registerStaffScalingTimer(): void {
       const hero = FirstOfGroup(SYNC_GROUP)
       if (!hero) break
       GroupRemoveUnit(SYNC_GROUP, hero)
-      if (isUnitAlive(hero) && isMercenaryHero(hero)) updateStaffIntScalingForHero(hero)
+      if (isUnitAliveLocal(hero) && isMercenaryHero(hero)) updateStaffIntScalingForHero(hero)
     }
     GroupClear(SYNC_GROUP)
     RemoveRect(world)
