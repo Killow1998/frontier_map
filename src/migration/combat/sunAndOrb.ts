@@ -35,7 +35,7 @@ function registerSunTrigger(): void {
     ForGroup(SYNC_GROUP, () => {
       const u = GetEnumUnit()
       if (IsUnitEnemy(u, GetOwningPlayer(caster)) && GetWidgetLife(u) > 0.405) {
-        UnitDamageTarget(caster, u, 300.0, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), null)
+        UnitDamageTarget(caster, u, 300.0, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_NORMAL(), WEAPON_TYPE_WHOKNOWS())
       }
     })
     GroupClear(SYNC_GROUP)

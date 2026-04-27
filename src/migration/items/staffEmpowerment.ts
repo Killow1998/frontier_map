@@ -12,7 +12,17 @@ import {
   WEAPON_TYPE_WHOKNOWS
 } from "@eiriksgata/wc3ts/src/globals/define"
 import { FourCC } from "../../utils/helper"
-import { findItemInInventory, getGlobal, registerAnyUnitDamagedEvent, registerPlayerUnitEventAll } from "../core/helpers"
+import {
+  SYNC_GROUP,
+  applyUnitBonus,
+  getAbilityDataRealValue,
+  getGlobal,
+  isHumanMercenaryPlayer,
+  isUnitAlive,
+  registerAnyUnitDamagedEvent,
+  registerPlayerUnitEventAll,
+  toSyncInt
+} from "../core/helpers"
 
 const STAFF_LV1_ITEM_ID = FourCC("I01S")
 const STAFF_LV2_ITEM_ID = FourCC("I01T")

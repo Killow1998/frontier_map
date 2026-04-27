@@ -43,7 +43,7 @@ function registerArcaneImpaleTrigger(): void {
     ForGroup(SYNC_GROUP, () => {
       const enumUnit = GetEnumUnit()
       if (IsUnitEnemy(enumUnit, GetOwningPlayer(caster)) && GetWidgetLife(enumUnit) > 0.405) {
-        UnitDamageTarget(caster, enumUnit, damage, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_MAGIC(), null)
+        UnitDamageTarget(caster, enumUnit, damage, true, false, ATTACK_TYPE_NORMAL(), DAMAGE_TYPE_MAGIC(), WEAPON_TYPE_WHOKNOWS())
       }
     })
     GroupClear(SYNC_GROUP)
