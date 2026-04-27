@@ -281,10 +281,11 @@ function ensureAnyUnitDamagedDispatcher(): void {
   }
 
   const world = GetWorldBounds()
-  const g = CreateGroup()
-  GroupEnumUnitsInRect(g, world, null)
-  ForGroup(g, () => registerUnit(GetEnumUnit()))
-  DestroyGroup(g)
+  // 【同步加固】
+  GroupClear(SYNC_TEMP_GROUP)
+  GroupEnumUnitsInRect(SYNC_TEMP_GROUP, world, null)
+  ForGroup(SYNC_TEMP_GROUP, () => registerUnit(GetEnumUnit()))
+  GroupClear(SYNC_TEMP_GROUP)
 
   anyUnitDamagedRegion = CreateRegion()
   RegionAddRect(anyUnitDamagedRegion, world)

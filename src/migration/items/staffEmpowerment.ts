@@ -359,19 +359,22 @@ function updateStaffIntScalingForHero(hero: unit): void {
 function registerStaffScalingTimer(): void {
   const timerHandle = CreateTimer()
   TimerStart(timerHandle, 1.0, true, () => {
-    const groupHandle = CreateGroup()
-    GroupEnumUnitsInRect(groupHandle, GetWorldBounds(), Filter(() => IsUnitType(GetFilterUnit(), UNIT_TYPE_HERO())))
+    // 【同步加固】
+    GroupClear(SYNC_GROUP)
+    const world = GetWorldBounds()
+    GroupEnumUnitsInRect(SYNC_GROUP, world, Filter(() => IsUnitType(GetFilterUnit(), UNIT_TYPE_HERO())))
     while (true) {
-      const hero = FirstOfGroup(groupHandle)
+      const hero = FirstOfGroup(SYNC_GROUP)
       if (!hero) {
         break
       }
-      GroupRemoveUnit(groupHandle, hero)
+      GroupRemoveUnit(SYNC_GROUP, hero)
       if (isUnitAlive(hero) && isMercenaryHero(hero)) {
         updateStaffIntScalingForHero(hero)
       }
     }
-    DestroyGroup(groupHandle)
+    GroupClear(SYNC_GROUP)
+    RemoveRect(world)
   })
 }
 
