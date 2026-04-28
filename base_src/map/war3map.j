@@ -213,6 +213,14 @@ integer YDWETimerSystem___TimerSystem_RunIndex= 0
 
 
 
+
+function CreateStandardDummy takes unit master, integer dummyId, real x, real y returns unit
+    local unit dummy = CreateUnit(GetOwningPlayer(master), dummyId, x, y, 0)
+    call SaveUnitHandle(YDHT, GetHandleId(dummy), StringHash("master"), master)
+    call UnitApplyTimedLife(dummy, 'BHwe', 2.0) // Auto cleanup
+    return dummy
+endfunction
+
 function CreateDynamicCriticalText takes unit u, string txt returns nothing
     local texttag tt = CreateTextTag()
     local real angle = GetRandomReal(70, 110)
@@ -5784,7 +5792,8 @@ call EXSetEventDamage(((LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * yd
         call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x74245F5C, R2I(YDWEGetUnitAbilityDataReal(GetEventDamageSource() , 'A06L' , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) , 110)))
         if ( ( GetRandomInt(1, 100) <= LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x74245F5C) ) ) then
             if ( ( YDWEDistanceBetweenUnits(GetTriggerUnit() , GetEventDamageSource()) <= 444.00 ) ) then
-                call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetEventDamageSource()), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
+                call CreateStandardDummy(GetEventDamageSource(), \'ewsp\', GetUnitX(GetEventDamageSource()), GetUnitY(GetEventDamageSource())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetEventDamageSource()), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
                 call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
                 call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
                 call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -6704,7 +6713,8 @@ function Trig_genshin_pushFunc001003002 takes nothing returns boolean
 endfunction
 function Trig_genshin_pushFunc002A takes nothing returns nothing
     call YDWETimerPatternRushSlide(GetEnumUnit() , YDWEAngleBetweenUnits(GetTriggerUnit() , GetEnumUnit()) , 300.00 , 0.50 , 0.03 , 0 , false , false , false , "origin" , "Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdl" , "Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdl")
-    call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetEnumUnit()), bj_UNIT_FACING)
+    call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetEnumUnit()), bj_UNIT_FACING)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840), true)
@@ -6845,7 +6855,8 @@ function Trig_time_shieldActions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     if ( ( GetRandomInt(1, 100) <= 30 ) ) then
-        call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetEventDamageSource()), bj_UNIT_FACING)
+        call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetEventDamageSource()), bj_UNIT_FACING)
         call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
         call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
         call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -7582,7 +7593,8 @@ function Trig_lighting_armorActions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801, GetTriggerUnit())
     call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetUnitLoc(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801)))
-    call CreateNUnitsAtLoc(1, 'e003', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801)), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), bj_UNIT_FACING)
+    call CreateStandardDummy(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801), \'e003\', GetUnitX(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801)), GetUnitY(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801))) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'e003\', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801)), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), bj_UNIT_FACING)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -7968,7 +7980,8 @@ function Trig_helmet_useConditions takes nothing returns boolean
 endfunction
 function Trig_helmet_useFunc001Func001A takes nothing returns nothing
     if ( ( IsUnitAlly(GetEnumUnit(), GetOwningPlayer(GetTriggerUnit())) == true ) and ( IsUnitType(GetEnumUnit(), UNIT_TYPE_STRUCTURE) == false ) and ( IsUnitIllusionBJ(GetEnumUnit()) == false ) ) then
-        call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetEnumUnit()), bj_UNIT_FACING)
+        call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetEnumUnit()), bj_UNIT_FACING)
         call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840, bj_lastCreatedUnit)
         call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840), false)
         call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840), true)
@@ -8118,7 +8131,8 @@ function Trig_book_fireActions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x5B71693F, ( ( 0 ) + ( 0 ) + ( GetHeroInt(GetTriggerUnit(), true) ) ))
-    call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetSpellTargetLoc(), bj_UNIT_FACING)
+    call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetSpellTargetLoc(), bj_UNIT_FACING)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -8148,7 +8162,8 @@ function Trig_shield_useActions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     if ( ( UnitHasBuffBJ(GetTriggerUnit(), 'B001') == true ) ) then
-        call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
+        call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
         call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
         call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
         call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -9469,7 +9484,8 @@ function Trig_Ash_ArrowActions takes nothing returns nothing
     else
     endif
     call SetItemCharges(YDWEGetItemOfTypeFromUnitBJNull(GetEventDamageSource() , 'I031'), LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5))
-    call CreateNUnitsAtLoc(1, 'e009', GetOwningPlayer(GetEventDamageSource()), GetUnitLoc(GetEventDamageSource()), GetUnitPropWindowBJ(GetEventDamageSource()))
+    call CreateStandardDummy(GetEventDamageSource(), \'e009\', GetUnitX(GetEventDamageSource()), GetUnitY(GetEventDamageSource())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'e009\', GetOwningPlayer(GetEventDamageSource()), GetUnitLoc(GetEventDamageSource()), GetUnitPropWindowBJ(GetEventDamageSource()))
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
     call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840) , 'A09P' , 1 , 108 , ( GetUnitState(GetEventDamageSource(), ConvertUnitState(0x15)) * 3.00 ))
     call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), 'A09P')
@@ -9664,7 +9680,8 @@ function Trig_area_slienceFunc005T takes nothing returns nothing
     if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xE2AED0F5) == 0 ) ) then
         call ResetUnitAnimation(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA))
         call PauseUnit(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), false)
-        call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), GetUnitLoc(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), bj_UNIT_FACING)
+        call CreateStandardDummy(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer(), \'ewsp\', GetUnitX(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), GetUnitY(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), GetUnitLoc(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), bj_UNIT_FACING)
         call SaveUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x90BB9840, bj_lastCreatedUnit)
         call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x90BB9840), false)
         call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x90BB9840), true)
@@ -9726,7 +9743,8 @@ function Trig_hpwaveFunc014T takes nothing returns nothing
     call SetUnitLifeBJ(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x400B680E), ( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x400B680E), UNIT_STATE_LIFE) + ( I2R(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x65A4C841)) * 1.00 ) ))
     call AddSpecialEffectTargetUnitBJ("overhead", LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x400B680E), "Abilities\\Spells\\Undead\\ReplenishHealth\\ReplenishHealthCaster.mdl")
     call YDWETimerDestroyEffect(0.44 , bj_lastCreatedEffect)
-    call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x400B680E)), GetUnitLoc(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x400B680E)), bj_UNIT_FACING)
+    call CreateStandardDummy(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer(), \'ewsp\', GetUnitX(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), GetUnitY(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x400B680E)), GetUnitLoc(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x400B680E)), bj_UNIT_FACING)
     call SaveUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x90BB9840), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x90BB9840), true)
@@ -11336,7 +11354,8 @@ function Trig_poisonous_fogActions takes nothing returns nothing
     call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90A2B744, YDWEGetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075) , 'A06W' , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) , 106))
     call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xCF7F00A7, YDWEGetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075) , 'A06W' , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) , 102))
     call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8, ( ( I2R(GetHeroStr(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075), true)) * ( 0.20 * I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239)) ) ) + ( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075), UNIT_STATE_MAX_MANA) * ( I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239)) * 0.02 ) ) ))
-    call CreateNUnitsAtLoc(1, 'e003', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075)), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), GetRandomDirectionDeg())
+    call CreateStandardDummy(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075), \'e003\', GetUnitX(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075)), GetUnitY(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075))) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'e003\', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075)), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), GetRandomDirectionDeg())
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
     call PauseUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -11412,7 +11431,8 @@ function Trig_ubstableActions takes nothing returns nothing
     call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetUnitLoc(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075)))
     call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90A2B744, YDWEGetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075) , 'A071' , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) , 106))
     call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xCF7F00A7, YDWEGetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075) , 'A071' , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) , 102))
-    call CreateNUnitsAtLoc(1, 'e003', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075)), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), GetRandomDirectionDeg())
+    call CreateStandardDummy(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075), \'e003\', GetUnitX(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075)), GetUnitY(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075))) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'e003\', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE6E64075)), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), GetRandomDirectionDeg())
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF798B817, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF798B817), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF798B817), true)
@@ -12143,7 +12163,8 @@ function Trig_sweet_soupActions takes nothing returns nothing
     endif
     if ( ( GetUnitTypeId(GetTriggerUnit()) == 'H00A' ) and ( GetUnitAbilityLevel(GetTriggerUnit(), 'A067') > 0 ) ) then
         if ( ( LoadBoolean(YDHT, 'A067', 0x1010ED95) == true ) ) then
-            call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), PolarProjectionBJ(GetUnitLoc(GetTriggerUnit()), 100.00, GetRandomDirectionDeg()), bj_UNIT_FACING)
+            call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), PolarProjectionBJ(GetUnitLoc(GetTriggerUnit()), 100.00, GetRandomDirectionDeg()), bj_UNIT_FACING)
             call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
             call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
             call EXSetUnitCollisionType(false, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), 1)
@@ -12332,7 +12353,8 @@ function Trig_Sharpening_Edge_learnActions takes nothing returns nothing
     else
         call DestroyEffect(LoadEffectHandle(YDHT, 'A067', 0x9F3E1AA6))
         if ( ( LoadBoolean(YDHT, 'A067', 0x1010ED95) == true ) ) then
-            call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), PolarProjectionBJ(GetUnitLoc(GetTriggerUnit()), 100.00, GetRandomDirectionDeg()), bj_UNIT_FACING)
+            call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), PolarProjectionBJ(GetUnitLoc(GetTriggerUnit()), 100.00, GetRandomDirectionDeg()), bj_UNIT_FACING)
             call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
             call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
             call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -12371,7 +12393,8 @@ function Trig_Sharpening_Edge_attackActions takes nothing returns nothing
  set ydl_localvar_step=ydl_localvar_step + 3
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), PolarProjectionBJ(GetUnitLoc(GetTriggerUnit()), 100.00, GetRandomDirectionDeg()), bj_UNIT_FACING)
+    call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), PolarProjectionBJ(GetUnitLoc(GetTriggerUnit()), 100.00, GetRandomDirectionDeg()), bj_UNIT_FACING)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -12454,7 +12477,8 @@ function Trig_blademan_dieActions takes nothing returns nothing
         call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE5171C8, GetKillingUnitBJ())
     endif
     if ( ( LoadBoolean(YDHT, 'A067', 0x1010ED95) == true ) ) then
-        call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE5171C8)), PolarProjectionBJ(GetUnitLoc(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE5171C8)), 100.00, GetRandomDirectionDeg()), bj_UNIT_FACING)
+        call CreateStandardDummy(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE5171C8), \'ewsp\', GetUnitX(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE5171C8)), GetUnitY(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE5171C8))) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE5171C8)), PolarProjectionBJ(GetUnitLoc(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE5171C8)), 100.00, GetRandomDirectionDeg()), bj_UNIT_FACING)
         call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
         call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
         call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -13288,7 +13312,8 @@ function Trig_sloth_skillFunc004001003 takes nothing returns boolean
 endfunction
 function Trig_sloth_skillFunc004A takes nothing returns nothing
     call YDWEJumpTimer(GetEnumUnit() , YDWEAngleBetweenUnits(GetEnumUnit() , GetTriggerUnit()) , ( ( YDWEDistanceBetweenUnits(GetEnumUnit() , GetTriggerUnit()) ) - ( 100.00 ) ) , 0.50 , 0.03 , 50.00)
-    call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetEnumUnit()), bj_UNIT_FACING)
+    call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetEnumUnit()), bj_UNIT_FACING)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840), true)
@@ -13381,7 +13406,8 @@ function Trig_wrath_skillActions takes nothing returns nothing
     call IncUnitAbilityLevel(GetTriggerUnit(), 'A05E')
     call DecUnitAbilityLevel(GetTriggerUnit(), 'A05E')
     call YDWEGeneralBounsSystemUnitSetBonus(GetTriggerUnit() , 2 , 1 , R2I(LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x15534168)))
-    call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
+    call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -13492,7 +13518,8 @@ function Trig_shadow_raidActions takes nothing returns nothing
     call SetUnitY(GetTriggerUnit(), GetLocationY(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC3155B14)))
     call SetUnitInvulnerable(GetTriggerUnit(), false)
     call SetUnitPathing(GetTriggerUnit(), true)
-    call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetSpellTargetLoc(), bj_UNIT_FACING)
+    call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetSpellTargetLoc(), bj_UNIT_FACING)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
     call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
     call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -13529,7 +13556,8 @@ function Trig_shadow_shackleConditions takes nothing returns boolean
 endfunction
 function Trig_shadow_shackleFunc004A takes nothing returns nothing
     if ( ( IsUnitEnemy(GetEnumUnit(), GetOwningPlayer(GetTriggerUnit())) == true ) and ( IsUnitType(GetEnumUnit(), UNIT_TYPE_STRUCTURE) == false ) and ( IsUnitIllusionBJ(GetEnumUnit()) == false ) ) then
-        call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), PolarProjectionBJ(GetUnitLoc(GetEnumUnit()), 100.00, YDWEAngleBetweenUnits(GetTriggerUnit() , GetEnumUnit())), bj_UNIT_FACING)
+        call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), PolarProjectionBJ(GetUnitLoc(GetEnumUnit()), 100.00, YDWEAngleBetweenUnits(GetTriggerUnit() , GetEnumUnit())), bj_UNIT_FACING)
         call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840, bj_lastCreatedUnit)
         call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840), false)
         call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0x90BB9840), true)
@@ -13636,7 +13664,8 @@ function Trig_blood_shadowActions takes nothing returns nothing
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9ABDB814, GetHeroAgi(GetTriggerUnit(), true))
     call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xCF7F00A7, ( ( 10.00 ) + ( 0.05 ) * ( I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9ABDB814)) ) ))
     if ( ( ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) >= 1 ) and ( GetRandomInt(1, 100) <= ( 5 + LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) ) ) ) ) then
-        call CreateNUnitsAtLoc(1, 'ewsp', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
+        call CreateStandardDummy(GetTriggerUnit(), \'ewsp\', GetUnitX(GetTriggerUnit()), GetUnitY(GetTriggerUnit())) // Tracking enabled
+// call CreateNUnitsAtLoc(1, \'ewsp\', GetOwningPlayer(GetTriggerUnit()), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
         call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840, bj_lastCreatedUnit)
         call ShowUnit(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), false)
         call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x90BB9840), true)
@@ -16165,28 +16194,58 @@ endfunction
 
 
 
-// Staff System Logic
-function StaffManaSiphonLogic takes unit attacker, real damage returns nothing
+
+// Enhanced Staff Mana Siphon System
+function StaffManaSiphonLogic takes unit source, real damage returns nothing
+    local unit master = source
+    local integer unitId
     local integer siphonPerc = 0
     local integer i = 0
-    local integer itId
     local item it
+    local real lastTriggerTime
     
+    // 1. Threshold Check (Ignore tick/small damage)
+    if (damage < 20.0) then
+        return
+    endif
+    
+    // 2. Summoned Exclusion
+    set unitId = GetUnitTypeId(source)
+    if (unitId == 'o000' or unitId == 'n00A') then
+        return
+    endif
+    
+    // 3. Dummy Source Redirection
+    if (IsUnitType(source, UNIT_TYPE_HERO) == false) then
+        set master = LoadUnitHandle(YDHT, GetHandleId(source), StringHash("master"))
+        if (master == null) then
+            return // No master found for this dummy, ignore
+        endif
+    endif
+
+    // 4. ICD Check (1.0s per Master)
+    set lastTriggerTime = LoadReal(YDHT, GetHandleId(master), StringHash("SiphonCD"))
+    if (TimerGetElapsed(bj_gameStartedTimer) - lastTriggerTime < 1.0) then
+         set master = null
+         return
+    endif
+
+    // 5. Calculate Siphon percentage
     set i = 0
     loop
         exitwhen i > 5
-        set it = UnitItemInSlot(attacker, i)
+        set it = UnitItemInSlot(master, i)
         if (it != null) then
-            set itId = GetItemTypeId(it)
-            if (itId == 'I01S') then
+            set unitId = GetItemTypeId(it)
+            if (unitId == 'I01S') then
                 set siphonPerc = siphonPerc + 1
-            elif (itId == 'I01T') then
+            elif (unitId == 'I01T') then
                 set siphonPerc = siphonPerc + 2
-            elif (itId == 'I01U') then
+            elif (unitId == 'I01U') then
                 set siphonPerc = siphonPerc + 3
-            elif (itId == 'I01V') then
+            elif (unitId == 'I01V') then
                 set siphonPerc = siphonPerc + 4
-            elif (itId == 'I01W') then
+            elif (unitId == 'I01W') then
                 set siphonPerc = siphonPerc + 5
             endif
         endif
@@ -16194,12 +16253,21 @@ function StaffManaSiphonLogic takes unit attacker, real damage returns nothing
     endloop
     
     if (siphonPerc > 0) then
-        call SetUnitState(attacker, UNIT_STATE_MANA, GetUnitState(attacker, UNIT_STATE_MANA) + damage * I2R(siphonPerc) * 0.01)
+        call SetUnitState(master, UNIT_STATE_MANA, GetUnitState(master, UNIT_STATE_MANA) + damage * I2R(siphonPerc) * 0.01)
+        call SaveReal(YDHT, GetHandleId(master), StringHash("SiphonCD"), TimerGetElapsed(bj_gameStartedTimer))
+        
+        // 6. Visual Feedback (Blue floating text)
+        // Only show if master is visible to player
+        if (GetLocalPlayer() == GetOwningPlayer(master)) then
+             // Using simple effect for now to avoid text spam
+             call DestroyEffect(AddSpecialEffectTarget("Abilities\Spells\Items\AIma\AImaTarget.mdl", master, "origin"))
+        endif
     endif
+    
+    set master = null
     set it = null
 endfunction
 
-// Special Staff Scaling (Summoner Verification + Bonus System)
 function StaffScalingActions takes nothing returns nothing
     local unit summoner = GetTriggerUnit()
     local unit summoned = GetSummonedUnit()
