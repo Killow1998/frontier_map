@@ -15527,15 +15527,19 @@ function Trig_enemystartFunc008Func002T takes nothing returns nothing
     
     if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x1D95A5A0) == 0 ) or ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x1D95A5A0) <= ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x7696C3FB) / 5 ) ) ) then
         if ( ( udg_enemywaveCount == 4 ) and ( udg_bosscnt < 2 ) and ( udg_bosswave == false ) ) then
+            set udg_enemywaveCount=( udg_enemywaveCount + 1 )
             set udg_bosswave=true
             call YDWETimerRunTrigger(2 , gg_trg_firstboss)
         elseif ( ( udg_enemywaveCount == 8 ) and ( udg_bosscnt < 3 ) and ( udg_bosswave == false ) ) then
+            set udg_enemywaveCount=( udg_enemywaveCount + 1 )
             set udg_bosswave=true
             call YDWETimerRunTrigger(2 , gg_trg_secondboss)
         elseif ( ( udg_enemywaveCount == 12 ) and ( udg_bosscnt < 4 ) and ( udg_bosswave == false ) ) then
+            set udg_enemywaveCount=( udg_enemywaveCount + 1 )
             set udg_bosswave=true
             call YDWETimerRunTrigger(2 , gg_trg_thirdboss)
         elseif ( ( udg_enemywaveCount == 16 ) and ( udg_bosscnt < 5 ) and ( udg_bosswave == false ) ) then
+            set udg_enemywaveCount=( udg_enemywaveCount + 1 )
             set udg_bosswave=true
             call YDWETimerRunTrigger(2 , gg_trg_fourthboss)
         elseif ( ( udg_bosswave == false ) ) then
