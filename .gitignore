@@ -1,0 +1,9 @@
+*.w3x
+*.exe
+*.dll
+/data/
+/log/
+/bin/
+/script/
+/template/
+!base_src/**/*.ini
