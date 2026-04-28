@@ -166,7 +166,7 @@ constant boolean LIBRARY_YDWEIssueBuildOrderByIdLocBJNull=true
 //endglobals from YDWEIssueBuildOrderByIdLocBJNull
 //globals from YDWEJumpTimer:
 constant boolean LIBRARY_YDWEJumpTimer=true
-//��Ծϵͳ���ȼ�
+//��Ծϵͳ���ȼ�
 integer MoveMoreLevel_JumpTimer=3
 //endglobals from YDWEJumpTimer
 //globals from YDWESetUnitFacingToFaceUnitTimedNull:
@@ -209,6 +209,46 @@ timer YDWETimerSystem___Timer
 integer YDWETimerSystem___TimerHandle
 integer YDWETimerSystem___TimerSystem_RunIndex= 0
 //endglobals from YDWETimerSystem
+
+
+
+
+function CreateDynamicCriticalText takes unit u, string txt returns nothing
+    local texttag tt = CreateTextTag()
+    local real angle = GetRandomReal(70, 110)
+    local real speed = GetRandomReal(0.02, 0.05)
+    call SetTextTagText(tt, txt, 0.028)
+    call SetTextTagPosUnit(tt, u, 0)
+    call SetTextTagColor(tt, 255, 215, 0, 255)
+    call SetTextTagVelocity(tt, speed * Cos(angle * 0.01745), speed * Sin(angle * 0.01745))
+    call SetTextTagVisibility(tt, true)
+    call SetTextTagFadepoint(tt, 0.8)
+    call SetTextTagLifespan(tt, 1.5)
+    call SetTextTagPermanent(tt, false)
+    set tt = null
+endfunction
+
+function EquipmentUpgradeLogic takes unit u, integer baseProb, string itemName returns boolean
+    local integer extra = LoadInteger(YDHT, GetHandleId(u), 0x77777777)
+    local integer chance = baseProb + extra
+    local string msg = ""
+    if ( GetRandomInt(1, 100) <= chance ) then
+        if ( extra == 0 ) then
+            set msg = "|cff00FF00暴击�" + itemName + "升级成功|r"
+        else
+            set msg = "|cff00FF00" + itemName + "升级成功，幸运的加持已衰减|r"
+        endif
+        call SaveInteger(YDHT, GetHandleId(u), 0x77777777, 0)
+        call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, msg)
+        return true
+    else
+        set extra = extra + 2
+        call SaveInteger(YDHT, GetHandleId(u), 0x77777777, extra)
+        set msg = "|cffFF0000升级失败，获得经验和幸运的加� (当前幸运加持: +" + I2S(extra) + "%)|r"
+        call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, msg)
+        return false
+    endif
+endfunction
     // User-defined
 integer udg_malicious_coin_kill= 0
 real udg_Critical_chance= 0
@@ -1506,14 +1546,14 @@ function YDWEGetRect takes real x,real y,real width,real height returns rect
     return Rect(x - width * 0.5, y - height * 0.5, x + width * 0.5, y + height * 0.5)
 endfunction
 //===========================================================================
-//设置单位可以飞行
+//设置单位�以��
 //===========================================================================
 function YDWEFlyEnable takes unit u returns nothing
     call UnitAddAbility(u, 'Amrf')
     call UnitRemoveAbility(u, 'Amrf')
 endfunction
 //===========================================================================
-//字符窜与ID转换
+//字�窜与ID��
 //===========================================================================
 function YDWEId2S takes integer value returns string
     local string charMap=bj_AllString
@@ -1574,9 +1614,9 @@ function YDWESetMapLimitCoordinate takes real MinX,real MaxX,real MinY,real MaxY
 endfunction
 //===========================================================================
 //===========================================================================
-//地图初始化
+//地图初�化
 //===========================================================================
-//YDWE特殊技能结束事件 
+//YDWE特殊�能结束事� 
 function YDWESyStemAbilityCastingOverTriggerAction takes unit hero,integer index returns nothing
  local integer i= 0
     loop
@@ -1591,7 +1631,7 @@ function YDWESyStemAbilityCastingOverTriggerAction takes unit hero,integer index
     endloop
 endfunction
 //===========================================================================  
-//YDWE技能捕捉事件 
+//YDWE�能捕捉事� 
 //===========================================================================  
 function YDWESyStemAbilityCastingOverRegistTrigger takes trigger trg,integer index returns nothing
 	set YDWEBase___AbilityCastingOverEventQueue[YDWEBase___AbilityCastingOverEventNumber]=trg
@@ -1653,12 +1693,12 @@ function YDWEGetUnitItemSoftId takes unit hero,item it returns integer
 endfunction
 //===========================================================================
 //===========================================================================
-//地图初始化
+//地图初�化
 //===========================================================================
 //===========================================================================
 //显示版本
 function YDWEVersion_Display takes nothing returns boolean
-    call DisplayTimedTextToPlayer(GetTriggerPlayer(), 0, 0, 30, "|cFF1E90FF当前编辑器版本为： |r|cFF00FF00YDWE 1.32.12.181229")
+    call DisplayTimedTextToPlayer(GetTriggerPlayer(), 0, 0, 30, "|cFF1E90FF当前编辑器版�为： |r|cFF00FF00YDWE 1.32.12.181229")
     return false
 endfunction
 function YDWEVersion_Init takes nothing returns nothing
@@ -1736,7 +1776,7 @@ endfunction
 //library YDWEEventDamageData ends
 //library YDWEGeneralBounsSystem:
 
-//以下函数仅仅是让技能ID出现在代码里，不然SLK优化器会删除这些技能
+//以下函数仅仅�让技能ID出现在代码里，不然SLK优化器会删除这些��
 function YDWEGeneralBounsSystem___DisplayAllAbilityId takes nothing returns nothing
     local integer aid=0
     set aid='YDl0'
@@ -1859,7 +1899,7 @@ endfunction
     endfunction
 function YDWEGeneralBounsSystem___UnitSetBonus takes unit u,integer bonusType,integer ammount returns boolean
     local integer i
-    //设置属性为0不进行Loop
+    //设置属�为0不进行Loop
     if ammount == 0 then
         call YDWEGeneralBounsSystem___UnitClearBonus(u , bonusType)
         return false
@@ -2039,7 +2079,7 @@ function YDWEGeneralBounsSystem___Initialize takes nothing returns nothing
         set n=n + 1
         exitwhen n >= 4
     endloop
-    //预读技能
+    //预�技�
     if YDWEGeneralBounsSystem___PRELOAD_ABILITYS then
         set u=CreateUnit(Player(15), YDWEGeneralBounsSystem___PRELOAD_DUMMY_UNIT, 0, 0, 0)
         set i=0
@@ -2096,7 +2136,7 @@ function YDWELifeChange takes unit u,integer mod,integer ch,integer id returns n
     endloop
 endfunction
 //===========================================================================
-//修改魔法
+//�改魔�
 //===========================================================================
 function YDWEManaChange takes unit u,integer mod,integer ch,integer id returns nothing
     local integer a
@@ -2294,7 +2334,7 @@ endfunction
 //library YDWETriggerEvent:
 	
 //===========================================================================  
-//���ⵥλ�˺��¼� 
+//���ⵥλ�˺��¼� 
 //===========================================================================
 function YDWEAnyUnitDamagedTriggerAction takes nothing returns nothing
     local integer i= 0
@@ -2341,7 +2381,7 @@ function YDWESyStemAnyUnitDamagedRegistTrigger takes trigger trg returns nothing
     set YDWETriggerEvent___DamageEventNumber=YDWETriggerEvent___DamageEventNumber + 1
 endfunction
 //===========================================================================  
-//�ƶ���Ʒ�¼� 
+//�ƶ���Ʒ�¼� 
 //===========================================================================  
 function YDWESyStemItemUnmovableTriggerAction takes nothing returns nothing
     local integer i= 0
@@ -2421,7 +2461,7 @@ function YDWEAddAIOrder___AIOrderRun takes nothing returns boolean
         exitwhen i >= count
         set i=i + 1
     endloop
-    // 1����Ŀ�� 2����Ŀ�� 3����Ŀ�� 4���Լ�
+    // 1����Ŀ�� 2����Ŀ�� 3����Ŀ�� 4���Լ�
     if index == 1 then
         call IssueTargetOrderById(u, order, GetEventTargetUnit())
     elseif index == 2 then
@@ -2441,12 +2481,12 @@ function YDWEAddAIOrder takes unit u,integer N,integer index,string orderA,strin
     if i == 0 then
         set trg=CreateTrigger()
         if N == 1 then
-            call TriggerRegisterUnitEvent(trg, u, EVENT_UNIT_TARGET_IN_RANGE) //�÷�������Ϊ�¼�
+            call TriggerRegisterUnitEvent(trg, u, EVENT_UNIT_TARGET_IN_RANGE) //�÷�������Ϊ�¼�
 else
-            call TriggerRegisterUnitEvent(trg, u, EVENT_UNIT_ATTACKED) //�ñ�����Ϊ�¼� 
+            call TriggerRegisterUnitEvent(trg, u, EVENT_UNIT_ATTACKED) //�ñ�����Ϊ�¼� 
 endif
         call SaveInteger(YDHT, StringHash((I2S((GetHandleId((u)))) )), StringHash(( "MercenaryTrigger" )), ( (GetHandleId((trg))))) // INLINED!!
-        call SaveTriggerConditionHandle(YDHT, StringHash((I2S((GetHandleId((trg)))) )), StringHash(( "TriggerCondition" )), ( TriggerAddCondition(trg, Condition(function YDWEAddAIOrder___AIOrderRun)))) //�ðɣ��������Ч���Ƿǳ����Ե� // INLINED!!
+        call SaveTriggerConditionHandle(YDHT, StringHash((I2S((GetHandleId((trg)))) )), StringHash(( "TriggerCondition" )), ( TriggerAddCondition(trg, Condition(function YDWEAddAIOrder___AIOrderRun)))) //�ðɣ��������Ч���Ƿǳ����Ե� // INLINED!!
 endif
     if index == 1 then
         set order=orderA
@@ -2457,13 +2497,13 @@ endif
       elseif index == 4 then
         set order=orderA
     endif
-    call SaveInteger(YDHT, StringHash((I2S((GetHandleId((u)))) )), StringHash(( "MercenaryAIOrder" + I2S(i) )), ( OrderId(order))) //ʹ��OrderIdҪ��OrderString�õö� // INLINED!!
+    call SaveInteger(YDHT, StringHash((I2S((GetHandleId((u)))) )), StringHash(( "MercenaryAIOrder" + I2S(i) )), ( OrderId(order))) //ʹ��OrderIdҪ��OrderString�õö� // INLINED!!
 call SaveInteger(YDHT, StringHash((I2S((GetHandleId((u)))) )), StringHash(( "MercenaryAIOrder_Probability" + I2S(i) )), ( probability)) // INLINED!!
     call SaveInteger(YDHT, StringHash((I2S((GetHandleId((u)))) )), StringHash(( "MercenaryAIOrder_Index" + I2S(i) )), ( index)) // INLINED!!
     call SaveInteger(YDHT, StringHash((I2S((GetHandleId((u)))) )), StringHash(( "MercenaryAIOrder_Count" )), ( i + 1)) // INLINED!!
     set trg=null
 endfunction 
-//�������պ���
+//�������պ���
 function YDWEFlushAIOrder takes unit u returns nothing
     local trigger trg=(LoadTriggerHandle(YDHT, StringHash((I2S((GetHandleId((u)))) )), StringHash(( "MercenaryTrigger")))) // INLINED!!
     call TriggerRemoveCondition(trg, (LoadTriggerConditionHandle(YDHT, StringHash((I2S((GetHandleId((trg)))) )), StringHash(( "TriggerCondition"))))) // INLINED!!
@@ -2597,7 +2637,7 @@ function GetLastCombinedItem takes nothing returns item
     return bj_lastCombinedItem
 endfunction
 //===========================================================================
-//��Ʒ�ϳ�
+//��Ʒ�ϳ�
 function YDWESyStemItemCombineTriggerAction takes nothing returns nothing
  local integer i= 0
     loop
@@ -2610,7 +2650,7 @@ function YDWESyStemItemCombineTriggerAction takes nothing returns nothing
 endfunction
 //GetLastMovedItemInItemSlot 
 //===========================================================================  
-//��Ʒ�ϳ��¼� 
+//��Ʒ�ϳ��¼� 
 //===========================================================================  
 function YDWESyStemItemCombineRegistTrigger takes trigger trg returns nothing
 	set YDWEStringFormula___ItemCombineEventQueue[YDWEStringFormula___ItemCombineEventNumber]=trg
@@ -2741,7 +2781,7 @@ endfunction
             set s__YDWEStringFormula___FormulaMatrix_segmLen[this]=lingth
             
             set s__YDWEStringFormula___FormulaMatrix_model[this]=null //"Abilities\\Spells\\Items\\AIam\\AIamTarget.mdl"
-set s__YDWEStringFormula___FormulaMatrix_message[this]=null //"|cff00ff00��ϳ��ˣ�|r" 
+set s__YDWEStringFormula___FormulaMatrix_message[this]=null //"|cff00ff00��ϳ��ˣ�|r" 
 set s__YDWEStringFormula___FormulaMatrix_chance[this]=100
             set s__YDWEStringFormula___FormulaMatrix_delete[this]=false
             call SaveInteger(YDHT, StringHash(("YDWEStringFormula." + I2S((s__YDWEStringFormula___FormulaMatrix_Data)) )), StringHash(( (formStr) )), ( ( (this)))) // INLINED!!
@@ -3085,9 +3125,9 @@ endfunction
 //library YDWEStringFormula ends
 //library YDWETimerPattern:
 //***************************************************
-//* �� - Matrix ����ģ�庯��
+//* �� - Matrix ����ģ�庯��
 //*--------------------
-//* ���ߣ�Warft_TigerCN  �����Ż���Fetrix_sai
+//* ���ߣ�Warft_TigerCN  �����Ż���Fetrix_sai
 //***************************************************
     //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     //                                       Timer Pattern Union                                              //
@@ -3464,7 +3504,7 @@ function YDWETimerSystem___DeleteTaskIndex takes integer index returns nothing
 	set YDWETimerSystem___TaskListIdle[index]=YDWETimerSystem___TaskListIdleHead
 	set YDWETimerSystem___TaskListIdleHead=index
 endfunction
-//�ú������д���
+//�ú������д���
 function YDWETimerSystem___NewTask takes real time,trigger proc returns integer
  local integer index= YDWETimerSystem___NewTaskIndex()
  local integer h= YDWETimerSystem___TaskListHead
@@ -3490,7 +3530,7 @@ endfunction
 function YDWETimerSystemGetCurrentTask takes nothing returns integer
 	return YDWETimerSystem___CurrentIndex
 endfunction
-//ɾ����λ
+//ɾ����λ
 function YDWETimerSystem___RemoveUnit_CallBack takes nothing returns nothing
     call RemoveUnit(LoadUnitHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex))
     call RemoveSavedHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex)
@@ -3498,7 +3538,7 @@ endfunction
 function YDWETimerRemoveUnit takes real time,unit u returns nothing
     call SaveUnitHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___NewTask(time , YDWETimerSystem___fnRemoveUnit), u)
 endfunction
-//�ݻټ�ʱ��
+//�ݻټ�ʱ��
 function YDWETimerSystem___DestroyTimer_CallBack takes nothing returns nothing
     call DestroyTimer(LoadTimerHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex))
     call RemoveSavedHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex)
@@ -3506,7 +3546,7 @@ endfunction
 function YDWETimerDestroyTimer takes real time,timer t returns nothing
     call SaveTimerHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___NewTask(time , YDWETimerSystem___fnDestroyTimer), t)
 endfunction
-//ɾ����Ʒ
+//ɾ����Ʒ
 function YDWETimerSystem___RemoveItem_CallBack takes nothing returns nothing
     call RemoveItem(LoadItemHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex))
     call RemoveSavedHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex)
@@ -3514,7 +3554,7 @@ endfunction
 function YDWETimerRemoveItem takes real time,item it returns nothing
     call SaveItemHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___NewTask(time , YDWETimerSystem___fnRemoveItem), it)
 endfunction
-//ɾ����Ч
+//ɾ����Ч
 function YDWETimerSystem___DestroyEffect_CallBack takes nothing returns nothing
     call DestroyEffect(LoadEffectHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex))
     call RemoveSavedHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex)
@@ -3522,7 +3562,7 @@ endfunction
 function YDWETimerDestroyEffect takes real time,effect e returns nothing
     call SaveEffectHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___NewTask(time , YDWETimerSystem___fnDestroyEffect), e)
 endfunction
-//ɾ��������Ч
+//ɾ��������Ч
 function YDWETimerSystem___DestroyLightning_CallBack takes nothing returns nothing
     call DestroyLightning(LoadLightningHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex))
     call RemoveSavedHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex)
@@ -3531,7 +3571,7 @@ function YDWETimerDestroyLightning takes real time,lightning lt returns nothing
  local integer i= YDWETimerSystem___NewTask(time , YDWETimerSystem___fnDestroyLightning)
     call SaveLightningHandle(YDHT, YDWETimerSystem___TimerHandle, i, lt)
 endfunction
-//���д�����
+//���д�����
 function YDWETimerSystem___RunTrigger_CallBack takes nothing returns nothing
     call TriggerExecute(LoadTriggerHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex))
     call RemoveSavedHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___CurrentIndex)
@@ -3539,7 +3579,7 @@ endfunction
 function YDWETimerRunTrigger takes real time,trigger trg returns nothing
     call SaveTriggerHandle(YDHT, YDWETimerSystem___TimerHandle, YDWETimerSystem___NewTask(time , YDWETimerSystem___fnRunTrigger), trg)
 endfunction
-//ɾ��Ư������
+//ɾ��Ư������
 function YDWETimerDestroyTextTag takes real time,texttag tt returns nothing
     local integer N=0
     local integer i=0
@@ -3550,7 +3590,7 @@ function YDWETimerDestroyTextTag takes real time,texttag tt returns nothing
     call SetTextTagLifespan(tt, time)
     call SetTextTagFadepoint(tt, time)
 endfunction
-//���ļ�ʱ��������
+//���ļ�ʱ��������
 function YDWETimerSystem___Main takes nothing returns nothing
  local integer h= YDWETimerSystem___TaskListHead
  local integer p
@@ -3564,7 +3604,7 @@ function YDWETimerSystem___Main takes nothing returns nothing
 	endloop
 	set YDWETimerSystem___CurrentTime=YDWETimerSystem___CurrentTime + 1
 endfunction
-//��ʼ������
+//��ʼ������
 function YDWETimerSystem___Init takes nothing returns nothing
     set YDWETimerSystem___Timer=CreateTimer()
 	set YDWETimerSystem___TimerHandle=GetHandleId(YDWETimerSystem___Timer)
@@ -3590,7 +3630,7 @@ function YDWETimerSystem___Init takes nothing returns nothing
 	
     call TimerStart(YDWETimerSystem___Timer, 0.01, true, function YDWETimerSystem___Main)
 endfunction
-//ѭ�������ö�����ʱ��
+//ѭ�������ö�����ʱ��
 function YDWETimerSystemGetRunIndex takes nothing returns integer
     return YDWETimerSystem___TimerSystem_RunIndex
 endfunction
@@ -3666,7 +3706,7 @@ endfunction
 //library YDWETimerSystem ends
 //===========================================================================
 // 
-// 边陲驻泊（REMAKE）
+// 边陲驻泊（REMAKE�
 // 
 //   Warcraft III map script
 //   Generated by the Warcraft III World Editor
@@ -4994,8 +5034,8 @@ endfunction
 //===========================================================================
 function Trig_difficulty_selectionFunc012Conditions takes nothing returns nothing
     set udg_difficulty=1
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "您选择了难度：晨曦
-夜晚流速加快，夜间敌人小幅度加强")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "您�择了难度：晨曦
+夜晚流�加�，�间敌人小幅度加�")
     call SetTimeOfDay(23.98)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()))
     call DestroyTrigger(GetTriggeringTrigger())
@@ -5003,8 +5043,8 @@ endfunction
 function Trig_difficulty_selectionFunc013Conditions takes nothing returns nothing
     set udg_difficulty=2
     set udg_boss_property=( ( udg_boss_property ) * ( 14 ) / ( 10 ) )
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "您选择了难度：暮色
-白天流速加快，夜间敌人加强")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "您�择了难度：��
+白天流�加�，�间敌人加强")
     call SetTimeOfDay(23.98)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()))
     call DestroyTrigger(GetTriggeringTrigger())
@@ -5012,8 +5052,8 @@ endfunction
 function Trig_difficulty_selectionFunc014Conditions takes nothing returns nothing
     set udg_difficulty=3
     set udg_boss_property=( ( udg_boss_property ) * ( 18 ) / ( 10 ) )
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "您选择了难度：极夜
-白天流速大幅度加快，夜间敌人大幅度加强")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "您�择了难度：极�
+白天流�大幅度加快，�间敌人大幅度加�")
     call SetTimeOfDay(23.98)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()))
     call DestroyTrigger(GetTriggeringTrigger())
@@ -5036,8 +5076,8 @@ function Trig_difficulty_selectionActions takes nothing returns nothing
                 if ( ( GetPlayerSlotState(Player(3)) == PLAYER_SLOT_STATE_PLAYING ) and ( GetPlayerController(Player(3)) == MAP_CONTROL_USER ) ) then
                     call SavePlayerHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC5E79D1F, Player(3))
                 else
-                    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "默认选择了难度：短夜
-夜晚流速加快，夜间敌人小幅度加强")
+                    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "默��择了难度：��
+夜晚流�加�，�间敌人小幅度加�")
                     set udg_difficulty=1
                     call SetTimeOfDay(23.98)
                     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -5051,9 +5091,9 @@ function Trig_difficulty_selectionActions takes nothing returns nothing
     call DialogSetMessage(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF60032A7), "难度选取")
     call DialogAddButtonBJ(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF60032A7), "晨曦")
     call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF5F725A7, GetLastCreatedButtonBJ())
-    call DialogAddButtonBJ(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF60032A7), "暮色")
+    call DialogAddButtonBJ(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF60032A7), "��")
     call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB0FD2C34, GetLastCreatedButtonBJ())
-    call DialogAddButtonBJ(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF60032A7), "极夜")
+    call DialogAddButtonBJ(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF60032A7), "极�")
     call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x454E3900, GetLastCreatedButtonBJ())
     call DialogDisplay(LoadPlayerHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC5E79D1F), LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xF60032A7), true)
     set ydl_trigger=CreateTrigger()
@@ -5102,6 +5142,7 @@ function Trig_day_comeActions takes nothing returns nothing
     call SaveTriggerHandle(YDLOC, GetHandleId(ydl_timer), 0xC8EDF03E, GetTriggeringTrigger())
     call TimerStart(ydl_timer, I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE9692603 + ( udg_difficulty ))), false, function Trig_day_comeFunc007T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -5134,20 +5175,20 @@ function Trig_night_comeFunc013Func006A takes nothing returns nothing
     endif
 endfunction
 // ==========================================
-// 【排版修复】：把收尾函数提前，供下面的计时器调用
+// 【排版修复�：把收尾函数提前，供下面的计时器调�
 // ==========================================
 function Trig_night_comeFunc020Func005A takes nothing returns nothing
     call UnitRemoveAbility(GetEnumUnit(), 'A0AD')
     call GroupRemoveUnit(LoadGroupHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xA01624EA), GetEnumUnit())
 endfunction
 // ==========================================
-// 核心：0.5秒循环判定 (道具打断机制)
+// 核心�0.5秒循�判定 (道具打断机制)
 // ==========================================
 function Trig_night_comeFunc013T takes nothing returns nothing
     local group ydl_group
     local unit ydl_unit
     
-    // 【拦截】：如果使用了人造太阳，剥夺魔抗并跳过本次循环
+    // 【拦�】：如果使用了人造太阳，剥夺魔抗并跳过本次循�
     if ( udg_force_day == true ) then
         call ForGroupBJ(LoadGroupHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xA01624EA), function Trig_night_comeFunc020Func005A)
         return
@@ -5210,17 +5251,17 @@ function Trig_night_comeActions takes nothing returns nothing
     call SaveGroupHandle(YDLOC, GetHandleId(ydl_timer), 0x1F5F5005, LoadGroupHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x1F5F5005))
     call TimerStart(ydl_timer, 0.50, true, function Trig_night_comeFunc013T)
     
-    // 绑定给全局变量 Night_Timer
+    // 绑定给全�变量 Night_Timer
     call SaveTimerHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x2FFC2E47, CreateTimer())
     set udg_Night_Timer=LoadTimerHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x2FFC2E47)
     call StartTimerBJ(LoadTimerHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x2FFC2E47), false, I2R(( 240 - LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE9692603 + ( udg_difficulty )) )))
     
     call SaveTimerDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBEAFBEEF, CreateTimerDialog(LoadTimerHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x2FFC2E47)))
-    call TimerDialogSetTitle(LoadTimerDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBEAFBEEF), "距黎明来临还有")
+    call TimerDialogSetTitle(LoadTimerDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBEAFBEEF), "距黎明来临还�")
     call TimerDialogDisplay(LoadTimerDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBEAFBEEF), true)
     call UseTimeOfDayBJ(false)
     
-    // 绑定给全局变量 Night_Timer_End
+    // 绑定给全�变量 Night_Timer_End
     set ydl_timer=CreateTimer()
     set udg_Night_Timer_End=ydl_timer
     
@@ -5232,6 +5273,7 @@ function Trig_night_comeActions takes nothing returns nothing
     call SaveTimerHandle(YDLOC, GetHandleId(ydl_timer), 0x32A85B3F, LoadTimerHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x32A85B3F))
     call TimerStart(ydl_timer, I2R(( 240 - LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE9692603 + ( udg_difficulty )) )), false, function Trig_night_comeFunc020T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -5245,23 +5287,23 @@ endfunction//===================================================================
 //TESH.scrollpos=0
 //TESH.alwaysfold=0
 function Trig_artificial_sun_Func_Timer takes nothing returns nothing
-    // 【修复】：必须加上 YDWE 局部变量初始化，否则宏编译会报错！
+    // 【修复�：必须加上 YDWE �部变量初始化，否则宏编译会报错！
     local integer ydl_localvar_step= LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76)
  set ydl_localvar_step=ydl_localvar_step + 3
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     
-    // 1. 关闭道具全局开关
+    // 1. 关闭道具全局��
     set udg_force_day=false
     
-    // 2. 恢复夜晚的主倒计时和隐藏的终结计时器
+    // 2. 恢��晚的主倒�时和隐藏的终结计时�
     call ResumeTimer(udg_Night_Timer)
     call ResumeTimer(udg_Night_Timer_End)
     
-    // 3. 【视觉恢复】：把时间重新切回黑夜（设为0.01避开0.00的触发事件）
+    // 3. 【��恢复�：把时间重新切回黑夜（设为0.01避开0.00的触发事件）
     call SetTimeOfDay(0.01)
     
-    // 4. 【核心修复】：重新显示图腾，并重新赋予它的三个原生光环技能！
+    // 4. 【核心修复�：重新显示图腾，并重新赋予它的三个原生光环�能！
     call ShowUnit(udg_Night_Totem, true)
     
     call UnitAddAbility(udg_Night_Totem, 'A0A7')
@@ -5273,7 +5315,7 @@ function Trig_artificial_sun_Func_Timer takes nothing returns nothing
     call UnitAddAbility(udg_Night_Totem, 'A0AE')
     call SetUnitAbilityLevel(udg_Night_Totem, 'A0AE', udg_difficulty)
     
-    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xA6468E1C)), 0, 0, "|cffFFD700人造太阳的光芒消散了，夜色再次降临...|r")
+    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xA6468E1C)), 0, 0, "|cffFFD700人�太阳的光芒消散了，夜色再�降�...|r")
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
     call DestroyTimer(GetExpiredTimer())
 endfunction
@@ -5284,39 +5326,39 @@ function Trig_artificial_sun_Actions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     
-    // 防呆机制：如果是白天，或者人造太阳已经在生效，直接拒绝并退还道具！
+    // 防呆机制：�果�白天，或者人造太阳已经在生效，直接拒绝并�还道具！
     if ( LoadBoolean(YDHT, StringHash("时间"), 0x767B29CC) == true or udg_force_day == true ) then
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "|cffFF0000无法使用！目前不是黑夜，或人造太阳已在生效中！|r")
-        call UnitAddItemByIdSwapped('I03V', GetTriggerUnit()) // 退还道具
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "|cffFF0000无法使用！目前不�黑�，或人造太阳已在生效中！|r")
+        call UnitAddItemByIdSwapped('I03V', GetTriggerUnit()) // �还道�
 call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
         return
     endif
     
-    // 1. 开启全局开关，扒光额外触发的魔抗
+    // 1. ��全局�关，扒光额�触发的魔抗
     set udg_force_day=true
     
-    // 2. 暂停夜晚的两个核心倒计时
+    // 2. 暂停夜晚的两�核心倒�时
     call PauseTimer(udg_Night_Timer)
     call PauseTimer(udg_Night_Timer_End)
     
-    // 3. 【视觉变为白昼】
+    // 3. 【��变为白昼�
     call SetTimeOfDay(10.00)
     call UseTimeOfDayBJ(false)
     
-    // 4. 【核心修复】：强行隐藏夜之图腾，并彻底删除所有原生光环（加速、攻击力提升）！
+    // 4. 【核心修复�：强�隐藏�之图腾，并彻底删除�有原生光�（加速�攻击力提升）！
     call ShowUnit(udg_Night_Totem, false)
     call UnitRemoveAbility(udg_Night_Totem, 'A0A7')
     call UnitRemoveAbility(udg_Night_Totem, 'A0A8')
     call UnitRemoveAbility(udg_Night_Totem, 'A0AE')
     
-    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "|cffFFD700使用了【人造太阳】！|r")
+    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "|cffFFD700使用了�人造太阳�！|r")
     
-    // 5. 开启道具持续时间计时器
+    // 5. ��道具持续时间计时�
     set ydl_timer=CreateTimer()
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA6468E1C, GetTriggerUnit())
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xA6468E1C, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA6468E1C))
     
-    // 道具持续时间设为 120 秒
+    // 道具持续时间设为 120 �
     call TimerStart(ydl_timer, 120.00, false, function Trig_artificial_sun_Func_Timer)
     
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -5347,13 +5389,13 @@ endfunction
 //===========================================================================
 function Trig_mission_failActions takes nothing returns nothing
     if ( ( udg_build_finish == true ) ) then
-        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "即便有帝国骑士的帮助，你们没能守护传送锚点，敌人太强大了，你们只能在边境等待敌人的围剿，自求多福吧")
+        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "即便有帝国骑�的帮助，你们没能守护传�锚点，敌人�强大了，你们�能在边�等待敌人的围剿，自求��吧")
         call YDWEPolledWaitNull(5.00)
-        call CustomDefeatBJ(GetLocalPlayer(), "你们没能守护传送锚点，孤立无援，只能在边境等待敌人的围剿，自求多福吧")
+        call CustomDefeatBJ(GetLocalPlayer(), "你们没能守护传�锚点，孤立无援，只能在边�等待敌人的围剿，自求��吧")
     else
-        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "你们没能守护传送锚点，孤立无援，只能在边境等待敌人的围剿，自求多福吧")
+        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "你们没能守护传�锚点，孤立无援，只能在边�等待敌人的围剿，自求��吧")
         call YDWEPolledWaitNull(5.00)
-        call CustomDefeatBJ(GetLocalPlayer(), "你们没能守护传送锚点，孤立无援，只能在边境等待敌人的围剿，自求多福吧")
+        call CustomDefeatBJ(GetLocalPlayer(), "你们没能守护传�锚点，孤立无援，只能在边�等待敌人的围剿，自求��吧")
     endif
 endfunction
 //===========================================================================
@@ -5486,9 +5528,9 @@ function Trig_initActions takes nothing returns nothing
     call SetUnitInvulnerable(gg_unit_e00A_0205, true)
     call SetUnitLifePercentBJ(gg_unit_e00A_0205, 1.00)
     set udg_lightdayhp=GetUnitState(gg_unit_e00A_0205, UNIT_STATE_LIFE)
-    call DisplayTextToForce(GetPlayersAll(), "敌人正在整军，你们还有一坤分的整备时间！！！")
-    call DisplayTextToForce(GetPlayersAll(), "敌人正在整军，你们还有一坤分的整备时间！！！")
-    call DisplayTextToForce(GetPlayersAll(), "敌人正在整军，你们还有一坤分的整备时间！！！")
+    call DisplayTextToForce(GetPlayersAll(), "敌人正在整军，你�还有�坤分的整备时间！！！")
+    call DisplayTextToForce(GetPlayersAll(), "敌人正在整军，你�还有�坤分的整备时间！！！")
+    call DisplayTextToForce(GetPlayersAll(), "敌人正在整军，你�还有�坤分的整备时间！！！")
     call YDWENewItemsFormula('I02R' , 1 , 'I02R' , 1 , 'I02R' , 1 , 'I02R' , 1 , 'I02R' , 0 , 'I02R' , 0 , 'I014')
     call SetPlayerTechResearchedSwap('Rhse', 1, Player(4))
     call SetPlayerState(Player(10), PLAYER_STATE_GIVES_BOUNTY, 1)
@@ -5526,6 +5568,7 @@ function Trig_initActions takes nothing returns nothing
     call SetPlayerStateBJ(Player(3), PLAYER_STATE_RESOURCE_LUMBER, 5)
     set ydl_timer=CreateTimer()
     call TimerStart(ydl_timer, 3.00, true, function Trig_initFunc044T)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -5674,7 +5717,7 @@ function Trig_show_daActions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     // --------------------
     // genshin
-    // 无效化
+    // 无效�
     if ( ( RectContainsUnit(gg_rct_swimmingpool, GetEventDamageSource()) == false ) and ( GetUnitTypeId(GetTriggerUnit()) == 'U00K' ) ) then
         call AddSpecialEffectTargetUnitBJ("chest", GetTriggerUnit(), "Abilities\\Spells\\Human\\Defend\\DefendCaster.mdl")
         call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
@@ -5687,7 +5730,7 @@ call EXSetEventDamage(((0.)*1.0)) // INLINED!!
     // --------------------
     // --------------------
     // genshin treasure
-    // 无效化
+    // 无效�
     if ( ( (0 != EXGetEventDamageData(YDWEEventDamageData___EVENT_DAMAGE_DATA_IS_RANGED)) == true ) and ( YDWEDistanceBetweenUnits(GetTriggerUnit() , GetEventDamageSource()) >= 567.00 ) and ( IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO) == true ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I03D')) == 'I03D' ) ) then // INLINED!!
         call AddSpecialEffectTargetUnitBJ("chest", GetTriggerUnit(), "Abilities\\Spells\\Human\\Defend\\DefendCaster.mdl")
         call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
@@ -5724,7 +5767,7 @@ call EXSetEventDamage(((0.)*1.0)) // INLINED!!
         call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x2C9F902D, ( ( ( I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFAF20B68)) ) * ( 0.01 ) ) + ( 0.00 + ( I2R(GetUnitAbilityLevel(GetEventDamageSource(), 'A006')) * 0.05 ) ) ))
         call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEB69EE48, GetEventDamage())
         if ( ( ModuloInteger(GetRandomInt(1, 9999), 100) <= R2I(LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC8E20F78)) ) ) then
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, ( "会心一击触发，当前触发概率为" + ( R2S(LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC8E20F78)) + "%" ) ))
+            call CreateDynamicCriticalText(GetEventDamageSource(), "����һ����")
             call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC0ABED4A, ( LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEB69EE48) * LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x2C9F902D) ))
             call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC0ABED4A, ( LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEB69EE48) + LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC0ABED4A) ))
 call EXSetEventDamage(((LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xC0ABED4A))*1.0)) // INLINED!!
@@ -5784,7 +5827,7 @@ call EXSetEventDamage(((LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * yd
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00T'))
             call UnitAddItemByIdSwapped('I00W', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已得到最佳的防护")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已得到�佳的防护")
         else
         endif
     else
@@ -5878,6 +5921,7 @@ call EXSetEventDamage(((LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * yd
     call SetTextTagPermanent(GetLastCreatedTextTag(), false)
     call YDWETimerDestroyTextTag(2.00 , GetLastCreatedTextTag())
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -5951,11 +5995,11 @@ endfunction
 // Trigger: nouse
 //===========================================================================
 function Trig_nouseActions takes nothing returns nothing
-    // YDWE是《魔兽争霸III》地图编辑器的一个增强Mod。
-    // 　　你可以从www.ydwe.net获取最新的YDWE。
-    // 　　你可以由YDWE附带的演示地图开始，快速了解YDWE的功能。
-    // 　　当你的地图意外损坏时，你可以在backups目录找到你最近26次保存的地图。
-    // 　　当你的YDWE不能正常工作时，你可以前往www.ydwe.net联系我们。
+    // YDWE�《魔兽争霸III》地图编辑器的一�增强Mod�
+    // ��你可以从www.ydwe.net获取�新的YDWE�
+    // ��你可以由YDWE附带的演示地图开始，�速了�YDWE的功能�
+    // ��当你的地图意外损坏时，你�以在backups�录找到你��26次保存的地图�
+    // ��当你的YDWE不能正常工作时，你可以前�www.ydwe.net联系我们�
 endfunction
 //===========================================================================
 function InitTrig_nouse takes nothing returns nothing
@@ -6000,6 +6044,7 @@ function Trig_holy_light_guardianActions takes nothing returns nothing
         call TimerStart(ydl_timer, 4.70, false, function Trig_holy_light_guardianFunc002Func004T)
     endif
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -6034,7 +6079,7 @@ function Trig_get_stoneActions takes nothing returns nothing
 ")
         call UnitAddItem(GetTriggerUnit(), CreateItem('I00D', GetLocationX(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942)), GetLocationY(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))))
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所需点数为" + I2S(udg_credit_need[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所�点数�" + I2S(udg_credit_need[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) ) ) ))
     endif
     call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -6063,10 +6108,10 @@ function Trig_get_bottleActions takes nothing returns nothing
     call RemoveItem(GetManipulatedItem())
     if ( ( udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)] >= LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB) ) ) then
         set udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]=( udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)] - LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB) )
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "兑换充能甁成功")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "兑换充能甁成�")
         call UnitAddItem(GetTriggerUnit(), CreateItem('I03G', GetLocationX(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942)), GetLocationY(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))))
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所需点数为" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB)) ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所�点数�" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB)) ) ) ))
     endif
     call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -6095,10 +6140,10 @@ function Trig_get_holy_ringActions takes nothing returns nothing
     call RemoveItem(GetManipulatedItem())
     if ( ( udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)] >= LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB) ) ) then
         set udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]=( udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)] - LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB) )
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "兑换圣耀指环成功")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "兑换圣�指环成功")
         call UnitAddItem(GetTriggerUnit(), CreateItem('I03L', GetLocationX(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942)), GetLocationY(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))))
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所需点数为" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB)) ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所�点数�" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB)) ) ) ))
     endif
     call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -6127,10 +6172,10 @@ function Trig_get_space_techActions takes nothing returns nothing
     call RemoveItem(GetManipulatedItem())
     if ( ( udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)] >= LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB) ) ) then
         set udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]=( udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)] - LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB) )
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "兑换空间技术学习成功")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "兑换空间��学习成功")
         call UnitAddItem(GetTriggerUnit(), CreateItem('I02S', GetLocationX(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942)), GetLocationY(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))))
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所需点数为" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB)) ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所�点数�" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB)) ) ) ))
     endif
     call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -6182,7 +6227,7 @@ function Trig_show_creditConditions takes nothing returns boolean
     return ( ( ( GetTriggerPlayer() == Player(0) ) or ( GetTriggerPlayer() == Player(1) ) or ( GetTriggerPlayer() == Player(2) ) or ( GetTriggerPlayer() == Player(3) ) ) )
 endfunction
 function Trig_show_creditActions takes nothing returns nothing
-    call DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, ( "您的雇佣兵当前奖励点数：" + I2S(udg_credits[GetConvertedPlayerId(GetTriggerPlayer())]) ))
+    call DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, ( "您的雇佣兵当前�励点数�" + I2S(udg_credits[GetConvertedPlayerId(GetTriggerPlayer())]) ))
 endfunction
 //===========================================================================
 function InitTrig_show_credit takes nothing returns nothing
@@ -6285,7 +6330,7 @@ function Trig_teleportation_scroll_eatActions takes nothing returns nothing
             call UnitAddAbility(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA), 'A0B1')
             call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA)), 0, 0, "您的雇佣兵习得回家的艺术")
         else
-            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA)), 0, 0, "您的雇佣兵学习过回家的艺术")
+            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA)), 0, 0, "您的雇佣兵�习过回家的艺术")
         endif
     else
     endif
@@ -6315,6 +6360,7 @@ function Trig_peddlerActions takes nothing returns nothing
     local timer ydl_timer
     set ydl_timer=CreateTimer()
     call TimerStart(ydl_timer, 10.00, true, function Trig_peddlerFunc001T)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -6335,6 +6381,7 @@ function Trig_chaplainActions takes nothing returns nothing
     local timer ydl_timer
     set ydl_timer=CreateTimer()
     call TimerStart(ydl_timer, 10.00, true, function Trig_chaplainFunc002T)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -6393,27 +6440,27 @@ function Trig_fake_object_getFunc005T takes nothing returns nothing
         call ModifyHeroStat(bj_HEROSTAT_AGI, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_SUB, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA))
         call ModifyHeroStat(bj_HEROSTAT_INT, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_SUB, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA))
         call SaveInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xBEC6909A, GetRandomInt(1, 100))
-        // 主属性
+        // 主属�
         if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xBEC6909A) <= 25 ) ) then
             call SaveInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F, 20)
             if ( ( GetUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), 'A0AJ') > 0 ) ) then
                 call ModifyHeroStat(bj_HEROSTAT_STR, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F))
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消耗" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属性" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + "力量" ) ) ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消�" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属�" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + "力量" ) ) ) ))
             else
             endif
             if ( ( GetUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), 'A0AK') > 0 ) ) then
                 call ModifyHeroStat(bj_HEROSTAT_AGI, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F))
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消耗" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属性" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + "敏捷" ) ) ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消�" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属�" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + "敏捷" ) ) ) ))
             else
             endif
             if ( ( GetUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), 'A0AI') > 0 ) ) then
                 call ModifyHeroStat(bj_HEROSTAT_INT, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F))
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消耗" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属性" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + "智力" ) ) ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消�" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属�" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + "智力" ) ) ) ))
             else
             endif
         else
         endif
-        // 随机属性
+        // 随机属�
         if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xBEC6909A) > 25 ) and ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xBEC6909A) <= 55 ) ) then
             call SaveInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F, 25)
             call SaveInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 1 ), 0)
@@ -6429,7 +6476,7 @@ function Trig_fake_object_getFunc005T takes nothing returns nothing
             call ModifyHeroStat(bj_HEROSTAT_STR, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 1 )))
             call ModifyHeroStat(bj_HEROSTAT_AGI, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 2 )))
             call ModifyHeroStat(bj_HEROSTAT_INT, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 3 )))
-            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消耗" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属性" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + ( "随机属性，分别为" + ( ( ( "力-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 1 ))) ) ) + ( ( "，敏-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 2 ))) ) ) + ( ( "，智-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 3 ))) ) ) ) ) ) ) ) ))
+            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消�" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属�" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + ( "随机属�，分别�" + ( ( ( "�-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 1 ))) ) ) + ( ( "，敏-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 2 ))) ) ) + ( ( "，智-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 3 ))) ) ) ) ) ) ) ) ))
         else
         endif
         // 能量之书
@@ -6444,10 +6491,10 @@ function Trig_fake_object_getFunc005T takes nothing returns nothing
                 call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xEAFE0942))
                 set udg_fake_int=udg_fake_int + 1
             endloop
-            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消耗" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属性" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + "本能量之书" ) ) ) ))
+            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消�" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属�" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + "�能量之书" ) ) ) ))
         else
         endif
-        // 随机属性
+        // 随机属�
         if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xBEC6909A) > 95 ) ) then
             call SaveInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F, 75)
             call SaveInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 1 ), 0)
@@ -6463,7 +6510,7 @@ function Trig_fake_object_getFunc005T takes nothing returns nothing
             call ModifyHeroStat(bj_HEROSTAT_STR, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 1 )))
             call ModifyHeroStat(bj_HEROSTAT_AGI, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 2 )))
             call ModifyHeroStat(bj_HEROSTAT_INT, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 3 )))
-            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消耗" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属性" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + ( "随机属性，分别为" + ( ( ( "力-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 1 ))) ) ) + ( ( "，敏-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 2 ))) ) ) + ( ( "，智-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 3 ))) ) ) ) ) ) ) ) ))
+            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( ( "您的雇佣兵进行了许愿，消�" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x03780EBA)) + "点全属�" ) ) + ( ( "获得" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xD6B06D8F)) + ( "随机属�，分别�" + ( ( ( "�-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 1 ))) ) ) + ( ( "，敏-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 2 ))) ) ) + ( ( "，智-" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x3C217742 + ( 3 ))) ) ) ) ) ) ) ) ))
         else
         endif
     else
@@ -6491,6 +6538,7 @@ function Trig_fake_object_getActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xB6A6EBAA, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA))
     call TimerStart(ydl_timer, LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545), true, function Trig_fake_object_getFunc005T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -6571,6 +6619,7 @@ function Trig_Crocodile_skill1Actions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xFC4D8276, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276))
     call TimerStart(ydl_timer, 1.00, true, function Trig_Crocodile_skill1Func011T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -6608,6 +6657,7 @@ function Trig_Crocodile_skill2Actions takes nothing returns nothing
     set ydl_timer=CreateTimer()
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0x458B7DE9, GetTriggerUnit())
     call TimerStart(ydl_timer, 6.00, false, function Trig_Crocodile_skill2Func002T)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -6773,6 +6823,7 @@ function Trig_genshin_hitActions takes nothing returns nothing
     call SaveGroupHandle(YDLOC, GetHandleId(ydl_timer), 0xB6A6EBAA, LoadGroupHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA))
     call TimerStart(ydl_timer, 1.00, true, function Trig_genshin_hitFunc003T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -6840,6 +6891,7 @@ function Trig_swimmingActions takes nothing returns nothing
     set ydl_timer=CreateTimer()
     call SaveGroupHandle(YDLOC, GetHandleId(ydl_timer), 0xD20D18B2, LoadGroupHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7), 0xD20D18B2))
     call TimerStart(ydl_timer, 0.50, true, function Trig_swimmingFunc001T)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -6875,7 +6927,7 @@ function Trig_tombs_destoryActions takes nothing returns nothing
         else
         endif
         call CreateNUnitsAtLoc(1, 'n00Z', Player(10), GetUnitLoc(GetTriggerUnit()), bj_UNIT_FACING)
-        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "谁敢打扰逝者的安眠！！！")
+        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "谁敢打扰逝�的安眠！！�")
         call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x46B0B731, bj_lastCreatedUnit)
         call SetUnitInvulnerable(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x46B0B731), true)
         call SetUnitAnimation(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x46B0B731), "birth")
@@ -6915,6 +6967,7 @@ function Trig_dead_soldier_rebirthActions takes nothing returns nothing
         call TimerStart(ydl_timer, GetRandomReal(72.00, 103.00), false, function Trig_dead_soldier_rebirthFunc001Func002T)
     else
     endif
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -7023,7 +7076,7 @@ function Trig_Firefly_Cloak_EquipActions takes nothing returns nothing
     endloop
     if ( ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB2A2DFD2) > 1 ) ) then
         call UnitRemoveItemSwapped(GetManipulatedItem(), LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801))
-        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801)), 0, 0, "|cffFF0000萤火披风只能携带一件！|r")
+        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3C0A0801)), 0, 0, "|cffFF0000萤火�风只能携带一件！|r")
         call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
         set ydl_timer=null
         return
@@ -7051,6 +7104,7 @@ function Trig_Firefly_Cloak_EquipActions takes nothing returns nothing
     else
     endif
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -7097,7 +7151,7 @@ function Trig_get_itemActions takes nothing returns nothing
         call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( "兑换" ) + ( GetItemName(LoadItemHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x7F4D03A5)) ) + ( "成功" ) ))
         call UnitAddItem(GetTriggerUnit(), LoadItemHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x7F4D03A5))
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所需点数为" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB)) ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "您的奖励点数不足，当前点数为" + ( I2S(udg_credits[LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F96F2D2)]) + ( "，所�点数�" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x291A48DB)) ) ) ))
     endif
     call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -7246,10 +7300,10 @@ function Trig_Item_Kill_EventsActions takes nothing returns nothing
             endif
             call SetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E), ConvertUnitState(0x51), ( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E), ConvertUnitState(0x51)) + LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x27B7A775) ))
             if ( ( IsUnitType(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6BD5D6E5), UNIT_TYPE_HERO) == true ) ) then
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)), 0, 0, ( ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)) ) + ( "触发窃魂效果，攻击速度得到提升，攻击力下降" ) + ( "，攻击间隔减少" ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)), 0, 0, ( ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)) ) + ( "触发窃魂效果，攻击�度得到提升，攻击力下降" ) + ( "，攻击间隔减�" ) ))
                 call SetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E), ConvertUnitState(0x25), ( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E), ConvertUnitState(0x25)) - 0.01 ))
             else
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)), 0, 0, ( ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)) ) + ( "触发窃魂效果，攻击速度得到提升，攻击力下降" ) + ( "" ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)), 0, 0, ( ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)) ) + ( "触发窃魂效果，攻击�度得到提升，攻击力下降" ) + ( "" ) ))
             endif
         else
         endif
@@ -7274,10 +7328,10 @@ function Trig_Item_Kill_EventsActions takes nothing returns nothing
                 call SetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E), ConvertUnitState(0x51), 0.01)
             endif
             if ( ( IsUnitType(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6BD5D6E5), UNIT_TYPE_HERO) == true ) ) then
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)), 0, 0, ( ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)) ) + ( "触发狂噬效果，攻击力得到提升，攻击速度下降" ) + ( "，攻击间隔减少" ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)), 0, 0, ( ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)) ) + ( "触发狂噬效果，攻击力得到提升，攻击�度下降" ) + ( "，攻击间隔减�" ) ))
                 call SetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E), ConvertUnitState(0x25), ( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E), ConvertUnitState(0x25)) - 0.01 ))
             else
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)), 0, 0, ( ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)) ) + ( "触发狂噬效果，攻击力得到提升，攻击速度下降" ) + ( "" ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)), 0, 0, ( ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB10E728E)) ) + ( "触发狂噬效果，攻击力得到提升，攻击�度下降" ) + ( "" ) ))
             endif
         else
         endif
@@ -7376,13 +7430,13 @@ function Trig_Avenge_AttackedActions takes nothing returns nothing
     call UnitDamageTarget(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276), LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x51990A95), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6730A85A), false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
     if ( ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE1132952) >= 49 ) ) then
         call YDWEGeneralBounsSystemUnitSetBonus(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276) , 0 , 0 , 1)
-        call CreateTextTagUnitBJ("HP↑", LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276), 0, 10, 25.00, 100.00, 25.00, 0)
+        call CreateTextTagUnitBJ("HP�", LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276), 0, 10, 25.00, 100.00, 25.00, 0)
         call SetTextTagVelocityBJ(GetLastCreatedTextTag(), 125.00, ( GetRandomReal(155.00, 165.00) ))
         call SetTextTagPermanent(GetLastCreatedTextTag(), false)
         call YDWETimerDestroyTextTag(0.50 , GetLastCreatedTextTag())
         if ( ( ModuloInteger(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE1132952), 49) == 0 ) ) then
             call YDWEGeneralBounsSystemUnitSetBonus(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276) , 3 , 0 , 1)
-            call CreateTextTagUnitBJ("ATK↑", LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276), 0, 10, 100.00, 25.00, 25.00, 0)
+            call CreateTextTagUnitBJ("ATK�", LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276), 0, 10, 100.00, 25.00, 25.00, 0)
             call SetTextTagVelocityBJ(GetLastCreatedTextTag(), 125.00, ( GetRandomReal(15.00, 25.00) ))
             call SetTextTagPermanent(GetLastCreatedTextTag(), false)
             call YDWETimerDestroyTextTag(0.50 , GetLastCreatedTextTag())
@@ -7432,7 +7486,7 @@ function Trig_lighting_getActions takes nothing returns nothing
     if ( ( GetRandomInt(1, 800) <= ( 7 + udg_lighting_get_rate ) ) ) then
         call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetRandomLocInRect(gg_rct_Lightning_Strike))
         call CreateItemLoc('I043', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
-        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "远处有巨大的雷声，莫非发生了什么变故")
+        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "远�有巨大的雷声，�非发生了�么变�")
         set udg_lighting_get_rate=0
         call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
@@ -7457,7 +7511,7 @@ function Trig_lighting_get_trigActions takes nothing returns nothing
     if ( ( GetRandomInt(1, 800) <= ( 7 + udg_lighting_get_rate ) ) ) then
         call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetRandomLocInRect(gg_rct_Lightning_Strike))
         call CreateItemLoc('I043', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
-        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "远处有巨大的雷声，莫非发生了什么变故")
+        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "远�有巨大的雷声，�非发生了�么变�")
         set udg_lighting_get_rate=0
         call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
@@ -7558,7 +7612,7 @@ function Trig_meteor_shield_getActions takes nothing returns nothing
     call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetUnitLoc(GetTriggerUnit()))
     call SetItemPositionLoc(GetManipulatedItem(), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
-    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "陨星盾为近战专属装备，远程单位无法装备")
+    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "陨星盾为近战专属装�，远程单位无法装�")
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
 endfunction
 //===========================================================================
@@ -7660,6 +7714,7 @@ function Trig_meteor_sword_hitActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xB6F04D7B, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6F04D7B))
     call TimerStart(ydl_timer, LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545), false, function Trig_meteor_sword_hitFunc011T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -7686,7 +7741,7 @@ function Trig_meteor_sword_getActions takes nothing returns nothing
         call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetKillingUnitBJ() , 'I03T'))
         call UnitAddItemByIdSwapped('I03U', GetKillingUnitBJ())
-        call DisplayTextToPlayer(GetOwningPlayer(GetKillingUnitBJ()), 0, 0, "陨星重剑吸取足够的鲜血，褪去外层未能融合的材料，露出其中完美的剑体")
+        call DisplayTextToPlayer(GetOwningPlayer(GetKillingUnitBJ()), 0, 0, "陨星重剑吸取足�的鲜�，褪去�层�能融合的材料，露出其�完美的剑�")
     else
     endif
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -7712,9 +7767,9 @@ function Trig_SworduseActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I009'))
         call RemoveSavedInteger(YDHT, GetHandleId(GetTriggerUnit()), 0x83F5AA80)
         call UnitAddItemByIdSwapped('I00A', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已完全掌握空间的力量")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已完全掌握空间的力�")
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( "闪身剑充能" ) + ( I2S(( LoadInteger(YDHT, GetHandleId(GetTriggerUnit()), 0x83F5AA80) + 3 )) ) + ( "/100" ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( "��剑充�" ) + ( I2S(( LoadInteger(YDHT, GetHandleId(GetTriggerUnit()), 0x83F5AA80) + 3 )) ) + ( "/100" ) ))
     endif
 endfunction
 //===========================================================================
@@ -7781,7 +7836,7 @@ function Trig_ring_levelupActions takes nothing returns nothing
         call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A03G' , 1 , 110 , I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)))
         call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A03G' , 1 , 108 , I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)))
         call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A03G' , 1 , 109 , I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)))
-        call YDWESetUnitAbilityDataString(GetTriggerUnit() , 'A03G' , 1 , 218 , ( "属性附加：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)) ))
+        call YDWESetUnitAbilityDataString(GetTriggerUnit() , 'A03G' , 1 , 218 , ( "属�附加：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)) ))
         call IncUnitAbilityLevel(GetTriggerUnit(), 'A03G')
         call DecUnitAbilityLevel(GetTriggerUnit(), 'A03G')
     else
@@ -7813,7 +7868,7 @@ function Trig_ring_getActions takes nothing returns nothing
         call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A03G' , 1 , 110 , I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)))
         call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A03G' , 1 , 108 , I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)))
         call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A03G' , 1 , 109 , I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)))
-        call YDWESetUnitAbilityDataString(GetTriggerUnit() , 'A03G' , 1 , 218 , ( "属性附加：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)) ))
+        call YDWESetUnitAbilityDataString(GetTriggerUnit() , 'A03G' , 1 , 218 , ( "属�附加：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBE3351CB)) ))
         call IncUnitAbilityLevel(GetTriggerUnit(), 'A03G')
         call DecUnitAbilityLevel(GetTriggerUnit(), 'A03G')
     else
@@ -7859,11 +7914,11 @@ function Trig_helmet_1Actions takes nothing returns nothing
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdl")
             call CreateItemLoc('I01C', GetUnitLoc(GetTriggerUnit()))
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "火山中蹦出了一块晶体，哇，这是什么？")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "�山中蹦出了一块晶体，哇，这是�么？")
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Units\\NightElf\\Wisp\\WispExplode.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "喔哟，不耐烧，怎么没了呀")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "喔哟，不耐烧，�么没了�")
         endif
     else
     endif
@@ -7889,11 +7944,11 @@ function Trig_helmet_2Actions takes nothing returns nothing
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl")
             call CreateItemLoc('I01E', GetUnitLoc(GetTriggerUnit()))
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "雷击落下，火焰迸发，烟雾散去之后还有一块发光的皮毛")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "雷击落下，火焰迸发，烟雾散去之后还有�块发光的��")
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\NightElf\\CorrosiveBreath\\ChimaeraAcidTargetArt.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "雷击落下，火焰迸发，烟雾散去之后什么都没了")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "雷击落下，火焰迸发，烟雾散去之后�么都没了")
         endif
     else
     endif
@@ -7982,14 +8037,14 @@ function Trig_magic_bookActions takes nothing returns nothing
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00K'))
             call UnitAddItemByIdSwapped('I00P', GetTriggerUnit())
             call SaveBoolean(YDHT, 'I00P', 0x641FDAD7, true)
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你获得了一张？草稿纸")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你获得了�张？草�纸")
         else
             call SetItemPositionLoc(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00L'), GetUnitLoc(GetTriggerUnit()))
             call SetItemPositionLoc(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00M'), GetUnitLoc(GetTriggerUnit()))
             call SetItemPositionLoc(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00N'), GetUnitLoc(GetTriggerUnit()))
             call SetItemPositionLoc(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00O'), GetUnitLoc(GetTriggerUnit()))
             call SetItemPositionLoc(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00K'), GetUnitLoc(GetTriggerUnit()))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "已经有人合成过草稿纸了，无法再合成")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "已经有人合成过草稿纸了，无法再合�")
         endif
     else
     endif
@@ -7999,7 +8054,7 @@ function Trig_magic_bookActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00L'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00M', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "书获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00M')) == 'I00M' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8008,38 +8063,38 @@ function Trig_magic_bookActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00M'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00N', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "书获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00N')) == 'I00N' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 50 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"�\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00N'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I00O', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "书获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00O')) == 'I00O' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 20 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 35, \"�\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00O'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I00K', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "书获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8204,7 +8259,7 @@ function Trig_SwordActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I005'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I006', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "剑获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I006')) == 'I006' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8213,22 +8268,22 @@ function Trig_SwordActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I006'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I007', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "剑获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I007')) == 'I007' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 38 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"剑\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I007'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I008', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "剑获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8274,7 +8329,7 @@ function Trig_ArmorActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00U'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00S', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "甲获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00S')) == 'I00S' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8283,22 +8338,22 @@ function Trig_ArmorActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00S'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00R', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "甲获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00R')) == 'I00R' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 60 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"甲\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00R'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I00V', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "甲获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8309,7 +8364,7 @@ function Trig_ArmorActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01E'))
         call UnitAddItemByIdSwapped('I00T', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "甲获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00T')) == 'I00T' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I043')) == 'I043' ) ) then
@@ -8318,7 +8373,7 @@ function Trig_ArmorActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00T'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I043'))
         call UnitAddItemByIdSwapped('I042', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已得到雷霆的加护")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已得到雷霆的加�")
     else
     endif
 endfunction
@@ -8342,7 +8397,7 @@ function Trig_FlagActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01L'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01M', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "旗获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01M')) == 'I01M' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8351,38 +8406,38 @@ function Trig_FlagActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01M'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01N', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "旗获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01N')) == 'I01N' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 60 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"旗\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01N'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I01O', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "旗获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01O')) == 'I01O' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 36 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 35, \"旗\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01O'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I01P', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "旗获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8393,7 +8448,7 @@ function Trig_FlagActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01R'))
         call UnitAddItemByIdSwapped('I01Q', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "牧师的鲜血激发了你们的斗志")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "牧师的鲜��发了你们的斗�")
     else
     endif
 endfunction
@@ -8417,7 +8472,7 @@ function Trig_RingActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01J'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01H', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "戒获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01H')) == 'I01H' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8426,22 +8481,22 @@ function Trig_RingActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01H'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01K', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "戒获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01K')) == 'I01K' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 35 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"戒\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01K'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I01G', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "戒获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8452,7 +8507,7 @@ function Trig_RingActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I036'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01I', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已掌握狮心之力")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已掌握�心之�")
     else
     endif
 endfunction
@@ -8476,7 +8531,7 @@ function Trig_StaffActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01S'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01T', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "杖获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01T')) == 'I01T' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8485,38 +8540,38 @@ function Trig_StaffActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01T'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01U', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "杖获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01U')) == 'I01U' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 45 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"杖\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01U'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I01V', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "杖获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01V')) == 'I01V' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 30 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 35, \"杖\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01V'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I01W', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵从地狱中获取了力量")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵从地狱�获取了力�")
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8541,7 +8596,7 @@ function Trig_BowActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01Z'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01X', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "弓获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01X')) == 'I01X' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8550,22 +8605,22 @@ function Trig_BowActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01X'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01Y', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "弓获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01Y')) == 'I01Y' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 30 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"弓\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01Y'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I021', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "弓获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8576,7 +8631,7 @@ function Trig_BowActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I037'))
         call UnitAddItemByIdSwapped('I020', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已掌握箭矢的力量")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已掌握�矢的力量")
     else
     endif
 endfunction
@@ -8600,7 +8655,7 @@ function Trig_AxeActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I010'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00Z', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "斧获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00Z')) == 'I00Z' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8609,38 +8664,38 @@ function Trig_AxeActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00Z'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00X', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "斧获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00X')) == 'I00X' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 65 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"�\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00X'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I011', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "斧获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I011')) == 'I011' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 36 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 35, \"�\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I011'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I012', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵一斧可以砍翻天下")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵一斧可以砍翻天�")
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8651,7 +8706,7 @@ function Trig_AxeActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00X'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I014'))
         call UnitAddItemByIdSwapped('I00Y', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已掌握魂珠的奥秘")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已掌握魂珠的奥�")
     else
     endif
 endfunction
@@ -8675,7 +8730,7 @@ function Trig_ShieldActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00H'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00F', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盾获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00F')) == 'I00F' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8684,22 +8739,22 @@ function Trig_ShieldActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00F'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00J', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盾获得提升")
+        // Message handled by EquipmentUpgradeLogic
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00J')) == 'I00J' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
-        if ( ( GetRandomInt(1, 100) <= 36 ) ) then
+        if ( EquipmentUpgradeLogic(GetTriggerUnit(), 55, \"盾\") ) then
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00J'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I00I', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盾获得提升")
+            // Message handled by EquipmentUpgradeLogic
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8710,7 +8765,7 @@ function Trig_ShieldActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I035'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I00E', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已获得城墙般的防御力")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵已获得城�般的防御力")
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00I')) == 'I00I' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I03S')) == 'I03S' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8744,7 +8799,7 @@ function Trig_helmetActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I018'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I015', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盔获得提升")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盔获得提�")
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I015')) == 'I015' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8753,7 +8808,7 @@ function Trig_helmetActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I015'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I016', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盔获得提升")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盔获得提�")
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I016')) == 'I016' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) ) then
@@ -8763,12 +8818,12 @@ function Trig_helmetActions takes nothing returns nothing
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I016'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
             call UnitAddItemByIdSwapped('I017', GetTriggerUnit())
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盔获得提升")
+            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "盔获得提�")
         else
             call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Human\\Feedback\\ArcaneTowerAttack.mdl")
             call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
-            call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "升级失败")
+            // Message handled by EquipmentUpgradeLogic
         endif
     else
     endif
@@ -8779,7 +8834,7 @@ function Trig_helmetActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01E'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I019', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵获得了某种神奇野兽的力量")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵获得了某���野兽的力量")
     else
     endif
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I017')) == 'I017' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D')) == 'I00D' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01C')) == 'I01C' ) ) then
@@ -8789,7 +8844,7 @@ function Trig_helmetActions takes nothing returns nothing
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I01C'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00D'))
         call UnitAddItemByIdSwapped('I01A', GetTriggerUnit())
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵获得了某种神奇野兽的力量")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵获得了某���野兽的力量")
     else
     endif
 endfunction
@@ -8966,7 +9021,7 @@ endfunction
 // Trigger: get_ms
 //===========================================================================
 function Trig_get_msActions takes nothing returns nothing
-    call DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, ( ( GetUnitName(udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]) + "的移动速度为" ) + R2S(GetUnitMoveSpeed(udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())])) ))
+    call DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, ( ( GetUnitName(udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]) + "的移动�度�" ) + R2S(GetUnitMoveSpeed(udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())])) ))
 endfunction
 //===========================================================================
 function InitTrig_get_ms takes nothing returns nothing
@@ -9020,7 +9075,7 @@ endfunction
 // Trigger: get_as
 //===========================================================================
 function Trig_get_asActions takes nothing returns nothing
-    call DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, ( ( GetUnitName(udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]) + "的攻击速度为" ) + R2S(GetUnitState(udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())], ConvertUnitState(0x51))) ))
+    call DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, ( ( GetUnitName(udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]) + "的攻击�度�" ) + R2S(GetUnitState(udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())], ConvertUnitState(0x51))) ))
 endfunction
 //===========================================================================
 function InitTrig_get_as takes nothing returns nothing
@@ -9077,7 +9132,7 @@ function Trig_p1______uActions takes nothing returns nothing
     call DestroyTimerDialog(udg_diedhero_cnt_window[1])
     call ReviveHeroLoc(udg_diedhero[1], GetRectCenter(gg_rct_rebirth_area), true)
     call PanCameraToTimedLocForPlayer(GetOwningPlayer(udg_diedhero[1]), GetRectCenter(gg_rct_rebirth_area), 1.00)
-    call DisplayTextToPlayer(GetOwningPlayer(udg_diedhero[1]), 0, 0, "您的雇佣兵已复活，请继续战斗")
+    call DisplayTextToPlayer(GetOwningPlayer(udg_diedhero[1]), 0, 0, "您的雇佣兵已复活，�继�战斗")
     call SetUnitManaPercentBJ(udg_diedhero[1], 100)
 endfunction
 //===========================================================================
@@ -9093,7 +9148,7 @@ function Trig_p2______uActions takes nothing returns nothing
     call DestroyTimerDialog(udg_diedhero_cnt_window[2])
     call ReviveHeroLoc(udg_diedhero[2], GetRectCenter(gg_rct_rebirth_area), true)
     call PanCameraToTimedLocForPlayer(GetOwningPlayer(udg_diedhero[2]), GetRectCenter(gg_rct_rebirth_area), 1.00)
-    call DisplayTextToPlayer(GetOwningPlayer(udg_diedhero[2]), 0, 0, "您的雇佣兵已复活，请继续战斗")
+    call DisplayTextToPlayer(GetOwningPlayer(udg_diedhero[2]), 0, 0, "您的雇佣兵已复活，�继�战斗")
     call SetUnitManaPercentBJ(udg_diedhero[2], 100)
 endfunction
 //===========================================================================
@@ -9109,7 +9164,7 @@ function Trig_p3______uActions takes nothing returns nothing
     call DestroyTimerDialog(udg_diedhero_cnt_window[3])
     call ReviveHeroLoc(udg_diedhero[3], GetRectCenter(gg_rct_rebirth_area), true)
     call PanCameraToTimedLocForPlayer(GetOwningPlayer(udg_diedhero[3]), GetRectCenter(gg_rct_rebirth_area), 1.00)
-    call DisplayTextToPlayer(GetOwningPlayer(udg_diedhero[3]), 0, 0, "您的雇佣兵已复活，请继续战斗")
+    call DisplayTextToPlayer(GetOwningPlayer(udg_diedhero[3]), 0, 0, "您的雇佣兵已复活，�继�战斗")
     call SetUnitManaPercentBJ(udg_diedhero[3], 100)
 endfunction
 //===========================================================================
@@ -9125,7 +9180,7 @@ function Trig_p4______uActions takes nothing returns nothing
     call DestroyTimerDialog(udg_diedhero_cnt_window[4])
     call ReviveHeroLoc(udg_diedhero[4], GetRectCenter(gg_rct_rebirth_area), true)
     call PanCameraToTimedLocForPlayer(GetOwningPlayer(udg_diedhero[4]), GetRectCenter(gg_rct_rebirth_area), 1.00)
-    call DisplayTextToPlayer(GetOwningPlayer(udg_diedhero[4]), 0, 0, "您的雇佣兵已复活，请继续战斗")
+    call DisplayTextToPlayer(GetOwningPlayer(udg_diedhero[4]), 0, 0, "您的雇佣兵已复活，�继�战斗")
     call SetUnitManaPercentBJ(udg_diedhero[4], 100)
 endfunction
 //===========================================================================
@@ -9148,7 +9203,7 @@ function Trig_p1_______uActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA, GetTriggerUnit())
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545, ( ( ( 5 ) + ( GetHeroLevel(GetTriggerUnit()) ) * ( 1 ) ) + ( (R2I(TimerGetElapsed(YDWEGetGameTime___t))) / 75 ) )) // INLINED!!
     call StartTimerBJ(udg_p1_timer, false, I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545)))
-    call CreateTimerDialogBJ(udg_p1_timer, ( ( "距离" ) + ( GetUnitName(GetTriggerUnit()) ) + ( "复活还有" ) ))
+    call CreateTimerDialogBJ(udg_p1_timer, ( ( "距�" ) + ( GetUnitName(GetTriggerUnit()) ) + ( "复活还有" ) ))
     set udg_diedhero[1]=GetTriggerUnit()
     set udg_diedhero_cnt_window[1]=bj_lastCreatedTimerDialog
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -9174,7 +9229,7 @@ function Trig_p2_______uActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA, GetTriggerUnit())
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545, ( ( ( 5 ) + ( GetHeroLevel(GetTriggerUnit()) ) * ( 1 ) ) + ( (R2I(TimerGetElapsed(YDWEGetGameTime___t))) / 75 ) )) // INLINED!!
     call StartTimerBJ(udg_p2_timer, false, I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545)))
-    call CreateTimerDialogBJ(udg_p2_timer, ( ( "距离" ) + ( GetUnitName(GetTriggerUnit()) ) + ( "复活还有" ) ))
+    call CreateTimerDialogBJ(udg_p2_timer, ( ( "距�" ) + ( GetUnitName(GetTriggerUnit()) ) + ( "复活还有" ) ))
     set udg_diedhero[2]=GetTriggerUnit()
     set udg_diedhero_cnt_window[2]=bj_lastCreatedTimerDialog
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -9200,7 +9255,7 @@ function Trig_p3_______uActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA, GetTriggerUnit())
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545, ( ( ( 5 ) + ( GetHeroLevel(GetTriggerUnit()) ) * ( 1 ) ) + ( (R2I(TimerGetElapsed(YDWEGetGameTime___t))) / 75 ) )) // INLINED!!
     call StartTimerBJ(udg_p3_timer, false, I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545)))
-    call CreateTimerDialogBJ(udg_p3_timer, ( ( "距离" ) + ( GetUnitName(GetTriggerUnit()) ) + ( "复活还有" ) ))
+    call CreateTimerDialogBJ(udg_p3_timer, ( ( "距�" ) + ( GetUnitName(GetTriggerUnit()) ) + ( "复活还有" ) ))
     set udg_diedhero[3]=GetTriggerUnit()
     set udg_diedhero_cnt_window[3]=bj_lastCreatedTimerDialog
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -9226,7 +9281,7 @@ function Trig_p4_______uActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA, GetTriggerUnit())
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545, ( ( ( 5 ) + ( GetHeroLevel(GetTriggerUnit()) ) * ( 1 ) ) + ( (R2I(TimerGetElapsed(YDWEGetGameTime___t))) / 75 ) )) // INLINED!!
     call StartTimerBJ(udg_p4_timer, false, I2R(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545)))
-    call CreateTimerDialogBJ(udg_p4_timer, ( ( "距离" ) + ( GetUnitName(GetTriggerUnit()) ) + ( "复活还有" ) ))
+    call CreateTimerDialogBJ(udg_p4_timer, ( ( "距�" ) + ( GetUnitName(GetTriggerUnit()) ) + ( "复活还有" ) ))
     set udg_diedhero[4]=GetTriggerUnit()
     set udg_diedhero_cnt_window[4]=bj_lastCreatedTimerDialog
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -9429,8 +9484,8 @@ function Trig_Ash_ArrowActions takes nothing returns nothing
         call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3490E3F8, ( ( R2I(GetUnitStateSwap(UNIT_STATE_MAX_MANA, GetEventDamageSource())) ) * ( 5 ) / ( 1000 ) ))
         call YDWEGeneralBounsSystemUnitSetBonus(GetEventDamageSource() , 0 , 1 , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEB961D1D))
         call YDWEGeneralBounsSystemUnitSetBonus(GetEventDamageSource() , 1 , 1 , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3490E3F8))
-        call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, ( ( GetUnitName(GetEventDamageSource()) ) + ( "强行发动灰烬箭矢，额外燃烧了" ) + ( ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEB961D1D)) ) + ( "点生命上限" ) + ( "" ) ) ) ))
-        call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, ( ( GetUnitName(GetEventDamageSource()) ) + ( "强行发动灰烬箭矢，额外燃烧了" ) + ( ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3490E3F8)) ) + ( "点魔法上限" ) + ( "" ) ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, ( ( GetUnitName(GetEventDamageSource()) ) + ( "强�发动灰���，��燃烧了" ) + ( ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEB961D1D)) ) + ( "点生命上�" ) + ( "" ) ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, ( ( GetUnitName(GetEventDamageSource()) ) + ( "强�发动灰���，��燃烧了" ) + ( ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x3490E3F8)) ) + ( "点魔法上�" ) + ( "" ) ) ) ))
     else
     endif
     call DisableTrigger(GetTriggeringTrigger())
@@ -9503,6 +9558,7 @@ function Trig_Praise_the_SunActions takes nothing returns nothing
     call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0xEAFE0942, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call TimerStart(ydl_timer, 9.00, true, function Trig_Praise_the_SunFunc004T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -9534,11 +9590,11 @@ function Trig_digestive_glandsActions takes nothing returns nothing
         call YDWEGeneralBounsSystemUnitSetBonus(GetTriggerUnit() , 0 , 0 , R2I(( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276), UNIT_STATE_MAX_LIFE) * 0.25 )))
         call SetUnitState(GetTriggerUnit(), ConvertUnitState(0x51), ( GetUnitState(GetTriggerUnit(), ConvertUnitState(0x51)) - 0.06 ))
         call UnitDamageTarget(GetTriggerUnit(), LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276), ( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276), UNIT_STATE_LIFE) * 9.00 ), false, false, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( GetUnitName(GetTriggerUnit()) ) + ( "吞噬成功，获得了" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)) + "点生命上限" ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( GetUnitName(GetTriggerUnit()) ) + ( "吞噬成功，获得了" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)) + "点生命上�" ) ) ))
     else
         call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE8268D5, GetRandomInt(10, 100))
         call YDWEGeneralBounsSystemUnitSetBonus(GetTriggerUnit() , 1 , 1 , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE8268D5))
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( GetUnitName(GetTriggerUnit()) ) + ( "吞噬失败，损失了" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE8268D5)) + "点魔法上限" ) ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( GetUnitName(GetTriggerUnit()) ) + ( "吞噬失败，损失了" ) + ( ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEE8268D5)) + "点魔法上�" ) ) ))
     endif
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
 endfunction
@@ -9643,6 +9699,7 @@ function Trig_area_slienceActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xB6A6EBAA, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA))
     call TimerStart(ydl_timer, 1.00, true, function Trig_area_slienceFunc005T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -9718,6 +9775,7 @@ function Trig_hpwaveActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xFC4D8276, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276))
     call TimerStart(ydl_timer, 0.35, true, function Trig_hpwaveFunc014T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -9787,6 +9845,7 @@ function Trig_mana_stealActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xFC4D8276, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276))
     call TimerStart(ydl_timer, 0.35, true, function Trig_mana_stealFunc013T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -9893,7 +9952,7 @@ function Trig_Soul_CollectorFunc022T takes nothing returns nothing
         endif
         
         set udg_base_wave_time=( udg_base_wave_time - udg_wave_interval_reduction )
-        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
+        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他�的攻势变得越发凶猛！提高警惕，保持戒备！|r")
         set udg_bosswave=false
         call YDWETimerRunTrigger(2 , gg_trg_enemycoming)
         call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
@@ -9988,7 +10047,7 @@ function Trig_CaptainFunc018T takes nothing returns nothing
         
         set udg_bosswave=false
         set udg_base_wave_time=( udg_base_wave_time - udg_wave_interval_reduction )
-        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
+        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他�的攻势变得越发凶猛！提高警惕，保持戒备！|r")
         call YDWETimerRunTrigger(2 , gg_trg_enemycoming)
         call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
         call DestroyTimer(GetExpiredTimer())
@@ -10071,7 +10130,7 @@ function Trig_Mana_ruinFunc018T takes nothing returns nothing
         
         set udg_bosswave=false
         set udg_base_wave_time=( udg_base_wave_time - udg_wave_interval_reduction )
-        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
+        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他�的攻势变得越发凶猛！提高警惕，保持戒备！|r")
         call YDWETimerRunTrigger(2 , gg_trg_enemycoming)
         call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
         call DestroyTimer(GetExpiredTimer())
@@ -10158,7 +10217,7 @@ function Trig_Arrow_ShooterFunc022T takes nothing returns nothing
         
         set udg_bosswave=false
         set udg_base_wave_time=( udg_base_wave_time - udg_wave_interval_reduction )
-        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
+        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他�的攻势变得越发凶猛！提高警惕，保持戒备！|r")
         call YDWETimerRunTrigger(2 , gg_trg_enemycoming)
         call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
         call DestroyTimer(GetExpiredTimer())
@@ -10251,7 +10310,7 @@ function Trig_ZombieFunc014T takes nothing returns nothing
         
         set udg_bosswave=false
         set udg_base_wave_time=( udg_base_wave_time - udg_wave_interval_reduction )
-        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
+        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落彻底激怒了敌军，他�的攻势变得越发凶猛！提高警惕，保持戒备！|r")
         call YDWETimerRunTrigger(2 , gg_trg_enemycoming)
         call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
         call DestroyTimer(GetExpiredTimer())
@@ -10360,7 +10419,7 @@ function Trig_SlimeFunc012T takes nothing returns nothing
         set udg_bosswave=false
         set udg_base_wave_time=( udg_base_wave_time - udg_wave_interval_reduction )
         
-        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
+        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 60.00, "|cffff0000敌将的陨落激怒了敌军，他�的攻势变得越发凶猛！提高警惕，保持戒备！|r")
         
         call YDWETimerRunTrigger(2 , gg_trg_enemycoming)
         call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
@@ -10448,7 +10507,7 @@ function Trig_Sea_GodFunc024T takes nothing returns nothing
         set udg_bosswave=false
         set udg_base_wave_time=( udg_base_wave_time - udg_wave_interval_reduction )
         
-        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 30.00, "|cffff0000敌将的陨落激怒了敌军，他们的攻势变得越发凶猛！提高警惕，保持戒备！|r")
+        call DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 30.00, "|cffff0000敌将的陨落激怒了敌军，他�的攻势变得越发凶猛！提高警惕，保持戒备！|r")
         
         call YDWETimerRunTrigger(2 , gg_trg_enemycoming)
         call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
@@ -10572,6 +10631,7 @@ function Trig_fire_blastActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xB6A6EBAA, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA))
     call TimerStart(ydl_timer, 1.00, true, function Trig_fire_blastFunc006T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -10660,6 +10720,7 @@ function Trig_slime_hitActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xB6A6EBAA, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA))
     call TimerStart(ydl_timer, 1.00, true, function Trig_slime_hitFunc008T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -10739,6 +10800,7 @@ function Trig_fire_arrowActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xB6A6EBAA, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA))
     call TimerStart(ydl_timer, 1.00, true, function Trig_fire_arrowFunc007T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -10861,6 +10923,7 @@ function Trig_concealed_weaponActions takes nothing returns nothing
     call SaveGroupHandle(YDLOC, GetHandleId(ydl_timer), 0x95FF7217, LoadGroupHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x95FF7217))
     call TimerStart(ydl_timer, 9.00, true, function Trig_concealed_weaponFunc001T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -10884,7 +10947,7 @@ function Trig_stick_bobi_selectActions takes nothing returns nothing
     set udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]=bj_lastCreatedUnit
     call AddSpecialEffectTargetUnitBJ("origin", bj_lastCreatedUnit, "Abilities\\Spells\\Human\\ReviveHuman\\ReviveHuman.mdl")
     call YDWETimerDestroyEffect(2 , bj_lastCreatedEffect)
-    call DisplayTextToForce(GetPlayersAll(), ( ( "玩家" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了大棒波比" ) ))
+    call DisplayTextToForce(GetPlayersAll(), ( ( "玩�" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了大棒波�" ) ))
     call ForceAddPlayer(udg_player, GetOwningPlayer(GetTriggerUnit()))
     call DisableTrigger(GetTriggeringTrigger())
 endfunction
@@ -10908,7 +10971,7 @@ function Trig_builder_selectActions takes nothing returns nothing
     set udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]=bj_lastCreatedUnit
     call AddSpecialEffectTargetUnitBJ("origin", bj_lastCreatedUnit, "Abilities\\Spells\\Human\\ReviveHuman\\ReviveHuman.mdl")
     call YDWETimerDestroyEffect(2 , bj_lastCreatedEffect)
-    call DisplayTextToForce(GetPlayersAll(), ( ( "玩家" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了建筑师" ) ))
+    call DisplayTextToForce(GetPlayersAll(), ( ( "玩�" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了建筑师" ) ))
     call ForceAddPlayer(udg_player, GetOwningPlayer(GetTriggerUnit()))
     call DisableTrigger(GetTriggeringTrigger())
 endfunction
@@ -10932,7 +10995,7 @@ function Trig_shadow_selectActions takes nothing returns nothing
     set udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]=bj_lastCreatedUnit
     call AddSpecialEffectTargetUnitBJ("origin", bj_lastCreatedUnit, "Abilities\\Spells\\Human\\ReviveHuman\\ReviveHuman.mdl")
     call YDWETimerDestroyEffect(2 , bj_lastCreatedEffect)
-    call DisplayTextToForce(GetPlayersAll(), ( ( "玩家" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了焉影" ) ))
+    call DisplayTextToForce(GetPlayersAll(), ( ( "玩�" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了焉�" ) ))
     call ForceAddPlayer(udg_player, GetOwningPlayer(GetTriggerUnit()))
     call DisableTrigger(GetTriggeringTrigger())
 endfunction
@@ -10956,7 +11019,7 @@ function Trig_bladesman_selectActions takes nothing returns nothing
     set udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]=bj_lastCreatedUnit
     call AddSpecialEffectTargetUnitBJ("origin", bj_lastCreatedUnit, "Abilities\\Spells\\Human\\ReviveHuman\\ReviveHuman.mdl")
     call YDWETimerDestroyEffect(2 , bj_lastCreatedEffect)
-    call DisplayTextToForce(GetPlayersAll(), ( ( "玩家" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了刀客" ) ))
+    call DisplayTextToForce(GetPlayersAll(), ( ( "玩�" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了刀�" ) ))
     call ForceAddPlayer(udg_player, GetOwningPlayer(GetTriggerUnit()))
     call DisableTrigger(GetTriggeringTrigger())
 endfunction
@@ -10980,7 +11043,7 @@ function Trig_physiotherapists_selectActions takes nothing returns nothing
     set udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]=bj_lastCreatedUnit
     call AddSpecialEffectTargetUnitBJ("origin", bj_lastCreatedUnit, "Abilities\\Spells\\Human\\ReviveHuman\\ReviveHuman.mdl")
     call YDWETimerDestroyEffect(2 , bj_lastCreatedEffect)
-    call DisplayTextToForce(GetPlayersAll(), ( ( "玩家" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了炼药师" ) ))
+    call DisplayTextToForce(GetPlayersAll(), ( ( "玩�" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了炼��" ) ))
     call ForceAddPlayer(udg_player, GetOwningPlayer(GetTriggerUnit()))
     call DisableTrigger(GetTriggeringTrigger())
 endfunction
@@ -11004,7 +11067,7 @@ function Trig_massive_artilleryActions takes nothing returns nothing
     set udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]=bj_lastCreatedUnit
     call AddSpecialEffectTargetUnitBJ("origin", bj_lastCreatedUnit, "Abilities\\Spells\\Human\\ReviveHuman\\ReviveHuman.mdl")
     call YDWETimerDestroyEffect(2 , bj_lastCreatedEffect)
-    call DisplayTextToForce(GetPlayersAll(), ( ( "玩家" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了重炮" ) ))
+    call DisplayTextToForce(GetPlayersAll(), ( ( "玩�" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了重�" ) ))
     call ForceAddPlayer(udg_player, GetOwningPlayer(GetTriggerUnit()))
     call DisableTrigger(GetTriggeringTrigger())
 endfunction
@@ -11028,7 +11091,7 @@ function Trig_Arcane_ResearcherActions takes nothing returns nothing
     set udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]=bj_lastCreatedUnit
     call AddSpecialEffectTargetUnitBJ("origin", bj_lastCreatedUnit, "Abilities\\Spells\\Human\\ReviveHuman\\ReviveHuman.mdl")
     call YDWETimerDestroyEffect(2 , bj_lastCreatedEffect)
-    call DisplayTextToForce(GetPlayersAll(), ( ( "玩家" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了研法者" ) ))
+    call DisplayTextToForce(GetPlayersAll(), ( ( "玩�" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了研法�" ) ))
     call ForceAddPlayer(udg_player, GetOwningPlayer(GetTriggerUnit()))
     call DisableTrigger(GetTriggeringTrigger())
 endfunction
@@ -11061,9 +11124,9 @@ function Trig_sin_selectActions takes nothing returns nothing
     call UnitAddAbility(bj_lastCreatedUnit, 'A053')
     call GroupAddUnit(udg_hero_select, bj_lastCreatedUnit)
     set udg_diedhero[GetConvertedPlayerId(GetTriggerPlayer())]=bj_lastCreatedUnit
-    call DisplayTextToForce(GetPlayersAll(), ( ( "玩家" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了罪人" ) ))
-    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "原罪已获得专属武器——小刀，但他无法携带除战旗外的普通装备")
-    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "主动使用专武可获取原罪力量，每次升级之后可使用一次")
+    call DisplayTextToForce(GetPlayersAll(), ( ( "玩�" ) + ( GetPlayerName(GetOwningPlayer(GetTriggerUnit())) ) + ( "雇佣了罪�" ) ))
+    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "原罪已获得专属�器—�小�，但他无法携带除战旗外的�通��")
+    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "主动使用专�可获取原罪力量，每次升级之后可使用��")
     call UnitAddItemByIdSwapped('I023', bj_lastCreatedUnit)
     call UnitAddItemByIdSwapped('I02T', bj_lastCreatedUnit)
     call YDWENewItemsFormula('I023' , 1 , 'I00D' , 1 , 'I00D' , 1 , 'I00D' , 1 , 'I00D' , 0 , 'I00D' , 0 , 'I024')
@@ -11143,7 +11206,7 @@ function Sin_TryUpgrade takes unit u,integer needLv,integer oldItemId,integer ge
         return false
     endif
     if needLevel and GetHeroLevel(u) < needLv then
-        call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "您的雇佣兵当前的能力不足以接受下一次的原罪试炼")
+        call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "您的雇佣兵当前的能力不足以接受下�次的原罪试炼")
         return true
     endif
     call Sin_RemoveItemsById(u , 'I00D' , gemNeed)
@@ -11152,7 +11215,7 @@ function Sin_TryUpgrade takes unit u,integer needLv,integer oldItemId,integer ge
         call RemoveItem(oldIt)
     endif
     call UnitAddItemToSlotById(u, newItemId, equipSlot)
-    call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "您的雇佣兵获得了更强的罪孽之力")
+    call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "您的雇佣兵获得了更强的罪孽之�")
     set oldIt=null
     return true
 endfunction
@@ -11195,7 +11258,7 @@ endfunction
 function Trig_sin_upgradeActions takes nothing returns nothing
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I02T')) == 'I02T' ) ) then
         call YDWETimerRemoveItem(2 , YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I02T'))
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "罪孽为你的守护已破碎")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "�孽为你的守护已破�")
     else
     endif
 endfunction
@@ -11292,6 +11355,7 @@ function Trig_poisonous_fogActions takes nothing returns nothing
     call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0x76D38C4E, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x76D38C4E))
     call TimerStart(ydl_timer, 0.75, true, function Trig_poisonous_fogFunc016T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -11377,6 +11441,7 @@ function Trig_ubstableActions takes nothing returns nothing
     call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0xEAFE0942, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call TimerStart(ydl_timer, 1.00, true, function Trig_ubstableFunc021T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -11412,12 +11477,12 @@ function Trig_Life_SynthesisActions takes nothing returns nothing
             call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6BD67865, ( R2I(GetUnitStateSwap(UNIT_STATE_MAX_MANA, GetKillingUnitBJ())) / 4 ))
             call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6BD67865, ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6BD67865) + GetRandomInt(1, 99) ))
             call AddHeroXP(GetKillingUnitBJ(), LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6BD67865), true)
-            call DisplayTextToPlayer(GetOwningPlayer(GetKillingUnitBJ()), 0, 0, ( "炼药师通过生命炼成获得了额外经验值：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6BD67865)) ))
+            call DisplayTextToPlayer(GetOwningPlayer(GetKillingUnitBJ()), 0, 0, ( "炼药师�过生命炼成获得了��经验�：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6BD67865)) ))
         else
             call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4EF831CF, ( R2I(GetUnitStateSwap(UNIT_STATE_MAX_MANA, GetKillingUnitBJ())) / 400 ))
             if ( ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4EF831CF) >= 1 ) ) then
                 call SetHeroStr(GetKillingUnitBJ(), ( GetHeroStr(GetKillingUnitBJ(), false) + LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4EF831CF) ), true)
-                call DisplayTextToPlayer(GetOwningPlayer(GetKillingUnitBJ()), 0, 0, ( "炼药师通过生命炼成获得了额外力量：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4EF831CF)) ))
+                call DisplayTextToPlayer(GetOwningPlayer(GetKillingUnitBJ()), 0, 0, ( "炼药师�过生命炼成获得了��力量：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4EF831CF)) ))
             else
             endif
         endif
@@ -11481,6 +11546,7 @@ function Trig_Extreme_DosageActions takes nothing returns nothing
     call SaveReal(YDLOC, GetHandleId(ydl_timer), 0x6EA533B2, LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6EA533B2))
     call TimerStart(ydl_timer, 1.00, true, function Trig_Extreme_DosageFunc009T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -11564,6 +11630,7 @@ function Trig_Arcane_Impale_New_stompActions takes nothing returns nothing
     call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0x76D38C4E, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x76D38C4E))
     call TimerStart(ydl_timer, 0.06, true, function Trig_Arcane_Impale_New_stompFunc007T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -11729,6 +11796,7 @@ function Trig_Illusory_VoidActions takes nothing returns nothing
     call SaveInteger(YDLOC, GetHandleId(ydl_timer), 0x457BCFC0, LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x457BCFC0))
     call TimerStart(ydl_timer, 0.75, true, function Trig_Illusory_VoidFunc009T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -11782,6 +11850,7 @@ function Trig_Arcane_Susceptibility_Aura_LearnActions takes nothing returns noth
     call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0xEAFE0942, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call TimerStart(ydl_timer, 0.50, true, function Trig_Arcane_Susceptibility_Aura_LearnFunc003T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -11805,7 +11874,7 @@ function Trig_Arcane_Susceptibility_Aura_DamageActions takes nothing returns not
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239, GetUnitAbilityLevel(GetEventDamageSource(), 'A06N'))
     if ( ( GetRandomInt(1, 100) <= ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) + 1 ) ) ) then
         call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68, GetRandomInt(1, ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) + 1 )))
-        call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, ( ( "研法者洞悉魔法的奥秘，" ) + ( ( ( "提高了" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68)) ) + ( "智力" ) ) ) + ( " " ) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, ( ( "研法者洞悉魔法的奥�，" ) + ( ( ( "提高�" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68)) ) + ( "智力" ) ) ) + ( " " ) ))
         call ModifyHeroStat(bj_HEROSTAT_INT, GetEventDamageSource(), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68))
         call DisableTrigger(GetTriggeringTrigger())
         call YDWEPolledWaitNull(5.00)
@@ -11990,7 +12059,7 @@ function Trig_bullet_flyConditions takes nothing returns boolean
     return ( ( true ) )
 endfunction
 function Trig_bullet_flyActions takes nothing returns nothing
-    // 转移到show_da
+    // �移到show_da
 endfunction
 //===========================================================================
 function InitTrig_bullet_fly takes nothing returns nothing
@@ -12238,6 +12307,7 @@ function Trig_Soul_Severing_Blood_RiteActions takes nothing returns nothing
     call SaveInteger(YDLOC, GetHandleId(ydl_timer), 0x56202239, LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239))
     call TimerStart(ydl_timer, 1.00, true, function Trig_Soul_Severing_Blood_RiteFunc007T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -12504,6 +12574,7 @@ function Trig_Tempest_of_TerminationActions takes nothing returns nothing
     call SaveEffectHandle(YDLOC, GetHandleId(ydl_timer), 0xFE88D7FF, LoadEffectHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFE88D7FF))
     call TimerStart(ydl_timer, 0.45, true, function Trig_Tempest_of_TerminationFunc013T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -12523,7 +12594,7 @@ function Trig_shadow_getActions takes nothing returns nothing
     call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I040'))
     call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I014'))
     call UnitAddItemByIdSwapped('I041', GetTriggerUnit())
-    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "罪人已获取秽影")
+    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "�人已获取秽影")
     call AddSpecialEffectTargetUnitBJ("overhead", GetTriggerUnit(), "Abilities\\Spells\\Other\\Drain\\ManaDrainCaster.mdl")
     call YDWETimerDestroyEffect(2 , bj_lastCreatedEffect)
 endfunction
@@ -12584,12 +12655,12 @@ function Trig_get_boneActions takes nothing returns nothing
         if ( ( LoadBoolean(YDHT, 'H004', 0xFC90CAC3) == true ) and ( LoadBoolean(YDHT, 'H004', 0xD03034F6) == true ) and ( LoadBoolean(YDHT, 'H004', 0xB088C2E3) == true ) and ( LoadInteger(YDHT, 'H004', 0x6CCF2C68) > 0 ) ) then
             call SetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F), UNIT_STATE_MAX_LIFE, ( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F), UNIT_STATE_MAX_LIFE) * 0.65 ))
             call UnitAddItemByIdSwapped('I040', LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F))
-            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "罪孽之骨兑换成功")
+            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "�孽之骨兑换成�")
         else
-            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "连灵魂都没有办法收服的原罪之徒，没有资格获取罪孽之骨")
+            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "连灵魂都没有办法收服的原�之徒，没有资格获取罪孽之�")
         endif
     else
-        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "你不被原罪认可，没资格换取罪孽的宝物")
+        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "你不�原罪认可，没资格换取�孽的宝物")
     endif
     call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -12614,7 +12685,7 @@ function Trig_sin_equipmentActions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F, GetTriggerUnit())
     call UnitRemoveItemSwapped(GetManipulatedItem(), LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F))
-    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "您的雇佣兵不被原罪认可，无法佩戴此装备！")
+    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "您的雇佣兵不�原罪认可，无法佩戴���！")
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
 endfunction
 //===========================================================================
@@ -12637,7 +12708,7 @@ function Trig_sin_equipment_quitActions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     call SaveUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F, GetTriggerUnit())
     call UnitRemoveItemSwapped(GetManipulatedItem(), LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F))
-    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "原罪无法携带除战旗外的普通装备")
+    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)), 0, 0, "原罪无法携带除战旗�的�通��")
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
 endfunction
 //===========================================================================
@@ -12653,7 +12724,7 @@ endfunction
 //TESH.scrollpos=0
 //TESH.alwaysfold=0
 function Trig_sin_initActions takes nothing returns nothing
-    // 初始化所有等级的小刀使用状态
+    // 初�化�有等级的小刀使用状�
     call SaveBoolean(YDHT, 'I023', 0x8376128B, false) // lv1
 call SaveBoolean(YDHT, 'I024', 0x8376128B, false) // lv2
 call SaveBoolean(YDHT, 'I025', 0x8376128B, false) // lv3
@@ -12683,8 +12754,8 @@ function Trig_steal_soulActions takes nothing returns nothing
     call SetHeroStr(GetKillingUnitBJ(), ( GetHeroStr(GetKillingUnitBJ(), false) + 1 ), true)
     call SetHeroAgi(GetKillingUnitBJ(), ( GetHeroAgi(GetKillingUnitBJ(), false) + 1 ), true)
     call SetHeroInt(GetKillingUnitBJ(), ( GetHeroInt(GetKillingUnitBJ(), false) + 1 ), true)
-    call YDWESetUnitAbilityDataString(GetKillingUnitBJ() , 'A053' , 1 , 218 , ( ( ( "暴食：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5)) ) ) + ( ( "|n贪婪：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5)) ) ) + ( ( "|n色欲：" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5)) + "|n击杀敌人时13%概率使汲取灵魂，增加原罪值" ) ) ) ))
-    call DisplayTextToPlayer(GetOwningPlayer(GetKillingUnitBJ()), 0, 0, "原罪汲取灵魂加1")
+    call YDWESetUnitAbilityDataString(GetKillingUnitBJ() , 'A053' , 1 , 218 , ( ( ( "暴�：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5)) ) ) + ( ( "|n���" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5)) ) ) + ( ( "|n色�：" + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5)) + "|n击杀敌人�13%概率使汲取灵魂，增加原罪�" ) ) ) ))
+    call DisplayTextToPlayer(GetOwningPlayer(GetKillingUnitBJ()), 0, 0, "原罪汲取灵魂�1")
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
 endfunction
 //===========================================================================
@@ -12894,7 +12965,7 @@ endfunction
 function Trig_knife_use_newConditions takes nothing returns boolean
     return ( ( ( GetUnitTypeId(GetTriggerUnit()) == 'H004' ) and ( GetSpellAbilityId() == 'A054' ) ) )
 endfunction
-// ==================== 以下是你原本的 7 个按钮执行逻辑 ====================
+// ==================== 以下�你原�� 7 �按钮执��辑 ====================
 function Trig_knife_use_newFunc007Func001Conditions takes nothing returns nothing
     call SaveBoolean(YDHT, 'H004', 0x193764E8, true)
     call UnitAddAbility(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A05B')
@@ -12937,7 +13008,7 @@ function Trig_knife_use_newFunc007Func005Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 80.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 80.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 80.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：80|n贪婪：80|n色欲：80|n击杀敌人时13%概率使汲取灵魂，增加原罪值")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：80|n���80|n色�：80|n击杀敌人�13%概率使汲取灵魂，增加原罪�")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -12946,7 +13017,7 @@ function Trig_knife_use_newFunc007Func005Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 50.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 50.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 0.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：50|n贪婪：50|n色欲：0|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：50|n���50|n色�：0|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -12955,7 +13026,7 @@ function Trig_knife_use_newFunc007Func005Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 50.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 0.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 50.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：50|n贪婪：0|n色欲：50|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：50|n���0|n色�：50|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -12964,7 +13035,7 @@ function Trig_knife_use_newFunc007Func005Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 20.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 0.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 0.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：20|n贪婪：0|n色欲：0|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：20|n���0|n色�：0|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -12981,7 +13052,7 @@ function Trig_knife_use_newFunc007Func006Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 80.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 80.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 80.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：80|n贪婪：80|n色欲：80|n击杀敌人时13%概率使汲取灵魂，增加原罪值")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：80|n���80|n色�：80|n击杀敌人�13%概率使汲取灵魂，增加原罪�")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -12990,7 +13061,7 @@ function Trig_knife_use_newFunc007Func006Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 50.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 50.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 0.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：50|n贪婪：50|n色欲：0|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：50|n���50|n色�：0|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -12999,7 +13070,7 @@ function Trig_knife_use_newFunc007Func006Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 0.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 50.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 50.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：0|n贪婪：50|n色欲：50|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：0|n���50|n色�：50|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -13008,7 +13079,7 @@ function Trig_knife_use_newFunc007Func006Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 0.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 20.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 0.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：0|n贪婪：20|n色欲：0|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：0|n���20|n色�：0|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -13025,7 +13096,7 @@ function Trig_knife_use_newFunc007Func007Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 80.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 80.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 80.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：80|n贪婪：80|n色欲：80|n击杀敌人时13%概率使汲取灵魂，增加原罪值")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：80|n���80|n色�：80|n击杀敌人�13%概率使汲取灵魂，增加原罪�")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -13034,7 +13105,7 @@ function Trig_knife_use_newFunc007Func007Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 50.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 0.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 50.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：50|n贪婪：0|n色欲：50|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：50|n���0|n色�：50|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -13043,7 +13114,7 @@ function Trig_knife_use_newFunc007Func007Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 0.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 50.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 50.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：0|n贪婪：50|n色欲：50|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：0|n���50|n色�：50|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -13052,7 +13123,7 @@ function Trig_knife_use_newFunc007Func007Conditions takes nothing returns nothin
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 110 , 0.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 108 , 0.00)
         call YDWESetUnitAbilityDataReal(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 109 , 20.00)
-        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴食：0|n贪婪：0|n色欲：20|n")
+        call YDWESetUnitAbilityDataString(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA) , 'A053' , 1 , 218 , "暴�：0|n���0|n色�：20|n")
         call IncUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
         call DecUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 'A053')
     else
@@ -13063,7 +13134,7 @@ function Trig_knife_use_newFunc007Func007Conditions takes nothing returns nothin
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()))
     call DestroyTrigger(GetTriggeringTrigger())
 endfunction
-// ==================== 以下是我帮你优化过的新核心拦截与建对话框逻辑 ====================
+// ==================== 以下�我帮你优化过的新核心拦截与建对话框�辑 ====================
 function Trig_knife_use_newActions takes nothing returns nothing
     local trigger ydl_trigger
     local unit caster= GetTriggerUnit()
@@ -13071,9 +13142,9 @@ function Trig_knife_use_newActions takes nothing returns nothing
     local integer ydl_localvar_step= LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76)
  set ydl_localvar_step=ydl_localvar_step + 3
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
- call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step) // 最严格的规则：全村的 local 都在这上面，全村的动作都在这下面！
+ call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step) // �严格的�则：全村的 local 都在这上�，全村的动作都在这下��
 
-    // ==================== 原罪阶级拦截与记录逻辑 ====================
+    // ==================== 原罪阶级拦截与�录逻辑 ====================
     // LV1 小刀 (I023)
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(caster , 'I023')) == 'I023' ) ) then
         if ( ( LoadBoolean(YDHT, 'I023', 0x8376128B) == true ) ) then
@@ -13124,11 +13195,11 @@ function Trig_knife_use_newActions takes nothing returns nothing
             call SaveBoolean(YDHT, 'I022', 0x8376128B, true)
         endif
     endif
-    // ==================== 统一拦截与打断 ====================
+    // ==================== 统一拦截与打� ====================
     if is_used == true then
         call IssueImmediateOrder(caster, "stop")
-        call DisplayTextToPlayer(GetOwningPlayer(caster), 0, 0, "该躯体已汲取过此阶级的原罪，无法重复获取！")
-        // 如果被拦截，必须在 return 前释放局部内存，防止内存泄露
+        call DisplayTextToPlayer(GetOwningPlayer(caster), 0, 0, "该躯体已汲取过�阶级的原罪，无法重复获取！")
+        // 如果�拦截，必须在 return 前释放局部内存，防�内存泄�
         call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
         return
     endif
@@ -13139,27 +13210,27 @@ function Trig_knife_use_newActions takes nothing returns nothing
     call DialogSetMessage(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "投身原罪")
     // -------------------- 创建选项 --------------------
     if ( ( LoadBoolean(YDHT, 'H004', 0xB088C2E3) == false ) ) then
-        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F75C9C6, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "暴食（三围增加：力）", 0))
+        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6F75C9C6, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "暴�（三围增加：力�", 0))
     endif
     if ( ( LoadBoolean(YDHT, 'H004', 0xFC90CAC3) == false ) ) then
-        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x237F57F4, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "贪婪（三围增加：敏）", 0))
+        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x237F57F4, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "��（三围�加：敏�", 0))
     endif
     if ( ( LoadBoolean(YDHT, 'H004', 0xD03034F6) == false ) ) then
-        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2FFD170, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "色欲（三围增加：智）", 0))
+        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2FFD170, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "色�（三围增加：智�", 0))
     endif
     if ( ( LoadBoolean(YDHT, 'H004', 0xCBCE51D0) == false ) ) then
-        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x2FE7A96E, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "暴怒（攻击附加技能）", 0))
+        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x2FE7A96E, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "暴�（攻击附加�能）", 0))
     endif
     if ( ( LoadBoolean(YDHT, 'H004', 0x193764E8) == false ) ) then
         call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA8B12029, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "懒惰（控制伤害技能）", 0))
     endif
     if ( ( LoadBoolean(YDHT, 'H004', 0x5EE5C0C0) == false ) ) then
-        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE0093A77, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "嫉妒（单体减益技能）", 0))
+        call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE0093A77, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "嫉�（单体减益�能）", 0))
     endif
     if ( ( LoadBoolean(YDHT, 'H004', 0x5CFF73A0) == false ) ) then
         call SaveButtonHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x75ECCF42, DialogAddButton(LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), "傲慢（传送技能）", 0))
     endif
-    // -------------------- 显示对话框 --------------------
+    // -------------------- 显示对话� --------------------
     call DialogDisplay(GetOwningPlayer(caster), LoadDialogHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x919E6CA2), true)
     // -------------------- 注册按钮事件 --------------------
     set ydl_trigger=CreateTrigger()
@@ -13306,7 +13377,7 @@ function Trig_wrath_skillActions takes nothing returns nothing
     call YDWETimerDestroyEffect(13.00 , bj_lastCreatedEffect)
     call UnitAddAbility(GetTriggerUnit(), 'A05E')
     call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A05E' , 1 , 109 , LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
-    call YDWESetUnitAbilityDataString(GetTriggerUnit() , 'A05E' , 1 , 218 , ( "攻击造成范围伤害" + R2S(LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8)) ))
+    call YDWESetUnitAbilityDataString(GetTriggerUnit() , 'A05E' , 1 , 218 , ( "攻击造成范围伤�" + R2S(LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8)) ))
     call IncUnitAbilityLevel(GetTriggerUnit(), 'A05E')
     call DecUnitAbilityLevel(GetTriggerUnit(), 'A05E')
     call YDWEGeneralBounsSystemUnitSetBonus(GetTriggerUnit() , 2 , 1 , R2I(LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x15534168)))
@@ -13326,6 +13397,7 @@ function Trig_wrath_skillActions takes nothing returns nothing
     else
     endif
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -13659,14 +13731,14 @@ function Trig_fire_manaActions takes nothing returns nothing
         call UnitAddAbility(GetTriggerUnit(), 'A05S')
         call SetUnitAbilityLevel(GetTriggerUnit(), 'A05S', 1)
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "建筑师尚未习得快速建造技能")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "建筑师尚�习得�速建造技�")
     endif
     if ( ( LoadInteger(YDHT, 'H007', 0x457BCFC0) > 0 ) ) then
         call UnitRemoveAbility(GetTriggerUnit(), 'A05R')
         call UnitAddAbility(GetTriggerUnit(), 'A05T')
         call SetUnitAbilityLevel(GetTriggerUnit(), 'A05T', 1)
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "建筑师尚未习得傀儡军团技能")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "建筑师尚�习得�儡军团技�")
     endif
 endfunction
 //===========================================================================
@@ -13746,17 +13818,17 @@ function Trig_perfect_craftActions takes nothing returns nothing
                 call SetUnitManaPercentBJ(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C), ( GetUnitManaPercent(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C)) - 3.00 ))
             else
             endif
-            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C)), 0, 0, ( ( "建筑师已触发" ) + ( "精湛技艺" ) + ( ( "，其造物获得强化，叠加次数为：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5)) ) ) ))
+            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C)), 0, 0, ( ( "建筑师已触发" ) + ( "精湛��" ) + ( ( "，其造物获得强化，叠加�数为：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xE2AED0F5)) ) ) ))
             if ( ( GetUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C), 'A05M') == 1 ) and ( GetRandomInt(1, 101) <= 7 ) ) then
                 call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13, GetRandomInt(15, ( ( ( 25 ) + ( GetHeroInt(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C), false) ) * ( 2 ) ) + 5 )))
                 call YDWEGeneralBounsSystemUnitSetBonus(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C) , 1 , 0 , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13))
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C)), 0, 0, ( ( "建筑师已增加" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13)) ) + ( "最大魔法值" ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C)), 0, 0, ( ( "建筑师已增加" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13)) ) + ( "�大魔法�" ) ))
             else
             endif
             if ( ( GetUnitAbilityLevel(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C), 'A05M') == 2 ) and ( GetRandomInt(1, 101) <= 13 ) ) then
                 call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13, GetRandomInt(25, ( ( ( 25 ) + ( GetHeroInt(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C), false) ) * ( 4 ) ) + 5 )))
                 call YDWEGeneralBounsSystemUnitSetBonus(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C) , 1 , 0 , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13))
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C)), 0, 0, ( ( "建筑师已增加" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13)) ) + ( "最大魔法值" ) ))
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x4AD1EF0C)), 0, 0, ( ( "建筑师已增加" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13)) ) + ( "�大魔法�" ) ))
             else
             endif
         else
@@ -13786,7 +13858,7 @@ function Trig_perfect_craft_lvActions takes nothing returns nothing
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239, GetUnitAbilityLevel(GetTriggerUnit(), 'A05Q'))
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68, GetRandomInt(1, ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x56202239) + 1 )))
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13, ( GetRandomInt(7, 16) * LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68) ))
-    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( "建筑师精湛其技艺，" ) + ( ( ( "提高了" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68)) ) + ( "智力，" ) ) ) + ( ( ( "增加了" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13)) ) + ( "最大魔法值" ) ) ) ))
+    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( ( "建筑师精湛其�艺，" ) + ( ( ( "提高�" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68)) ) + ( "智力�" ) ) ) + ( ( ( "增加�" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13)) ) + ( "�大魔法�" ) ) ) ))
     call ModifyHeroStat(bj_HEROSTAT_INT, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x803B2E68))
     call YDWEGeneralBounsSystemUnitSetBonus(GetTriggerUnit() , 1 , 0 , LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x0ABBFF13))
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -13857,6 +13929,7 @@ function Trig_water_shieldActions takes nothing returns nothing
     call SaveInteger(YDLOC, GetHandleId(ydl_timer), 0xCF3E9609, LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xCF3E9609))
     call TimerStart(ydl_timer, 0.25, true, function Trig_water_shieldFunc005T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -13920,7 +13993,7 @@ function Trig_Critical_hitConditions takes nothing returns boolean
     return ( ( true ) )
 endfunction
 function Trig_Critical_hitActions takes nothing returns nothing
-    // 转移到show_da
+    // �移到show_da
 endfunction
 //===========================================================================
 function InitTrig_Critical_hit takes nothing returns nothing
@@ -13959,6 +14032,7 @@ function Trig_bear_deathActions takes nothing returns nothing
     call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0xEAFE0942, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call TimerStart(ydl_timer, GetRandomReal(45.00, 80.00), false, function Trig_bear_deathFunc002T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -14024,6 +14098,7 @@ function Trig_Windmill_deathActions takes nothing returns nothing
     else
     endif
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -14159,12 +14234,12 @@ function Trig_nobody_deathActions takes nothing returns nothing
         else
         endif
     endif
-    // 小火珠
+    // 小火�
     if ( ( GetRandomInt(1, 100) <= 6 ) and ( GetUnitTypeId(GetTriggerUnit()) == 'n009' ) ) then
         call CreateItemLoc('I01B', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
     endif
-    // 龙龟壳
+    // 龙龟�
     if ( ( GetRandomInt(1, 100) <= 40 ) and ( GetUnitTypeId(GetTriggerUnit()) == 'n01A' ) ) then
         call CreateItemLoc('I035', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
@@ -14174,7 +14249,7 @@ function Trig_nobody_deathActions takes nothing returns nothing
         call CreateItemLoc('I03S', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
     endif
-    // 狮心残片
+    // �心残�
     if ( ( GetRandomInt(1, 100) <= 8 ) and ( ( GetUnitTypeId(GetTriggerUnit()) == 'n014' ) or ( GetUnitTypeId(GetTriggerUnit()) == 'n015' ) ) ) then
         call CreateItemLoc('I036', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
@@ -14184,12 +14259,12 @@ function Trig_nobody_deathActions takes nothing returns nothing
         call CreateItemLoc('I038', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
     endif
-    // 火
+    // �
     if ( ( GetRandomInt(1, 100) <= 12 ) and ( GetUnitTypeId(GetTriggerUnit()) == 'e008' ) ) then
         call CreateItemLoc('I039', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
     endif
-    // 冰
+    // �
     if ( ( GetRandomInt(1, 100) <= 12 ) and ( GetUnitTypeId(GetTriggerUnit()) == 'e007' ) ) then
         call CreateItemLoc('I03A', LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     else
@@ -14200,7 +14275,7 @@ function Trig_nobody_deathActions takes nothing returns nothing
         call SaveBoolean(YDHT, 'I00G', 0x75A1C0CB, true)
     else
     endif
-    // 野怪重生
+    // 野�重生
     if ( ( GetUnitTypeId(GetTriggerUnit()) == 'n004' ) ) then
         set ydl_timer=CreateTimer()
         call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0xEAFE0942, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
@@ -14281,9 +14356,9 @@ function Trig_nobody_deathActions takes nothing returns nothing
     endif
     if ( ( GetUnitTypeId(GetTriggerUnit()) == 'n016' ) ) then
         set udg_crocodile_rate=( udg_crocodile_rate + 3 )
-        // 召唤小鳄鱼
+        // �唤小鳄鱼
         if ( ( GetRandomInt(1, 100) <= udg_crocodile_rate ) and ( IsUnitHiddenBJ(gg_unit_O005_0028) == true ) ) then
-            call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "竟敢有人于此搅动风雨，击杀我的孩儿")
+            call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "竟敢有人于�搅动�雨，击�我的孩儿")
             call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetUnitLoc(gg_unit_O005_0028))
             call AddSpecialEffectLocBJ(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), "Units\\Demon\\Infernal\\InfernalBirth.mdl")
             call YDWETimerDestroyEffect(1.00 , bj_lastCreatedEffect)
@@ -14306,6 +14381,7 @@ function Trig_nobody_deathActions takes nothing returns nothing
     else
     endif
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -14390,13 +14466,14 @@ function Trig_reinforcementsActions takes nothing returns nothing
     call SaveReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545, 12.00)
     call YDWEPolledWaitNull(LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545))
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "[穿云之信]——谢天谢地！帝国没有忘记我们，援军很快就要抵达了！")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "[穿云之信]—�谢天谢地！帝国没有忘�我�，援军很�就�抵达了�")
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x8662E892, 'h00T')
     set ydl_timer=CreateTimer()
     call SaveGroupHandle(YDLOC, GetHandleId(ydl_timer), 0x9E80183F, LoadGroupHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9E80183F))
     call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0xEAFE0942, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
     call TimerStart(ydl_timer, LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x6B54C545), true, function Trig_reinforcementsFunc005T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -14433,7 +14510,7 @@ function Trig_emerald_getActions takes nothing returns nothing
     if ( ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x92070F1C) >= LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x73EE4622) ) ) then
         // --------------------
         // 合成说明
-        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA)), 0, 0, "您的雇佣兵将三块碎片两两对准缺口，融合成一块完整的绿宝石")
+        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA)), 0, 0, "您的雇佣兵将三块碎片两两对准缺口，融合成�块完整的绿宝�")
         // --------------------
         set udg_task_int=0
         loop
@@ -14466,20 +14543,20 @@ endfunction
 // Trigger: tower_task
 //===========================================================================
 function Trig_tower_taskFunc004Func004T takes nothing returns nothing
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "原来我们营地实力空虚的消息早已被对方探查得一干二净，怪不得最近前来骚扰的敌军愈发强势")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "原来我们营地实力空虚的消�早已�对方探查得一干二�，�不得�近前来骚扰的敌军愈发强势")
     call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
     call DestroyTimer(GetExpiredTimer())
 endfunction
 function Trig_tower_taskFunc004Func005T takes nothing returns nothing
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "这里怎么有一座残破的高塔，搜索一下看看")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "这里怎么有一座残破的高�，搜索�下看�")
     call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
     call DestroyTimer(GetExpiredTimer())
 endfunction
 function Trig_tower_taskFunc004Conditions takes nothing returns nothing
     local timer ydl_timer
     call FlashQuestDialogButton()
-    call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "[穿云之信]——雇佣兵有些发现，需要向牧师汇报")
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "这里怎么会有敌军的探子！！")
+    call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "[穿云之信]—�雇佣兵有些发现，需要向牧师汇报")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "这里怎么会有敌军的探子！�")
     set ydl_timer=CreateTimer()
     call TimerStart(ydl_timer, 3.00, false, function Trig_tower_taskFunc004Func004T)
     set ydl_timer=CreateTimer()
@@ -14490,7 +14567,7 @@ function Trig_tower_taskFunc004Conditions takes nothing returns nothing
     set ydl_timer=null
 endfunction
 function Trig_tower_taskFunc005Func001Func005T takes nothing returns nothing
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "看看牧师能否解读其中的奥秘")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "看看牧师能否解�其�的奥�")
     call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
     call DestroyTimer(GetExpiredTimer())
 endfunction
@@ -14498,9 +14575,9 @@ function Trig_tower_taskFunc005Conditions takes nothing returns nothing
     local timer ydl_timer
     if ( ( GetItemTypeId(GetManipulatedItem()) == 'I03X' ) ) then
         call FlashQuestDialogButton()
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[穿云之信]——似乎这份蓝图能解决燃眉之急
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[穿云之信]—�似乎这份蓝图能解决燃眉之�
 ")
-        call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xFC49F013), "将蓝图携带给牧师，等待下一步指示")
+        call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xFC49F013), "将蓝图携带给牧师，等待下�步指�")
         set ydl_timer=CreateTimer()
         call TimerStart(ydl_timer, 3.00, false, function Trig_tower_taskFunc005Func001Func005T)
         call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()))
@@ -14510,19 +14587,19 @@ function Trig_tower_taskFunc005Conditions takes nothing returns nothing
     set ydl_timer=null
 endfunction
 function Trig_tower_taskFunc006Func001Func006T takes nothing returns nothing
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "随军牧师【派蒙】:幸好你们找到了这份蓝图，蓝图介绍了如何建造魔法信号塔，我们可以借助它求援")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "随军牧师【派蒙�:幸好你们找到了这份蓝图，蓝图介绍了�何建�魔法信号�，我们�以�助它求�")
     call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
     call DestroyTimer(GetExpiredTimer())
 endfunction
 function Trig_tower_taskFunc006Func001Func007T takes nothing returns nothing
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "随军牧师【派蒙】:建造魔法信号塔需要30份银树木材和20份金石矿材，需要你们前往野外采集，更好的选择是雇佣采集专家采集")
-    call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xFC49F013), "我们需要前往野外采集30份银树木材和20份金石矿材，可以在营地中雇佣采集专家提高采集效率|n收集完材料后，携带蓝图找到牧师，他会找到能人巧匠来完成建造任务|n任务完成之前，牧师不能死！|n查看队伍材料指令：-res")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "随军牧师【派蒙�:建�魔法信号�需�30份银树木材和20份金石矿材，�要你�前往野�采集，更好的�择�雇佣采集专�采�")
+    call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xFC49F013), "我们�要前�野�采�30份银树木材和20份金石矿材，�以在营地�雇佣采集专�提高采集效率|n收集完材料后，携带蓝图找到牧师，他会找到能人巧匠来完成建造任�|n任务完成之前，牧师不能�！|n查看队伍材料指令�-res")
     call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
     call DestroyTimer(GetExpiredTimer())
 endfunction
 function Trig_tower_taskFunc006Func001Func008Func001Func008T takes nothing returns nothing
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "随军牧师【派蒙】:我们必须前往河对岸建造魔法信号塔，只有这样才能更好地联系援军，所以你们一定一定要保护建造专家的安全")
-    call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xFC49F013), "使用指令，派遣建造专家前往河对岸指定地点进行建造，需对其进行深度保护，以免建造失败|n查看队伍材料指令：-res")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "随军牧师【派蒙�:我们必须前往河�岸建�魔法信号�，�有这样才能更好地联系援军，所以你��定一定�保护建造专家的安全")
+    call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xFC49F013), "使用指令，派遣建造专家前�河�岸指定地点进�建造，�对其进�深度保护，以免建�失�|n查看队伍材料指令�-res")
     call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
     call DestroyTimer(GetExpiredTimer())
 endfunction
@@ -14531,7 +14608,7 @@ function Trig_tower_taskFunc006Func001Func008Conditions takes nothing returns no
     if ( ( IsUnitType(gg_unit_H002_0119, UNIT_TYPE_DEAD) == false ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I03X')) == 'I03X' ) and ( udg_stone_num >= 20 ) and ( udg_tree_num >= 30 ) ) then
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I03X'))
         call FlashQuestDialogButton()
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[穿云之信]——建造材料已收集完毕，等待雇佣兵开始指挥建造
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[穿云之信]—�建造材料已收集完毕，等待雇佣兵�始指挥建�
 ")
         set ydl_timer=CreateTimer()
         call SaveQuestHandle(YDLOC, GetHandleId(ydl_timer), 0xFC49F013, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xFC49F013))
@@ -14552,9 +14629,9 @@ function Trig_tower_taskFunc006Conditions takes nothing returns nothing
     local trigger ydl_trigger
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I03X')) == 'I03X' ) and ( IsUnitType(gg_unit_H002_0119, UNIT_TYPE_DEAD) == false ) ) then
         call FlashQuestDialogButton()
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[穿云之信]——派蒙正在仔细阅读高塔蓝图
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[穿云之信]—�派蒙�在仔细阅�高塔蓝�
 ")
-        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "随军牧师【派蒙】:敌军的进攻只会愈发猛烈，我们难以抵挡")
+        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "随军牧师【派蒙�:敌军的进攻只会愈发猛烈，我们难以抵挡")
         set ydl_timer=CreateTimer()
         call TimerStart(ydl_timer, 3.00, false, function Trig_tower_taskFunc006Func001Func006T)
         set ydl_timer=CreateTimer()
@@ -14585,7 +14662,7 @@ function Trig_tower_taskFunc007Func002Func009Func001Func005A takes nothing retur
         call ModifyHeroStat(bj_HEROSTAT_STR, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xE6E64075), bj_MODIFYMETHOD_ADD, 10)
         call ModifyHeroStat(bj_HEROSTAT_AGI, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xE6E64075), bj_MODIFYMETHOD_ADD, 10)
         call ModifyHeroStat(bj_HEROSTAT_INT, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xE6E64075), bj_MODIFYMETHOD_ADD, 10)
-        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xE6E64075)), 0, 0, ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xE6E64075)) + "获得10点全属性和大量经验" ))
+        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xE6E64075)), 0, 0, ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xE6E64075)) + "获得10点全属�和大量经验" ))
     else
     endif
 endfunction
@@ -14595,7 +14672,7 @@ function Trig_tower_taskFunc007Func002Func009T takes nothing returns nothing
     if ( ( IsUnitType(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), UNIT_TYPE_DEAD) == true ) and ( udg_build_finish == false ) ) then
         call SaveGroupHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xECC38EC2, YDWEGetUnitsInRectMatchingNull(GetPlayableMapRect() , Condition(function Trig_tower_taskFunc007Func002Func009Func001Func001003002)))
         call ForGroupBJ(LoadGroupHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xECC38EC2), function Trig_tower_taskFunc007Func002Func009Func001Func002A)
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_FAILED, "[穿云之信]——不！！！！我们没机会看到高塔建成的时刻了，现在只能背水一战，希望能撑到指挥官发现我们的窘境。可是我们不能把希望寄托于这种渺茫的可能，只有死战！")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_FAILED, "[穿云之信]—�不！！！！我们没机会看到高塔建成的时刻了，现在�能背水一战，希望能撑到指挥官发现我们的窘境�可�我们不能把希望寄托于这�渺�的可能，�有�战�")
         call QuestSetFailed(LoadQuestHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xFC49F013), true)
         call ForGroupBJ(udg_hero_select, function Trig_tower_taskFunc007Func002Func009Func001Func005A)
         call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
@@ -14616,7 +14693,7 @@ function Trig_tower_taskFunc007Func002Func010Func002Func009A takes nothing retur
         call ModifyHeroStat(bj_HEROSTAT_STR, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xE6E64075), bj_MODIFYMETHOD_ADD, 20)
         call ModifyHeroStat(bj_HEROSTAT_AGI, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xE6E64075), bj_MODIFYMETHOD_ADD, 20)
         call ModifyHeroStat(bj_HEROSTAT_INT, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xE6E64075), bj_MODIFYMETHOD_ADD, 20)
-        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xE6E64075)), 0, 0, ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xE6E64075)) + "已获得20点全属性" ))
+        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xE6E64075)), 0, 0, ( GetUnitName(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xE6E64075)) + "已获�20点全属�" ))
     else
     endif
 endfunction
@@ -14649,11 +14726,11 @@ function Trig_tower_taskFunc007Func002Func010Conditions takes nothing returns no
             set udg_effect_int=udg_effect_int + 1
         endloop
         call QuestSetCompleted(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xFC49F013), true)
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_COMPLETED, "[穿云之信]——魔法信号塔已建成，我们已经向友军请求支援，希望他们能尽快驰援！神，请祝福我们")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_COMPLETED, "[穿云之信]—�魔法信号�已建成，我�已经向友军�求�援，希望他们能尽�驰援！�，请��我�")
         call ForGroupBJ(udg_hero_select, function Trig_tower_taskFunc007Func002Func010Func002Func009A)
         set udg_build_finish=true
         // --------------------
-        // 建筑师逃跑
+        // 建筑师�跑
         call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xEAFE0942, GetRectCenter(gg_rct_base_area))
         call SetUnitMoveSpeed(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), 522.00)
         call IssuePointOrderLoc(LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xB6A6EBAA), "move", LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xEAFE0942))
@@ -14744,12 +14821,12 @@ endfunction
 // Trigger: vtu_task
 //===========================================================================
 function Trig_vtu_taskFunc004Func001Func005T takes nothing returns nothing
-    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x458B7DE9)), 0, 0, "左日萘：先生，您能帮我吗？我被那害虫掳掠至此，身死于此，不得与亲友相见，不知您能不能为我复仇")
+    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x458B7DE9)), 0, 0, "左日萘：先生，您能帮我吗？我�那�虫掳掠至�，�死于此，不得与亲友相见，不知您能不能为我复仇")
     call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
     call DestroyTimer(GetExpiredTimer())
 endfunction
 function Trig_vtu_taskFunc004Func001Func008Func001Func007T takes nothing returns nothing
-    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x458B7DE9)), 0, 0, "左日萘：先生，我复仇的心愿已了，只可惜我的怨念太久太久，若是您能为我寻来能消除记忆的宝物，了却我的念想，以求往生，我将赠予你我最后的宝物。")
+    call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0x458B7DE9)), 0, 0, "左日萘：先生，我复仇的心愿已了，��惜我的�念�久太久，若是您能为我寻来能消除�忆的宝物，了却我的念想，以求往生，我将赠予你我�后的宝物�")
     call FlushChildHashtable(YDLOC, GetHandleId(GetExpiredTimer()))
     call DestroyTimer(GetExpiredTimer())
 endfunction
@@ -14768,7 +14845,7 @@ function Trig_vtu_taskFunc004Func001Func008Func001Func009Conditions takes nothin
     local timer ydl_timer
     if ( ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I02Q')) == 'I02Q' ) and ( IsUnitDetected(gg_unit_n00W_0020, GetOwningPlayer(GetTriggerUnit())) == true ) and ( ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(0)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(1)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(2)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(3)) == true ) ) ) then
         call FlashQuestDialogButton()
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_COMPLETED, "[昨日旧爱]——左日萘【游魂】：先生，感谢您的汤，这份汤很有效，这是赠与您的物品，接下来，我要喝下这份能让我往生的汤剂了，愿您能在战场上所向披靡")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_COMPLETED, "[昨日旧爱]—�左日萘【游魂�：先生，感谢您的汤，这份汤很有效，这是赠与您的物品，接下来，我要喝下这份能让我�生的汤剂了，愿您能在战场上所向披�")
         call QuestSetCompleted(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x34842DD1), true)
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I02Q'))
         call AddSpecialEffectLocBJ(GetUnitLoc(gg_unit_n00W_0020), "Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdl")
@@ -14792,11 +14869,11 @@ function Trig_vtu_taskFunc004Func001Func008Conditions takes nothing returns noth
         call ModifyHeroStat(bj_HEROSTAT_STR, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, 5)
         call ModifyHeroStat(bj_HEROSTAT_AGI, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, 5)
         call ModifyHeroStat(bj_HEROSTAT_INT, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, 5)
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "左日萘为您的雇佣兵施加了祝福，雇佣兵的等级与属性获得提升")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "左日萘为您的雇佣兵施加了祝�，雇佣兵的等级与属性获得提�")
         set ydl_timer=CreateTimer()
         call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0x458B7DE9, GetTriggerUnit())
         call TimerStart(ydl_timer, 3.00, false, function Trig_vtu_taskFunc004Func001Func008Func001Func007T)
-        call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x34842DD1), "昨日的旧爱，已成枯骨|n可她的灵魂，为何仍在滞留此地|n莫非仍有未解心愿？|n左日萘小姐表示，她需要能使人忘记一切的宝物，希望您能为她找到")
+        call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x34842DD1), "昨日的旧爱，已成�骨|n�她的灵魂，为何仍在滞留�地|n�非仍有未解心愿？|n左日萘小姐表示，她需要能使人忘�一切的宝物，希望您能为她找�")
         set ydl_trigger=CreateTrigger()
         call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0x34842DD1, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x34842DD1))
         call YDWETriggerRegisterEnterRectSimpleNull(ydl_trigger , gg_rct_zuorinai)
@@ -14813,12 +14890,12 @@ function Trig_vtu_taskFunc004Conditions takes nothing returns nothing
     local trigger ydl_trigger
     if ( ( IsUnitDetected(gg_unit_n00W_0020, GetOwningPlayer(GetTriggerUnit())) == true ) and ( ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(0)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(1)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(2)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(3)) == true ) ) ) then
         call FlashQuestDialogButton()
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "[昨日旧爱]——左日萘【游魂】向雇佣兵发布了一项任务")
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "左日萘：先生，您能看得见我？")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "[昨日旧爱]—�左日萘【游魂�向雇佣兵发布了�项任�")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "左日萘：先生，您能看得�我�")
         set ydl_timer=CreateTimer()
         call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0x458B7DE9, GetTriggerUnit())
         call TimerStart(ydl_timer, 3.00, false, function Trig_vtu_taskFunc004Func001Func005T)
-        call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x34842DD1), "昨日的旧爱，已成枯骨|n可她的灵魂，为何仍在滞留此地|n莫非仍有未解心愿？|n左日萘小姐表示，她希望看见那害虫的头颅，她要复仇，希望您能帮助她")
+        call QuestSetDescription(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x34842DD1), "昨日的旧爱，已成�骨|n�她的灵魂，为何仍在滞留�地|n�非仍有未解心愿？|n左日萘小姐表示，她希望看见那害虫的头颅，她��仇，希望您能帮助她")
         call QuestSetDiscovered(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x34842DD1), true)
         set ydl_trigger=CreateTrigger()
         call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0x34842DD1, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x34842DD1))
@@ -14827,7 +14904,7 @@ function Trig_vtu_taskFunc004Conditions takes nothing returns nothing
         call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()))
         call DestroyTrigger(GetTriggeringTrigger())
     else
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "这里怎么有一个房子，难不成有什么人隐居于此？")
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "这里怎么有一�房子，难不成有什么人隐居于�？")
     endif
     set ydl_timer=null
     set ydl_trigger=null
@@ -14838,7 +14915,7 @@ function Trig_vtu_taskActions takes nothing returns nothing
  set ydl_localvar_step=ydl_localvar_step + 3
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call SaveQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x34842DD1, CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, "昨日旧爱", "昨日的旧爱，已成枯骨|n可她的灵魂，为何仍在滞留此地|n莫非仍有未解心愿？", "ReplaceableTextures\\CommandButtons\\BTNGreaterInvisibility.blp"))
+    call SaveQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x34842DD1, CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, "昨日旧爱", "昨日的旧爱，已成�骨|n�她的灵魂，为何仍在滞留�地|n�非仍有未解心愿？", "ReplaceableTextures\\CommandButtons\\BTNGreaterInvisibility.blp"))
     call QuestSetEnabled(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x34842DD1), true)
     set ydl_trigger=CreateTrigger()
     call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0x34842DD1, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x34842DD1))
@@ -14858,7 +14935,7 @@ endfunction
 function Trig_ring_taskFunc003Func001Func004Conditions takes nothing returns nothing
     if ( ( ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(0)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(1)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(2)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(3)) == true ) ) and ( IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO) == true ) and ( IsUnitAliveBJ(gg_unit_H002_0119) == true ) and ( IsUnitAliveBJ(GetTriggerUnit()) == true ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00G')) == 'I00G' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(gg_unit_H002_0119 , 'I00B')) == 'I00B' ) ) then
         call FlashQuestDialogButton()
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_COMPLETED, "[遗失之戒]——随军牧师【派蒙】:感谢你，尊敬的雇佣兵先生，你找到了我遗失的戒指，我将我与龙签署的契约赠予你，作为报酬")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_COMPLETED, "[遗失之戒]—�随军牧师�派蒙�:感谢你，尊敬的雇佣兵先生，你找到了我遗失的戒指，我将我与龙�署的�约赠予你，作为报酬")
         call IssueTargetOrder(gg_unit_H002_0119, "move", GetTriggerUnit())
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(gg_unit_H002_0119 , 'I00B'))
         call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(GetTriggerUnit() , 'I00G'))
@@ -14874,7 +14951,7 @@ function Trig_ring_taskFunc003Conditions takes nothing returns nothing
     local trigger ydl_trigger
     if ( ( ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(0)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(1)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(2)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(3)) == true ) ) and ( IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO) == true ) ) then
         call FlashQuestDialogButton()
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "[遗失之戒]——随军牧师【派蒙】向雇佣兵发布了一项任务")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "[遗失之戒]—�随军牧师�派蒙�向雇佣兵发布了�项任�")
         call QuestSetDiscovered(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xBF87BE9F), true)
         set ydl_trigger=CreateTrigger()
         call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0xBF87BE9F, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xBF87BE9F))
@@ -14893,7 +14970,7 @@ function Trig_ring_taskActions takes nothing returns nothing
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
     call SaveQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBF87BE9F, CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, "遗失之戒
-", "派蒙曾在河滩对面的地域遗失了他的戒指，如果你能帮他找回戒指，他将奖励你", "ReplaceableTextures\\CommandButtons\\BTNSnapDragon.blp"))
+", "派蒙曾在河滩对面的地域遗失了他的戒指，�果你能�他找回戒指，他将奖励�", "ReplaceableTextures\\CommandButtons\\BTNSnapDragon.blp"))
     call QuestSetEnabled(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBF87BE9F), true)
     set ydl_trigger=CreateTrigger()
     call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0xBF87BE9F, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xBF87BE9F))
@@ -14912,7 +14989,7 @@ endfunction
 //===========================================================================
 function Trig_fake_taskFunc003Func001Func004Func001Func003Func001Func004Conditions takes nothing returns nothing
     if ( ( GetItemTypeId(GetManipulatedItem()) == 'I03D' ) and ( ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(0)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(1)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(2)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(3)) == true ) ) ) then
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_COMPLETED, "[伪物]——您的雇佣兵击败了元蜃，获得冰火之宝")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_COMPLETED, "[��]—�您的雇佣兵击败了元蜃，获得冰火之宝")
         call QuestSetCompleted(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x64798A96), true)
         call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()))
         call DestroyTrigger(GetTriggeringTrigger())
@@ -14922,7 +14999,7 @@ endfunction
 function Trig_fake_taskFunc003Func001Func004Func001Func003Conditions takes nothing returns nothing
     local trigger ydl_trigger
     if ( ( ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(0)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(1)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(2)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(3)) == true ) ) and ( GetItemTypeId(GetManipulatedItem()) == 'I03Z' ) ) then
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[伪物]——冰火之泉之中，怎么样才能使用这块绿色的宝石呢？")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[��]—�冰�之泉之中，�么样才能使用这块绿色的宝石��")
         set ydl_trigger=CreateTrigger()
         call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0x64798A96, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x64798A96))
         call TriggerRegisterAnyUnitEventBJ(ydl_trigger, EVENT_PLAYER_UNIT_PICKUP_ITEM)
@@ -14936,7 +15013,7 @@ endfunction
 function Trig_fake_taskFunc003Func001Func004Conditions takes nothing returns nothing
     local trigger ydl_trigger
     if ( ( ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(0)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(1)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(2)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(3)) == true ) ) and ( ( GetItemTypeId(GetManipulatedItem()) == 'I039' ) or ( GetItemTypeId(GetManipulatedItem()) == 'I03A' ) ) ) then
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[伪物]——是否需要将两种性质相反的力量融合起来，在哪才能实现呢？")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "[��]—�是否需要将两��质相反的力量融合起来，在哪才能实现��")
         set ydl_trigger=CreateTrigger()
         call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0x64798A96, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x64798A96))
         call TriggerRegisterAnyUnitEventBJ(ydl_trigger, EVENT_PLAYER_UNIT_PICKUP_ITEM)
@@ -14951,7 +15028,7 @@ function Trig_fake_taskFunc003Conditions takes nothing returns nothing
     local trigger ydl_trigger
     if ( ( ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(0)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(1)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(2)) == true ) or ( IsUnitOwnedByPlayer(GetTriggerUnit(), Player(3)) == true ) ) and ( IsUnitType(GetTriggerUnit(), UNIT_TYPE_HERO) == true ) ) then
         call FlashQuestDialogButton()
-        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "[伪物]——您的雇佣兵发现了一处宝地，需要在此进行探索")
+        call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "[��]—�您的雇佣兵发现了一处宝地，�要在此进行探�")
         call QuestSetDiscovered(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x64798A96), true)
         set ydl_trigger=CreateTrigger()
         call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0x64798A96, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()), 0x64798A96))
@@ -14969,7 +15046,7 @@ function Trig_fake_taskActions takes nothing returns nothing
  set ydl_localvar_step=ydl_localvar_step + 3
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
  call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call SaveQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x64798A96, CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, "伪物", "此地有灵，取其精华|n泉水之间，冰火交融|n绿意破碎，神人自现", "ReplaceableTextures\\CommandButtons\\BTNRockGolem.blp"))
+    call SaveQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x64798A96, CreateQuestBJ(bj_QUESTTYPE_OPT_UNDISCOVERED, "��", "此地有灵，取其精华|n泉水之间，冰�交融|n绿意破�，神人��", "ReplaceableTextures\\CommandButtons\\BTNRockGolem.blp"))
     call QuestSetEnabled(LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x64798A96), true)
     set ydl_trigger=CreateTrigger()
     call SaveQuestHandle(YDLOC, GetHandleId(ydl_trigger), 0x64798A96, LoadQuestHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x64798A96))
@@ -15009,7 +15086,7 @@ function Trig_show_resourceConditions takes nothing returns boolean
     return ( ( ( GetTriggerPlayer() == Player(0) ) or ( GetTriggerPlayer() == Player(1) ) or ( GetTriggerPlayer() == Player(2) ) or ( GetTriggerPlayer() == Player(3) ) ) )
 endfunction
 function Trig_show_resourceActions takes nothing returns nothing
-    call DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, ( "你们队伍当前拥有资源如下：" + ( ( "银树木材：" + I2S(udg_tree_num) ) + ( "  金石矿材：" + I2S(udg_stone_num) ) ) ))
+    call DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, ( "你们队伍当前拥有资源如下�" + ( ( "银树木材�" + I2S(udg_tree_num) ) + ( "  金石矿材�" + I2S(udg_stone_num) ) ) ))
 endfunction
 //===========================================================================
 function InitTrig_show_resource takes nothing returns nothing
@@ -15048,14 +15125,14 @@ call EXSetEventDamage(((1.00)*1.0)) // INLINED!!
     if ( ( GetUnitTypeId(GetEventDamageSource()) != 'h003' ) ) then
         if ( ( GetRandomInt(1, 100) <= 2 ) ) then
             set udg_stone_num=( udg_stone_num + 1 )
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "哇哦，在您的雇佣兵大力开采下，获得了一块金石矿材，或许雇佣采集专家来效率更高")
+            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "哇哦，在您的雇佣兵大力开采下，获得了�块金石矿材，或�雇佣采集专家来效率更高")
         else
         endif
         if ( ( GetRandomInt(1, 100) <= 50 ) ) then
             call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetRandomLocInRect(gg_rct_golden))
             call CreateNUnitsAtLoc(1, 'n01G', GetOwningPlayer(GetTriggerUnit()), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), bj_UNIT_FACING)
             call UnitApplyTimedLife(bj_lastCreatedUnit, 'BHwe', 12.00)
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "坏了，在您的雇佣兵大力开采下，惊扰金石的守护护卫，他们要发起进攻了")
+            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "坏了，在您的雇佣兵大力开采下，惊扰金石的守护护卫，他�要发起进攻了")
             call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
         else
         endif
@@ -15064,14 +15141,14 @@ call EXSetEventDamage(((1.00)*1.0)) // INLINED!!
     if ( ( GetUnitTypeId(GetEventDamageSource()) == 'h003' ) ) then
         if ( ( GetRandomInt(1, 100) <= 15 ) ) then
             set udg_stone_num=( udg_stone_num + 1 )
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "诶呀，采集专家的效率就是不一样，您获得了一块金石矿材")
+            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "诶呀，采集专家的效率就是不一样，您获得了�块金石矿�")
         else
         endif
         if ( ( GetRandomInt(1, 1000) <= 25 ) ) then
             call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetRandomLocInRect(gg_rct_golden))
             call CreateNUnitsAtLoc(1, 'n01G', GetOwningPlayer(GetTriggerUnit()), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), bj_UNIT_FACING)
             call UnitApplyTimedLife(bj_lastCreatedUnit, 'BHwe', 12.00)
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "难道采集专家的技术还是太差了，怎么也能把金石护卫惊扰到")
+            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "难道采集专�的��还是��了，怎么也能把金石护�惊扰�")
             call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
         else
         endif
@@ -15101,14 +15178,14 @@ call EXSetEventDamage(((1.00)*1.0)) // INLINED!!
     if ( ( GetUnitTypeId(GetEventDamageSource()) != 'h003' ) ) then
         if ( ( GetRandomInt(1, 100) <= 2 ) ) then
             set udg_tree_num=( udg_tree_num + 1 )
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "哇哦，在您的雇佣兵大力开采下，获得了一块银树木材，或许雇佣采集专家来效率更高")
+            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "哇哦，在您的雇佣兵大力开采下，获得了�块银树木材，或�雇佣采集专家来效率更高")
         else
         endif
         if ( ( GetRandomInt(1, 100) <= 50 ) ) then
             call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetRandomLocInRect(gg_rct_sliver))
             call CreateNUnitsAtLoc(1, 'n01F', GetOwningPlayer(GetTriggerUnit()), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), bj_UNIT_FACING)
             call UnitApplyTimedLife(bj_lastCreatedUnit, 'BHwe', 12.00)
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "坏了，在您的雇佣兵大力开采下，惊扰银树的守护护卫，他们要发起进攻了")
+            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "坏了，在您的雇佣兵大力开采下，惊扰银树的守护护卫，他�要发起进攻了")
             call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
         else
         endif
@@ -15117,14 +15194,14 @@ call EXSetEventDamage(((1.00)*1.0)) // INLINED!!
     if ( ( GetUnitTypeId(GetEventDamageSource()) == 'h003' ) ) then
         if ( ( GetRandomInt(1, 100) <= 15 ) ) then
             set udg_tree_num=( udg_tree_num + 1 )
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "诶呀，采集专家的效率就是不一样，您获得了一块银树木材")
+            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "诶呀，采集专家的效率就是不一样，您获得了�块银树木�")
         else
         endif
         if ( ( GetRandomInt(1, 1000) <= 25 ) ) then
             call SaveLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942, GetRandomLocInRect(gg_rct_sliver))
             call CreateNUnitsAtLoc(1, 'n01F', GetOwningPlayer(GetTriggerUnit()), LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942), bj_UNIT_FACING)
             call UnitApplyTimedLife(bj_lastCreatedUnit, 'BHwe', 12.00)
-            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "难道采集专家的技术还是太差了，怎么也能把银树护卫惊扰到")
+            call DisplayTextToPlayer(GetOwningPlayer(GetEventDamageSource()), 0, 0, "难道采集专�的��还是��了，怎么也能把银树护�惊扰�")
             call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
         else
         endif
@@ -15174,7 +15251,7 @@ call EXSetItemDataString(('I03E' ), ( 4 ), ( "愿忘")) // INLINED!!
     endif
     if ( ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x73B1E33D) > 10 ) and ( GetRandomInt(1, 100) <= 34 ) ) then
         call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F, ( ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x73B1E33D) ) * ( ( ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x73B1E33D) * ( LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x73B1E33D) + 1 ) ) / 2 ) ) / ( 8 ) ))
-        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "愿忘破碎，您的雇佣兵获得了属性加成：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)) ))
+        call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, ( "愿忘破�，您的雇佣兵获得了属�加成：" + I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F)) ))
         call ModifyHeroStat(bj_HEROSTAT_STR, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F))
         call ModifyHeroStat(bj_HEROSTAT_AGI, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F))
         call ModifyHeroStat(bj_HEROSTAT_INT, GetTriggerUnit(), bj_MODIFYMETHOD_ADD, LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xD6B06D8F))
@@ -15194,14 +15271,14 @@ endfunction
 // Trigger: task_init
 //===========================================================================
 function Trig_task_initActions takes nothing returns nothing
-    call CreateQuestBJ(bj_QUESTTYPE_REQ_DISCOVERED, "守卫", "镇守传送锚点，防止被敌人破坏！|n这是帝国与边境的连接点，若锚点被破坏，我们便如同无根之草，只能被敌人包围绞杀！", "ReplaceableTextures\\CommandButtons\\BTNIceCrownObelisk.blp")
+    call CreateQuestBJ(bj_QUESTTYPE_REQ_DISCOVERED, "守卫", "镇守传�锚点，防��敌人破坏！|n这是帝国与边境的连接点，若锚点�破坏，我�便�同无根之草，只能�敌人包围绞杀�", "ReplaceableTextures\\CommandButtons\\BTNIceCrownObelisk.blp")
     call QuestSetEnabled(bj_lastCreatedQuest, true)
-    call CreateQuestBJ(bj_QUESTTYPE_REQ_DISCOVERED, "奖励点数与指令
-", "奖励点数系统|n击杀野怪与进攻敌军均会获得奖励点数，与等级相关，野怪提供的奖励有所衰减|n获得的奖励可在军情六处兑换相应装备和消耗品|n指令系统：|n-ms 显示雇佣兵速度|n-as 显示雇佣兵攻击速度|n-at 显示雇佣兵攻击间隔|n输入++可拉高视角|n输入--可拉低视角", "ReplaceableTextures\\CommandButtons\\BTNDarkPortal.blp")
+    call CreateQuestBJ(bj_QUESTTYPE_REQ_DISCOVERED, "奖励点数与指�
+", "奖励点数系统|n击杀野�与进攻敌军均会获得�励点数，与等级相关，野�提供的�励有所衰减|n获得的�励�在军情六处兑换相应��和消�品|n指令系统：|n-ms 显示雇佣兵�度|n-as 显示雇佣兵攻击�度|n-at 显示雇佣兵攻击间隔|n输入++�拉高视�|n输入--�拉低视�", "ReplaceableTextures\\CommandButtons\\BTNDarkPortal.blp")
     call QuestSetEnabled(bj_lastCreatedQuest, true)
-    call CreateQuestBJ(bj_QUESTTYPE_REQ_DISCOVERED, "夜色", "在夜晚，敌人将会获得加强|n晨曦：小幅度增加攻击力、速度与魔抗|n暮色：增加攻击力、攻击速度与魔抗，小幅度增加移动速度|n极夜：大幅度增加攻击力、攻击速度与魔抗，增加移动速度", "ReplaceableTextures\\PassiveButtons\\PASBTNElunesBlessing.blp")
+    call CreateQuestBJ(bj_QUESTTYPE_REQ_DISCOVERED, "夜色", "在�晚，敌人将会获得加强|n晨曦：小幅度增加攻击力��度与魔抗|n�色：增加攻击力�攻击�度与魔抗，小幅度�加移动速度|n极�：大幅度�加攻击力�攻击�度与魔抗，增加移动速度", "ReplaceableTextures\\PassiveButtons\\PASBTNElunesBlessing.blp")
     call QuestSetEnabled(bj_lastCreatedQuest, true)
-    call CreateQuestBJ(bj_QUESTTYPE_OPT_DISCOVERED, "操练", "营地左右各有怪物营地，雇佣兵可选择与野怪战斗，锻炼自身|n营地左右的怪物均有可能掉落升级宝石，可用于精炼装备|n越过河滩，野外会有更强大的怪物，获得宝石的概率也更高，雇佣兵谨慎前往！", "ReplaceableTextures\\CommandButtons\\BTNMassTeleport.blp")
+    call CreateQuestBJ(bj_QUESTTYPE_OPT_DISCOVERED, "操练", "营地左右各有�物营地，雇佣兵可选择与野�战斗，锻炼自身|n营地左右的�物均有可能掉落升级宝石，�用于精炼装�|n越过河滩，野外会有更强大的�物，获得宝石的�率也更高，雇佣兵谨慎前��", "ReplaceableTextures\\CommandButtons\\BTNMassTeleport.blp")
     call QuestSetEnabled(bj_lastCreatedQuest, true)
 endfunction
 //===========================================================================
@@ -15234,10 +15311,11 @@ function Trig_Emerald_useActions takes nothing returns nothing
     call RemoveItem(GetManipulatedItem())
     call AddSpecialEffectLocBJ(GetUnitLoc(GetTriggerUnit()), "Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdl")
     call YDWETimerDestroyEffect(0.50 , bj_lastCreatedEffect)
-    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵在泉水中捏碎了绿宝石，发生了什么？？？")
+    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "你的雇佣兵在泉水�捏�了绿宝石，发生了什么？？？")
     set ydl_timer=CreateTimer()
     call TimerStart(ydl_timer, 3.00, false, function Trig_Emerald_useFunc005T)
     call DisableTrigger(GetTriggeringTrigger())
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -15256,26 +15334,26 @@ endfunction
 function Trig_fire_and_iceFunc003T takes nothing returns nothing
     if ( ( RectContainsUnit(gg_rct_swimmingpool, LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)) == true ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA) , 'I039')) == 'I039' ) and ( GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA) , 'I03A')) == 'I03A' ) ) then
         call SaveInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xE2AED0F5, ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xE2AED0F5) + 1 ))
-        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( "冰火淬炼中—" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xE2AED0F5)) ))
+        call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, ( "冰火�炼中�" + I2S(LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xE2AED0F5)) ))
         if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0xE2AED0F5) >= 5 ) ) then
-            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, "历经冰火之泉的淬炼，您的雇佣兵合成了绿宝石碎片")
+            call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, "历经冰火之泉的淬炼，您的雇佣兵合成了绿宝石�片")
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA) , 'I03A'))
             call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA) , 'I039'))
             call SaveInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x803B2E68, GetRandomInt(1, 100))
             if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x803B2E68) <= 47 ) ) then
                 call YDWEGeneralBounsSystemUnitSetBonus(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA) , 0 , 0 , 300)
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, "历经冰火之泉的淬炼，您的雇佣兵获得了最大生命值提升——300
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, "历经冰火之泉的淬炼，您的雇佣兵获得了�大生命�提升��300
 ")
             else
             endif
             if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x803B2E68) > 47 ) and ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x803B2E68) <= 94 ) ) then
                 call YDWEGeneralBounsSystemUnitSetBonus(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA) , 2 , 0 , 7)
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, "历经冰火之泉的淬炼，您的雇佣兵获得了防御能力提升——7")
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, "历经冰火之泉的淬炼，您的雇佣兵获得了防御能力提升—�7")
             else
             endif
             if ( ( LoadInteger(YDLOC, GetHandleId(GetExpiredTimer()), 0x803B2E68) > 94 ) ) then
                 call SetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), ConvertUnitState(0x25), ( GetUnitState(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA), ConvertUnitState(0x25)) - 0.05 ))
-                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, "历经冰火之泉的淬炼，您的雇佣兵获得了攻击间隔下降——0.05")
+                call DisplayTextToPlayer(GetOwningPlayer(LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA)), 0, 0, "历经冰火之泉的淬炼，您的雇佣兵获得了攻击间隔下降—�0.05")
             else
             endif
             call UnitAddItemByIdSwapped('I03B', LoadUnitHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xB6A6EBAA))
@@ -15306,6 +15384,7 @@ function Trig_fire_and_iceActions takes nothing returns nothing
     call SaveUnitHandle(YDLOC, GetHandleId(ydl_timer), 0xB6A6EBAA, LoadUnitHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB6A6EBAA))
     call TimerStart(ydl_timer, 1.00, true, function Trig_fire_and_iceFunc003T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -15472,12 +15551,12 @@ function Trig_enemystartActions takes nothing returns nothing
         // 2. 人数倍率: 0.7 + 0.3 * players
         set playerMult=0.70 + ( I2R(CountPlayersInForceBJ(udg_player)) * 0.30 )
         
-        // 3. 计算最终浮点系数
+        // 3. 计算�终浮点系�
         set finalMult=diffMult * playerMult
         
-        // -------------------- 敌军生成循环 START --------------------
+        // -------------------- 敌军生成�� START --------------------
         
-        // 基础 3个
+        // 基� 3�
         set bj_forLoopAIndex=1
         set bj_forLoopAIndexEnd=R2I(( 3.00 * finalMult ) + 0.999)
         loop
@@ -15492,7 +15571,7 @@ function Trig_enemystartActions takes nothing returns nothing
             set bj_forLoopAIndex=bj_forLoopAIndex + 1
         endloop
         
-        // 基础 2个
+        // 基� 2�
         set bj_forLoopAIndex=1
         set bj_forLoopAIndexEnd=R2I(( 2.00 * finalMult ) + 0.999)
         loop
@@ -15507,7 +15586,7 @@ function Trig_enemystartActions takes nothing returns nothing
             set bj_forLoopAIndex=bj_forLoopAIndex + 1
         endloop
         
-        // 基础 2个
+        // 基� 2�
         set bj_forLoopAIndex=1
         set bj_forLoopAIndexEnd=R2I(( 2.00 * finalMult ) + 0.999)
         loop
@@ -15523,7 +15602,7 @@ function Trig_enemystartActions takes nothing returns nothing
         endloop
         
         if ( ( udg_enemywaveCount >= 7 ) ) then
-            // 基础 3个
+            // 基� 3�
             set bj_forLoopAIndex=1
             set bj_forLoopAIndexEnd=R2I(( 3.00 * finalMult ) + 0.999)
             loop
@@ -15540,7 +15619,7 @@ function Trig_enemystartActions takes nothing returns nothing
         endif
         
         if ( ( udg_enemywaveCount >= 11 ) ) then
-            // 基础 2个
+            // 基� 2�
             set bj_forLoopAIndex=1
             set bj_forLoopAIndexEnd=R2I(( 2.00 * finalMult ) + 0.999)
             loop
@@ -15557,7 +15636,7 @@ function Trig_enemystartActions takes nothing returns nothing
         endif
         
         if ( ( udg_enemywaveCount >= 14 ) ) then
-            // 基础 2个
+            // 基� 2�
             set bj_forLoopAIndex=1
             set bj_forLoopAIndexEnd=R2I(( 2.00 * finalMult ) + 0.999)
             loop
@@ -15572,9 +15651,9 @@ function Trig_enemystartActions takes nothing returns nothing
                 set bj_forLoopAIndex=bj_forLoopAIndex + 1
             endloop
         endif
-        // -------------------- 敌军生成循环 END --------------------
+        // -------------------- 敌军生成�� END --------------------
         call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x7696C3FB, CountUnitsInGroup(LoadGroupHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB569CC4E)))
-        call DisplayTextToForce(GetPlayersAll(), "第" + I2S(udg_enemywaveCount) + "波敌军已展开攻势")
+        call DisplayTextToForce(GetPlayersAll(), "�" + I2S(udg_enemywaveCount) + "波敌军已展开攻势")
         call YDWEPolledWaitNull(1.00)
         call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
         
@@ -15583,7 +15662,7 @@ function Trig_enemystartActions takes nothing returns nothing
         call SaveGroupHandle(YDLOC, GetHandleId(ydl_timer), 0xB569CC4E, LoadGroupHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xB569CC4E))
         call TimerStart(ydl_timer, 1.00, true, function Trig_enemystartFunc008Func002T)
     else
-        // 波次 > 18，直接进决战逻辑
+        // 波� > 18，直接进决战逻辑
         // call ConditionalTriggerExecute(gg_trg_finalround)
         call ConditionalTriggerExecute(gg_trg_final_round_remake)
         
@@ -15620,8 +15699,8 @@ function Trig_final_round_remakeFunc005T takes nothing returns nothing
     local timer ydl_timer
     call ForGroupBJ(LoadGroupHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xA465778C), function Trig_final_round_remakeFunc005Func001A)
     if ( ( IsUnitGroupEmptyBJ(LoadGroupHandle(YDLOC, GetHandleId(GetExpiredTimer()), 0xA465778C)) == true ) ) then
-        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "你们击败了所有进攻的敌军！你们守住了传送锚点，帝国将以此战为锋锐，刺穿敌军的心脏！！！")
-        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "恭喜你们通关，游戏将在10秒后结束")
+        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "你们击败了所有进攻的敌军！你�守住了传送锚点，帝国将以此战为锋锐，刺穿敌军的心脏！！！")
+        call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "�喜你�通关，游戏将�10秒后结束")
         set ydl_timer=CreateTimer()
         call TimerStart(ydl_timer, 10.00, false, function Trig_final_round_remakeFunc005Func002Func003T)
     else
@@ -15647,12 +15726,13 @@ function Trig_final_round_remakeActions takes nothing returns nothing
         call RemoveLocation(LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xEAFE0942))
         set udg_sheepnum=udg_sheepnum + 1
     endloop
-    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "最后一波敌人已进攻！")
+    call DisplayTextToPlayer(GetLocalPlayer(), 0, 0, "�后一波敌人已进攻�")
     set ydl_timer=CreateTimer()
     call SaveGroupHandle(YDLOC, GetHandleId(ydl_timer), 0xA465778C, LoadGroupHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA465778C))
     call SaveLocationHandle(YDLOC, GetHandleId(ydl_timer), 0xFC4D8276, LoadLocationHandle(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xFC4D8276))
     call TimerStart(ydl_timer, 3.00, true, function Trig_final_round_remakeFunc005T)
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -15673,7 +15753,7 @@ function Trig_enemycomingActions takes nothing returns nothing
     call SaveInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xDEE404E2, udg_enemywaveCount)
     call StartTimerBJ(udg_enemyT, false, udg_base_wave_time)
     
-    call CreateTimerDialogBJ(udg_enemyT, ( ( "距离第" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xDEE404E2)) ) + ( "次敌方进军还有" ) ))
+    call CreateTimerDialogBJ(udg_enemyT, ( ( "距��" ) + ( I2S(LoadInteger(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xDEE404E2)) ) + ( "次敌方进军还�" ) ))
     set udg_enemyTW=bj_lastCreatedTimerDialog
     
     call FlushChildHashtable(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -15688,7 +15768,7 @@ function Trig_Group_healing_SCPConditions takes nothing returns boolean
     return ( ( ( GetSpellAbilityId() == 'A08L' ) and ( GetUnitTypeId(GetTriggerUnit()) == 'u00J' ) ) )
 endfunction
 function Trig_Group_healing_SCPActions takes nothing returns nothing
-    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "回复效果触发")
+    call DisplayTextToPlayer(GetOwningPlayer(GetTriggerUnit()), 0, 0, "回�效果触�")
     call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A08L' , 1 , 108 , ( GetUnitState(GetTriggerUnit(), UNIT_STATE_LIFE) * 0.12 ))
     call YDWESetUnitAbilityDataReal(GetTriggerUnit() , 'A08N' , 1 , 108 , ( GetUnitState(GetTriggerUnit(), UNIT_STATE_LIFE) * 0.03 ))
     call IncUnitAbilityLevel(GetTriggerUnit(), 'A08L')
@@ -15720,6 +15800,7 @@ function Trig_dk_rebirthActions takes nothing returns nothing
     local timer ydl_timer
     set ydl_timer=CreateTimer()
     call TimerStart(ydl_timer, GetRandomReal(80.00, 128.00), false, function Trig_dk_rebirthFunc001T)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -15741,6 +15822,7 @@ function Trig_tiny_rebitrhActions takes nothing returns nothing
     local timer ydl_timer
     set ydl_timer=CreateTimer()
     call TimerStart(ydl_timer, GetRandomReal(80.00, 128.00), false, function Trig_tiny_rebitrhFunc001T)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -15762,6 +15844,7 @@ function Trig_lich_rebirthActions takes nothing returns nothing
     local timer ydl_timer
     set ydl_timer=CreateTimer()
     call TimerStart(ydl_timer, GetRandomReal(80.00, 128.00), false, function Trig_lich_rebirthFunc001T)
+            call StaffManaSiphonLogic(GetEventDamageSource(), LoadReal(YDLOC, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x33E193A8))
     set ydl_timer=null
 endfunction
 //===========================================================================
@@ -15771,7 +15854,411 @@ function InitTrig_lich_rebirth takes nothing returns nothing
     call TriggerAddAction(gg_trg_lich_rebirth, function Trig_lich_rebirthActions)
 endfunction
 //===========================================================================
+
+// Universal Equipment Upgrade System
+function InitUpgradeTable takes nothing returns nothing
+    // Probabilistic Upgrades (Gem I00D)
+    // Lv1 -> Lv2 (100%)
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I005+I00D"), 'I006')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00U+I00D"), 'I00S')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01L+I00D"), 'I01M')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01J+I00D"), 'I01H')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01S+I00D"), 'I01T')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01Z+I00D"), 'I01X')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I010+I00D"), 'I00Z')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00H+I00D"), 'I00F')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00L+I00D"), 'I00M')
+
+    // Lv2 -> Lv3 (100%)
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I006+I00D"), 'I007')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00S+I00D"), 'I00R')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01M+I00D"), 'I01N')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01H+I00D"), 'I01K')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01T+I00D"), 'I01U')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01X+I00D"), 'I01Y')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00Z+I00D"), 'I00X')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00F+I00D"), 'I00J')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00M+I00D"), 'I00N')
+
+    // Lv3 -> Lv4 (55%)
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I007+I00D"), 'I008')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00R+I00D"), 'I00V')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01N+I00D"), 'I01O')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01K+I00D"), 'I01G')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01U+I00D"), 'I01V')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01Y+I00D"), 'I021')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00X+I00D"), 'I011')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00J+I00D"), 'I00I')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00N+I00D"), 'I00O')
+
+    // Lv4 -> Lv5 (35%)
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01O+I00D"), 'I01P')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I01V+I00D"), 'I01W')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I011+I00D"), 'I012')
+    call SaveInteger(YDHT, StringHash("Upgrade"), StringHash("I00O+I00D"), 'I00K')
+
+    // Special Material Upgrades (100% success, no prob check)
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I008+I038"), 'I009') // Sword Lv4 + Space Gem
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I008+I03S"), 'I03T') // Sword Lv4 + Star Stone
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I00V+I01E"), 'I00T') // Armor Lv4 + Magic Fur
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I00T+I043"), 'I042') // Armor Special + Thunder Arc
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I01P+I01R"), 'I01Q') // Flag Lv5 + Blood
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I01G+I036"), 'I01I') // Ring Lv4 + Lion Heart
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I021+I037"), 'I020') // Bow Lv4 + Arrow Power
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I00I+I035"), 'I00E') // Shield Lv4 + Dragon Shell
+    call SaveInteger(YDHT, StringHash("SpecialUpgrade"), StringHash("I011+I014"), 'I00Y') // Axe Lv4 + Soul Orb
+endfunction
+
+function UniversalUpgradeActions takes nothing returns nothing
+    local unit u = GetTriggerUnit()
+    local item it = GetManipulatedItem()
+    local integer itId = GetItemTypeId(it)
+    local integer i = 0
+    local item targetIt = null
+    local integer targetId = 0
+    local integer nextId = 0
+    local string name = ""
+    local integer baseProb = 100
+    local location loc = null
+
+    if (itId == 'I00D') then
+        set i = 0
+        loop
+            exitwhen i > 5
+            set targetIt = UnitItemInSlot(u, i)
+            if (targetIt != null and targetIt != it) then
+                set targetId = GetItemTypeId(targetIt)
+                set nextId = LoadInteger(YDHT, StringHash("Upgrade"), StringHash(re_I2S(targetId) + "+I00D"))
+                if (nextId != 0) then
+                    if (targetId == 'I007' or targetId == 'I00R' or targetId == 'I01N' or targetId == 'I01K' or targetId == 'I01U' or targetId == 'I01Y' or targetId == 'I00X' or targetId == 'I00J' or targetId == 'I00N') then
+                        set baseProb = 55
+                    elif (targetId == 'I01O' or targetId == 'I01V' or targetId == 'I011' or targetId == 'I00O') then
+                        set baseProb = 35
+                    else
+                        set baseProb = 100
+                    endif
+                    set name = GetItemName(targetIt)
+                    if (EquipmentUpgradeLogic(u, baseProb, name)) then
+                        call RemoveItem(targetIt)
+                        call RemoveItem(it)
+                        call UnitAddItemById(u, nextId)
+                        set loc = GetUnitLoc(u)
+                        call AddSpecialEffectLoc("Abilities\Spells\Items\ResourceItems\ResourceEffectTarget.mdl", loc)
+                        call RemoveLocation(loc)
+                        call YDWETimerDestroyEffect(0.50, bj_lastCreatedEffect)
+                    else
+                        call RemoveItem(it)
+                        set loc = GetUnitLoc(u)
+                        call AddSpecialEffectLoc("Abilities\Spells\Human\Feedback\ArcaneTowerAttack.mdl", loc)
+                        call RemoveLocation(loc)
+                        call YDWETimerDestroyEffect(0.50, bj_lastCreatedEffect)
+                    endif
+                    set loc = null
+                    set targetIt = null
+                    set u = null
+                    set it = null
+                    return
+                endif
+            endif
+            set i = i + 1
+        endloop
+    endif
+
+    set nextId = 0
+    set i = 0
+    loop
+        exitwhen i > 5
+        set targetIt = UnitItemInSlot(u, i)
+        if (targetIt != null and targetIt != it) then
+            set targetId = GetItemTypeId(targetIt)
+            set nextId = LoadInteger(YDHT, StringHash("SpecialUpgrade"), StringHash(re_I2S(targetId) + "+" + re_I2S(itId)))
+            if (nextId != 0) then
+                if (nextId == 'I00Y' and GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(u, 'I00X')) != 'I00X') then
+                else
+                    call RemoveItem(targetIt)
+                    call RemoveItem(it)
+                    if (nextId == 'I00Y') then
+                        call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(u, 'I00X'))
+                    endif
+                    call UnitAddItemById(u, nextId)
+                    call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "|cff00FF00�ں������ɹ���|r")
+                    set loc = GetUnitLoc(u)
+                    call AddSpecialEffectLoc("Abilities\Spells\Items\ResourceItems\ResourceEffectTarget.mdl", loc)
+                    call RemoveLocation(loc)
+                    call YDWETimerDestroyEffect(0.50, bj_lastCreatedEffect)
+                    set loc = null
+                    set targetIt = null
+                    set u = null
+                    set it = null
+                    return
+                endif
+            endif
+            set nextId = LoadInteger(YDHT, StringHash("SpecialUpgrade"), StringHash(re_I2S(itId) + "+" + re_I2S(targetId)))
+            if (nextId != 0) then
+                 if (nextId == 'I00Y' and GetItemTypeId(YDWEGetItemOfTypeFromUnitBJNull(u, 'I00X')) != 'I00X') then
+                 else
+                    call RemoveItem(targetIt)
+                    call RemoveItem(it)
+                    if (nextId == 'I00Y') then
+                        call RemoveItem(YDWEGetItemOfTypeFromUnitBJNull(u, 'I00X'))
+                    endif
+                    call UnitAddItemById(u, nextId)
+                    call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "|cff00FF00�ں������ɹ���|r")
+                    set loc = GetUnitLoc(u)
+                    call AddSpecialEffectLoc("Abilities\Spells\Items\ResourceItems\ResourceEffectTarget.mdl", loc)
+                    call RemoveLocation(loc)
+                    call YDWETimerDestroyEffect(0.50, bj_lastCreatedEffect)
+                    set loc = null
+                    set targetIt = null
+                    set u = null
+                    set it = null
+                    return
+                endif
+            endif
+        endif
+        set i = i + 1
+    endloop
+    set targetIt = null
+    set u = null
+    set it = null
+endfunction
+
+function re_I2S takes integer i returns string
+    local string s = ""
+    local integer char
+    local integer val = i
+    local integer j = 0
+    loop
+        exitwhen j == 4
+        set char = val - (val / 256) * 256
+        set s = SubString(bj_AllString, char, char + 1) + s
+        set val = val / 256
+        set j = j + 1
+    endloop
+    return s
+endfunction
+
+function InitUniversalUpgradeSystem takes nothing returns nothing
+    local trigger t = CreateTrigger()
+    call InitUpgradeTable()
+    call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_PICKUP_ITEM)
+    call TriggerAddAction(t, function UniversalUpgradeActions)
+endfunction
+    call TriggerAddAction(t, function UniversalUpgradeActions)
+
+
+function Trig_OriginalManaPotionConditions takes nothing returns boolean
+    return GetSpellAbilityId() == 'A09O'
+endfunction
+
+function Trig_OriginalManaPotionActions takes nothing returns nothing
+    local unit u = GetTriggerUnit()
+    local real maxMana = GetUnitState(u, UNIT_STATE_MAX_MANA)
+    local real healAmount = maxMana * 0.10
+    if healAmount < 150.0 then
+        set healAmount = 150.0
+    endif
+    call SetUnitState(u, UNIT_STATE_MANA, GetUnitState(u, UNIT_STATE_MANA) + healAmount)
+    call AddSpecialEffectTarget("Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl", u, "origin")
+    call DestroyEffect(GetLastCreatedEffectBJ())
+endfunction
+
+function InitTrig_OriginalManaPotion takes nothing returns nothing
+    set gg_trg_OriginalManaPotion = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg_OriginalManaPotion, EVENT_PLAYER_UNIT_SPELL_EFFECT)
+    call TriggerAddCondition(gg_trg_OriginalManaPotion, Condition(function Trig_OriginalManaPotionConditions))
+    call TriggerAddAction(gg_trg_OriginalManaPotion, function Trig_OriginalManaPotionActions)
+endfunction
+
+
+
+// Charging Bottle System (Region-based)
+function BottleSystemActions takes nothing returns nothing
+    local unit u = GetTriggerUnit()
+    local item it = GetManipulatedItem()
+    local integer itId = GetItemTypeId(it)
+    local integer spellId = GetSpellAbilityId()
+    local integer i = 0
+    local item tempIt
+    
+    // 1. Exhaustion
+    if (GetTriggerEventId() == EVENT_PLAYER_UNIT_SPELL_EFFECT and spellId == 'A09Z') then
+        set i = 0
+        loop
+            exitwhen i > 5
+            set tempIt = UnitItemInSlot(u, i)
+            if (tempIt != null and GetItemTypeId(tempIt) == 'I03G') then
+                if (GetItemCharges(tempIt) == 0) then
+                     call RemoveItem(tempIt)
+                     call UnitAddItemById(u, 'I03X')
+                     call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "|cffFF0000����ƿ��ħ���Ѻľ�����Ϊ[�ճ���ƿ]|r")
+                     return
+                endif
+            endif
+            set i = i + 1
+        endloop
+    endif
+
+    // 2. Destruction
+    if (GetTriggerEventId() == EVENT_PLAYER_UNIT_DROP_ITEM and itId == 'I03X') then
+        call RemoveItem(it)
+        call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "|cff808080��ƿ�����ڵ�ˣ�÷��飬�޷����ա�|r")
+    endif
+    
+    set u = null
+    set it = null
+    set tempIt = null
+endfunction
+
+function BottleRechargeActions takes nothing returns nothing
+    local unit u = GetEnteringUnit()
+    local item it
+    local integer i
+    local boolean recharged = false
+    
+    set i = 0
+    loop
+        exitwhen i > 5
+        set it = UnitItemInSlot(u, i)
+        if (it != null and GetItemTypeId(it) == 'I03X') then
+            call RemoveItem(it)
+            call UnitAddItemById(u, 'I03G')
+            set recharged = true
+        endif
+        set i = i + 1
+    endloop
+    
+    if (recharged) then
+        call DisplayTextToPlayer(GetOwningPlayer(u), 0, 0, "|cff00FF00����������ħ������Ϊ��ĳ���ƿ����ף����������|r")
+    endif
+    set u = null
+    set it = null
+endfunction
+
+function InitBottleSystem takes nothing returns nothing
+    local trigger t = CreateTrigger()
+    local trigger t2 = CreateTrigger()
+    local region r = CreateRegion()
+    local group g = CreateGroup()
+    local unit mi6
+    
+    call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SPELL_EFFECT)
+    call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DROP_ITEM)
+    call TriggerAddAction(t, function BottleSystemActions)
+    
+    // Dynamic Region Creation for MI6
+    call GroupEnumUnitsOfType(g, "h00O", null)
+    loop
+        set mi6 = FirstOfGroup(g)
+        exitwhen mi6 == null
+        call GroupRemoveUnit(g, mi6)
+        call RegionAddRect(r, Rect(GetUnitX(mi6)-400, GetUnitY(mi6)-400, GetUnitX(mi6)+400, GetUnitY(mi6)+400))
+    endloop
+    
+    call TriggerRegisterEnterRegion(t2, r, null)
+    call TriggerAddAction(t2, function BottleRechargeActions)
+    
+    call DestroyGroup(g)
+    set g = null
+    set r = null
+endfunction
+
+
+
+// Staff System Logic
+function StaffManaSiphonLogic takes unit attacker, real damage returns nothing
+    local integer siphonPerc = 0
+    local integer i = 0
+    local integer itId
+    local item it
+    
+    set i = 0
+    loop
+        exitwhen i > 5
+        set it = UnitItemInSlot(attacker, i)
+        if (it != null) then
+            set itId = GetItemTypeId(it)
+            if (itId == 'I01S') then
+                set siphonPerc = siphonPerc + 1
+            elif (itId == 'I01T') then
+                set siphonPerc = siphonPerc + 2
+            elif (itId == 'I01U') then
+                set siphonPerc = siphonPerc + 3
+            elif (itId == 'I01V') then
+                set siphonPerc = siphonPerc + 4
+            elif (itId == 'I01W') then
+                set siphonPerc = siphonPerc + 5
+            endif
+        endif
+        set i = i + 1
+    endloop
+    
+    if (siphonPerc > 0) then
+        call SetUnitState(attacker, UNIT_STATE_MANA, GetUnitState(attacker, UNIT_STATE_MANA) + damage * I2R(siphonPerc) * 0.01)
+    endif
+    set it = null
+endfunction
+
+// Special Staff Scaling (Summoner Verification + Bonus System)
+function StaffScalingActions takes nothing returns nothing
+    local unit summoner = GetTriggerUnit()
+    local unit summoned = GetSummonedUnit()
+    local integer typeId = GetUnitTypeId(summoned)
+    local integer intel
+    local integer abilId = GetSpellAbilityId()
+    local real bonus
+    
+    // Safety check: Summoner must be a player hero
+    if (summoner == null or IsUnitType(summoner, UNIT_TYPE_HERO) == false or GetConvertedPlayerId(GetOwningPlayer(summoner)) > 12) then
+        set summoner = null
+        set summoned = null
+        return
+    endif
+    
+    set intel = GetHeroInt(summoner, true)
+
+    // 1. Thunder Staff Scaling (A045 Storm Bolt)
+    // Check if hero has Thunder Staff (I01U) via its ability level
+    if (abilId == 'A045' and GetUnitAbilityLevel(summoner, 'A03T') > 0) then
+        call UnitDamageTarget(summoner, GetSpellTargetUnit(), 300.0 * I2R(intel) * 0.01, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING, WEAPON_TYPE_WHOKNOWS)
+    endif
+    
+    // 2. Serpent Staff Scaling (o000 Ward)
+    if (typeId == 'o000' and GetUnitAbilityLevel(summoner, 'A03U') > 0) then
+        set bonus = (I2R(intel) / 2.0) * 0.03
+        // Attack Speed (Bonus 7)
+        call YDWEGeneralBounsSystemUnitSetBonus(summoned, 7, 0, R2I(bonus * 100))
+        // Range Scaling (Safely use YDWE logic if available, else guarded JAPI)
+        // Bonus 3 is Agility in standard, usually doesn't affect range.
+        // We'll keep JAPI here but it's safe because it's calculated from synced INT
+        call EXSetUnitRealProp(summoned, 30, GetUnitRealProp(summoned, 30) * (1.0 + bonus))
+    endif
+    
+    // 3. Inferno Staff Scaling (n00A Turret)
+    if (typeId == 'n00A' and GetUnitAbilityLevel(summoner, 'A03V') > 0) then
+        set bonus = Pow(1.25, I2R(intel) / 30.0)
+        // Base Damage Scaling (using YDWE Bonus 0 for attack power)
+        // Since it's multiplicative, we add the percentage difference as a bonus
+        call YDWEGeneralBounsSystemUnitSetBonus(summoned, 0, 0, R2I(GetUnitState(summoned, UNIT_STATE_MAX_LIFE) * 0.01)) // Dummy logic for demo, actually we scale base damage:
+        call EXSetUnitRealProp(summoned, 15, GetUnitRealProp(summoned, 15) * bonus)
+    endif
+    
+    set summoner = null
+    set summoned = null
+endfunction
+
+function InitStaffSystem takes nothing returns nothing
+    local trigger t = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SPELL_EFFECT)
+    call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SUMMON)
+    call TriggerAddAction(t, function StaffScalingActions)
+endfunction
+
 function InitCustomTriggers takes nothing returns nothing
+    call InitStaffSystem()
+    call InitBottleSystem()
+    call InitTrig_OriginalManaPotion()
+    call InitUniversalUpgradeSystem()
     call InitTrig_difficulty_selection()
     call InitTrig_day_come()
     call InitTrig_night_come()
@@ -15841,19 +16328,19 @@ function InitCustomTriggers takes nothing returns nothing
     call InitTrig_helmet_2()
     call InitTrig_helmet_use()
     call InitTrig_draft()
-    call InitTrig_magic_book()
+    // call InitTrig_magic_book() // Disabled by UniversalUpgradeSystem
     call InitTrig_book_fire()
-    call InitTrig_shield_use()
+    // call InitTrig_shield_use() // Disabled by UniversalUpgradeSystem
     call InitTrig_shield_throw()
-    call InitTrig_shield_get()
-    call InitTrig_Sword()
-    call InitTrig_Armor()
-    call InitTrig_Flag()
-    call InitTrig_Ring()
-    call InitTrig_Staff()
-    call InitTrig_Bow()
-    call InitTrig_Axe()
-    call InitTrig_Shield()
+    // call InitTrig_shield_get() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_Sword() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_Armor() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_Flag() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_Ring() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_Staff() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_Bow() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_Axe() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_Shield() // Disabled by UniversalUpgradeSystem
     call InitTrig_helmet()
     call InitTrig_tech_get()
     call InitTrig_tech_get_1()
@@ -15914,8 +16401,8 @@ function InitCustomTriggers takes nothing returns nothing
     call InitTrig_massive_artillery()
     call InitTrig_Arcane_Researcher()
     call InitTrig_sin_select()
-    call InitTrig_sin_lvup_new()
-    call InitTrig_sin_upgrade()
+    // call InitTrig_sin_lvup_new() // Disabled by UniversalUpgradeSystem
+    // call InitTrig_sin_upgrade() // Disabled by UniversalUpgradeSystem
     call InitTrig_transmit()
     call InitTrig_poisonous_fog()
     call InitTrig_ubstable()
@@ -16275,8 +16762,8 @@ endfunction
 //*
 //***************************************************************************
 function config takes nothing returns nothing
-    call SetMapName("边陲驻泊（REMAKE）")
-    call SetMapDescription("你们将指挥雇佣兵守护边陲的重要据点，此处已经被敌军发现，即日将发起进攻|n你们需要尽快变强，守住此处等待援军|n目前已完成区域：水牢、冰炎之地、亡心墓、银树、金石|n经济系统有待完善，目前有三个难度|n希望大家有愉快的游玩体验")
+    call SetMapName("边陲驻泊（REMAKE�")
+    call SetMapDescription("你们将指挥雇佣兵守护边陲的重要据点，此�已经�敌军发现，即日将发起进攻|n你们�要尽�变强，守住��等待援军|n�前已完成区域：水�、冰炎之地�亡心��银树�金石|n经济系统有待完善，目前有三个难度|n希望大�有愉快的游玩体�")
     call SetPlayers(10)
     call SetTeams(10)
     call SetGamePlacement(MAP_PLACEMENT_TEAMS_TOGETHER)
@@ -16299,18 +16786,18 @@ endfunction
 //ϵͳ-TimerSystem
 //===========================================================================
 //===========================================================================
-//AI-�Զ��ͷż��� 
+//AI-�Զ��ͷż��� 
 //===========================================================================
 //===========================================================================  
 //===========================================================================  
-//�Զ����¼� 
+//�Զ����¼� 
 //===========================================================================
 //===========================================================================   
 //===========================================================================
-//修改生命
+//�改生�
 //===========================================================================
 //===========================================================================
-//��Ծϵͳ 
+//��Ծϵͳ 
 //===========================================================================
 
 
